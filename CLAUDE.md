@@ -88,6 +88,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/view-pipeline.md
 - Railwayへのデプロイ(IaC)
   - docs/dev/railway.md
+- プッシュ通知
+  - docs/dev/push-notification.md
 
 ## 開発の進め方(仕様駆動)
 

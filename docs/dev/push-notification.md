@@ -1,39 +1,82 @@
 # プッシュ通知
 
-通知が追加されたときに、Subscopeのwebクライアントへ Web Push(VAPID)でプッシュ通知を送る。外部サービスは使わず、workerがブラウザのプッシュサーバーへ直接送る。
+## 概要
 
-このファイルは実装前の設計書。実装するPRで、下の「仕様」を docs/specs に移し、テストと実装を同じPRに入れる。すべて実装したら、このファイルは消す。
+メンバー宛ての通知が追加されたときに、Subscopeのwebクライアントへ Web Push(VAPID)でプッシュ通知を送る。外部サービスは使わず、workerがブラウザのプッシュサーバー(FCM、Mozilla、Appleなど)へ直接送る。振る舞いの仕様は docs/specs/worker.md の「プッシュ通知の送信」と docs/specs/web-client.md の「プッシュ通知」に書く。
 
 ## 方針
 
-- 対象はSubscopeのwebクライアントだけにする。公式アプリのプッシュはBlueskyのAPNs/FCMの鍵で送られ、PDSは `app.bsky.notification.registerPush` を本文の `serviceDid` へ転送するので、Subscopeからは送れない。`registerPush` は実装しない
-- 通知の6種類(like、repost、follow、reply、quote、mention)をすべて送る。種類ごとのオン/オフは作らない
-- 端末ごとにオプトインする。通知ページの切り替えを本人が押したときだけ、ブラウザに許可を求めて購読する
-- 本文に相手の名前と投稿の本文を入れる。Web Pushの本文は端末の鍵で暗号化されるので、プッシュサーバーには読まれない
-- VAPID鍵を設定していないサーバーでは、プッシュ通知の機能を出さない。セルフホストで鍵の設定を必須にしないため
+- **対象はSubscopeのwebクライアントだけ**: 公式アプリのプッシュはBlueskyが持つAPNs/FCMの鍵で送られ、PDSは `app.bsky.notification.registerPush` を本文の `serviceDid` へ転送する。Subscopeからは公式アプリに送れないので、`registerPush` は実装しない。公式アプリの利用者には、これまで通りBlueskyからプッシュが届く
+- **外部サービスを使わない**: VAPIDの鍵ペアを環境変数に入れるだけで動くようにし、セルフホストの手間を増やさない
+- **鍵がなければ機能を出さない**: VAPID鍵は本番でも任意にする。未設定のサーバーでは切り替えを表示せず、何も送らない。鍵を設定し忘れても、デプロイ直後に止まらない
+- **6種類すべてを送る**: like、repost、follow、reply、quote、mention。種類ごとのオン/オフは持たない
+- **端末ごとのオプトイン**: 通知ページの切り替えを本人が押したときだけ、ブラウザに許可を求めて購読する。設定はアカウントではなく端末に付く
+- **本文に名前と投稿を入れる**: Web Pushの本文は端末の鍵で暗号化されるので、プッシュサーバーには読まれない
 
 ## 全体の流れ
 
 ```
 [web] 通知ページで「オンにする」
-  → ブラウザが /sw.js を登録し、PushManager.subscribe で購読を作る
-  → POST /api/push-subscription で購読を push_subscriptions に保存
-[worker] Tapからliveのレコードを受け取り、通知を新しく保存する
-  → コミット後に sendPushNotification ジョブを積む
-  → ジョブが購読を読み、web-push で暗号化してプッシュサーバーへ送る
-[ブラウザ] /sw.js が push を受けて通知を出し、タップで /notifications を開く
+  → ブラウザがService Workerを登録して購読を作る
+  → webが購読をDBに保存する
+[worker] Tapからリアルタイムに受け取ったレコードで、通知を新しく保存する
+  → コミット後にプッシュ送信ジョブを積む
+  → ジョブが購読を読み、暗号化してプッシュサーバーへ送る
+[ブラウザ] Service Workerが通知を出し、タップで /notifications を開く
 ```
 
-## 仕様
+## データ
 
-### docs/specs/worker.md に追加する節
+購読は `push_subscriptions` テーブルに置く。
 
-「通知の生成」の節の後に置く。
+| 列           | 内容                                                    |
+| ------------ | ------------------------------------------------------- |
+| `endpoint`   | 主キー。ブラウザが発行するプッシュサーバーのURL         |
+| `accountDid` | 受け取るメンバー。`accounts` を参照し、削除時は連鎖削除 |
+| `p256dh`     | 本文の暗号化に使う端末の公開鍵                          |
+| `auth`       | 本文の暗号化に使う端末の秘密値                          |
+| `createdAt`  | 登録した時刻                                            |
 
-```md
-## プッシュ通知の送信
+- 1つの端末は1行。同じ端末で別のアカウントがオンにしたら、その行を上書きする。共有の端末では、最後にオンにしたアカウントの通知だけが届く
+- 1アカウントあたりの端末数に上限は設けない。メンバーは招待制で、悪用で増えすぎる心配が小さいため
 
-通知を作ったときに、受け取るメンバーが登録した端末へ Web Push でプッシュ通知を送る。タイトルは通知ページと同じ文にし、相手の名前は表示名、なければハンドル、それもなければDIDにする。
+## 環境変数
+
+| 変数                | 使う場所    | 用途                                   |
+| ------------------- | ----------- | -------------------------------------- |
+| `VAPID_PUBLIC_KEY`  | web, worker | ブラウザの購読と、送信時の署名に使う   |
+| `VAPID_PRIVATE_KEY` | worker      | 送信時の署名に使う                     |
+| `VAPID_SUBJECT`     | worker      | プッシュサーバーに伝える運営者の連絡先 |
+
+- 鍵は `npx web-push generate-vapid-keys` で作る
+- 開発とE2Eでは、コミットした既定値を使う。webとworkerで同じ公開鍵にする
+- 本番では3つとも任意。webに公開鍵がなければ購読が作られないので、workerにも何も届かない
+
+## worker
+
+### いつ送るか
+
+通知を保存する処理を1か所にまとめ、そこで送るかを決める。like・repost・follow・postの各indexerは通知を直接保存せず、この処理を通す。送るのは次をすべて満たす通知だけ。
+
+- **新しく保存した**: 保存は重複を無視し、新しく入った通知だけを返す。レコードの更新や再受信で同じ通知を作り直しても送らない
+- **リアルタイムに受け取った**: Tapの `live` が真で、かつTapから直接受け取ったレコード(取得しに行ったレコードではない)。バックフィルや、引用先・返信先を取りに行って保存した過去の投稿の通知を送らないため
+- **作成から10分以内**: workerが止まっていた間にTapが溜めたイベントをまとめて受け取ったときに、古い通知が大量に届くのを防ぐため。時刻は通知の並び順に使う `sortAt`(作成日時と受信日時の早いほう)で見る
+
+条件を満たした通知ごとに、トランザクションのコミット後にジョブを1つ積む。ジョブには通知を特定するキー(レコードのURIと受け取るDID)だけを入れ、中身はジョブの実行時にDBから読む。
+
+### ジョブ
+
+- キューは `sendPushNotification`。リトライしない。既存のリトライ間隔(10秒・1分・1時間・1日)では、遅れて届く通知に意味がないため
+- ジョブは次の順に処理する
+  1. 通知の中身と、受け取るメンバーの購読を読む。通知が消えていれば(いいねの取り消しなど)、何もしない
+  2. 購読ごとに送る。1台の失敗は他の端末に影響させず、ログに残すだけにする
+  3. プッシュサーバーが404か410を返した購読は、端末側で解除されたものとして削除する
+- 送信は `web-push` で暗号化したリクエストを作り、送るのはNode.jsの `fetch` で行う。`web-push` の送信関数はhttpsにしか送れず、E2Eでローカルの受け口に送れないため
+- `web-push` はインターフェースの裏に閉じ込め、テストでは送った内容を記録するin-memory実装に差し替える
+
+### 本文
+
+本文はJSONで、タイトル・本文・タグの3つを持つ。
 
 | reason  | タイトル                       | 本文             |
 | ------- | ------------------------------ | ---------------- |
@@ -44,270 +87,54 @@
 | quote   | {名前}さんが引用しました       | その投稿の本文   |
 | mention | {名前}さんがメンションしました | その投稿の本文   |
 
-対象の投稿を保存していないときは、本文を空にする。
+- タイトルは通知ページと同じ文にする。名前は表示名、なければハンドル、それもなければDID
+- 対象の投稿を保存していなければ、本文は空にする。本文は切り詰めない(投稿は300文字以内で、Web Pushの上限4KBに収まる)
+- タグは、like・repostなら種類と対象の投稿、それ以外は通知のレコードにする。同じタグの通知は端末上で置き換わるので、1つの投稿へのいいねが続いても1件にまとまる
 
-- push-1: 通知を作ると、受け取るメンバーが登録したすべての端末にプッシュ通知を送る
-- push-2: Tapからリアルタイムに受け取ったレコードの通知だけを送り、バックフィルで受け取ったレコードや、取得しに行ったレコードの通知は送らない
-- push-3: 作成日時が10分より前の通知は送らない
-- push-4: すでに保存していた通知は、レコードの更新や再受信で作り直しても送らない
-- push-5: 送る前に取り消された通知は送らない
-- push-6: タイトルと本文を、通知の種類に合わせて上の表のとおりにする
-- push-7: いいねとリポストは、同じ投稿への同じ種類の通知が端末上で1件にまとまるようにする
-- push-8: プッシュサーバーが404か410を返した端末の登録を削除する
-```
+## web
 
-push-3は、workerが止まっていた間にTapが溜めたイベントをまとめて受け取ったときに、古い通知が大量に届くのを防ぐため。
+### API
 
-### docs/specs/web-client.md
+ログインが必要な `/api/push-subscription` を1つ置く。
 
-「PWA」の節の説明文を次に変える。
+- GET: VAPIDの公開鍵を返す。未設定ならnull
+- POST: 購読(endpointと2つの鍵)を、ログイン中のメンバーの端末として保存する
+- DELETE: endpointを受け取り、ログイン中のメンバーの購読なら削除する
 
-```md
-ブラウザやOSのホーム画面にアプリとしてインストールできるようにする。Service Workerはプッシュ通知のためだけに使い、オフライン動作には対応しない。
-```
+購読の保存はappviewを経由せず、OAuthのセッションと同じくwebからDBに直接書く。購読はwebクライアントだけの関心で、XRPCとして公開する必要がないため。
 
-「通知」の節の後に、次の節を追加する。
+本番では、endpointが `https://` で始まるものだけを受け付ける。workerがメンバーの指定した任意のURLへ送らないようにするため。
 
-```md
-## プッシュ通知
+### Service Worker
 
-通知ページ(`/notifications`)の見出し「通知」の下に、この端末でプッシュ通知を受け取るかの切り替えを1行で表示する。切り替えは端末ごとで、アカウントの設定ではない。プッシュ通知をタップすると `/notifications` を開く。サーバーにVAPID鍵が設定されていないときは、この行を表示しない。
+- `/sw.js` に置く、ビルドしない素のJS。プッシュを受けて通知を出すことと、タップで `/notifications` を開くことだけを行う
+- 「オンにする」を押したときに初めて登録する。オンにしない人の端末には登録しない
+- オフライン動作には使わない
 
-- pushSetting-e1: 「オンにする」を押すと、通知が追加されたときにその端末へプッシュ通知を送る
-- pushSetting-e2: 「オフにする」を押すと、その端末へプッシュ通知を送らない
-- pushSetting-e3: ログアウトすると、その端末へプッシュ通知を送らない
-- pushSetting-s1: 受け取らない設定のときは「プッシュ通知はオフです」と「オンにする」ボタンを表示する
-- pushSetting-s2: 受け取る設定のときは「プッシュ通知はオンです」と「オフにする」ボタンを表示する
-- pushSetting-s3: ブラウザで通知をブロックしているときは、ボタンを出さず「ブラウザで通知がブロックされています。ブラウザの設定から許可してください」と表示する
-- pushSetting-s4: プッシュ通知に対応していないブラウザでは、ボタンを出さず「このブラウザはプッシュ通知に対応していません。iPhoneとiPadではホーム画面に追加すると使えます」と表示する
-- pushSetting-s5: 切り替えている間は、ボタンを押せなくしてスピナーを表示する
-```
+### 切り替えの状態
 
-## 実装
+ブラウザと端末の状態から、次の5つのどれかを決める。上から順に判定する。
 
-### PRの分け方
+| 状態          | 条件                                                               | 表示                                                     |
+| ------------- | ------------------------------------------------------------------ | -------------------------------------------------------- |
+| `unavailable` | サーバーに公開鍵がない                                             | 何も出さない                                             |
+| `unsupported` | ブラウザにService Worker・Push API・Notification APIのどれかがない | 非対応の案内(iPhone・iPadはホーム画面に追加すると使える) |
+| `denied`      | ブラウザで通知がブロックされている                                 | ブラウザの設定で許可するよう案内                         |
+| `on`          | この端末に購読がある                                               | 「オフにする」                                           |
+| `off`         | それ以外                                                           | 「オンにする」                                           |
 
-1. DBとworker: テーブル、環境変数、ジョブ、送信。worker.md の仕様とテスト
-2. web: 環境変数、API、Service Worker、切り替えのUI、ログアウト。web-client.md の仕様、E2E、story、VRTのスナップショット
+- 状態はサーバーではなくブラウザが持つ。サーバーには「この端末がオンか」を問い合わせない
+- 状態はTanStack Queryの1つのキーで持ち、切り替えたら取り直す。storyではこのキーにデータを入れて、状態ごとの見た目を出す
+- 読み込み中と、読み込みに失敗したときは何も出さない。SSRでも出さない
+- 切り替えは、オンなら許可を求めてから購読して保存し、オフなら購読を解除して削除する。切り替えている間はボタンを押せなくする
 
-1をマージしてから2に取りかかる。1だけをデプロイしても購読が0件なので、何も送らない。
+### ログアウト
 
-### DB(PR1)
+ログアウトするときは、送信の前にその端末の購読を解除して削除する。共有の端末で、ログアウトした人の通知が届き続けないようにするため。解除に失敗してもログアウトは続ける。
 
-`packages/db/src/schema.ts` に追加し、`pnpm --filter @repo/db db:generate` でマイグレーションを作る。
+## テスト
 
-```ts
-export const pushSubscriptions = pgTable(
-  "push_subscriptions",
-  {
-    endpoint: text().primaryKey(),
-    accountDid: varchar({ length: 256 })
-      .notNull()
-      .references(() => accounts.did, { onDelete: "cascade" }),
-    p256dh: varchar({ length: 256 }).notNull(),
-    auth: varchar({ length: 256 }).notNull(),
-    createdAt: timestamp().notNull(),
-  },
-  (table) => [index("push_subscriptions_account_idx").on(table.accountDid)],
-);
-```
-
-- 主キーは `endpoint`。同じ端末で別のアカウントがオンにしたら、`accountDid` と鍵を上書きする(最後にオンにしたアカウントの通知だけが届く)
-- 1アカウントあたりの端末数に上限は設けない
-
-### 環境変数
-
-鍵は `npx web-push generate-vapid-keys` で作る。開発用の既定値は一度だけ作ってコミットする(webとworkerで同じ公開鍵にする)。本番では任意にし、未設定なら機能を出さない。
-
-| 変数                | 使う場所    | 本番 | 開発の既定値             |
-| ------------------- | ----------- | ---- | ------------------------ |
-| `VAPID_PUBLIC_KEY`  | web, worker | 任意 | 生成してコミット         |
-| `VAPID_PRIVATE_KEY` | worker      | 任意 | 生成してコミット         |
-| `VAPID_SUBJECT`     | worker      | 任意 | `mailto:dev@example.com` |
-
-- web: `apps/web/app/server/env.ts` に `VAPID_PUBLIC_KEY` を `ADMIN_API_TOKEN` と同じ `match` の書き方で足す
-- worker: `apps/worker/src/shared/env.ts` に3つ足す。workerの `match` は `NODE_ENV` だけを見ているので、E2Eでも開発の既定値になる
-- PR1で `.railway/railway.ts` のworkerに3つ、PR2でwebに `VAPID_PUBLIC_KEY` を `preserve()` で足す。`deploy/compose.yaml`(`${VAPID_PUBLIC_KEY:-}` の形で任意にする)、`deploy/.env.example`、`docs/user/deploy.md`、`docs/dev/railway.md` の初回セットアップにも足す
-
-### worker(PR1)
-
-#### 通知を保存したらジョブを積む
-
-- `INotificationRepository.save` の戻り値を `Promise<Notification[]>` にし、`NotificationRepository` は `.onConflictDoNothing().returning()` で新しく入った通知だけを返す(push-4)
-- `application/services/notification-service.ts` に `NotificationService` を作り、indexerは `INotificationRepository` の代わりにこれを使う。like・repost・follow・post の4つのindexerの `notificationRepository.save(...)` を置き換える
-
-```ts
-export class NotificationService {
-  constructor(
-    private readonly notificationRepository: INotificationRepository,
-    private readonly jobScheduler: IJobScheduler,
-  ) {}
-
-  async create({
-    ctx,
-    notifications,
-    live,
-    depth,
-  }: {
-    ctx: AfterCommitContext;
-    notifications: Notification[];
-    live: boolean;
-    depth: number;
-  }) {
-    const saved = await this.notificationRepository.save({
-      ctx,
-      notifications,
-    });
-    if (!live || depth > 0) return; // push-2
-    const threshold = Date.now() - 10 * 60 * 1000;
-    for (const n of saved) {
-      if (n.sortAt.getTime() < threshold) continue; // push-3
-      ctx.afterCommit(() => this.jobScheduler.scheduleSendPushNotification(n));
-    }
-  }
-}
-```
-
-- indexerの `upsert` は `depth` も受け取っているので、そのまま渡す(like・repost・followは引数の分割代入に `live`・`depth` を足す)
-- `PostIndexer.createNotifications` の引数の型は `AfterCommitContext` に変える
-
-#### ジョブ
-
-- `packages/common/src/lib/interface/job-queue.ts` の `JobData` に `sendPushNotification: { recordUri: string; recipientDid: string }` を足す
-- `IJobScheduler` に `scheduleSendPushNotification(notification: { recordUri: string; recipientDid: string })` を足し、`JobScheduler` と `InMemoryJobScheduler` に実装する。`jobId` や重複除去は付けない(重複はpush-4で防いでいる)
-- `JobQueue` のキューは `queueOptions()`(リトライなし)で作る。リトライの間隔が10秒・1分・1時間・1日で、遅れて届く通知に意味がないため
-- `SyncWorker` に `createWorker("sendPushNotification", ..., { concurrency: 8 })` を足す
-
-#### 送信のユースケース
-
-`application/use-cases/async/send-push-notification-use-case.ts`。
-
-1. トランザクションの中で `IPushNotificationQuery.findContent({ recordUri, recipientDid })` で通知の中身を読む。なければ終わる(push-5)
-2. 同じトランザクションで `IPushSubscriptionQuery.findByAccountDid(recipientDid)` で端末を読む。0件なら終わる
-3. トランザクションの外で、端末ごとに `IPushSender.send(subscription, payload)` を呼ぶ。`Promise.all` で並べ、1台の失敗が他の端末に影響しないよう、端末ごとに例外をつかんでwarnログにする
-4. 結果のステータスが404か410の端末は、`IPushSubscriptionRepository.delete({ ctx, endpoint })` で消す(push-8)
-
-payloadはJSON文字列にする。
-
-```ts
-{
-  title: string;
-  body: string;
-  tag: string;
-}
-```
-
-- `tag` は like と repost なら `${reason}:${reasonSubject}`、それ以外は `recordUri`(push-7)
-- 名前と本文は `findContent` が `notifications` から `accounts.handle`・`profiles.displayName`・`posts.text` を結合して返す。本文は like・repost なら `reasonSubject` の投稿、それ以外は `recordUri` の投稿、follow なら空
-- 本文は切り詰めない(投稿は300文字以内で、Web Pushの上限4KBに収まる)
-
-#### 置き場所
-
-| interface                                                                                   | 実装                                                                      |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `queries/push-notification-query.ts` `IPushNotificationQuery`                               | `infrastructure/queries/push-notification-query.ts`                       |
-| `queries/push-subscription-query.ts` `IPushSubscriptionQuery`                               | `infrastructure/queries/push-subscription-query.ts`                       |
-| `repositories/push-subscription-repository.ts` `IPushSubscriptionRepository`(`delete` だけ) | `infrastructure/repositories/push-subscription-repository/`               |
-| `external/push-sender.ts` `IPushSender`                                                     | `infrastructure/push-sender/push-sender.ts` と `push-sender.in-memory.ts` |
-
-既存のクエリ・リポジトリと同じ並びに置き、`shared/registry.ts` に登録する。
-
-#### IPushSender
-
-```ts
-export interface IPushSender {
-  send: (
-    subscription: { endpoint: string; p256dh: string; auth: string },
-    payload: string,
-  ) => Promise<{ statusCode: number }>;
-}
-```
-
-- 実装は `web-push` を使う。`webpush.sendNotification` は https しか送れないので、`webpush.generateRequestDetails(subscription, payload, { vapidDetails, TTL: 24 * 60 * 60, urgency: "high" })` で暗号化したリクエストを作り、`fetch(details.endpoint, { method: details.method, headers: details.headers, body: details.body })` で送る。E2Eで `http://127.0.0.1` の受け口に送れるようにするため
-- VAPIDの3つの環境変数のどれかがなければ、`send` は `Error("VAPID keys are not configured")` を投げる。webに公開鍵がなければ購読は作られないので、ここに来るのは設定の誤りのときだけ
-- `web-push` は worker の dependencies に足す(型は `@types/web-push`)。registryで直接importせず、このクラスの中に閉じ込める
-- in-memory実装は送った `{ subscription, payload }` を配列に貯め、`setStatusCode(endpoint, code)` で返すステータスを変えられるようにする(既定は201)
-
-#### テスト
-
-`apps/worker/src/presentation/push-notification.test.ts` に push-1〜push-8 を1つずつ書く。`sync-tap-repo.test.ts` と同じく `setupJobTest` で `indexCommit` からジョブの実行までを通す。
-
-- `shared/job-test-utils.ts` に `runSendPushNotificationJobs` と、in-memoryの `IPushSender` を返すようにする
-- 購読は `@repo/test-utils` にファクトリを足すか、テスト内で `ctx.db.insert(schema.pushSubscriptions)` する
-- push-2は `live: false` のイベントと、`fetchRecord` で取得した投稿(depth 1)の両方で送らないことを確かめる
-- push-3は `createdAt` を11分前にしたレコードで確かめる
-- push-4は同じ投稿の `update` イベントを送り直す
-- push-5はジョブを実行する前にいいねを削除する
-- push-7は同じ投稿への2件のいいねの `tag` が同じで、リプライの `tag` が別になることを確かめる
-
-既存の notify-* のテストは indexer のテストにあり、indexerの依存が `NotificationService` に変わるので、そのテストのregistryも合わせて直す。
-
-### web(PR2)
-
-#### API
-
-`apps/web/app/routes/api.push-subscription.ts`。`loginRequiredMiddleware` を付ける。
-
-- loader(GET): `{ vapidPublicKey: string | null }` を返す
-- action(POST): JSON `{ endpoint, keys: { p256dh, auth } }` を受け取り、`push_subscriptions` に upsert する。`createdAt` は今
-- action(DELETE): JSON `{ endpoint }` を受け取り、`endpoint` とログイン中のDIDの両方が一致する行を消す
-
-入力はフォームではないので、conformではなくzodで検証する。`endpoint` は `z.url()` にし、本番(`isProduction`)では `https://` で始まるものだけを受け付ける。workerが任意のURLへPOSTしないようにするため。
-
-ユースケースは `application/notification/save-push-subscription-use-case.ts` と `delete-push-subscription-use-case.ts`、DBへの書き込みは `infrastructure/notification/push-subscription-command.ts`(`IPushSubscriptionCommand`)。公開鍵はroutesで `env` から読んでよい。webはOAuthのセッションと同じく `di.db` で直接書く(appviewを経由しない)。
-
-#### Service Worker
-
-`apps/web/public/sw.js`(ビルドしない素のJS)。
-
-```js
-self.addEventListener("push", (event) => {
-  const { title, body, tag } = event.data.json();
-  event.waitUntil(
-    self.registration.showNotification(title, {
-      body,
-      tag,
-      icon: "/icon-192.png",
-    }),
-  );
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  event.waitUntil(self.clients.openWindow("/notifications"));
-});
-```
-
-Service Workerは「オンにする」を押したときに初めて登録する。オンにしない人には登録しない。
-
-#### ブラウザ側の処理
-
-`apps/web/app/lib/push-subscription.ts` に置く。
-
-- `getPushStatus(vapidPublicKey: string | null)`: 次の順に判定して返す
-  1. `vapidPublicKey` が null → `"unavailable"`
-  2. `serviceWorker`・`PushManager`・`Notification` のどれかがない → `"unsupported"`
-  3. `Notification.permission === "denied"` → `"denied"`
-  4. `navigator.serviceWorker.getRegistration()` の `pushManager.getSubscription()` があれば `"on"`、なければ `"off"`
-- `subscribePush(vapidPublicKey)`: `Notification.requestPermission()` が `"granted"` でなければ終わる。`navigator.serviceWorker.register("/sw.js")` → `navigator.serviceWorker.ready` → `pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidPublicKey })` → `subscription.toJSON()` を POST する
-- `unsubscribePush()`: 購読があれば `unsubscribe()` して、その `endpoint` を DELETE する。なければ何もしない
-
-#### UI
-
-- `features/notification/push-setting.tsx`(Presentational)と `push-setting-container.tsx`(Container)を作り、`NotificationPanel` の見出しの下に置く。行は左に文、右にボタン。見た目は apps/web/DESIGN.md に従う
-- Containerは TanStack Query のキー `["pushSetting"]` で `{ status }` を取る。queryFnは `/api/push-subscription` を取ってから `getPushStatus` を呼ぶ。SSR中は取らない(`unavailable` と同じく何も出さない)
-- 切り替えは `useMutation` で `subscribePush` / `unsubscribePush` を呼び、終わったら `["pushSetting"]` を invalidate する。実行中はボタンを disabled にしてスピナーを出す(pushSetting-s5)
-- `status` ごとの表示は仕様の pushSetting-s1〜s4 のとおり。`unavailable` と、読み込み中・読み込みに失敗したときは何も出さない
-- ログアウト: `side-nav.tsx` と `mobile-header.tsx` のログアウトのフォームで、送信の前に `unsubscribePush()` を待つ(失敗しても無視してログアウトする)
-
-#### テスト
-
-- play: `apps/web/app/pages/client/notifications-page.stories.tsx` に pushSetting-s1〜s5 のstoryを足す。`queryClient.setQueryData(["pushSetting"], { status })` で状態を決める。s5は `status: "off"` にし、storyの `beforeEach` で `Notification.requestPermission` を終わらない Promise を返す関数に差し替えてから「オンにする」を押す。pages配下のstoryはVRTの対象なので、足したstoryのスナップショットも追加する
-- E2E: `e2e/tests/web-client/push-setting.spec.ts` に pushSetting-e1〜e3 を書く
-  - テストの中で `http.createServer` を `127.0.0.1` の空いているポートで立て、受け取ったリクエストのパスを記録する(201を返す)。これをプッシュサーバーの代わりにする
-  - `context.grantPermissions(["notifications"])` で許可し、`page.addInitScript` で `PushManager.prototype.subscribe` と `getSubscription` を差し替える。`subscribe` は呼ばれるたびに用意した endpoint(`http://127.0.0.1:{port}/a`、`/b` …)を順に使った購読を返し、`unsubscribe()` で消える。鍵は `crypto.createECDH("prime256v1")` で作った公開鍵(base64url)と16バイトの `auth` を渡す(workerが実際に暗号化するため)
-  - 通知は notification.spec.ts と同じく、alice の投稿に bob がいいねして起こす
-  - e1: オン(`/a`)→ いいね → `/a` に届く
-  - e2: オン(`/a`)→ オフ → オン(`/b`)→ いいね → `/b` に届き、`/a` には届かない
-  - e3: オン(`/a`)→ ログアウト。別のcontext(aliceのstorageState)でオン(`/b`)→ いいね → `/b` に届き、`/a` には届かない
-  - e2・e3 は届かないことを待つのではなく、後から登録した端末に届いたことを確かめてから、先の端末に届いていないことを見る。同じ通知は1つのジョブで全端末に送るので、これで決まる
+- workerは、Tapのイベントを処理してからジョブを実行するまでを通し、in-memoryの送信先に記録された内容で確かめる
+- webのE2Eは、本物のプッシュサーバーの代わりに、テストの中でHTTPサーバーを立てて受け口にする。ブラウザの購読は、受け口のURLと実際に暗号化できる鍵を返すよう差し替える。workerが本当に暗号化して送るところまで通すため
+- 「送らない」ことは、届かないのを待って確かめない。後から登録した別の端末に届いたことを確かめてから、先の端末に届いていないことを見る。同じ通知は1つのジョブで全端末に送るので、これで決まる
+- 状態ごとの見た目はstoryのplayテストにする
