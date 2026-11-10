@@ -74,7 +74,12 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
   return (
     <section>
       {refreshing && (
-        <div className="relative h-0">
+        <div
+          className="
+            sticky top-25.25 h-0
+            lg:top-11.25
+          "
+        >
           <div
             className="
               pointer-events-none absolute inset-x-0 top-2 z-raised flex
