@@ -118,10 +118,12 @@ export const Loading: Story = {
   tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["thread", alice.handle] });
-    void queryClient.query({
-      queryKey: ["thread", alice.handle, "selected"],
-      queryFn: () => new Promise<never>(() => {}),
-    });
+    queryClient
+      .query({
+        queryKey: ["thread", alice.handle, "selected"],
+        queryFn: () => new Promise<never>(() => {}),
+      })
+      .catch(() => {});
   },
   play: async ({ canvasElement }) => {
     await expect(
