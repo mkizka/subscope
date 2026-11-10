@@ -36,6 +36,96 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const setPost = (external: NonNullable<TimelinePost["external"]>) =>
+  queryClient.setQueryData(
+    ["timeline"],
+    infinite<typeof timelineLoader>({
+      posts: [
+        {
+          uri: "at://did:plc:example1/app.bsky.feed.post/1",
+          cid: "bafyexample1",
+          authorHandle: "alice.bsky.social",
+          authorDisplayName: "Alice",
+          text: "リンク付きの投稿",
+          replyCount: 0,
+          repostCount: 0,
+          likeCount: 0,
+          createdAt: new Date().toISOString(),
+          external,
+        },
+      ],
+    }),
+  );
+
+const tweet = {
+  uri: "https://x.com/jack/status/20",
+  title: "ツイート",
+  description: "ツイートの説明",
+};
+
+export const LinkCard: Story = {
+  name: "link-card-s1: リンクカードのサムネイル・タイトル・説明を投稿の中に表示し、選ぶとリンク先を新しいタブで開く",
+  tags: ["play"],
+  beforeEach: () => {
+    setPost({
+      uri: "https://example.com/link-card",
+      title: "リンクカードのタイトル",
+      description: "リンクカードの説明",
+      thumb:
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E",
+    });
+  },
+  play: async ({ canvasElement }) => {
+    const card = within(canvasElement).getByRole("link", {
+      name: /リンクカードのタイトル/,
+    });
+    await expect(card).toHaveTextContent("リンクカードの説明");
+    await expect(card).toHaveAttribute("href", "https://example.com/link-card");
+    await expect(card).toHaveAttribute("target", "_blank");
+    await waitFor(() =>
+      expect(card.querySelector("img")?.naturalWidth).toBeGreaterThan(0),
+    );
+  },
+};
+
+export const TweetEmbed: Story = {
+  name: "link-card-s2: リンク先がx.com・twitter.comのツイートの場合は、リンクカードの代わりにツイートを埋め込んで表示する",
+  tags: ["play"],
+  beforeEach: () => {
+    setPost(tweet);
+  },
+  play: async ({ canvasElement }) => {
+    const embed = canvasElement.querySelector("[data-tweet-id]");
+    await expect(embed).toHaveAttribute("data-tweet-id", "20");
+    await expect(
+      within(canvasElement).queryByRole("link", { name: /ツイートの説明/ }),
+    ).toBeNull();
+    await waitFor(() =>
+      expect(
+        document.querySelector("script[src$='/widgets.js']"),
+      ).not.toBeNull(),
+    );
+  },
+};
+
+export const TweetEmbedClick: Story = {
+  name: "link-card-s3: 埋め込んだツイートの中を選んだ場合は、投稿の詳細へ遷移せずツイート側の操作を優先する",
+  tags: ["play"],
+  beforeEach: () => {
+    setPost(tweet);
+  },
+  play: async ({ canvasElement }) => {
+    const embed = canvasElement.querySelector("[data-tweet-id]");
+    if (!(embed instanceof HTMLElement)) throw new Error("embed not found");
+    const content = document.createElement("div");
+    content.style.height = "40px";
+    embed.append(content);
+    const rect = embed.getBoundingClientRect();
+    const hit = document.elementFromPoint(rect.left + 5, rect.top + 5);
+    await expect(embed.contains(hit)).toBe(true);
+  },
+};
+
 export const Default: Story = {};
 
 export const Empty: Story = {
@@ -482,92 +572,171 @@ export const PostFormAltLimit: Story = {
   },
 };
 
-const setPost = (external: NonNullable<TimelinePost["external"]>) =>
-  queryClient.setQueryData(
-    ["timeline"],
-    infinite<typeof timelineLoader>({
-      posts: [
-        {
-          uri: "at://did:plc:example1/app.bsky.feed.post/1",
-          cid: "bafyexample1",
-          authorHandle: "alice.bsky.social",
-          authorDisplayName: "Alice",
-          text: "リンク付きの投稿",
-          replyCount: 0,
-          repostCount: 0,
-          likeCount: 0,
-          createdAt: new Date().toISOString(),
-          external,
-        },
-      ],
-    }),
-  );
+type TimelinePost = Data<typeof timelineLoader>["posts"][number];
 
-const tweet = {
-  uri: "https://x.com/jack/status/20",
-  title: "ツイート",
-  description: "ツイートの説明",
+const dot =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E";
+const image = { thumb: dot, fullsize: dot, alt: "画像" };
+const external = {
+  uri: "https://example.com/quote",
+  title: "リンクカードのタイトル",
+  description: "リンクカードの説明",
 };
 
-export const LinkCard: Story = {
-  name: "link-card-s1: リンクカードのサムネイル・タイトル・説明を投稿の中に表示し、選ぶとリンク先を新しいタブで開く",
-  tags: ["play"],
+const quoting = (post: Partial<TimelinePost>): Story => ({
   beforeEach: () => {
-    setPost({
-      uri: "https://example.com/link-card",
-      title: "リンクカードのタイトル",
-      description: "リンクカードの説明",
-      thumb:
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E",
-    });
-  },
-  play: async ({ canvasElement }) => {
-    const card = within(canvasElement).getByRole("link", {
-      name: /リンクカードのタイトル/,
-    });
-    await expect(card).toHaveTextContent("リンクカードの説明");
-    await expect(card).toHaveAttribute("href", "https://example.com/link-card");
-    await expect(card).toHaveAttribute("target", "_blank");
-    await waitFor(() =>
-      expect(card.querySelector("img")?.naturalWidth).toBeGreaterThan(0),
+    queryClient.setQueryData(
+      ["timeline"],
+      infinite<typeof timelineLoader>({
+        posts: [
+          {
+            uri: "at://did:plc:erin/app.bsky.feed.post/1",
+            cid: "bafyquote",
+            authorHandle: "erin.bsky.social",
+            text: "引用した投稿",
+            createdAt: new Date().toISOString(),
+            ...post,
+          },
+        ],
+      }),
     );
   },
+});
+
+const quote = (canvasElement: HTMLElement) =>
+  within(canvasElement).getByRole("blockquote");
+
+export const QuoteText: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      authorDisplayName: "Alice",
+      text: "引用される投稿",
+    },
+  }),
+  name: "quote-s1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const q = quote(canvasElement);
+    await expect(q).toHaveTextContent("Alice");
+    await expect(q).toHaveTextContent("@alice.bsky.social");
+    await expect(q).toHaveTextContent("引用される投稿");
+  },
 };
 
-export const TweetEmbed: Story = {
-  name: "link-card-s2: リンク先がx.com・twitter.comのツイートの場合は、リンクカードの代わりにツイートを埋め込んで表示する",
+export const QuoteWithMedia: Story = {
+  ...quoting({
+    images: [{ ...image, alt: "引用した投稿の画像" }],
+    quote: { authorHandle: "alice.bsky.social", text: "引用される投稿" },
+  }),
+  name: "quote-s2: 画像付きで引用した投稿は、画像と引用している投稿の両方を表示する",
   tags: ["play"],
-  beforeEach: () => {
-    setPost(tweet);
-  },
   play: async ({ canvasElement }) => {
-    const embed = canvasElement.querySelector("[data-tweet-id]");
-    await expect(embed).toHaveAttribute("data-tweet-id", "20");
     await expect(
-      within(canvasElement).queryByRole("link", { name: /ツイートの説明/ }),
-    ).toBeNull();
-    await waitFor(() =>
-      expect(
-        document.querySelector("script[src$='/widgets.js']"),
-      ).not.toBeNull(),
+      within(canvasElement).getByRole("img", { name: "引用した投稿の画像" }),
+    ).toBeVisible();
+    await expect(quote(canvasElement)).toHaveTextContent("引用される投稿");
+  },
+};
+
+export const QuoteImages: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      text: "引用される投稿",
+      images: [{ ...image, alt: "引用される投稿の画像" }],
+    },
+  }),
+  name: "quote-s3: 引用される投稿に付いた画像を、引用した投稿の中に表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(quote(canvasElement)).getByRole("img", {
+        name: "引用される投稿の画像",
+      }),
+    ).toBeVisible();
+  },
+};
+
+export const QuoteAvatar: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      authorAvatar: dot,
+      text: "引用される投稿",
+    },
+  }),
+  name: "quote-s4: 引用されている投稿の投稿者のアバターを、引用した投稿の中に表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(quote(canvasElement).querySelector("img")).toHaveAttribute(
+      "src",
+      dot,
     );
   },
 };
 
-export const TweetEmbedClick: Story = {
-  name: "link-card-s3: 埋め込んだツイートの中を選んだ場合は、投稿の詳細へ遷移せずツイート側の操作を優先する",
+export const QuoteExternal: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      text: "引用される投稿",
+      external,
+    },
+  }),
+  name: "quote-s5: 引用される投稿に付いたリンクカードを、引用した投稿の中に表示する",
   tags: ["play"],
-  beforeEach: () => {
-    setPost(tweet);
-  },
   play: async ({ canvasElement }) => {
-    const embed = canvasElement.querySelector("[data-tweet-id]");
-    if (!(embed instanceof HTMLElement)) throw new Error("embed not found");
-    const content = document.createElement("div");
-    content.style.height = "40px";
-    embed.append(content);
-    const rect = embed.getBoundingClientRect();
-    const hit = document.elementFromPoint(rect.left + 5, rect.top + 5);
-    await expect(embed.contains(hit)).toBe(true);
+    await expect(
+      within(quote(canvasElement)).getByRole("link", {
+        name: /リンクカードのタイトル/,
+      }),
+    ).toHaveAttribute("href", external.uri);
+  },
+};
+
+export const QuoteDeleted: Story = {
+  ...quoting({ quoteUnavailable: "notFound" }),
+  name: "quote-s6: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(quote(canvasElement)).toHaveTextContent("削除されました");
+  },
+};
+
+export const QuoteFeed: Story = {
+  ...quoting({
+    quotedFeed: {
+      displayName: "フィード名",
+      creatorHandle: "alice.bsky.social",
+      description: "フィードの説明",
+    },
+  }),
+  name: "quote-s7: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const q = quote(canvasElement);
+    await expect(q).toHaveTextContent("フィード名");
+    await expect(q).toHaveTextContent("@alice.bsky.social");
+    await expect(q).toHaveTextContent("フィードの説明");
+  },
+};
+
+export const QuoteLink: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      text: "引用される投稿 example.com/quote...",
+      links: [{ byteStart: 22, byteEnd: 42, uri: "https://example.com/full" }],
+    },
+  }),
+  name: "quote-s8: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(quote(canvasElement)).getByRole("link", {
+        name: "example.com/quote...",
+      }),
+    ).toHaveAttribute("href", "https://example.com/full");
   },
 };
