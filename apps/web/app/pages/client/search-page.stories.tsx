@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { alice, type Data, queryClient } from "@/.storybook/query-client";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
@@ -58,4 +59,20 @@ export const AccountsNotFound: Story = {
 
 export const Empty: Story = {
   args: { q: undefined },
+};
+
+export const NoSidebarSearch: Story = {
+  name: "layout-s10: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない",
+  tags: ["play"],
+  globals: { viewport: { value: "desktop" } },
+  play: async ({ canvasElement }) => {
+    const sidebar = within(canvasElement).getAllByRole("complementary").at(-1);
+
+    await expect(
+      within(canvasElement).getAllByRole("searchbox", { name: "検索語" }),
+    ).toHaveLength(1);
+    await expect(
+      sidebar && within(sidebar).queryByRole("searchbox"),
+    ).toBeNull();
+  },
 };
