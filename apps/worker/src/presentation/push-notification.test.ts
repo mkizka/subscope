@@ -19,6 +19,8 @@ const setupJobTest = async () => {
   return jobTest;
 };
 
+type Nsid = `${string}.${string}.${string}`;
+
 let count = 0;
 const nextRev = () => String(++count).padStart(13, "0");
 
@@ -30,7 +32,7 @@ const createEvent = async ({
   action = "create",
 }: {
   did: string;
-  collection: string;
+  collection: Nsid;
   rkey?: string;
   record: Record<string, unknown>;
   action?: "create" | "update";
@@ -53,7 +55,7 @@ const createEvent = async ({
 
 const deleteEvent = (
   did: string,
-  collection: string,
+  collection: Nsid,
   rkey: string,
 ): RecordEvent => ({
   id: 1,
