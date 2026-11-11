@@ -9,6 +9,7 @@ type Props = {
   displayName?: string;
   handle?: string;
   accountUrl: string | null;
+  onLogout: () => void;
 };
 
 export function Settings({
@@ -16,6 +17,7 @@ export function Settings({
   displayName,
   handle,
   accountUrl,
+  onLogout,
 }: Props) {
   return (
     <>
@@ -52,7 +54,14 @@ export function Settings({
             />
           </a>
         )}
-        <Form method="post" action="/oauth/logout">
+        <Form
+          method="post"
+          action="/oauth/logout"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onLogout();
+          }}
+        >
           <Button type="submit" variant="secondary">
             <LogOutIcon className="size-4" />
             ログアウト

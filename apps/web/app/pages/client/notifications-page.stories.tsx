@@ -1,6 +1,6 @@
 import { asDatetimeString } from "@atproto/syntax";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 import {
   bob,
@@ -8,12 +8,18 @@ import {
   infinite,
   queryClient,
 } from "@/.storybook/query-client";
+import type { PushSettingState } from "@/app/lib/push-setting";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 
 import { NotificationsPage } from "./notifications-page";
 
+const pushSetting = (state: PushSettingState) => () => {
+  queryClient.setQueryData(["pushSetting"], state);
+};
+
 const meta = {
   beforeEach: () => {
+    pushSetting("unavailable")();
     const indexedAt = asDatetimeString(new Date().toISOString());
     queryClient.setQueryData(
       ["notifications"],
@@ -129,6 +135,89 @@ export const IconAndAvatar: Story = {
       within(item).getByRole("img", { name: "フォロー" }),
     ).toBeVisible();
     await expect(item.querySelector(`img[src="${avatarUrl}"]`)).not.toBeNull();
+  },
+};
+
+export const PushSettingOff: Story = {
+  name: "pushSetting-s1: 受け取らない設定のときは「プッシュ通知はオフです」と「オンにする」ボタンを表示する",
+  tags: ["play"],
+  beforeEach: pushSetting("off"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText("プッシュ通知はオフです")).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "オンにする" }),
+    ).toBeVisible();
+  },
+};
+
+export const PushSettingOn: Story = {
+  name: "pushSetting-s2: 受け取る設定のときは「プッシュ通知はオンです」と「オフにする」ボタンを表示する",
+  tags: ["play"],
+  beforeEach: pushSetting("on"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText("プッシュ通知はオンです")).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "オフにする" }),
+    ).toBeVisible();
+  },
+};
+
+export const PushSettingDenied: Story = {
+  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、ボタンを出さず「ブラウザで通知がブロックされています。ブラウザの設定から許可してください」と表示する",
+  tags: ["play"],
+  beforeEach: pushSetting("denied"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByText(
+        "ブラウザで通知がブロックされています。ブラウザの設定から許可してください",
+      ),
+    ).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: /にする$/ })).toBeNull();
+  },
+};
+
+export const PushSettingUnsupported: Story = {
+  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、ボタンを出さず「このブラウザはプッシュ通知に対応していません。iPhoneとiPadではホーム画面に追加すると使えます」と表示する",
+  tags: ["play"],
+  beforeEach: pushSetting("unsupported"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByText(
+        "このブラウザはプッシュ通知に対応していません。iPhoneとiPadではホーム画面に追加すると使えます",
+      ),
+    ).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: /にする$/ })).toBeNull();
+  },
+};
+
+export const PushSettingToggling: Story = {
+  name: "pushSetting-s5: 切り替えている間は、ボタンを押せなくしてスピナーを表示する",
+  tags: ["play"],
+  beforeEach: () => {
+    pushSetting("off")();
+    const original = Notification.requestPermission.bind(Notification);
+    Notification.requestPermission = () => new Promise(() => {});
+    return () => {
+      Notification.requestPermission = original;
+    };
+  },
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole("button", {
+      name: "オンにする",
+    });
+
+    await userEvent.click(button);
+
+    await expect(button).toBeDisabled();
+    await expect(button.querySelector(".animate-spin")).not.toBeNull();
   },
 };
 

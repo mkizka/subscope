@@ -8,6 +8,7 @@ import {
   Repeat2Icon,
   UserPlusIcon,
 } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { NotificationsSkeleton } from "@/app/components/rows-skeleton";
@@ -24,6 +25,7 @@ type Notification = {
 };
 
 type Props = {
+  pushSetting?: ReactNode;
   notifications: Notification[];
   onLoadMore: () => void;
   hasNextPage: boolean;
@@ -68,6 +70,7 @@ const reasons: Record<
 };
 
 export function NotificationPanel({
+  pushSetting,
   notifications,
   onLoadMore,
   hasNextPage,
@@ -76,6 +79,7 @@ export function NotificationPanel({
   return (
     <section aria-label="通知">
       <h2 className="border-b border-line px-4 py-3 text-title">通知</h2>
+      {pushSetting}
       {isLoading ? (
         <NotificationsSkeleton />
       ) : notifications.length === 0 ? (

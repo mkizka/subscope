@@ -30,6 +30,9 @@ import { getNotificationsUseCaseFactory } from "./application/notification/get-n
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { deletePostUseCaseFactory } from "./application/post/delete-post-use-case";
+import { getPushPublicKeyUseCaseFactory } from "./application/push/get-push-public-key-use-case";
+import { subscribePushUseCaseFactory } from "./application/push/subscribe-push-use-case";
+import { unsubscribePushUseCaseFactory } from "./application/push/unsubscribe-push-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
@@ -59,6 +62,7 @@ import { notificationCommandFactory } from "./infrastructure/notification/notifi
 import { notificationQueryFactory } from "./infrastructure/notification/notification-query";
 import { postCommandFactory } from "./infrastructure/post/post-command";
 import { postQueryFactory } from "./infrastructure/post/post-query";
+import { pushSubscriptionCommandFactory } from "./infrastructure/push/push-subscription-command";
 import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
 import { subscopeCommandFactory } from "./infrastructure/subscope/subscope-command";
 import { subscopeQueryFactory } from "./infrastructure/subscope/subscope-query";
@@ -122,6 +126,18 @@ export const di = await createRegistry()
     "markNotificationsSeenUseCase",
     ["notificationCommand"],
     markNotificationsSeenUseCaseFactory,
+  )
+  .service("pushSubscriptionCommand", ["db"], pushSubscriptionCommandFactory)
+  .service("getPushPublicKeyUseCase", getPushPublicKeyUseCaseFactory)
+  .service(
+    "subscribePushUseCase",
+    ["pushSubscriptionCommand"],
+    subscribePushUseCaseFactory,
+  )
+  .service(
+    "unsubscribePushUseCase",
+    ["pushSubscriptionCommand"],
+    unsubscribePushUseCaseFactory,
   )
   .service("timelineQuery", ["oauthClient"], timelineQueryFactory)
   .service("postCommand", ["oauthClient"], postCommandFactory)
