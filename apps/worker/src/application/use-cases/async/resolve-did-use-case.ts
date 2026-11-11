@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { IDidResolver } from "@repo/common/interface";
+import { DidNotFoundError, type IDidResolver } from "@repo/common/interface";
 import { type ITransactionManager } from "@repo/common/interface";
 
 import { Account } from "../../../domain/account.js";
@@ -25,7 +25,13 @@ export class ResolveDidUseCase {
       return;
     }
 
-    const { handle } = await this.didResolver.resolve(did);
+    let handle;
+    try {
+      ({ handle } = await this.didResolver.resolve(did));
+    } catch (error) {
+      if (error instanceof DidNotFoundError) return;
+      throw error;
+    }
     const resolvedDid = await this.handleResolver.resolve(handle);
 
     const account = existingAccount ?? Account.create({ did });
