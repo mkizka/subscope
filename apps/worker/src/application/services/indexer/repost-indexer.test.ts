@@ -105,7 +105,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        live: false,
+        live: true,
         depth: 0,
       });
 

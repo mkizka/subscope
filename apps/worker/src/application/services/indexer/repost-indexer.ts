@@ -42,6 +42,8 @@ export class RepostIndexer implements ICollectionIndexer {
     const subjectUri = new AtUri(repost.subjectUri);
     const recipientDid = subjectUri.host;
     if (
+      live &&
+      depth === 0 &&
       recipientDid !== repost.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, recipientDid))
     ) {

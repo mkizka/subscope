@@ -22,10 +22,12 @@ export class FollowIndexer implements ICollectionIndexer {
     ctx,
     record,
     live,
+    depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
     live: boolean;
+    depth: number;
   }) {
     const follow = parseFollow(record);
     await this.indexAccountService.upsert({
@@ -46,6 +48,8 @@ export class FollowIndexer implements ICollectionIndexer {
     }
 
     if (
+      live &&
+      depth === 0 &&
       follow.subjectDid !== follow.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, follow.subjectDid))
     ) {
