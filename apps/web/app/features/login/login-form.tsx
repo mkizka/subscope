@@ -7,11 +7,20 @@ import { Input } from "@/app/components/ui/input";
 type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
+  inviteCodeInputProps?: ComponentProps<"input">;
+  inviteCodeError?: string;
   error?: string;
   loading: boolean;
 };
 
-export function LoginForm({ formProps, inputProps, error, loading }: Props) {
+export function LoginForm({
+  formProps,
+  inputProps,
+  inviteCodeInputProps,
+  inviteCodeError,
+  error,
+  loading,
+}: Props) {
   return (
     <Form
       action="/oauth/login"
@@ -26,8 +35,16 @@ export function LoginForm({ formProps, inputProps, error, loading }: Props) {
         error={error}
         {...inputProps}
       />
+      {inviteCodeInputProps && (
+        <Input
+          label="招待コード"
+          placeholder="subsco-me-abcde"
+          error={inviteCodeError}
+          {...inviteCodeInputProps}
+        />
+      )}
       <Button type="submit" loading={loading}>
-        ログイン
+        {inviteCodeInputProps ? "新規登録" : "ログイン"}
       </Button>
     </Form>
   );

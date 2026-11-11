@@ -11,12 +11,15 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if ("error" in result) {
     return redirect(`/?error=${result.error}`);
   }
-  return redirect("/login", {
-    headers: {
-      "Set-Cookie": await di.cookieSessionStorage.commit(
-        request.headers.get("Cookie"),
-        result.did,
-      ),
+  return redirect(
+    result.invalidInviteCode ? "/login?error=invalid_invite_code" : "/login",
+    {
+      headers: {
+        "Set-Cookie": await di.cookieSessionStorage.commit(
+          request.headers.get("Cookie"),
+          result.did,
+        ),
+      },
     },
-  });
+  );
 };
