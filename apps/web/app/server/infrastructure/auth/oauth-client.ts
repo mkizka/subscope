@@ -13,7 +13,14 @@ import { env, isProduction } from "@/app/server/env";
 
 const issuerSchema = z.object({ issuer: z.string() });
 
-const scope = "atproto transition:generic";
+const appviewAud = encodeURIComponent(`${env.APPVIEW_DID}#bsky_appview`);
+const scope = [
+  "atproto",
+  "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
+  "repo:app.bsky.graph.list",
+  "blob:image/*",
+  `rpc:*?aud=${appviewAud}`,
+].join(" ");
 const redirectUri = `${env.PUBLIC_URL}/oauth/callback`;
 
 const clientMetadata = isProduction
