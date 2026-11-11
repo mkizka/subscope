@@ -14,7 +14,9 @@ import { testSetup } from "@repo/test-utils";
 import type { LabelData } from "../application/interfaces/repositories/label-repository.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
+import { InMemoryWebPushSender } from "../infrastructure/web-push-sender/web-push-sender.in-memory.js";
 import { indexCommitCommandFactory } from "../presentation/tap.js";
+import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 import { createWorkerRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";
 
@@ -27,6 +29,7 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
   .replaceService("labelFetcher", asClassArgs(InMemoryLabelFetcher))
+  .replaceService("webPushSender", asClassArgs(InMemoryWebPushSender))
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("syncWorker", {} as never);
 
@@ -51,8 +54,21 @@ export const setupJobTest = async () => {
       await services.checkBackfillUseCase.execute(job);
     }
   };
+  const runSendPushNotificationJobs = async () => {
+    const jobs = [...services.jobScheduler.getSendPushNotificationJobs()];
+    services.jobScheduler.clear();
+    for (const { recordUri, recipientDid } of jobs) {
+      await services.sendPushNotificationUseCase.execute({
+        recordUri: recordUri.toString(),
+        recipientDid,
+        jobLogger: new InMemoryJobLogger(),
+      });
+    }
+  };
   return {
     indexCommit,
+    runSendPushNotificationJobs,
+    webPushSender: services.webPushSender,
     runSyncTapRepoJobs,
     runCheckBackfillJobs,
     scheduleBackfillChecks: () =>

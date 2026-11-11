@@ -8,9 +8,9 @@ import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
-import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { NotificationService } from "../notification-service.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
@@ -19,7 +19,7 @@ export class RepostIndexer implements ICollectionIndexer {
     private readonly postQuery: IPostQuery,
     private readonly jobScheduler: IJobScheduler,
     private readonly registrationQuery: IRegistrationQuery,
-    private readonly notificationRepository: INotificationRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async upsert({
@@ -47,7 +47,7 @@ export class RepostIndexer implements ICollectionIndexer {
       recipientDid !== repost.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, recipientDid))
     ) {
-      await this.notificationRepository.save({
+      await this.notificationService.create({
         ctx,
         notifications: [
           {

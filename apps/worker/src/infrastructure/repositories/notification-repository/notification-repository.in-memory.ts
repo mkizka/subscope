@@ -21,10 +21,14 @@ export class InMemoryNotificationRepository implements INotificationRepository {
   }: {
     ctx: TransactionContext;
     notifications: Notification[];
-  }): Promise<void> {
+  }) {
+    const created = [];
     for (const n of notifications) {
       const key = `${n.recordUri}:${n.recipientDid}`;
-      if (!this.notifications.has(key)) this.notifications.set(key, n);
+      if (this.notifications.has(key)) continue;
+      this.notifications.set(key, n);
+      created.push(n);
     }
+    return created;
   }
 }

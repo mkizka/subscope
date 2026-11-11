@@ -287,6 +287,20 @@ export const notifications = pgTable(
   ],
 );
 
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    endpoint: text().primaryKey(),
+    accountDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => accounts.did, { onDelete: "cascade" }),
+    p256dh: varchar({ length: 256 }).notNull(),
+    auth: varchar({ length: 256 }).notNull(),
+    createdAt: timestamp().notNull().defaultNow(),
+  },
+  (table) => [index("push_subscriptions_account_idx").on(table.accountDid)],
+);
+
 const feedType = ["post", "repost"] as const;
 
 export const feedItems = pgTable(
