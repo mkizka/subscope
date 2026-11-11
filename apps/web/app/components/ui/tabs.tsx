@@ -12,9 +12,9 @@ export function Tabs({ tabs, onSelect }: Props) {
       role="tablist"
       className="
         sticky top-14 z-sticky flex border-b border-line bg-surface
-        transition-transform
+        transition-[top]
         lg:top-0
-        max-lg:[main:has(>header[data-visible=false])_&]:-translate-y-14
+        max-lg:[main:has(>header[data-visible=false])_&]:top-0
       "
     >
       {tabs.map(({ to, label, selected }) => (
