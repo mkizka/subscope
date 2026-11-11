@@ -145,6 +145,23 @@ export const ServerMenu: Story = {
   },
 };
 
+export const SettingsMenu: Story = {
+  name: "layout-s15: 左カラムとモバイルのドロワーのメニューの「設定」から `/settings` に移動できる",
+  tags: ["play"],
+  globals: mobile,
+  play: async ({ canvasElement }) => {
+    const drawer = await openDrawer(canvasElement);
+
+    await expect(drawer.getByRole("link", { name: "設定" })).toHaveAttribute(
+      "href",
+      "/settings",
+    );
+    await expect(
+      canvasElement.querySelector('aside nav a[href="/settings"]'),
+    ).not.toBeNull();
+  },
+};
+
 const seedHistory = (words: string[]): (() => void) => {
   localStorage.setItem("search-history", JSON.stringify(words));
   return () => localStorage.removeItem("search-history");
