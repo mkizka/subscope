@@ -360,3 +360,25 @@ export const ListsLoading: Story = {
     ).toBeVisible();
   },
 };
+
+export const TabsStayInPlaceOnSlowScroll: Story = {
+  name: "layout-s16: モバイルでタブがまだ画面上端に届いていないうちにヘッダーが隠れても、タブはその場から動かさず、下の投稿との間に隙間を作らない",
+  tags: ["play"],
+  globals: { viewport: { value: "mobile1" } },
+  play: async ({ canvasElement }) => {
+    canvasElement
+      .querySelector("main")
+      ?.style.setProperty("min-height", "3000px");
+    const tablist = within(canvasElement).getByRole("tablist");
+    const header = canvasElement.querySelector("header");
+    const firstPost = tablist.nextElementSibling;
+    window.scrollTo(0, 100);
+    await waitFor(() => expect(header?.dataset.visible).toBe("false"));
+    await expect(tablist.getBoundingClientRect().top).toBeGreaterThan(56);
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    await expect(firstPost?.getBoundingClientRect().top).toBeCloseTo(
+      tablist.getBoundingClientRect().bottom,
+      0,
+    );
+  },
+};
