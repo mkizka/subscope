@@ -47,10 +47,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({
-        ctx,
-        record,
-      });
+      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
 
       // assert
       const like = await likeRepo.find({ ctx, uri: record.uri });
@@ -102,11 +99,53 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({ ctx: { db, afterCommit }, record });
+      await likeIndexer.upsert({
+        ctx: { db, afterCommit },
+        record,
+        live: true,
+        depth: 0,
+      });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(expected);
     });
+  });
+
+  describe("notify-9", () => {
+    test.each([
+      { name: "バックフィルで受け取ったレコード", live: false, depth: 0 },
+      { name: "取得しに行ったレコード", live: true, depth: 1 },
+    ])(
+      "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルで受け取ったレコードや取得しに行ったレコードでは作らない ($name)",
+      async ({ live, depth }) => {
+        // arrange
+        const liker = accountFactory();
+        const author = accountFactory();
+        registrationQuery.add(author.did);
+        const record = recordFactory({
+          uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
+          json: {
+            $type: "app.bsky.feed.like",
+            subject: {
+              uri: `at://${author.did}/app.bsky.feed.post/123`,
+              cid: fakeCid(),
+            },
+            createdAt: new Date().toISOString(),
+          },
+        });
+
+        // act
+        await likeIndexer.upsert({
+          ctx: { db, afterCommit },
+          record,
+          live,
+          depth,
+        });
+
+        // assert
+        expect(notificationRepo.findAll()).toEqual([]);
+      },
+    );
   });
 
   describe("afterAction", () => {
@@ -127,10 +166,7 @@ describe("LikeIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await likeIndexer.upsert({
-        ctx,
-        record,
-      });
+      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
 
       // act
       likeIndexer.afterAction({ ctx: { db, afterCommit }, record });

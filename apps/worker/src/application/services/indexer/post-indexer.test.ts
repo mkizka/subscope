@@ -192,7 +192,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -230,7 +230,7 @@ describe("PostIndexer", () => {
         postRecord("mention", mentioned.did, true),
         postRecord("quote", quoted.did, false),
       ]) {
-        await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+        await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
       }
 
       // assert
@@ -274,7 +274,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(

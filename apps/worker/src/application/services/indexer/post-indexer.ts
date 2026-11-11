@@ -48,7 +48,9 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = feedItemFromPost(post);
     await this.feedItemRepository.save({ ctx, feedItem });
 
-    await this.createNotifications(ctx, record, post);
+    if (live && depth === 0) {
+      await this.createNotifications(ctx, record, post);
+    }
 
     const embedUri = getEmbedRecordUri(post);
     if (embedUri) {
