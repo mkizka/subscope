@@ -16,7 +16,7 @@ export const inviteCodeSchema = z.object({
   }),
 });
 
-export function InviteCodeFormContainer() {
+export function InviteCodeFormContainer({ error }: { error?: string }) {
   const lastResult = useActionData<SubmissionResult>();
   const navigation = useNavigation();
   const [form, fields] = useForm({
@@ -33,7 +33,7 @@ export function InviteCodeFormContainer() {
     <InviteCodeForm
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.inviteCode, { type: "text" })}
-      error={(form.errors ?? fields.inviteCode.errors)?.[0]}
+      error={(form.errors ?? fields.inviteCode.errors)?.[0] ?? error}
       loading={navigation.formAction === "/login"}
     />
   );

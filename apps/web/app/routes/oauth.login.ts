@@ -16,7 +16,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   try {
     return redirect(
-      await di.oauthClient.authorize(submission.value.identifier),
+      await di.oauthClient.authorize(
+        submission.value.identifier,
+        submission.value.inviteCode,
+      ),
     );
   } catch {
     return redirect("/login?error=auth_failed");

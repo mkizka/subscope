@@ -124,3 +124,55 @@ export const InviteCodeSubmitting: Story = {
     ).toBeDisabled();
   },
 };
+
+export const Register: Story = {
+  args: {
+    tab: "register",
+  },
+};
+
+export const InviteCodeError: Story = {
+  args: {
+    step: "inviteCode",
+    inviteCodeError: "招待コードが無効または期限切れです",
+  },
+};
+
+export const Tabs: Story = {
+  name: "login-s7: 管理者がいるサーバーのログイン画面には「ログイン」「新規登録」のタブを出し、最初は「ログイン」を選ぶ",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const tabs = within(canvasElement).getAllByRole("tab");
+    await expect(tabs.map((tab) => tab.textContent)).toEqual([
+      "ログイン",
+      "新規登録",
+    ]);
+    await expect(tabs[0]).toHaveAttribute("aria-selected", "true");
+  },
+};
+
+export const RegisterFields: Story = {
+  name: "login-s8: 「新規登録」タブにはハンドルと招待コードの入力欄を出す",
+  tags: ["play"],
+  args: {
+    tab: "register",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByLabelText("ハンドル")).toBeVisible();
+    await expect(canvas.getByLabelText("招待コード")).toBeVisible();
+  },
+};
+
+export const SetupWithoutTabs: Story = {
+  name: "login-s9: 管理者がまだいないサーバーのログイン画面には、タブを出さない",
+  tags: ["play"],
+  args: {
+    step: "setup",
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).queryByRole("tab"),
+    ).not.toBeInTheDocument();
+  },
+};
