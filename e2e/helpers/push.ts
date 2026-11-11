@@ -88,7 +88,9 @@ export const openDevice = async (
 ) => {
   const receiver = await createPushReceiver();
   const context = await browser.newContext(options);
-  await context.grantPermissions(["notifications"]);
+  await context.grantPermissions(["notifications"], {
+    origin: options.baseURL,
+  });
   await context.addInitScript(({ endpoint, p256dh, auth }) => {
     const key = "mockPushSubscribed";
     const subscription = {

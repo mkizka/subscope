@@ -30,7 +30,10 @@ export const fetchPushSettingState = async (): Promise<PushSettingState> => {
   ) {
     return "unsupported";
   }
-  if (Notification.permission === "denied") return "denied";
+  const permission = await navigator.permissions.query({
+    name: "notifications",
+  });
+  if (permission.state === "denied") return "denied";
   return (await findSubscription()) ? "on" : "off";
 };
 
