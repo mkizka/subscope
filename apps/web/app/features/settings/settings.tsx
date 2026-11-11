@@ -35,13 +35,18 @@ export function Settings({
             target="_blank"
             rel="noreferrer"
             className="
-              flex items-center justify-between rounded-xl px-3 py-2 text-body
+              flex items-center justify-between rounded-xl px-3 py-2
               hover:bg-surface-2
             "
           >
-            アカウント管理
+            <div className="min-w-0">
+              <div className="text-body">アカウント管理</div>
+              <div className="truncate text-caption text-muted">
+                {new URL(accountUrl).host} で設定できます
+              </div>
+            </div>
             <ExternalLinkIcon
-              className="size-4"
+              className="size-4 shrink-0"
               aria-hidden
               data-testid="external-link-icon"
             />
