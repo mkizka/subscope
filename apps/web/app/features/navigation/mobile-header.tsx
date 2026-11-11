@@ -1,10 +1,8 @@
-import { LogOutIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 
-import { AdminNavMenu, navItemClass, NavMenu } from "./nav-menu";
+import { AdminNavMenu, NavMenu } from "./nav-menu";
 
 type Props = {
   avatarUrl?: string;
@@ -70,18 +68,6 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
         <nav className="flex flex-col gap-3">
           <NavMenu profileId={profileId} onNavigate={close} />
           {isAdmin && <AdminNavMenu onNavigate={close} />}
-          <Form method="post" action="/oauth/logout">
-            <button
-              type="submit"
-              className={`
-                ${navItemClass}
-                w-full
-              `}
-            >
-              <LogOutIcon className="size-6" />
-              ログアウト
-            </button>
-          </Form>
         </nav>
       </dialog>
     </header>

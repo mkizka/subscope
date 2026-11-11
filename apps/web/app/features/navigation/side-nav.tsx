@@ -1,10 +1,7 @@
 import { clsx } from "clsx";
-import { EllipsisIcon, LogOutIcon } from "lucide-react";
-import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { buttonClass } from "@/app/components/ui/button";
-import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { ComposeButton } from "@/app/features/post/post-form-container";
 
 import { AdminNavMenu, NavMenu } from "./nav-menu";
@@ -45,17 +42,6 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
             @{handle}
           </span>
         )}
-        <Menu
-          label="アカウントメニュー"
-          placement="top"
-          trigger={<EllipsisIcon className="size-4" />}
-        >
-          <button type="submit" form="logout-form" className={menuItemClass}>
-            <LogOutIcon className="size-4" />
-            ログアウト
-          </button>
-        </Menu>
-        <Form id="logout-form" method="post" action="/oauth/logout" />
       </div>
     </nav>
   );

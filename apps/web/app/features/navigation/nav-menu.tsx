@@ -8,6 +8,7 @@ import {
   MailIcon,
   SearchIcon,
   ServerIcon,
+  SettingsIcon,
   UsersIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -92,6 +93,9 @@ export function NavMenu({
       )}
       <Item to="/server" icon={<ServerIcon className="size-6" />} {...p}>
         サーバー
+      </Item>
+      <Item to="/settings" icon={<SettingsIcon className="size-6" />} {...p}>
+        設定
       </Item>
     </ul>
   );

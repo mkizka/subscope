@@ -6,9 +6,12 @@ import {
   type NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
 import type { ILoggerManager } from "@repo/common/interface";
+import { z } from "zodV4";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { env, isProduction } from "@/app/server/env";
+
+const issuerSchema = z.object({ issuer: z.string() });
 
 const appviewAud = encodeURIComponent(`${env.APPVIEW_DID}#bsky_appview`);
 const scope = [
@@ -90,6 +93,16 @@ export const oauthClientFactory = ({
     async restore(did) {
       try {
         return createAgent(await client.restore(did));
+      } catch (e) {
+        logger.warn(e, "Failed to restore OAuth session");
+        return null;
+      }
+    },
+    async getAccountUrl(did) {
+      try {
+        const session = await client.restore(did);
+        const { issuer } = issuerSchema.parse(session.serverMetadata);
+        return `${issuer}/account`;
       } catch (e) {
         logger.warn(e, "Failed to restore OAuth session");
         return null;

@@ -6,19 +6,6 @@ const rightColumn = (page: Page) =>
   });
 
 test.describe("レイアウト", () => {
-  test("layout-e1: 左カラムのアカウント欄の⋯から「ログアウト」すると、ログイン画面に移動する", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
-
-    const nav = page.getByRole("navigation");
-    await nav.getByRole("button", { name: "アカウントメニュー" }).click();
-    await nav.getByRole("button", { name: "ログアウト" }).click();
-
-    await expect(page).toHaveURL("/login");
-  });
-
   test("layout-e4: `/server` では、同じ内容の重複を避けるため右カラムのカードを表示せず、中央カラムの位置は他のページと変えない", async ({
     page,
   }) => {
@@ -95,21 +82,6 @@ test.describe("レイアウト", () => {
 
 test.describe("レイアウト（モバイル）", () => {
   test.use({ viewport: { width: 375, height: 667 } });
-
-  test("layout-e3: モバイルでは、ヘッダーの自分のアイコンから開くドロワーの「ログアウト」で、ログイン画面に移動する", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
-
-    await page.getByRole("button", { name: "メニューを開く" }).click();
-    await page
-      .getByRole("dialog", { name: "メニュー" })
-      .getByRole("button", { name: "ログアウト" })
-      .click();
-
-    await expect(page).toHaveURL("/login");
-  });
 
   test("layout-e6: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
     page,
