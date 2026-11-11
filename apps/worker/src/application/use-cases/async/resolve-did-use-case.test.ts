@@ -71,4 +71,14 @@ describe("ResolveDidUseCase", () => {
     const saved = await accountRepository.find({ ctx, did: account.did });
     expect(saved?.handle).toBe("old.test");
   });
+
+  test("resolveDid-5: DIDが登録されていないときは、再試行せずに終える", async () => {
+    // arrange
+    didResolver.clear();
+
+    // act & assert
+    await expect(
+      resolveDidUseCase.execute(asDid("did:plc:unknown")),
+    ).resolves.toBeUndefined();
+  });
 });
