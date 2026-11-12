@@ -4,6 +4,7 @@ import type { IMetricReporter } from "@repo/common/interface";
 
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
+import type { Env } from "../shared/env.js";
 
 export class LabelSubscriber {
   private readonly subscription;
@@ -12,14 +13,14 @@ export class LabelSubscriber {
     private readonly metricReporter: IMetricReporter,
     private readonly indexLabelUseCase: IndexLabelUseCase,
     private readonly labelCursorStore: ILabelCursorStore,
-    private readonly moderationUrl: string,
+    private readonly env: Pick<Env, "MODERATION_URL">,
   ) {
     this.subscription = new Subscription({
-      service: moderationUrl,
+      service: env.MODERATION_URL,
       method: subscribeLabels.$nsid,
       getParams: async () => {
         const cursor = await this.labelCursorStore.getCursor(
-          this.moderationUrl,
+          this.env.MODERATION_URL,
         );
         return cursor === undefined ? {} : { cursor };
       },
@@ -34,7 +35,10 @@ export class LabelSubscriber {
         for (const label of message.labels) {
           await this.indexLabelUseCase.execute(label);
         }
-        await this.labelCursorStore.setCursor(this.moderationUrl, message.seq);
+        await this.labelCursorStore.setCursor(
+          this.env.MODERATION_URL,
+          message.seq,
+        );
       }
     }
   }

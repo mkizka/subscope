@@ -105,15 +105,9 @@ export const createWorkerRegistry = (env: Env) =>
   createRegistry()
     // envs
     .value("env", env)
-    .value("redisUrl", env.REDIS_URL)
-    .value("handleResolverUrl", env.ATPROTO_HANDLE_RESOLVER_URL)
-    .value("tapUrl", env.TAP_URL)
-    .value("moderationUrl", env.MODERATION_URL)
-    .value("port", env.PORT)
-    .value("tapConcurrency", env.TAP_CONCURRENCY)
     // infrastructure
     .service("loggerManager", ["env"], asClassArgs(LoggerManager))
-    .service("tapClient", ["tapUrl"], asClassArgs<ITapClient>()(TapClient))
+    .service("tapClient", ["env"], asClassArgs<ITapClient>()(TapClient))
     .service("connectionPool", ["env"], connectionPoolFactory)
     .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
@@ -121,9 +115,9 @@ export const createWorkerRegistry = (env: Env) =>
     .service("didCache", ["env", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["env", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["env"], asClassArgs<IJobQueue>()(JobQueue))
-    .service("handleResolver", ["handleResolverUrl"], asClassArgs<IHandleResolver>()(HandleResolver))
-    .service("labelCursorStore", ["redisUrl"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
-    .service("labelFetcher", ["moderationUrl"], asClassArgs<ILabelFetcher>()(LabelFetcher))
+    .service("handleResolver", ["env"], asClassArgs<IHandleResolver>()(HandleResolver))
+    .service("labelCursorStore", ["env"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
+    .service("labelFetcher", ["env"], asClassArgs<ILabelFetcher>()(LabelFetcher))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
     .service("accountStatsQuery", asClassArgs<IAccountStatsQuery>()(AccountStatsQuery))
     .service("postStatsQuery", asClassArgs<IPostStatsQuery>()(PostStatsQuery))
@@ -172,9 +166,9 @@ export const createWorkerRegistry = (env: Env) =>
     .service("syncTapRepoUseCase", ["tapClient", "registrationQuery", "labelFetcher", "indexLabelUseCase", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
     .service("checkBackfillUseCase", ["tapClient", "registrationQuery", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
-    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "redisUrl"], asClassArgs(SyncWorker))
+    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "env"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["env"], healthRouterFactory)
-    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "tapUrl", "tapConcurrency"], asClassArgs(TapSubscriber))
-    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "moderationUrl"], asClassArgs(LabelSubscriber))
-    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "port", "env"], asClassArgs(WorkerServer));
+    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClassArgs(TapSubscriber))
+    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "env"], asClassArgs(LabelSubscriber))
+    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClassArgs(WorkerServer));
