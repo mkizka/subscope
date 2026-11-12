@@ -74,6 +74,7 @@ import { GetFollowersUseCase } from "../application/use-cases/graph/get-follower
 import { GetFollowsUseCase } from "../application/use-cases/graph/get-follows-use-case.js";
 import { GetListUseCase } from "../application/use-cases/graph/get-list-use-case.js";
 import { GetListsUseCase } from "../application/use-cases/graph/get-lists-use-case.js";
+import { GetListsWithMembershipUseCase } from "../application/use-cases/graph/get-lists-with-membership-use-case.js";
 import { GetServerMemberFollowersUseCase } from "../application/use-cases/graph/get-server-member-followers-use-case.js";
 import { GetGroupedNotificationsUseCase } from "../application/use-cases/notification/get-grouped-notifications-use-case.js";
 import { GetUnreadCountUseCase } from "../application/use-cases/notification/get-unread-count-use-case.js";
@@ -143,6 +144,7 @@ import { GetFollowers } from "../presentation/routes/app/bsky/graph/getFollowers
 import { GetFollows } from "../presentation/routes/app/bsky/graph/getFollows.js";
 import { GetList } from "../presentation/routes/app/bsky/graph/getList.js";
 import { GetLists } from "../presentation/routes/app/bsky/graph/getLists.js";
+import { GetListsWithMembership } from "../presentation/routes/app/bsky/graph/getListsWithMembership.js";
 import { GetGroupedNotifications } from "../presentation/routes/app/bsky/notification/getGroupedNotifications.js";
 import { GetUnreadCount } from "../presentation/routes/app/bsky/notification/getUnreadCount.js";
 import { ListNotifications } from "../presentation/routes/app/bsky/notification/listNotifications.js";
@@ -249,6 +251,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getFollowsUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowersUseCase))
     .service("getListUseCase", ["listQuery", "viewContextFactory", "listViews", "profileViews"], asClassArgs(GetListUseCase))
+    .service("getListsWithMembershipUseCase", ["listQuery", "viewContextFactory", "listViews", "profileViews"], asClassArgs(GetListsWithMembershipUseCase))
     .service("getListsUseCase", ["listQuery", "viewContextFactory", "listViews"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["transactionManager", "inviteCodeRepository", "env"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
@@ -297,6 +300,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getFollows", ["getFollowsUseCase", "handleMiddleware"], asClassArgs(GetFollows))
     .service("getFollowers", ["getFollowersUseCase", "handleMiddleware"], asClassArgs(GetFollowers))
     .service("getList", ["getListUseCase", "atUriService"], asClassArgs(GetList))
+    .service("getListsWithMembership", ["authVerifierMiddleware", "getListsWithMembershipUseCase", "handleMiddleware"], asClassArgs(GetListsWithMembership))
     .service("getLists", ["getListsUseCase", "handleMiddleware"], asClassArgs(GetLists))
     .service("createInviteCode", ["createInviteCodeUseCase", "adminMiddleware"], asClassArgs(CreateInviteCode))
     .service("deleteInviteCode", ["deleteInviteCodeUseCase", "adminMiddleware"], asClassArgs(DeleteInviteCode))
@@ -320,7 +324,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unbanAccount", ["unbanAccountUseCase", "adminMiddleware"], asClassArgs(UnbanAccount))
     .service("banAccount", ["banAccountUseCase", "adminMiddleware"], asClassArgs(BanAccount))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getListsWithMembership", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["env"], healthRouterFactory)
     .service("wellKnownRouter", ["env"], wellKnownRouterFactory)
     // bootstrap

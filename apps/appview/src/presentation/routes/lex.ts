@@ -22,6 +22,7 @@ import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
+import type { GetListsWithMembership } from "./app/bsky/graph/getListsWithMembership.js";
 import type { GetGroupedNotifications } from "./app/bsky/notification/getGroupedNotifications.js";
 import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
@@ -60,6 +61,7 @@ export const lexRouterFactory = (
   getFollowers: GetFollowers,
   getList: GetList,
   getLists: GetLists,
+  getListsWithMembership: GetListsWithMembership,
   getUnreadCount: GetUnreadCount,
   listNotifications: ListNotifications,
   getGroupedNotifications: GetGroupedNotifications,
@@ -108,6 +110,7 @@ export const lexRouterFactory = (
     getFollowers,
     getList,
     getLists,
+    getListsWithMembership,
     getUnreadCount,
     listNotifications,
     getGroupedNotifications,

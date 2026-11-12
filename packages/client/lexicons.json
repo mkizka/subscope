@@ -57,6 +57,7 @@
     "app.bsky.graph.getFollows",
     "app.bsky.graph.getList",
     "app.bsky.graph.getLists",
+    "app.bsky.graph.getListsWithMembership",
     "app.bsky.graph.list",
     "app.bsky.graph.listitem",
     "app.bsky.labeler.defs",
@@ -263,6 +264,10 @@
     "app.bsky.graph.getLists": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.getLists",
       "cid": "bafyreiffrqdk7vdses2qzrmmfotwyvncuhvq7anaw64x7wmlz5cix5nihy"
+    },
+    "app.bsky.graph.getListsWithMembership": {
+      "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.getListsWithMembership",
+      "cid": "bafyreifgvypq6ahfxtkbdmudh7bb7vib6c7kvkit6ks3gjoagor747cxfy"
     },
     "app.bsky.graph.list": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.list",
