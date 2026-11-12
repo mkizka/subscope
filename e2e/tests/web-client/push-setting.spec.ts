@@ -1,7 +1,7 @@
 import { expect, test as base } from "@playwright/test";
+import { openDevice } from "@repo/web-push-mock";
 
 import { createRecord, follow, putRecord } from "../../helpers/pds";
-import { openDevice } from "../../helpers/push";
 
 type Device = Awaited<ReturnType<typeof openDevice>>;
 
