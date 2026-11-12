@@ -11,11 +11,14 @@ const sha256 = (value: string) => createHash("sha256").update(value).digest();
 const isAdminApiTokenRequest = (request: Request) => {
   const authorization = request.headers.get("Authorization");
   return (
-    di.adminApiToken !== undefined &&
+    di.env.ADMIN_API_TOKEN !== undefined &&
     authorization !== null &&
     request.method === "GET" &&
     new URL(request.url).pathname.startsWith("/admin/bull-board/api/") &&
-    timingSafeEqual(sha256(authorization), sha256(`Bearer ${di.adminApiToken}`))
+    timingSafeEqual(
+      sha256(authorization),
+      sha256(`Bearer ${di.env.ADMIN_API_TOKEN}`),
+    )
   );
 };
 

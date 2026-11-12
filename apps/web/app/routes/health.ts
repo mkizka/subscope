@@ -4,10 +4,10 @@ export const loader = () => {
   return Response.json({
     status: "ok",
     env: {
-      NODE_ENV: di.nodeEnv,
-      LOG_LEVEL: di.logLevel,
-      PORT: di.port,
-      PUBLIC_URL: di.publicUrl,
+      NODE_ENV: di.env.NODE_ENV,
+      LOG_LEVEL: di.env.LOG_LEVEL,
+      PORT: di.env.PORT,
+      PUBLIC_URL: di.env.PUBLIC_URL,
     },
   });
 };
