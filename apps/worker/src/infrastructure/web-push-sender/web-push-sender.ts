@@ -45,7 +45,7 @@ export class WebPushSender implements IWebPushSender {
     const response = await fetch(request.endpoint, {
       method: request.method,
       headers: request.headers,
-      body: request.body,
+      body: new Uint8Array(request.body),
       signal: AbortSignal.timeout(10_000),
     });
     if (response.status === 404 || response.status === 410) return "gone";
