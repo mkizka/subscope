@@ -179,6 +179,7 @@ import type { Env } from "./env.js";
 export const createAppRegistry = (env: Env) =>
   createRegistry()
     // envs
+    .value("env", env)
     .value("logLevel", env.LOG_LEVEL)
     .value("plcUrl", env.PLC_URL)
     .value("redisUrl", env.REDIS_URL)
@@ -187,7 +188,6 @@ export const createAppRegistry = (env: Env) =>
     .value("blobProxyUrl", env.BLOB_PROXY_URL)
     .value("serviceDid", env.SERVICE_DID)
     .value("port", env.PORT)
-    .value("nodeEnv", env.NODE_ENV)
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("metricReporter", asClassArgs(MetricReporter))
@@ -329,7 +329,7 @@ export const createAppRegistry = (env: Env) =>
     .service("banAccount", ["banAccountUseCase", "adminMiddleware"], asClassArgs(BanAccount))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
     .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
-    .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
-    .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
+    .service("healthRouter", ["env"], healthRouterFactory)
+    .service("wellKnownRouter", ["env"], wellKnownRouterFactory)
     // bootstrap
-    .service("appViewServer", ["loggerManager", "lexRouter", "healthRouter", "wellKnownRouter", "port"], asClassArgs(AppViewServer));
+    .service("appViewServer", ["loggerManager", "lexRouter", "healthRouter", "wellKnownRouter", "port", "env"], asClassArgs(AppViewServer));
