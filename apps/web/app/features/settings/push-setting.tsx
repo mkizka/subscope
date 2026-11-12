@@ -49,7 +49,7 @@ export function PushSetting({
           </div>
           {note && (
             <div className="flex items-start gap-1 text-caption text-muted">
-              <InfoIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
+              <InfoIcon className="size-4 shrink-0" aria-hidden />
               {note}
             </div>
           )}
