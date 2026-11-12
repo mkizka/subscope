@@ -89,7 +89,6 @@ export const Empty: Story = {
 
 export const UnreadBadge: Story = {
   name: "notification-s1: モバイルでは、未読があるとき下のタブの通知に未読数を表示する",
-  tags: ["play"],
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
     const tab = within(canvasElement).getByRole("navigation", {
@@ -106,7 +105,6 @@ const avatarUrl =
 
 export const IconAndAvatar: Story = {
   name: "notification-s2: 通知には種類を表す色付きのアイコンと相手のアバターを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData(
       ["notifications"],
@@ -140,7 +138,6 @@ export const IconAndAvatar: Story = {
 
 export const PushPromptOff: Story = {
   name: "pushSetting-s8: 受け取らない設定のときだけ、通知一覧の上に「プッシュ通知を受け取る」の案内と「オンにする」ボタンを表示する。受け取る設定・ブロック中・非対応・読み込み中・VAPID鍵なしのときは表示しない",
-  tags: ["play"],
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -171,7 +168,6 @@ export const PushPromptOff: Story = {
 
 export const SettingsLink: Story = {
   name: "pushSetting-s9: 通知ページの見出しの右端に、設定ページへ移動する「通知の設定」ボタンを表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByRole("link", { name: "通知の設定" }),
@@ -183,7 +179,6 @@ let release: () => void = () => {};
 
 export const Loading: Story = {
   name: "notification-s3: 通知の読み込み中は「通知はまだありません」を表示せず、読み込みが終わって0件のときだけ表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.clear();
     const gate = new Promise<void>((resolve) => (release = resolve));
@@ -211,7 +206,6 @@ export const Loading: Story = {
 
 export const LoadingSkeleton: Story = {
   name: "notification-s4: 通知の読み込み中は左にアイコン列、右にアバター・文・ハンドル・本文を持つ通知の形のスケルトンを6行表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.clear();
     void queryClient.infiniteQuery({

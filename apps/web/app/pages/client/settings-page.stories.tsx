@@ -37,7 +37,6 @@ export const PushUnsupported: Story = {
 
 export const Account: Story = {
   name: "settings-s1: 自分のアイコン、表示名、ハンドルを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof meLoader>>(["me"], {
       did: alice.did,
@@ -62,7 +61,6 @@ export const Account: Story = {
 
 export const AccountNote: Story = {
   name: "settings-s2: 「アカウント管理」の下に、認可サーバーのホスト名を使って「{ホスト名} で設定できます」と表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const main = within(await within(canvasElement).findByRole("main"));
 
@@ -75,7 +73,6 @@ const pushSwitch = (canvasElement: HTMLElement) =>
 
 export const PushSettingOff: Story = {
   name: "pushSetting-s1: 受け取らない設定のときは、スイッチをオフにする。説明文は表示しない",
-  tags: ["play"],
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).not.toBeChecked();
@@ -87,7 +84,6 @@ export const PushSettingOff: Story = {
 
 export const PushSettingOn: Story = {
   name: "pushSetting-s2: 受け取る設定のときは、スイッチをオンにする。説明文は表示しない",
-  tags: ["play"],
   beforeEach: pushSetting("on"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).toBeChecked();
@@ -99,7 +95,6 @@ export const PushSettingOn: Story = {
 
 export const PushSettingDenied: Story = {
   name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチを無効にして「ブラウザで通知がブロックされています。サイト設定から許可すると使えます」と表示する",
-  tags: ["play"],
   beforeEach: pushSetting("denied"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).toBeDisabled();
@@ -113,7 +108,6 @@ export const PushSettingDenied: Story = {
 
 export const PushSettingUnsupported: Story = {
   name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、スイッチを無効にして「このブラウザでは使えません。iPhone・iPadはホーム画面に追加すると使えます」と表示する",
-  tags: ["play"],
   beforeEach: pushSetting("unsupported"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).toBeDisabled();
@@ -140,7 +134,6 @@ const pendingPermission = () => {
 
 export const PushSettingToggling: Story = {
   name: "pushSetting-s5: 切り替えている間は、スイッチを無効にして横にスピナーを表示する",
-  tags: ["play"],
   beforeEach: () => {
     pushSetting("off")();
     const permission = pendingPermission();
@@ -159,7 +152,6 @@ export const PushSettingToggling: Story = {
 
 export const PushSettingDismissed: Story = {
   name: "pushSetting-s6: スイッチをオンにして通知の許可ダイアログが選択されずに閉じたときは、「許可されませんでした。もう一度押すか、ブラウザのサイト設定から許可してください」と表示する",
-  tags: ["play"],
   beforeEach: () => {
     pushSetting("off")();
     const permission = pendingPermission();
@@ -179,7 +171,6 @@ export const PushSettingDismissed: Story = {
 
 export const PushSettingUnavailable: Story = {
   name: "pushSetting-s7: サーバーにVAPID鍵が設定されていないときは、「この端末」のセクションを表示しない",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await within(canvasElement).findByRole("heading", { name: "アカウント" });
 

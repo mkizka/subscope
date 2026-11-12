@@ -55,7 +55,6 @@ export const Empty: Story = {
 
 export const Submitting: Story = {
   name: "list-s1: リストの作成・保存ボタンは、送信が終わるまでスピナーを出して押せなくする",
-  tags: ["play"],
   parameters: { pending: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -73,7 +72,6 @@ export const Submitting: Story = {
 
 export const ListAvatar: Story = {
   name: "list-s7: リスト一覧の各行の左に、リストのアバター画像を表示し、未設定ならリストのアイコンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof listsLoader>>(
       ["lists", alice.handle],

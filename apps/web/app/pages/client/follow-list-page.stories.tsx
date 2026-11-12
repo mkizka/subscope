@@ -45,7 +45,6 @@ const emptyData = (handle: string, kind: "follows" | "followers") => {
 
 export const SyncStatus: Story = {
   name: "follow-list-s1: 一覧の追跡アカウントには過去の投稿の同期状態を表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof followListLoader>>(
       ["follow-list", alice.handle, "follows", false],
@@ -64,7 +63,6 @@ export const SyncStatus: Story = {
 
 export const Loading: Story = {
   name: "follow-list-s2: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["follow-list", alice.handle] });
     queryClient
@@ -87,7 +85,6 @@ export const Loading: Story = {
 
 export const FollowersTabs: Story = {
   name: "follow-list-s3: フォロワー一覧に「すべて」と「メンバー」のタブを表示し、「メンバー」には人数を添える",
-  tags: ["play"],
   args: { kind: "followers" },
   parameters: { path: "/alice.bsky.social/followers" },
   beforeEach: () => {
@@ -105,7 +102,6 @@ export const FollowersTabs: Story = {
 
 export const FollowsEmpty: Story = {
   name: "follow-list-s4: 読み込みが終わって0件のときは、フォロー一覧には「フォローしているアカウントはありません」を表示する",
-  tags: ["play"],
   args: { handle: "dave.bsky.social" },
   beforeEach: () => emptyData("dave.bsky.social", "follows"),
   play: async ({ canvasElement }) => {
@@ -117,7 +113,6 @@ export const FollowsEmpty: Story = {
 
 export const FollowersEmpty: Story = {
   name: "follow-list-s5: 読み込みが終わって0件のときは、フォロワー一覧には「フォロワーはいません」を表示する",
-  tags: ["play"],
   args: { handle: "dave.bsky.social", kind: "followers" },
   beforeEach: () => emptyData("dave.bsky.social", "followers"),
   play: async ({ canvasElement }) => {
