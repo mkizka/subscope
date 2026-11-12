@@ -30,7 +30,6 @@ import { getNotificationsUseCaseFactory } from "./application/notification/get-n
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { deletePostUseCaseFactory } from "./application/post/delete-post-use-case";
-import { getPushPublicKeyUseCaseFactory } from "./application/push/get-push-public-key-use-case";
 import { subscribePushUseCaseFactory } from "./application/push/subscribe-push-use-case";
 import { unsubscribePushUseCaseFactory } from "./application/push/unsubscribe-push-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
@@ -41,6 +40,7 @@ import {
   getLocalTimelineUseCaseFactory,
   getTimelineUseCaseFactory,
 } from "./application/timeline/get-timeline-use-case";
+import { env, isProduction } from "./env";
 import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
@@ -70,6 +70,8 @@ import { threadQueryFactory } from "./infrastructure/thread/thread-query";
 import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 
 export const di = await createRegistry()
+  .value("isProduction", isProduction)
+  .value("vapidPublicKey", env.VAPID_PUBLIC_KEY)
   .service("loggerManager", loggerManagerFactory)
   .service("db", ["loggerManager"], dbFactory)
   .service("jobQueue", jobQueueFactory)
@@ -128,7 +130,6 @@ export const di = await createRegistry()
     markNotificationsSeenUseCaseFactory,
   )
   .service("pushSubscriptionCommand", ["db"], pushSubscriptionCommandFactory)
-  .service("getPushPublicKeyUseCase", getPushPublicKeyUseCaseFactory)
   .service(
     "subscribePushUseCase",
     ["pushSubscriptionCommand"],

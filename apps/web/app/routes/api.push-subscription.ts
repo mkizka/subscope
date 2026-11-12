@@ -4,7 +4,6 @@ import { z } from "zodV4";
 import { didContext } from "@/app/context/did";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
-import { isProduction } from "@/app/server/env";
 
 import type { Route } from "./+types/api.push-subscription";
 
@@ -14,7 +13,7 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 const endpointSchema = z
   .url()
   .max(2048)
-  .refine((value) => !isProduction || value.startsWith("https://"));
+  .refine((value) => !di.isProduction || value.startsWith("https://"));
 
 const subscriptionSchema = z.object({
   endpoint: endpointSchema,
@@ -22,7 +21,7 @@ const subscriptionSchema = z.object({
 });
 
 export const loader = () => {
-  return data({ publicKey: di.getPushPublicKeyUseCase.execute() });
+  return data({ publicKey: di.vapidPublicKey ?? null });
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
