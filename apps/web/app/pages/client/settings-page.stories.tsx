@@ -75,7 +75,7 @@ export const Account: Story = {
     const main = within(await within(canvasElement).findByRole("main"));
     const account = within(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      main.getByRole("heading", { name: "アカウント" }).parentElement!,
+      main.getByText("Alice").parentElement!.parentElement!,
     );
 
     await expect(account.getByText("Alice")).toBeVisible();
