@@ -18,6 +18,7 @@ async function fetchMe(): Promise<MeResponse> {
 export const meQueryOptions = {
   queryKey: ["me"],
   queryFn: fetchMe,
+  retry: false,
 };
 
 export function useMe() {

@@ -139,4 +139,14 @@ test.describe("起動時のスプラッシュ（JS無効）", () => {
 
     await expect(page.getByTestId("splash")).toBeVisible();
   });
+
+  test("splash-e7: 自分の情報の取得に失敗したときは、再試行を待たずにスプラッシュを消す", async ({
+    page,
+  }) => {
+    await page.route("**/api/me", (route) => route.fulfill({ status: 500 }));
+
+    await page.goto("/");
+
+    await expect(page.getByTestId("splash")).toBeHidden({ timeout: 3000 });
+  });
 });
