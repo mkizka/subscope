@@ -25,8 +25,7 @@ export function Settings({
   return (
     <>
       <h1 className="p-4 pb-2 text-title">設定</h1>
-      <section className="space-y-4 p-4">
-        <h2 className="text-caption text-muted">アカウント</h2>
+      <section className="p-4">
         <div className="flex items-center gap-3 rounded-xl border border-line p-4">
           <Avatar src={avatarUrl} />
           <div className="min-w-0">
@@ -34,6 +33,9 @@ export function Settings({
             <div className="truncate text-label text-muted">@{handle}</div>
           </div>
         </div>
+      </section>
+      <section className="space-y-4 p-4">
+        <h2 className="text-caption text-muted">アカウント</h2>
         {accountUrl && (
           <a
             href={accountUrl}
@@ -57,6 +59,9 @@ export function Settings({
             />
           </a>
         )}
+      </section>
+      {pushSetting}
+      <section className="p-4">
         <Form
           method="post"
           action="/oauth/logout"
@@ -71,7 +76,6 @@ export function Settings({
           </Button>
         </Form>
       </section>
-      {pushSetting}
     </>
   );
 }
