@@ -7,7 +7,7 @@ type Props = {
 
 export function SettingsPage({ accountUrl }: Props) {
   return (
-    <ThreeColumnLayout>
+    <ThreeColumnLayout hideCompose>
       <SettingsContainer accountUrl={accountUrl} />
     </ThreeColumnLayout>
   );
