@@ -2,7 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { asAtUriString } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
-import { and, desc, eq, inArray, lt, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, inArray, lt, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import type {
@@ -99,6 +99,25 @@ export class FollowQuery implements IFollowQuery {
       accountDid: asDid(result.accountDid),
       sortAt: result.sortAt,
     }));
+  }
+
+  async countKnownFollowers(params: {
+    viewerDid: Did;
+    subjectDid: Did;
+  }): Promise<number> {
+    const knownFollow = alias(schema.follows, "known_follow");
+    const [result] = await this.db
+      .select({ count: count() })
+      .from(schema.follows)
+      .innerJoin(
+        knownFollow,
+        and(
+          eq(knownFollow.accountDid, schema.follows.subjectDid),
+          eq(knownFollow.subjectDid, params.subjectDid),
+        ),
+      )
+      .where(eq(schema.follows.accountDid, params.viewerDid));
+    return result?.count ?? 0;
   }
 
   async findFolloweeDids(accountDid: Did): Promise<Did[]> {

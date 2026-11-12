@@ -44,13 +44,24 @@ export class ProfileViews {
     if (!profile) {
       return undefined;
     }
-    const [basic, stats, links] = await Promise.all([
+    const [basic, stats, links, known] = await Promise.all([
       this.toBasic(profile, ctx),
       ctx.accountStats(did),
       this.links(did, ctx),
+      ctx.knownFollowers(did),
     ]);
+    const knownFollowers =
+      known && known.count > 0
+        ? {
+            count: known.count,
+            followers: (
+              await Promise.all(known.dids.map((d) => this.basic(d, ctx)))
+            ).filter((follower) => follower !== undefined),
+          }
+        : undefined;
     return {
       ...basic,
+      viewer: basic.viewer && { ...basic.viewer, knownFollowers },
       $type: "app.bsky.actor.defs#profileViewDetailed",
       description: profile.description ?? undefined,
       banner: profile.bannerCid
