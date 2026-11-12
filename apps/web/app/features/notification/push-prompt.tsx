@@ -15,11 +15,8 @@ export function PushPrompt({ isPending, onEnable }: Props) {
       "
     >
       <BellIcon className="size-6 shrink-0 text-brand" aria-hidden />
-      <div className="min-w-0 flex-1">
-        <div className="text-body font-bold">プッシュ通知を受け取る</div>
-        <div className="text-caption text-muted">
-          この端末に新しい通知を届けます
-        </div>
+      <div className="min-w-0 flex-1 text-body font-bold">
+        プッシュ通知を受け取る
       </div>
       <Button size="sm" loading={isPending} onClick={onEnable}>
         オンにする

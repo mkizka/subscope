@@ -74,26 +74,26 @@ const pushSwitch = (canvasElement: HTMLElement) =>
   within(canvasElement).findByRole("switch", { name: "プッシュ通知" });
 
 export const PushSettingOff: Story = {
-  name: "pushSetting-s1: 受け取らない設定のときは、スイッチをオフにして「この端末に新しい通知を届けます」と表示する",
+  name: "pushSetting-s1: 受け取らない設定のときは、スイッチをオフにする。説明文は表示しない",
   tags: ["play"],
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).not.toBeChecked();
     await expect(
-      within(canvasElement).getByText("この端末に新しい通知を届けます"),
-    ).toBeVisible();
+      within(canvasElement).queryByText(/届けます|許可|使えます/),
+    ).toBeNull();
   },
 };
 
 export const PushSettingOn: Story = {
-  name: "pushSetting-s2: 受け取る設定のときは、スイッチをオンにして「この端末に新しい通知を届けます」と表示する",
+  name: "pushSetting-s2: 受け取る設定のときは、スイッチをオンにする。説明文は表示しない",
   tags: ["play"],
   beforeEach: pushSetting("on"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).toBeChecked();
     await expect(
-      within(canvasElement).getByText("この端末に新しい通知を届けます"),
-    ).toBeVisible();
+      within(canvasElement).queryByText(/届けます|許可|使えます/),
+    ).toBeNull();
   },
 };
 

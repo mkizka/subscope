@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { BellIcon, LoaderCircle } from "lucide-react";
+import { BellIcon, InfoIcon, LoaderCircle } from "lucide-react";
 
 import type { PushSettingState } from "@/app/lib/push-setting";
 
@@ -23,7 +23,7 @@ const description = ({
   if (permissionDismissed) {
     return "許可されませんでした。もう一度押すか、ブラウザのサイト設定から許可してください";
   }
-  return "この端末に新しい通知を届けます";
+  return null;
 };
 
 export function PushSetting({
@@ -33,6 +33,10 @@ export function PushSetting({
   onToggle,
 }: Props) {
   const isOn = state === "on";
+  const note = description({
+    state,
+    permissionDismissed: permissionDismissed && !isPending,
+  });
   const unavailable = state === "denied" || state === "unsupported";
   return (
     <section className="space-y-4 p-4">
@@ -43,12 +47,12 @@ export function PushSetting({
           <div id="push-setting-label" className="text-body">
             プッシュ通知
           </div>
-          <div className="text-caption text-muted">
-            {description({
-              state,
-              permissionDismissed: permissionDismissed && !isPending,
-            })}
-          </div>
+          {note && (
+            <div className="flex items-start gap-1 text-caption text-muted">
+              <InfoIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
+              {note}
+            </div>
+          )}
         </div>
         {isPending && <LoaderCircle className="size-4 animate-spin" />}
         <button
