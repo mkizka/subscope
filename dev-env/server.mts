@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import { TestNetworkNoAppView } from "@atproto/dev-env";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
-import { GenericContainer, PullPolicy } from "testcontainers";
+import { GenericContainer } from "testcontainers";
 
 const PORTS = {
   plc: 2582,
@@ -96,7 +96,6 @@ const tap = await new GenericContainer("ghcr.io/bluesky-social/indigo/tap:0.1")
   .start();
 
 const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:0")
-  .withPullPolicy(PullPolicy.alwaysPull())
   .withNetworkMode("host")
   .withEnvironment({
     PORT: String(PORTS.blobProxy),
