@@ -15,6 +15,7 @@ allowBuilds:
   sharp: false
   ssh2: false
 patchedDependencies:
+  "@atproto/oauth-scopes@0.5.14": patches/@atproto__oauth-scopes@0.5.14.patch
   "@factory-js/factory": patches/@factory-js__factory.patch
 overrides:
   "@opentelemetry/api": 1.9.1

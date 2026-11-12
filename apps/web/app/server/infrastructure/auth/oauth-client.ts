@@ -38,7 +38,8 @@ export const oauthClientFactory = async ({
     "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
     "repo:app.bsky.graph.list",
     "blob:image/*",
-    `rpc:*?aud=${appviewAud}`,
+    `include:me.subsco.authFull?aud=${appviewAud}`,
+    `include:app.bsky.authViewAll?aud=${appviewAud}`,
   ].join(" ");
   const redirectUri = `${env.PUBLIC_URL}/oauth/callback`;
 

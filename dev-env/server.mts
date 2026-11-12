@@ -1,5 +1,5 @@
 import { execSync, spawn } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -57,6 +57,32 @@ for (const name of [
     handle: `${name}.test`,
     email: `${name}@example.com`,
     password: "password",
+  });
+}
+
+const lexiconAgent = network.pds.getAgent();
+const lexiconAuthority = await lexiconAgent.createAccount({
+  handle: "lex-authority.test",
+  email: "lex-authority@example.com",
+  password: "password",
+});
+network.pds.ctx.cfg.lexicon.didAuthority = lexiconAuthority.data.did;
+for (const lexicon of [
+  new URL(
+    "../packages/client/lexicons/me/subsco/authFull.json",
+    import.meta.url,
+  ),
+  new URL(
+    "../packages/client/lexicons/app/bsky/authViewAll.json",
+    import.meta.url,
+  ),
+]) {
+  const record = JSON.parse(await readFile(lexicon, "utf-8"));
+  await lexiconAgent.com.atproto.repo.createRecord({
+    repo: lexiconAuthority.data.did,
+    collection: "com.atproto.lexicon.schema",
+    rkey: record.id,
+    record,
   });
 }
 

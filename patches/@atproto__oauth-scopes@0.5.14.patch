@@ -1,0 +1,13 @@
+diff --git a/dist/lib/syntax-string.js b/dist/lib/syntax-string.js
+index addb0de993f75dbe91dfe316564fc13dadff29de..64b1025f322dad37f478375dc904584724636d6d 100644
+--- a/dist/lib/syntax-string.js
++++ b/dist/lib/syntax-string.js
+@@ -66,7 +66,7 @@ export class ScopeStringSyntax {
+ const ALLOWED_SCOPE_CHARS = new Set(
+ // @NOTE This list must not contain "?" or "&" as it would interfere with
+ // query string parsing.
+-[':', '/', '+', ',', '@', '%']);
++[':', '/', '+', ',', '@']);
+ const NORMALIZABLE_CHARS_MAP = new Map(Array.from(ALLOWED_SCOPE_CHARS, (c) => [encodeURIComponent(c), c]).filter(([encoded, c]) => 
+ // Make sure that any char added to ALLOWED_SCOPE_CHARS that is a char
+ // that indeed needs encoding. Also, the normalizeURIComponent only
