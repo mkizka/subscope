@@ -87,7 +87,7 @@ test.describe("引用一覧", () => {
       await expect(articles).toHaveCount(2, { timeout: 1000 });
     }).toPass();
 
-    await expect(articles.getByText(/^quotes-e2: /)).toHaveText([
+    await expect(articles.getByText(/^quotes-e2: 引用\d$/)).toHaveText([
       "quotes-e2: 引用2",
       "quotes-e2: 引用1",
     ]);
