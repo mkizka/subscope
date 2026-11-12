@@ -5,21 +5,17 @@ import { data, redirect, type RouterContextProvider } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { di } from "@/app/server/di";
-import { env } from "@/app/server/env";
 
 const sha256 = (value: string) => createHash("sha256").update(value).digest();
 
 const isAdminApiTokenRequest = (request: Request) => {
   const authorization = request.headers.get("Authorization");
   return (
-    env.ADMIN_API_TOKEN !== undefined &&
+    di.adminApiToken !== undefined &&
     authorization !== null &&
     request.method === "GET" &&
     new URL(request.url).pathname.startsWith("/admin/bull-board/api/") &&
-    timingSafeEqual(
-      sha256(authorization),
-      sha256(`Bearer ${env.ADMIN_API_TOKEN}`),
-    )
+    timingSafeEqual(sha256(authorization), sha256(`Bearer ${di.adminApiToken}`))
   );
 };
 

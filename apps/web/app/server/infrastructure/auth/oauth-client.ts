@@ -9,77 +9,88 @@ import type { ILoggerManager } from "@repo/common/interface";
 import { z } from "zodV4";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
-import { env, isProduction } from "@/app/server/env";
 
 const issuerSchema = z.object({ issuer: z.string() });
 
-const appviewAud = encodeURIComponent(`${env.APPVIEW_DID}#bsky_appview`);
-const scope = [
-  "atproto",
-  "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
-  "repo:app.bsky.graph.list",
-  "blob:image/*",
-  `rpc:*?aud=${appviewAud}`,
-].join(" ");
-const redirectUri = `${env.PUBLIC_URL}/oauth/callback`;
-
-const clientMetadata = isProduction
-  ? {
-      client_name: "Subscope",
-      client_id: `${env.PUBLIC_URL}/oauth/client-metadata.json`,
-      client_uri: env.PUBLIC_URL,
-      jwks_uri: `${env.PUBLIC_URL}/oauth/jwks.json`,
-      redirect_uris: [redirectUri],
-      scope,
-      grant_types: ["authorization_code", "refresh_token"],
-      response_types: ["code"],
-      application_type: "web",
-      token_endpoint_auth_method: "private_key_jwt",
-      token_endpoint_auth_signing_alg: "ES256",
-      dpop_bound_access_tokens: true,
-    }
-  : {
-      client_id: `http://localhost?${new URLSearchParams({ redirect_uri: redirectUri, scope })}`,
-      redirect_uris: [redirectUri],
-      scope,
-      grant_types: ["authorization_code", "refresh_token"],
-      response_types: ["code"],
-      application_type: "native",
-      token_endpoint_auth_method: "none",
-      dpop_bound_access_tokens: true,
-    };
-
-const keyset = isProduction
-  ? [
-      await JoseKey.fromImportable(
-        Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString(),
-        "key1",
-      ),
-    ]
-  : undefined;
-
-export const oauthClientFactory = ({
+export const oauthClientFactory = async ({
   oauthStateStore,
   oauthSessionStore,
   loggerManager,
+  isProduction,
+  publicUrl,
+  appviewDid,
+  privateKeyEs256B64,
+  atprotoPlcUrl,
+  atprotoHandleResolverUrl,
 }: {
   oauthStateStore: NodeSavedStateStore;
   oauthSessionStore: NodeSavedSessionStore;
   loggerManager: ILoggerManager;
-}): IOAuthClient => {
+  isProduction: boolean;
+  publicUrl: string;
+  appviewDid: `did:${string}:${string}`;
+  privateKeyEs256B64: string;
+  atprotoPlcUrl: string;
+  atprotoHandleResolverUrl: string | undefined;
+}): Promise<IOAuthClient> => {
+  const appviewAud = encodeURIComponent(`${appviewDid}#bsky_appview`);
+  const scope = [
+    "atproto",
+    "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
+    "repo:app.bsky.graph.list",
+    "blob:image/*",
+    `rpc:*?aud=${appviewAud}`,
+  ].join(" ");
+  const redirectUri = `${publicUrl}/oauth/callback`;
+
+  const clientMetadata = isProduction
+    ? {
+        client_name: "Subscope",
+        client_id: `${publicUrl}/oauth/client-metadata.json`,
+        client_uri: publicUrl,
+        jwks_uri: `${publicUrl}/oauth/jwks.json`,
+        redirect_uris: [redirectUri],
+        scope,
+        grant_types: ["authorization_code", "refresh_token"],
+        response_types: ["code"],
+        application_type: "web",
+        token_endpoint_auth_method: "private_key_jwt",
+        token_endpoint_auth_signing_alg: "ES256",
+        dpop_bound_access_tokens: true,
+      }
+    : {
+        client_id: `http://localhost?${new URLSearchParams({ redirect_uri: redirectUri, scope })}`,
+        redirect_uris: [redirectUri],
+        scope,
+        grant_types: ["authorization_code", "refresh_token"],
+        response_types: ["code"],
+        application_type: "native",
+        token_endpoint_auth_method: "none",
+        dpop_bound_access_tokens: true,
+      };
+
+  const keyset = isProduction
+    ? [
+        await JoseKey.fromImportable(
+          Buffer.from(privateKeyEs256B64, "base64").toString(),
+          "key1",
+        ),
+      ]
+    : undefined;
+
   const client = new NodeOAuthClient({
     clientMetadata,
     keyset,
     allowHttp: !isProduction,
-    plcDirectoryUrl: env.ATPROTO_PLC_URL,
-    handleResolver: env.ATPROTO_HANDLE_RESOLVER_URL,
+    plcDirectoryUrl: atprotoPlcUrl,
+    handleResolver: atprotoHandleResolverUrl,
     stateStore: oauthStateStore,
     sessionStore: oauthSessionStore,
   });
   const logger = loggerManager.createLogger("oauthClient");
 
   const createAgent = (session: ConstructorParameters<typeof Client>[0]) =>
-    new Client(session, { service: `${env.APPVIEW_DID}#bsky_appview` });
+    new Client(session, { service: `${appviewDid}#bsky_appview` });
 
   return {
     async authorize(identifier, state) {
