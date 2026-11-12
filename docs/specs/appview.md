@@ -269,6 +269,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getFollows-1: 指定したアカウントをsubjectに、そのフォロー先をfollowsにprofileViewで返す
 - getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
+## app.bsky.graph.getKnownFollowers
+
+指定したアカウントをフォローしているアカウントのうち、認証したアカウントがフォローしているものを返す。認証は必須。
+
+- getKnownFollowers-1: 認証がないリクエストには401を返す
+- getKnownFollowers-2: 指定したアカウントをsubjectに、閲覧者がフォローしているそのフォロワーだけをfollowersにprofileViewで返す
+- getKnownFollowers-3: 閲覧者がフォローした新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+
 ## app.bsky.graph.getList
 
 指定したリストとそのリストに追加されたアカウントを返す。認証は任意。

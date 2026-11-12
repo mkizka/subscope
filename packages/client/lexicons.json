@@ -56,6 +56,7 @@
     "app.bsky.graph.follow",
     "app.bsky.graph.getFollowers",
     "app.bsky.graph.getFollows",
+    "app.bsky.graph.getKnownFollowers",
     "app.bsky.graph.getList",
     "app.bsky.graph.getLists",
     "app.bsky.graph.getListsWithMembership",
@@ -261,6 +262,10 @@
     "app.bsky.graph.getFollows": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.getFollows",
       "cid": "bafyreicun6mwmjgrdmrtmnfqv3ws37g5okcmo3uiaf2qwopk3bhtj5rqae"
+    },
+    "app.bsky.graph.getKnownFollowers": {
+      "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.getKnownFollowers",
+      "cid": "bafyreia3bjqeaj5uk2zlkhk5pipefehy2mlrdp3hoqtgu3np3tvbg6xjuq"
     },
     "app.bsky.graph.getList": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.getList",

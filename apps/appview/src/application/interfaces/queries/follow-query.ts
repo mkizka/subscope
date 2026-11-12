@@ -21,5 +21,11 @@ export interface IFollowQuery {
     limit: number;
     cursor?: string;
   }) => Promise<FollowerDto[]>;
+  findKnownFollowers: (params: {
+    viewerDid: Did;
+    subjectDid: Did;
+    limit: number;
+    cursor?: string;
+  }) => Promise<FollowerDto[]>;
   findFolloweeDids: (accountDid: Did) => Promise<Did[]>;
 }
