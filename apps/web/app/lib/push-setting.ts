@@ -59,6 +59,6 @@ export const enablePush = async () => {
 export const disablePush = async () => {
   const subscription = await findSubscription();
   if (!subscription) return;
-  await request("DELETE", { endpoint: subscription.endpoint });
   await subscription.unsubscribe();
+  await request("DELETE", { endpoint: subscription.endpoint });
 };
