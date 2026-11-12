@@ -27,6 +27,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = { beforeEach: pushSetting("off") };
 
+export const PushOn: Story = { beforeEach: pushSetting("on") };
+
+export const PushDenied: Story = { beforeEach: pushSetting("denied") };
+
+export const PushUnsupported: Story = {
+  beforeEach: pushSetting("unsupported"),
+};
+
 export const Account: Story = {
   name: "settings-s1: 自分のアイコン、表示名、ハンドルを表示する",
   tags: ["play"],
