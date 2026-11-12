@@ -68,6 +68,7 @@ export function ProfileContainer({ handle }: Props) {
         backfillStatus={data?.backfillStatus}
         untracked={!!data && !data.backfillStatus}
         followedBy={!!profile?.viewer?.followedBy}
+        knownFollowers={profile?.viewer?.knownFollowers}
         action={
           profile && (
             <div className="flex items-center gap-2">

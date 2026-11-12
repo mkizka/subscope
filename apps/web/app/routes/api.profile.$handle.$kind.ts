@@ -21,14 +21,15 @@ export const loader = async ({
   ) {
     throw data("ページが見つかりません", { status: 404 });
   }
+  const { searchParams } = new URL(request.url);
+  const filter = searchParams.get("filter");
   return data(
     await di.getFollowListUseCase.execute(
       context.get(didContext),
       handle,
       kind,
-      new URL(request.url).searchParams.get("filter") === "registered"
-        ? "registered"
-        : undefined,
+      filter === "registered" || filter === "known" ? filter : undefined,
+      searchParams.get("cursor") ?? undefined,
     ),
   );
 };

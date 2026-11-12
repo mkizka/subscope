@@ -1,6 +1,6 @@
 import type { ProfileLinkView } from "@repo/client/app/bsky/actor/defs";
 import { Link as LinkIcon } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { Fragment, type ReactNode, useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -25,6 +25,15 @@ type Props = {
   backfillStatus?: BackfillStatus;
   untracked?: boolean;
   followedBy?: boolean;
+  knownFollowers?: {
+    count: number;
+    followers: {
+      did: string;
+      displayName?: string;
+      handle: string;
+      avatar?: string;
+    }[];
+  };
   action?: ReactNode;
 };
 
@@ -41,6 +50,7 @@ export function ProfileHeader({
   backfillStatus,
   untracked,
   followedBy,
+  knownFollowers,
   action,
 }: Props) {
   const [viewing, setViewing] = useState<string>();
@@ -142,6 +152,41 @@ export function ProfileHeader({
             <b className="text-ink">{followersCount}</b> フォロワー
           </Link>
         </div>
+        {knownFollowers && (
+          <Link
+            to={`/${handle}/followers?filter=known`}
+            className="
+              flex items-center gap-2 text-label text-muted
+              hover:underline
+            "
+          >
+            <span className="flex">
+              {knownFollowers.followers.slice(0, 3).map((follower) => (
+                <span
+                  key={follower.did}
+                  className="
+                    -ml-2 rounded-full border-2 border-surface
+                    first:ml-0
+                  "
+                >
+                  <Avatar src={follower.avatar} size="xs" />
+                </span>
+              ))}
+            </span>
+            <span>
+              {knownFollowers.followers.slice(0, 2).map((follower, i) => (
+                <Fragment key={follower.did}>
+                  {i > 0 && "、"}
+                  <b className="text-ink">
+                    {follower.displayName || follower.handle}
+                  </b>
+                </Fragment>
+              ))}
+              {knownFollowers.count > 2 && `ほか${knownFollowers.count - 2}人`}
+              がフォローしています
+            </span>
+          </Link>
+        )}
       </div>
       <ImageViewer
         images={viewing ? [{ src: viewing, alt: "" }] : []}

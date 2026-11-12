@@ -24,6 +24,11 @@ export interface IAccountQuery {
     account: AtIdentifierString,
     kind: "follows" | "followers",
   ) => Promise<FollowListDto>;
+  findKnownFollowers: (
+    did: string,
+    account: AtIdentifierString,
+    cursor?: string,
+  ) => Promise<FollowListDto>;
   findProfiles: (did: string, dids: string[]) => Promise<AccountDto[]>;
   isAdmin: (did: string) => Promise<boolean>;
   searchActors: (did: string, q: string) => Promise<AccountDto[]>;

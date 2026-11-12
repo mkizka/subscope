@@ -9,6 +9,7 @@ import getActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
 import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
 import getFollowers from "@repo/client/app/bsky/graph/getFollowers";
 import getFollows from "@repo/client/app/bsky/graph/getFollows";
+import getKnownFollowers from "@repo/client/app/bsky/graph/getKnownFollowers";
 import verifyAccess from "@repo/client/me/subsco/admin/verifyAccess";
 
 import type { AccountDto } from "@/app/server/application/dto/account";
@@ -95,6 +96,19 @@ export const accountQueryFactory = ({
       return {
         subject: toAccount(res.subject),
         accounts: accounts.map(toAccount),
+      };
+    },
+    async findKnownFollowers(did, account, cursor) {
+      const agent = await restore(did);
+      const res = await agent.call(getKnownFollowers, {
+        actor: account,
+        limit: 50,
+        cursor,
+      });
+      return {
+        subject: toAccount(res.subject),
+        accounts: res.followers.map(toAccount),
+        cursor: res.cursor,
       };
     },
     async findProfiles(did, dids) {

@@ -1,7 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
 
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
 import { AccountList } from "@/app/features/account/account-list";
@@ -15,6 +17,7 @@ const emptyMessages = {
   follows: "フォローしているアカウントはありません",
   followers: "フォロワーはいません",
 };
+const filters = ["registered", "known"] as const;
 
 type Props = {
   handle: string;
@@ -22,17 +25,34 @@ type Props = {
 };
 
 export function FollowListContainer({ handle, kind }: Props) {
-  const [searchParams] = useSearchParams();
-  const registered =
-    kind === "followers" && searchParams.get("filter") === "registered";
-  const { data } = useQuery({
-    queryKey: ["follow-list", handle, kind, registered],
-    queryFn: () =>
-      fetchJson<FollowListResponse>(
-        `/api/profile/${encodeURIComponent(handle)}/${kind}${registered ? "?filter=registered" : ""}`,
-      ),
+  const filterParam = useSearchParams()[0].get("filter");
+  const filter =
+    kind === "followers"
+      ? filters.find((value) => value === filterParam)
+      : undefined;
+  const {
+    data: pages,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["follow-list", handle, kind, filter ?? "all"],
+    queryFn: ({ pageParam }) => {
+      const query = new URLSearchParams({
+        ...(filter && { filter }),
+        ...(pageParam && { cursor: pageParam }),
+      }).toString();
+      return fetchJson<FollowListResponse>(
+        `/api/profile/${encodeURIComponent(handle)}/${kind}${query && `?${query}`}`,
+      );
+    },
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
     throwOnError: true,
   });
+  const data = pages?.pages[0];
+  const accounts = pages?.pages.flatMap((page) => page.accounts);
 
   const subject = data?.subject;
   return (
@@ -49,23 +69,40 @@ export function FollowListContainer({ handle, kind }: Props) {
       {kind === "followers" && (
         <Tabs
           tabs={[
-            { to: ".", label: "すべて", selected: !registered },
+            { to: ".", label: "すべて", selected: !filter },
+            {
+              to: "?filter=known",
+              label: "知り合い",
+              selected: filter === "known",
+            },
             {
               to: "?filter=registered",
               label: `メンバー${data?.registeredCount === undefined ? "" : ` ${data.registeredCount}`}`,
-              selected: registered,
+              selected: filter === "registered",
             },
           ]}
         />
       )}
-      {!data ? (
+      {!accounts ? (
         <AccountsSkeleton />
-      ) : data.accounts.length === 0 ? (
+      ) : accounts.length === 0 ? (
         <p className="py-8 text-center text-label text-muted">
-          {emptyMessages[kind]}
+          {filter === "known"
+            ? "知り合いのフォロワーはいません"
+            : emptyMessages[kind]}
         </p>
       ) : (
-        <AccountList accounts={data.accounts} />
+        <>
+          <AccountList accounts={accounts} />
+          {hasNextPage && (
+            <LoadingSpinner label="続きを読み込み中">
+              <InfiniteScrollTrigger
+                onIntersect={() => void fetchNextPage()}
+                enabled={!isFetchingNextPage}
+              />
+            </LoadingSpinner>
+          )}
+        </>
       )}
     </>
   );

@@ -15,4 +15,5 @@ export type FollowListDto = {
   subject: AccountDto;
   accounts: AccountDto[];
   registeredCount?: number;
+  cursor?: string;
 };
