@@ -4,16 +4,22 @@ import type { PushSettingState } from "@/app/lib/push-setting";
 type Props = {
   state: Exclude<PushSettingState, "unavailable">;
   isPending: boolean;
+  permissionDismissed?: boolean;
   onToggle: () => void;
 };
 
-export function PushSetting({ state, isPending, onToggle }: Props) {
+export function PushSetting({
+  state,
+  isPending,
+  permissionDismissed,
+  onToggle,
+}: Props) {
   const isOn = state === "on";
   return (
     <div
       className="
-        flex items-center justify-between gap-3 border-b border-line px-4 py-2
-        text-label
+        flex flex-wrap items-center justify-between gap-3 border-b border-line
+        px-4 py-2 text-label
       "
     >
       {state === "denied" ? (
@@ -35,6 +41,11 @@ export function PushSetting({ state, isPending, onToggle }: Props) {
           >
             {isOn ? "オフにする" : "オンにする"}
           </Button>
+          {permissionDismissed && !isPending && (
+            <p className="basis-full text-muted">
+              アドレスバーのアイコンから通知を許可してください
+            </p>
+          )}
         </>
       )}
     </div>

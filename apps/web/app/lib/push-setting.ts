@@ -38,10 +38,10 @@ export const fetchPushSettingState = async (): Promise<PushSettingState> => {
 };
 
 export const enablePush = async () => {
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return permission;
   const publicKey = await fetchPublicKey();
-  if (!publicKey || (await Notification.requestPermission()) !== "granted") {
-    return;
-  }
+  if (!publicKey) return permission;
   const registration = await navigator.serviceWorker.register("/sw.js");
   await navigator.serviceWorker.ready;
   const subscription = await registration.pushManager.subscribe({
@@ -54,6 +54,7 @@ export const enablePush = async () => {
     await subscription.unsubscribe();
     throw e;
   }
+  return permission;
 };
 
 export const disablePush = async () => {
