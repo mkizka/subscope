@@ -7,4 +7,4 @@ export const jobQueueFactory = ({
   env,
 }: {
   env: Pick<Env, "REDIS_URL">;
-}): IJobQueue => new JobQueue(env.REDIS_URL);
+}): IJobQueue => new JobQueue(env);

@@ -32,14 +32,17 @@ export class DidResolver implements IDidResolver {
   private readonly logger: Logger;
 
   constructor(
-    plcUrl: string,
+    env: { PLC_URL: string },
     loggerManager: ILoggerManager,
     didCache: DidCache,
     private readonly metricReporter: IMetricReporter,
   ) {
     const fetch =
-      new URL(plcUrl).protocol === "http:" ? globalThis.fetch : undefined;
-    this.resolver = new Resolver({ didCache, plcUrl, fetch }, metricReporter);
+      new URL(env.PLC_URL).protocol === "http:" ? globalThis.fetch : undefined;
+    this.resolver = new Resolver(
+      { didCache, plcUrl: env.PLC_URL, fetch },
+      metricReporter,
+    );
     this.logger = loggerManager.createLogger("DidResolver");
   }
 

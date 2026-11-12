@@ -139,11 +139,6 @@ export const config = [
     rules: { "local/no-env-import": "off" },
   },
   {
-    // 個別のvalueからenvへの移行が終わるまで除外する
-    files: ["**/shared/registry.ts"],
-    rules: { "local/no-env-value": "off" },
-  },
-  {
     files: ["**/*.in-memory.ts"],
     rules: {
       "@typescript-eslint/require-await": "off",
