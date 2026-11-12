@@ -538,6 +538,9 @@ importers:
       '@repo/vitest':
         specifier: workspace:*
         version: link:../../packages/vitest
+      '@repo/web-push-mock':
+        specifier: workspace:*
+        version: link:../../packages/web-push-mock
       '@tsconfig/node-lts':
         specifier: 24.0.1
         version: 24.0.1
