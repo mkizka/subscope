@@ -354,4 +354,42 @@ test.describe("リスト", () => {
       });
     }).toPass();
   });
+
+  test("list-e12: プロフィール全体ページのフォローボタンの右にある「…」メニューの「リストに追加」から、自分のリストにそのアカウントを追加・削除する（自分のプロフィールにも出す）", async ({
+    page,
+  }) => {
+    const name = `list-e12のリスト ${Date.now()}`;
+    await createEmptyList(name);
+    await page.goto("/bob.test");
+    const main = page.getByRole("main");
+    const dialog = page.getByRole("dialog", { name: "リストに追加" });
+    const row = dialog.getByRole("listitem").filter({ hasText: name });
+
+    const reopen = async (button: "追加" | "削除") => {
+      await expect(async () => {
+        await page.reload();
+        await main.getByRole("button", { name: "その他" }).click();
+        await page.getByRole("button", { name: "リストに追加" }).click();
+        await expect(row.getByRole("button", { name: button })).toBeVisible({
+          timeout: 1000,
+        });
+      }).toPass();
+    };
+
+    await reopen("追加");
+    const click = async (button: "追加" | "削除") => {
+      const submitted = page.waitForResponse((res) =>
+        res.url().includes("/api/list-members"),
+      );
+      await row.getByRole("button", { name: button }).click();
+      await submitted;
+    };
+    await click("追加");
+    await reopen("削除");
+    await click("削除");
+    await reopen("追加");
+
+    await page.goto("/alice.test");
+    await expect(main.getByRole("button", { name: "その他" })).toBeVisible();
+  });
 });

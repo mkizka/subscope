@@ -58,3 +58,27 @@ export function RemoveListMemberButton({
     </fetcher.Form>
   );
 }
+
+export function AddListMemberButton({
+  listUri,
+  did,
+}: {
+  listUri: string;
+  did: string;
+}) {
+  const fetcher = useFetcher();
+  return (
+    <fetcher.Form method="post" action="/api/list-members">
+      <input type="hidden" name="listUri" value={listUri} />
+      <input type="hidden" name="handle" value={did} />
+      <Button
+        type="submit"
+        variant="secondary"
+        size="sm"
+        loading={fetcher.state !== "idle"}
+      >
+        追加
+      </Button>
+    </fetcher.Form>
+  );
+}

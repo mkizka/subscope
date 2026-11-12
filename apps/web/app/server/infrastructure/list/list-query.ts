@@ -3,6 +3,7 @@ import getListFeed from "@repo/client/app/bsky/feed/getListFeed";
 import type { ListView } from "@repo/client/app/bsky/graph/defs";
 import getList from "@repo/client/app/bsky/graph/getList";
 import getLists from "@repo/client/app/bsky/graph/getLists";
+import getListsWithMembership from "@repo/client/app/bsky/graph/getListsWithMembership";
 
 import type { ListDto } from "@/app/server/application/dto/list";
 import type { IListQuery } from "@/app/server/application/interfaces/list-query";
@@ -56,6 +57,17 @@ export const listQueryFactory = ({
           description: subject.description,
         })),
       };
+    },
+    async findListsWithMembership(did, subjectDid) {
+      const agent = await restore(did);
+      const { listsWithMembership } = await agent.call(getListsWithMembership, {
+        actor: subjectDid,
+        purposes: ["curatelist"],
+      });
+      return listsWithMembership.map(({ list, listItem }) => ({
+        list: toList(list),
+        listItemUri: listItem?.uri,
+      }));
     },
     async findPosts(did, listUri) {
       const agent = await restore(did);
