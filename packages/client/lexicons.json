@@ -26,6 +26,7 @@
     "app.bsky.actor.profile",
     "app.bsky.actor.searchActors",
     "app.bsky.actor.searchActorsTypeahead",
+    "app.bsky.authViewAll",
     "app.bsky.embed.defs",
     "app.bsky.embed.external",
     "app.bsky.embed.images",
@@ -134,6 +135,10 @@
     "app.bsky.actor.searchActorsTypeahead": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.actor.searchActorsTypeahead",
       "cid": "bafyreigydtxvpnrndvk7iws4uypd6adqzohcdafeuqajiqmmbcqq5vatmu"
+    },
+    "app.bsky.authViewAll": {
+      "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.authViewAll",
+      "cid": "bafyreidc5wivem7vuisq5tdps2g5xacy2flcf4yxzotd6wcffhcar5uumm"
     },
     "app.bsky.embed.defs": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.embed.defs",

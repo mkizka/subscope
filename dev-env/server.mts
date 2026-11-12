@@ -72,7 +72,10 @@ for (const lexicon of [
     "../packages/client/lexicons/me/subsco/authFull.json",
     import.meta.url,
   ),
-  new URL("./lexicons/app.bsky.authViewAll.json", import.meta.url),
+  new URL(
+    "../packages/client/lexicons/app/bsky/authViewAll.json",
+    import.meta.url,
+  ),
 ]) {
   const record = JSON.parse(await readFile(lexicon, "utf-8"));
   await lexiconAgent.com.atproto.repo.createRecord({
