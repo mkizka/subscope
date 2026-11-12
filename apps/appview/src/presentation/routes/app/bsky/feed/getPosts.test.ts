@@ -183,7 +183,7 @@ describe("app.bsky.feed.getPosts", () => {
     ]);
   });
 
-  test("threadgate-1: スレッドの起点の投稿は、そのthreadgateをthreadgateに含める", async () => {
+  test("threadgate-1: スレッドの起点の投稿はそのthreadgateをthreadgateに含める", async () => {
     // arrange
     const { client } = await setupApiTest();
     const root = await createPost();
@@ -403,7 +403,7 @@ describe("app.bsky.feed.getPosts", () => {
       },
     ]);
   });
-  test("embed-1: gallery埋め込みの画像は、引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す", async () => {
+  test("embed-1: gallery埋め込みの画像は引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const quoted = await createPost();
@@ -437,7 +437,7 @@ describe("app.bsky.feed.getPosts", () => {
     ]);
   });
 
-  test("embed-2: 動画の埋め込みは、再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す", async () => {
+  test("embed-2: 動画の埋め込みは再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const post = await createPost();

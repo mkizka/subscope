@@ -83,7 +83,7 @@ describe("commit", () => {
     return post ?? null;
   };
 
-  test("index-5: 削除したレコードは、削除より古いrevのコミットで復活させない", async () => {
+  test("index-5: 削除したレコードは削除より古いrevのコミットで復活させない", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
@@ -99,7 +99,7 @@ describe("commit", () => {
     expect(await findPost(account.did)).toBeNull();
   });
 
-  test("index-6: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない", async () => {
+  test("index-6: 更新したレコードは更新より古いrevのコミットで古い内容に戻さない", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())

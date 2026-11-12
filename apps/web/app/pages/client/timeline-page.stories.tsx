@@ -321,7 +321,7 @@ export const ImageViewerSwipe: Story = {
 };
 
 export const ImageViewerZoom: Story = {
-  name: "image-viewer-s6: 拡大表示した画像は、ピンチ操作か拡大ボタンでさらにズームできる",
+  name: "image-viewer-s6: 拡大表示した画像はピンチ操作か拡大ボタンでさらにズームできる",
   tags: ["play"],
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
@@ -388,7 +388,7 @@ const article = (root: HTMLElement, text: string) => {
 };
 
 export const DeleteOnlyOwnPost: Story = {
-  name: "post-toolbar-s1: 「…」メニューの削除は、自分の投稿にだけ表示する",
+  name: "post-toolbar-s1: 「…」メニューの削除は自分の投稿にだけ表示する",
   tags: ["play"],
   beforeEach: withToolbarPosts,
   play: async ({ canvasElement }) => {
@@ -406,7 +406,7 @@ export const DeleteOnlyOwnPost: Story = {
 };
 
 export const LikedHeartFilled: Story = {
-  name: "post-toolbar-s2: いいね済みの投稿のいいねボタンは、ハートを塗りつぶして表示する",
+  name: "post-toolbar-s2: いいね済みの投稿のいいねボタンはハートを塗りつぶして表示する",
   tags: ["play"],
   beforeEach: withToolbarPosts,
   play: async ({ canvasElement }) => {
@@ -434,7 +434,7 @@ const setBackfillStatus = (
 };
 
 export const BackfillInProgress: Story = {
-  name: "backfillBanner-s1: 自分の同期中は、「過去の投稿を同期しています」の帯を出す",
+  name: "backfillBanner-s1: 自分の同期中は「過去の投稿を同期しています」の帯を出す",
   tags: ["play"],
   beforeEach: () => setBackfillStatus("inProgress"),
   play: async ({ canvasElement }) => {
@@ -559,7 +559,7 @@ const player = (canvasElement: HTMLElement) =>
   });
 
 export const VideoCenteredPlay: Story = {
-  name: "post-video-s1: 停止中は、動画の中央に再生ボタンを表示する",
+  name: "post-video-s1: 停止中は動画の中央に再生ボタンを表示する",
   tags: ["play"],
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
@@ -729,7 +729,7 @@ export const PostFormQuote: Story = {
 };
 
 export const PostFormReplyRules: Story = {
-  name: "post-form-s6: 返信できる人の設定は、入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ",
+  name: "post-form-s6: 返信できる人の設定は入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ",
   tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
@@ -1162,7 +1162,7 @@ const reposted = () => {
 };
 
 export const RepostAboveAvatar: Story = {
-  name: "timeline-s7: リポストした人の表示は、投稿者のアイコンより上の行に出す",
+  name: "timeline-s7: リポストした人の表示は投稿者のアイコンより上の行に出す",
   tags: ["play"],
   beforeEach: reposted,
   play: async ({ canvasElement }) => {
@@ -1175,7 +1175,7 @@ export const RepostAboveAvatar: Story = {
 };
 
 export const AuthorHandle: Story = {
-  name: "timeline-s8: 投稿には、投稿者の名前の隣にハンドルを表示する",
+  name: "timeline-s8: 投稿には投稿者の名前の隣にハンドルを表示する",
   tags: ["play"],
   beforeEach: () => {
     setPosts([post("handle")]);
@@ -1190,7 +1190,7 @@ export const AuthorHandle: Story = {
 };
 
 export const RepostLink: Story = {
-  name: "timeline-s9: 「○○がリポスト」をタップすると、投稿ではなく○○のプロフィール全体ページを開く",
+  name: "timeline-s9: 「○○がリポスト」をタップすると、○○のプロフィール全体ページを開く",
   tags: ["play"],
   beforeEach: reposted,
   play: async ({ canvasElement }) => {
@@ -1218,7 +1218,7 @@ export const Hashtag: Story = {
 };
 
 export const OmittedPosts: Story = {
-  name: "timeline-s11: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する。この表示は、最後の投稿のスレッドページへのリンクにする",
+  name: "timeline-s11: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する。この表示は最後の投稿のスレッドページへのリンクにする",
   tags: ["play"],
   beforeEach: () => {
     const chain = [post("t1")];

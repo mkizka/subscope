@@ -75,7 +75,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getGroupedNotifications-2: 同じ投稿へのいいねとリポストは、種類ごとに1つのグループにまとめる", async () => {
+  test("getGroupedNotifications-2: 同じ投稿へのいいねとリポストは種類ごとに1つのグループにまとめる", async () => {
     // arrange
     const { client, notify, viewerPost } = await setup();
     const post = await viewerPost();

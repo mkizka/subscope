@@ -136,7 +136,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-e5: 全体ページの「メディア」タブには、画像付きの投稿だけを表示する", async ({
+  test("profile-e5: 全体ページの「メディア」タブには画像付きの投稿だけを表示する", async ({
     page,
   }) => {
     const image = `profile-10の画像付き ${Date.now()}`;
@@ -209,7 +209,7 @@ test.describe("プロフィール", () => {
     await expect(followers).toBeVisible();
   });
 
-  test("profile-e8: 全体ページの「投稿」タブでは、自分の投稿への自分のリプライ(スレッド)を含め、timeline-s6と同じく線で繋げる", async ({
+  test("profile-e8: 全体ページの「投稿」タブでは自分の投稿への自分のリプライ(スレッド)を含め、timeline-s6と同じく線で繋げる", async ({
     page,
   }) => {
     const root = await createRecord("alice.test", "app.bsky.feed.post", {

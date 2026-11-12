@@ -130,7 +130,7 @@ for (const { id, name, submit, title, subjectOf } of composeCases) {
   });
 }
 
-test("post-toolbar-e5: いいね・リポストのボタンは、押した結果を画面に反映し終えるまで押せない", async ({
+test("post-toolbar-e5: いいね・リポストのボタンは押した結果を画面に反映し終えるまで押せない", async ({
   page,
   request,
 }) => {

@@ -87,7 +87,7 @@ export const ServerCard: Story = {
 };
 
 export const TabBarCurrent: Story = {
-  name: "layout-s4: モバイルでは、下のタブで今いるページの項目を強調する",
+  name: "layout-s4: モバイルでは下のタブで今いるページの項目を強調する",
   tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
@@ -113,7 +113,7 @@ const openDrawer = async (canvasElement: HTMLElement) => {
 };
 
 export const DrawerItems: Story = {
-  name: "layout-s5: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べる",
+  name: "layout-s5: モバイルのドロワーにはPCの左カラムと同じメニュー項目を並べる",
   tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
@@ -255,7 +255,7 @@ export const Skeleton: Story = {
 };
 
 export const TabBarIconOnly: Story = {
-  name: "layout-s13: モバイルでは、下のタブにラベル文字を出さず、アイコンだけを表示する",
+  name: "layout-s13: モバイルでは下のタブにラベル文字を出さず、アイコンだけを表示する",
   tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {

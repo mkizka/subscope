@@ -8,7 +8,7 @@ import {
 } from "../../helpers/pds";
 
 test.describe("通知", () => {
-  test("notification-e2: フォローの通知には、相手の名前を表示する", async ({
+  test("notification-e2: フォローの通知には相手の名前を表示する", async ({
     page,
   }) => {
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -30,7 +30,7 @@ test.describe("通知", () => {
     }).toPass();
   });
 
-  test("notification-e1: いいね・リポストの通知には、相手の名前と対象の投稿の本文を表示する", async ({
+  test("notification-e1: いいね・リポストの通知には相手の名前と対象の投稿の本文を表示する", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();

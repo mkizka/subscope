@@ -105,7 +105,7 @@ const avatarUrl =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 
 export const IconAndAvatar: Story = {
-  name: "notification-s2: 通知には、種類を表す色付きのアイコンと相手のアバターを表示する",
+  name: "notification-s2: 通知には種類を表す色付きのアイコンと相手のアバターを表示する",
   tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData(
@@ -252,7 +252,7 @@ export const Loading: Story = {
 };
 
 export const LoadingSkeleton: Story = {
-  name: "notification-s4: 通知の読み込み中は、左にアイコン列、右にアバター・文・ハンドル・本文を持つ通知の形のスケルトンを6行表示する",
+  name: "notification-s4: 通知の読み込み中は左にアイコン列、右にアバター・文・ハンドル・本文を持つ通知の形のスケルトンを6行表示する",
   tags: ["play"],
   beforeEach: () => {
     queryClient.clear();

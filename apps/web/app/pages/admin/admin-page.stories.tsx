@@ -85,7 +85,7 @@ export const MemberCount: Story = {
 };
 
 export const BannedAccounts: Story = {
-  name: "admin-accounts-s2: 「停止中」タブには、サーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す",
+  name: "admin-accounts-s2: 「停止中」タブにはサーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す",
   tags: ["play"],
   parameters: { path: "/admin/registered-accounts?tab=banned" },
   beforeEach: () => {

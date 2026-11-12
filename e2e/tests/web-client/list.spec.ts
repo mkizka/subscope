@@ -268,7 +268,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e9: リストのメンバーの投稿は、タイムラインと同じ規則でリプライを絞り込む", async ({
+  test("list-e9: リストのメンバーの投稿はタイムラインと同じ規則でリプライを絞り込む", async ({
     page,
   }) => {
     const rkey = await createList(`list-e9のリスト ${Date.now()}`);
@@ -303,7 +303,7 @@ test.describe("リスト", () => {
     await expect(main.getByText("list-e9: aliceへの返信")).toHaveCount(0);
   });
 
-  test("list-e10: リスト一覧は、プロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示し、自分のプロフィールでも作成フォームは表示しない", async ({
+  test("list-e10: リスト一覧はプロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示し、自分のプロフィールでも作成フォームは表示しない", async ({
     page,
   }) => {
     const name = `list-e10のリスト ${Date.now()}`;

@@ -56,7 +56,7 @@ test.describe("レイアウト", () => {
     await expect(page).toHaveURL("/alice.test");
   });
 
-  test("layout-e2: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
+  test("layout-e2: ページの読み込み中は画面上部に読み込み中のプログレスバーを表示する", async ({
     page,
   }) => {
     await page.goto("/");
@@ -83,7 +83,7 @@ test.describe("レイアウト", () => {
 test.describe("レイアウト（モバイル）", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
-  test("layout-e6: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
+  test("layout-e6: モバイルでは下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
     page,
   }) => {
     await page.goto("/server");

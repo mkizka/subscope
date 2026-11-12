@@ -313,7 +313,7 @@ test.describe("招待コード", () => {
     );
   });
 
-  test("invite-codes-e4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
+  test("invite-codes-e4: 未使用で期限内の招待コードは確認のうえ削除できる", async ({
     page,
   }) => {
     await page.goto("/");

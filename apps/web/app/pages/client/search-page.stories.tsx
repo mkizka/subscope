@@ -105,7 +105,7 @@ export const FromUrl: Story = {
 };
 
 export const Submitting: Story = {
-  name: "search-s4: 検索ボタンは、検索結果を読み込み終えるまでスピナーを出して押せなくする",
+  name: "search-s4: 検索ボタンは検索結果を読み込み終えるまでスピナーを出して押せなくする",
   tags: ["play"],
   beforeEach: () => pendingSearch("posts", "alice"),
   play: async ({ canvasElement }) => {
@@ -117,7 +117,7 @@ export const Submitting: Story = {
 };
 
 export const AccountSyncStatus: Story = {
-  name: "search-s5: アカウントの検索結果には、過去の投稿の同期状態を表示する",
+  name: "search-s5: アカウントの検索結果には過去の投稿の同期状態を表示する",
   tags: ["play"],
   parameters: { path: "/search?q=alice&tab=accounts" },
   beforeEach: () => {
