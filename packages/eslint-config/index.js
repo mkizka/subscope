@@ -62,6 +62,29 @@ export const config = [
     },
   },
   {
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "process",
+          property: "env",
+          message:
+            "process.envはenv.tsでだけ読み、DIのvalueとして渡してください。",
+        },
+      ],
+    },
+  },
+  {
+    // drizzle-kitのCLI設定と、アプリ外のプロダクション起動スクリプト(PORTのみ)はDIを通らないため
+    files: [
+      "**/shared/env.ts",
+      "**/server/env.ts",
+      "**/drizzle.config.ts",
+      "apps/web/server.js",
+    ],
+    rules: { "no-restricted-properties": "off" },
+  },
+  {
     files: ["**/*.in-memory.ts"],
     rules: {
       "@typescript-eslint/require-await": "off",
