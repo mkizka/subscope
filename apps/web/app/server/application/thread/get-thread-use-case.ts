@@ -9,6 +9,22 @@ export interface IGetThreadUseCase {
   ) => ReturnType<IThreadQuery["findThread"]>;
 }
 
+export interface IGetQuotesUseCase {
+  execute: (
+    did: string,
+    uri: AtUriString,
+    cursor?: string,
+  ) => ReturnType<IThreadQuery["findQuotes"]>;
+}
+
+export const getQuotesUseCaseFactory = ({
+  threadQuery,
+}: {
+  threadQuery: IThreadQuery;
+}): IGetQuotesUseCase => ({
+  execute: (did, uri, cursor) => threadQuery.findQuotes(did, uri, cursor),
+});
+
 export const getThreadUseCaseFactory = ({
   threadQuery,
 }: {

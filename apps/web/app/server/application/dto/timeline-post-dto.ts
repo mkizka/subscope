@@ -21,6 +21,7 @@ export type TimelinePostDto = {
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
+  quoteCount?: number;
   createdAt?: string;
   images?: {
     thumb: string;

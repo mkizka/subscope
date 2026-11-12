@@ -158,6 +158,7 @@ export function toTimelinePost({
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
+    quoteCount: post.quoteCount,
     images: toImages(media),
     video: toVideo(media),
     external: externalView.matches(media) ? media.external : undefined,

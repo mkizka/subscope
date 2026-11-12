@@ -35,7 +35,10 @@ import { subscribePushUseCaseFactory } from "./application/push/subscribe-push-u
 import { unsubscribePushUseCaseFactory } from "./application/push/unsubscribe-push-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { searchUseCaseFactory } from "./application/search/search-use-case";
-import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
+import {
+  getQuotesUseCaseFactory,
+  getThreadUseCaseFactory,
+} from "./application/thread/get-thread-use-case";
 import { getBackfillStatusUseCaseFactory } from "./application/timeline/get-backfill-status-use-case";
 import {
   getLocalTimelineUseCaseFactory,
@@ -222,6 +225,7 @@ export const di = await createRegistry()
   )
   .service("threadQuery", ["oauthClient"], threadQueryFactory)
   .service("getThreadUseCase", ["threadQuery"], getThreadUseCaseFactory)
+  .service("getQuotesUseCase", ["threadQuery"], getQuotesUseCaseFactory)
   .service("listQuery", ["oauthClient"], listQueryFactory)
   .service("listCommand", ["oauthClient"], listCommandFactory)
   .service(
