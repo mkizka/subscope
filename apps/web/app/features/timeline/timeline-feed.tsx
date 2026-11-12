@@ -72,30 +72,24 @@ function OmittedPosts({ count, to }: { count: number; to: string }) {
 
 export function TimelineFeed({ posts, refreshing = false }: Props) {
   return (
-    <section>
+    <section className="relative">
       {refreshing && (
         <div
           className="
-            sticky top-25.25 z-raised h-0
-            lg:top-11.25
+            pointer-events-none absolute inset-x-0 top-2 z-raised flex
+            justify-center
           "
         >
           <div
+            role="status"
+            aria-label="タイムラインを更新中"
             className="
-              pointer-events-none absolute inset-x-0 top-2 flex justify-center
+              flex items-center gap-2 rounded-full border border-line
+              bg-surface py-1.5 pr-3.5 pl-2.5 text-caption shadow-lg
             "
           >
-            <div
-              role="status"
-              aria-label="タイムラインを更新中"
-              className="
-                flex items-center gap-2 rounded-full border border-line
-                bg-surface py-1.5 pr-3.5 pl-2.5 text-caption shadow-lg
-              "
-            >
-              <LoaderCircle className="size-4 animate-spin text-brand" />
-              更新中
-            </div>
+            <LoaderCircle className="size-4 animate-spin text-brand" />
+            更新中
           </div>
         </div>
       )}
