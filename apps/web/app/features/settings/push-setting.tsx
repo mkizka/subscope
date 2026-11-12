@@ -62,45 +62,50 @@ export function PushSetting({ state, isPending, onToggle }: Props) {
   const isOn = state === "on";
   return (
     <section className="space-y-4 p-4">
-      <h2 className="text-label font-bold">この端末</h2>
-      <div className="flex items-center gap-3 px-3">
-        <BellIcon className="size-6 shrink-0" aria-hidden />
-        <div id="push-setting-label" className="min-w-0 flex-1 text-body">
-          プッシュ通知
-        </div>
-        {state === "denied" || state === "unsupported" ? (
+      <h2 className="text-label font-bold">通知</h2>
+      {state === "denied" || state === "unsupported" ? (
+        <div className="flex items-center gap-3 rounded-xl px-3 py-2">
+          <BellIcon className="size-6 shrink-0" aria-hidden />
+          <div className="min-w-0 flex-1 text-body">プッシュ通知</div>
           <BlockedNote state={state} />
-        ) : (
-          <>
-            {isPending && <LoaderCircle className="size-4 animate-spin" />}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isOn}
-              aria-labelledby="push-setting-label"
-              disabled={isPending}
-              onClick={onToggle}
-              className={clsx(
+        </div>
+      ) : (
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isOn}
+          disabled={isPending}
+          onClick={onToggle}
+          className="
+            flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left
+            hover:bg-surface-2
+            disabled:cursor-not-allowed disabled:opacity-50
+          "
+        >
+          <BellIcon className="size-6 shrink-0" aria-hidden />
+          <div className="min-w-0 flex-1 text-body">プッシュ通知</div>
+          {isPending && <LoaderCircle className="size-4 animate-spin" />}
+          <span
+            aria-hidden
+            className={clsx(
+              `
+                relative h-6 w-11 shrink-0 rounded-full
+                after:absolute after:top-0.75 after:size-4.5 after:rounded-full
+                after:bg-surface
+              `,
+              isOn
+                ? `
+                  bg-brand
+                  after:left-5.75
                 `
-                  relative h-6 w-11 shrink-0 rounded-full
-                  after:absolute after:top-0.75 after:size-4.5
-                  after:rounded-full after:bg-surface
-                  disabled:cursor-not-allowed disabled:opacity-50
+                : `
+                  bg-line
+                  after:left-0.75
                 `,
-                isOn
-                  ? `
-                    bg-brand
-                    after:left-5.75
-                  `
-                  : `
-                    bg-line
-                    after:left-0.75
-                  `,
-              )}
-            />
-          </>
-        )}
-      </div>
+            )}
+          />
+        </button>
+      )}
     </section>
   );
 }
