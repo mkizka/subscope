@@ -24,8 +24,7 @@ export class WorkerServer {
     private readonly jobQueue: IJobQueue,
     private readonly scheduleBackfillChecksUseCase: ScheduleBackfillChecksUseCase,
     healthRouter: Router,
-    private readonly port: number,
-    env: Pick<Env, "NODE_ENV">,
+    private readonly env: Pick<Env, "NODE_ENV" | "PORT">,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
@@ -37,8 +36,8 @@ export class WorkerServer {
   }
 
   start() {
-    this.server = this.app.listen(this.port, async () => {
-      this.logger.info(`Worker server listening on port ${this.port}`);
+    this.server = this.app.listen(this.env.PORT, async () => {
+      this.logger.info(`Worker server listening on port ${this.env.PORT}`);
       this.tapSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Tap subscriber threw");
       });

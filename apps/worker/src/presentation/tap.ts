@@ -8,6 +8,7 @@ import { isSupportedCollection } from "@repo/common/utils";
 import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
+import type { Env } from "../shared/env.js";
 
 export const indexCommitCommandFactory = (
   event: RecordEvent,
@@ -46,8 +47,7 @@ export class TapSubscriber {
     private readonly metricReporter: IMetricReporter,
     private readonly indexCommitUseCase: IndexCommitUseCase,
     private readonly upsertIdentityUseCase: UpsertIdentityUseCase,
-    private readonly tapUrl: string,
-    private readonly tapConcurrency: number,
+    private readonly env: Pick<Env, "TAP_URL" | "TAP_CONCURRENCY">,
   ) {
     this.logger = loggerManager.createLogger("TapSubscriber");
   }
@@ -76,10 +76,10 @@ export class TapSubscriber {
 
   async start() {
     const inFlight = new Set<Promise<void>>();
-    const channel = new Tap(this.tapUrl).channel(
+    const channel = new Tap(this.env.TAP_URL).channel(
       {
         onEvent: async (event, { ack }) => {
-          if (inFlight.size >= this.tapConcurrency) {
+          if (inFlight.size >= this.env.TAP_CONCURRENCY) {
             await Promise.race(inFlight);
           }
           const task = this.handleEvent(event)
@@ -97,7 +97,7 @@ export class TapSubscriber {
       },
       { heartbeatIntervalMs: 60_000 },
     );
-    this.logger.info(`Tap connection starting at ${this.tapUrl}`);
+    this.logger.info(`Tap connection starting at ${this.env.TAP_URL}`);
     await channel.start();
   }
 }
