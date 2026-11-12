@@ -13,11 +13,16 @@ export default defineConfig(
   },
   importAlias.configs.recommended,
   {
+    files: ["public/sw.js"],
+    languageOptions: { globals: { self: "readonly" } },
+  },
+  {
     files: ["app/**/*.{ts,tsx}"],
     ignores: [
       "app/server/application/**/*.ts",
       "app/server/infrastructure/db/db.ts",
       "app/server/infrastructure/auth/oauth-storage.ts",
+      "app/server/infrastructure/push/push-subscription-command.ts",
     ],
     rules: {
       "no-restricted-imports": [
@@ -26,7 +31,8 @@ export default defineConfig(
           patterns: [
             {
               regex: "^@repo/db",
-              message: "webは認証以外でDBに触れず、XRPCを経由してください。",
+              message:
+                "webは認証とプッシュ通知の購読以外でDBに触れず、XRPCを経由してください。",
             },
           ],
         },

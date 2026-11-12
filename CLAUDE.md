@@ -32,6 +32,7 @@ packagesディレクトリ(共通パッケージ)
 - `@repo/common/utils` - 共有ユーティリティ関数
 - `@repo/client` - `@atproto/lex`で生成したlexiconスキーマ
 - `@repo/test-utils` - テスト用データ生成ファクトリを含むユーティリティ
+- `@repo/web-push-mock` - E2Eでブラウザのプッシュ購読をすり替え、送信内容を受信・復号するモック
 - `@repo/eslint-config` - 全パッケージ共通のESLint設定
 
 e2eディレクトリ

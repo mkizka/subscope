@@ -16,6 +16,9 @@ const DEVELOPMENT_COOKIE_SECRET =
 const DEVELOPMENT_ADMIN_API_TOKEN =
   "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
+const DEVELOPMENT_VAPID_PUBLIC_KEY =
+  "BE-yfiTXTZBW7fGBJFpzslYpc1PUzl_aUvcOV70r1V7cU2jvzvpLW1m3LJiwXUCqItMcvIACzVOPsTtM6sgoKRM";
+
 const schema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]),
@@ -49,6 +52,11 @@ const schema = z
     ADMIN_API_TOKEN: match({
       prod: z.string().min(32).optional(),
       dev: z.string().min(32).default(DEVELOPMENT_ADMIN_API_TOKEN),
+    }),
+    // npx web-push generate-vapid-keys
+    VAPID_PUBLIC_KEY: match({
+      prod: z.string().optional(),
+      dev: z.string().default(DEVELOPMENT_VAPID_PUBLIC_KEY),
     }),
     ATPROTO_PLC_URL: z.string().default("https://plc.directory"),
     ATPROTO_HANDLE_RESOLVER_URL: z.url().optional(),
