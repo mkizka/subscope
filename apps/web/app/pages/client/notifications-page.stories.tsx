@@ -221,6 +221,30 @@ export const PushSettingToggling: Story = {
   },
 };
 
+export const PushSettingDismissed: Story = {
+  name: "pushSetting-s6: 「オンにする」を押して通知の許可ダイアログが選択されずに閉じたときは、「アドレスバーのアイコンから通知を許可してください」と表示する",
+  tags: ["play"],
+  beforeEach: () => {
+    pushSetting("off")();
+    const original = Notification.requestPermission.bind(Notification);
+    Notification.requestPermission = () => Promise.resolve("default");
+    return () => {
+      Notification.requestPermission = original;
+    };
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByRole("button", { name: "オンにする" }));
+
+    await expect(
+      await canvas.findByText(
+        "アドレスバーのアイコンから通知を許可してください",
+      ),
+    ).toBeVisible();
+  },
+};
+
 let release: () => void = () => {};
 
 export const Loading: Story = {

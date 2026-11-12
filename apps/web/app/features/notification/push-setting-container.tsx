@@ -15,7 +15,13 @@ export function PushSettingContainer() {
     queryFn: fetchPushSettingState,
   });
   const toggle = useMutation({
-    mutationFn: () => (state === "on" ? disablePush() : enablePush()),
+    mutationFn: async () => {
+      if (state === "on") {
+        await disablePush();
+        return null;
+      }
+      return enablePush();
+    },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["pushSetting"] }),
   });
@@ -25,6 +31,7 @@ export function PushSettingContainer() {
     <PushSetting
       state={state}
       isPending={toggle.isPending}
+      permissionDismissed={toggle.data === "default"}
       onToggle={() => toggle.mutate()}
     />
   );
