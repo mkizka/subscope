@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import { type ReactNode, useEffect } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import { alice, type Data, queryClient } from "@/.storybook/query-client";
@@ -33,6 +34,30 @@ export const PushDenied: Story = { beforeEach: pushSetting("denied") };
 
 export const PushUnsupported: Story = {
   beforeEach: pushSetting("unsupported"),
+};
+
+function OpenPopover({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    document.querySelector<HTMLElement>("[popover]")?.showPopover();
+  }, []);
+
+  return children;
+}
+
+const withOpenPopover: Decorator = (Story) => (
+  <OpenPopover>
+    <Story />
+  </OpenPopover>
+);
+
+export const PushDeniedHelp: Story = {
+  beforeEach: pushSetting("denied"),
+  decorators: [withOpenPopover],
+};
+
+export const PushUnsupportedHelp: Story = {
+  beforeEach: pushSetting("unsupported"),
+  decorators: [withOpenPopover],
 };
 
 export const Account: Story = {
@@ -93,29 +118,41 @@ export const PushSettingOn: Story = {
   },
 };
 
+const helpTexts = {
+  denied: "ブラウザのサイト設定で、このサイトの通知を許可すると使えます。",
+  unsupported:
+    "iPhone・iPadでは、このサイトをホーム画面に追加して開くと使えます。",
+};
+
 export const PushSettingDenied: Story = {
-  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチを無効にして「ブラウザで通知がブロックされています。サイト設定から許可すると使えます」と表示する",
+  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチの代わりに行の右端へ「ブロック中」を表示する。押すと、ラベルの下に「ブラウザのサイト設定で、このサイトの通知を許可すると使えます。」を吹き出しで表示する",
   beforeEach: pushSetting("denied"),
   play: async ({ canvasElement }) => {
-    await expect(await pushSwitch(canvasElement)).toBeDisabled();
-    await expect(
-      within(canvasElement).getByText(
-        "ブラウザで通知がブロックされています。サイト設定から許可すると使えます",
-      ),
-    ).toBeVisible();
+    const canvas = within(canvasElement);
+    const help = await canvas.findByText(helpTexts.denied);
+    await expect(canvas.queryByRole("switch")).toBeNull();
+    await expect(help).not.toBeVisible();
+
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "ブロック中" }),
+    );
+    await expect(help).toBeVisible();
   },
 };
 
 export const PushSettingUnsupported: Story = {
-  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、スイッチを無効にして「このブラウザでは使えません。iPhone・iPadはホーム画面に追加すると使えます」と表示する",
+  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、スイッチの代わりに行の右端へ「非対応」を表示する。押すと、「iPhone・iPadでは、このサイトをホーム画面に追加して開くと使えます。」を吹き出しで表示する",
   beforeEach: pushSetting("unsupported"),
   play: async ({ canvasElement }) => {
-    await expect(await pushSwitch(canvasElement)).toBeDisabled();
-    await expect(
-      within(canvasElement).getByText(
-        "このブラウザでは使えません。iPhone・iPadはホーム画面に追加すると使えます",
-      ),
-    ).toBeVisible();
+    const canvas = within(canvasElement);
+    const help = await canvas.findByText(helpTexts.unsupported);
+    await expect(canvas.queryByRole("switch")).toBeNull();
+    await expect(help).not.toBeVisible();
+
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "非対応" }),
+    );
+    await expect(help).toBeVisible();
   },
 };
 
@@ -151,7 +188,7 @@ export const PushSettingToggling: Story = {
 };
 
 export const PushSettingDismissed: Story = {
-  name: "pushSetting-s6: スイッチをオンにして通知の許可ダイアログが選択されずに閉じたときは、「許可されませんでした。もう一度押すか、ブラウザのサイト設定から許可してください」と表示する",
+  name: "pushSetting-s6: スイッチをオンにして通知の許可ダイアログが選択されずに閉じたときは、何も表示せずスイッチをオフのままにする",
   beforeEach: () => {
     pushSetting("off")();
     const permission = pendingPermission();
@@ -159,13 +196,13 @@ export const PushSettingDismissed: Story = {
     return permission.restore;
   },
   play: async ({ canvasElement }) => {
-    await userEvent.click(await pushSwitch(canvasElement));
+    const toggle = await pushSwitch(canvasElement);
 
-    await expect(
-      await within(canvasElement).findByText(
-        "許可されませんでした。もう一度押すか、ブラウザのサイト設定から許可してください",
-      ),
-    ).toBeVisible();
+    await userEvent.click(toggle);
+
+    await waitFor(() => expect(toggle).toBeEnabled());
+    await expect(toggle).not.toBeChecked();
+    await expect(canvasElement.querySelector("[popover]")).toBeNull();
   },
 };
 

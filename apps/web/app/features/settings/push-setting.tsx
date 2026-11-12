@@ -1,85 +1,105 @@
 import { clsx } from "clsx";
 import { BellIcon, InfoIcon, LoaderCircle } from "lucide-react";
+import { useId } from "react";
 
 import type { PushSettingState } from "@/app/lib/push-setting";
 
 type Props = {
   state: Exclude<PushSettingState, "unavailable">;
   isPending: boolean;
-  permissionDismissed?: boolean;
   onToggle: () => void;
 };
 
-const description = ({
-  state,
-  permissionDismissed,
-}: Pick<Props, "state" | "permissionDismissed">) => {
-  if (state === "denied") {
-    return "ブラウザで通知がブロックされています。サイト設定から許可すると使えます";
-  }
-  if (state === "unsupported") {
-    return "このブラウザでは使えません。iPhone・iPadはホーム画面に追加すると使えます";
-  }
-  if (permissionDismissed) {
-    return "許可されませんでした。もう一度押すか、ブラウザのサイト設定から許可してください";
-  }
-  return null;
+const blocked = {
+  denied: {
+    label: "ブロック中",
+    help: "ブラウザのサイト設定で、このサイトの通知を許可すると使えます。",
+  },
+  unsupported: {
+    label: "非対応",
+    help: "iPhone・iPadでは、このサイトをホーム画面に追加して開くと使えます。",
+  },
 };
 
-export function PushSetting({
-  state,
-  isPending,
-  permissionDismissed,
-  onToggle,
-}: Props) {
+function BlockedNote({ state }: { state: keyof typeof blocked }) {
+  const id = useId();
+  const anchor = `--${id.replace(/[^\w-]/g, "")}`;
+  return (
+    <>
+      <button
+        type="button"
+        popoverTarget={id}
+        style={{ anchorName: anchor }}
+        className="
+          inline-flex h-10 shrink-0 items-center gap-1 rounded-full px-3
+          text-label text-muted
+          hover:bg-surface-2
+        "
+      >
+        <InfoIcon className="size-4" aria-hidden />
+        {blocked[state].label}
+      </button>
+      <div
+        id={id}
+        popover="auto"
+        className="
+          m-0 w-64 rounded-xl border border-line bg-surface p-3 text-label
+          text-ink shadow-lg
+        "
+        style={{
+          positionAnchor: anchor,
+          positionArea: "bottom span-left",
+          positionTryFallbacks: "flip-inline",
+        }}
+      >
+        {blocked[state].help}
+      </div>
+    </>
+  );
+}
+
+export function PushSetting({ state, isPending, onToggle }: Props) {
   const isOn = state === "on";
-  const note = description({
-    state,
-    permissionDismissed: permissionDismissed && !isPending,
-  });
-  const unavailable = state === "denied" || state === "unsupported";
   return (
     <section className="space-y-4 p-4">
       <h2 className="text-caption text-muted">この端末</h2>
-      <div className="flex items-start gap-3 px-3">
+      <div className="flex items-center gap-3 px-3">
         <BellIcon className="size-6 shrink-0" aria-hidden />
-        <div className="min-w-0 flex-1">
-          <div id="push-setting-label" className="text-body">
-            プッシュ通知
-          </div>
-          {note && (
-            <div className="flex items-start gap-1 text-caption text-muted">
-              <InfoIcon className="size-4 shrink-0" aria-hidden />
-              {note}
-            </div>
-          )}
+        <div id="push-setting-label" className="min-w-0 flex-1 text-body">
+          プッシュ通知
         </div>
-        {isPending && <LoaderCircle className="mt-1 size-4 animate-spin" />}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={isOn}
-          aria-labelledby="push-setting-label"
-          disabled={unavailable || isPending}
-          onClick={onToggle}
-          className={clsx(
-            `
-              relative h-6 w-11 shrink-0 rounded-full
-              after:absolute after:top-0.75 after:size-4.5 after:rounded-full
-              after:bg-surface
-              disabled:cursor-not-allowed disabled:opacity-50
-            `,
-            isOn
-              ? `
-                bg-brand
-                after:left-5.75
-              `
-              : `
-                bg-line
-                after:left-0.75
-              `,
-          )}
-        />
+        {state === "denied" || state === "unsupported" ? (
+          <BlockedNote state={state} />
+        ) : (
+          <>
+            {isPending && <LoaderCircle className="size-4 animate-spin" />}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isOn}
+              aria-labelledby="push-setting-label"
+              disabled={isPending}
+              onClick={onToggle}
+              className={clsx(
+                `
+                  relative h-6 w-11 shrink-0 rounded-full
+                  after:absolute after:top-0.75 after:size-4.5
+                  after:rounded-full after:bg-surface
+                  disabled:cursor-not-allowed disabled:opacity-50
+                `,
+                isOn
+                  ? `
+                    bg-brand
+                    after:left-5.75
+                  `
+                  : `
+                    bg-line
+                    after:left-0.75
+                  `,
+              )}
+            />
+          </>
+        )}
       </div>
     </section>
   );

@@ -3,15 +3,8 @@ import { usePushSetting } from "@/app/lib/use-push-setting";
 import { PushSetting } from "./push-setting";
 
 export function PushSettingContainer() {
-  const { state, isPending, permissionDismissed, toggle } = usePushSetting();
+  const { state, isPending, toggle } = usePushSetting();
 
   if (!state || state === "unavailable") return null;
-  return (
-    <PushSetting
-      state={state}
-      isPending={isPending}
-      permissionDismissed={permissionDismissed}
-      onToggle={toggle}
-    />
-  );
+  return <PushSetting state={state} isPending={isPending} onToggle={toggle} />;
 }

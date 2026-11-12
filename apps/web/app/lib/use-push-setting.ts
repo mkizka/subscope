@@ -10,11 +10,7 @@ export function usePushSetting() {
   });
   const toggle = useMutation({
     mutationFn: async () => {
-      if (state === "on") {
-        await disablePush();
-        return null;
-      }
-      return enablePush();
+      await (state === "on" ? disablePush() : enablePush());
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["pushSetting"] }),
@@ -22,7 +18,6 @@ export function usePushSetting() {
   return {
     state,
     isPending: toggle.isPending,
-    permissionDismissed: toggle.data === "default",
     toggle: () => toggle.mutate(),
   };
 }
