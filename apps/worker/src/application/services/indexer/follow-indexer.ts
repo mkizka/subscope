@@ -5,9 +5,9 @@ import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexAccountService } from "../index-account-service.js";
+import type { NotificationService } from "../notification-service.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
@@ -15,7 +15,7 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly jobScheduler: IJobScheduler,
     private readonly indexAccountService: IndexAccountService,
     private readonly registrationQuery: IRegistrationQuery,
-    private readonly notificationRepository: INotificationRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async upsert({
@@ -53,7 +53,7 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.subjectDid !== follow.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, follow.subjectDid))
     ) {
-      await this.notificationRepository.save({
+      await this.notificationService.create({
         ctx,
         notifications: [
           {

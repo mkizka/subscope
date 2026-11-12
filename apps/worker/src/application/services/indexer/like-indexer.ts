@@ -6,15 +6,15 @@ import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
-import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { NotificationService } from "../notification-service.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
     private readonly likeRepository: ILikeRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly registrationQuery: IRegistrationQuery,
-    private readonly notificationRepository: INotificationRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async shouldIndex({
@@ -59,7 +59,7 @@ export class LikeIndexer implements ICollectionIndexer {
       recipientDid !== like.accountDid &&
       isRecipientServerMember
     ) {
-      await this.notificationRepository.save({
+      await this.notificationService.create({
         ctx,
         notifications: [
           {

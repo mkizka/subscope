@@ -10,7 +10,7 @@ describe("NotificationRepository", () => {
   const notificationRepository = new NotificationRepository();
 
   describe("save", () => {
-    test("通知を保存し、同じレコードと受信者の組み合わせは無視する", async () => {
+    test("通知を保存し、同じレコードと受信者の組み合わせは無視して、新しく保存した通知だけを返す", async () => {
       // arrange
       const author = await accountFactory(ctx.db).create();
       const recipient = await accountFactory(ctx.db).create();
@@ -26,17 +26,25 @@ describe("NotificationRepository", () => {
       };
 
       // act
-      await notificationRepository.save({
+      const created = await notificationRepository.save({
         ctx,
         notifications: [
           { ...notification, reason: "mention" },
           { ...notification, reason: "reply" },
         ],
       });
+      const createdAgain = await notificationRepository.save({
+        ctx,
+        notifications: [{ ...notification, reason: "mention" }],
+      });
 
       // assert
       const notifications = await ctx.db.select().from(schema.notifications);
       expect(notifications).toMatchObject([{ reason: "mention" }]);
+      expect(created).toEqual([
+        { recordUri: record.uri, recipientDid: recipient.did },
+      ]);
+      expect(createdAgain).toEqual([]);
     });
   });
 });
