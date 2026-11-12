@@ -16,3 +16,5 @@ allowBuilds:
   ssh2: false
 patchedDependencies:
   "@factory-js/factory": patches/@factory-js__factory.patch
+overrides:
+  "@opentelemetry/api": 1.9.1
