@@ -354,4 +354,30 @@ test.describe("リスト", () => {
       });
     }).toPass();
   });
+
+  test("list-e12: プロフィール全体ページのフォローボタンの右にある「…」メニューの「リストに追加」から、自分のリストにそのアカウントを追加・削除する（自分のプロフィールにも出す）", async ({
+    page,
+  }) => {
+    const name = `list-e12のリスト ${Date.now()}`;
+    await createEmptyList(name);
+    await page.goto("/bob.test");
+    const main = page.getByRole("main");
+    const dialog = page.getByRole("dialog", { name: "リストに追加" });
+    const row = dialog.getByRole("listitem").filter({ hasText: name });
+
+    await expect(async () => {
+      await page.reload();
+      await main.getByRole("button", { name: "その他" }).click();
+      await page.getByRole("button", { name: "リストに追加" }).click();
+      await expect(row).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await row.getByRole("button", { name: "追加" }).click();
+
+    await expect(row.getByRole("button", { name: "削除" })).toBeVisible();
+    await row.getByRole("button", { name: "削除" }).click();
+    await expect(row.getByRole("button", { name: "追加" })).toBeVisible();
+
+    await page.goto("/alice.test");
+    await expect(main.getByRole("button", { name: "その他" })).toBeVisible();
+  });
 });

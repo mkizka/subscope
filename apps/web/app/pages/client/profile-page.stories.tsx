@@ -9,6 +9,7 @@ import {
 } from "@/.storybook/query-client";
 import { ListsContainer } from "@/app/features/list/lists-container";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
+import type { loader as membershipLoader } from "@/app/routes/api.list-membership.$did";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 
 import { ProfilePage } from "./profile-page";
@@ -366,5 +367,85 @@ export const TabsStayInPlaceOnSlowScroll: Story = {
       tablist.getBoundingClientRect().bottom,
       0,
     );
+  },
+};
+
+const seedMembership = (lists: Data<typeof membershipLoader>["lists"]) =>
+  queryClient.setQueryData(["listMembership", alice.did], { lists });
+
+const openAddToList = async (canvasElement: HTMLElement) => {
+  await userEvent.click(
+    main(canvasElement).getByRole("button", { name: "その他" }),
+  );
+  await userEvent.click(
+    await screen.findByRole("button", { name: "リストに追加" }),
+  );
+  return within(await screen.findByRole("dialog", { name: "リストに追加" }));
+};
+
+const membershipLists: Data<typeof membershipLoader>["lists"] = [
+  {
+    uri: "at://did:plc:me/app.bsky.graph.list/1",
+    rkey: "1",
+    creatorDid: "did:plc:me",
+    name: "技術系",
+    description: "Webとプロトコルの話をする人",
+    listItemUri: "at://did:plc:me/app.bsky.graph.listitem/1",
+  },
+  {
+    uri: "at://did:plc:me/app.bsky.graph.list/2",
+    rkey: "2",
+    creatorDid: "did:plc:me",
+    name: "友だち",
+  },
+];
+
+export const AddToListDialog: Story = {
+  name: "list-s8: 「リストに追加」ダイアログは、自分のキュレーションリストを新しい順に並べ、そのアカウントが入っているリストに「削除」、入っていないリストに「追加」を出す",
+  beforeEach: () => {
+    seedMembership(membershipLists);
+  },
+  play: async ({ canvasElement }) => {
+    const dialog = await openAddToList(canvasElement);
+
+    await expect(dialog.getByText("技術系")).toBeVisible();
+    await expect(dialog.getByText("友だち")).toBeVisible();
+    await expect(
+      dialog.getAllByRole("button").map((button) => button.textContent),
+    ).toEqual(["削除", "追加", "完了"]);
+  },
+};
+
+export const AddToListSubmitting: Story = {
+  name: "list-s9: 「リストに追加」ダイアログの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする",
+  parameters: { pending: true },
+  beforeEach: () => {
+    seedMembership(membershipLists);
+  },
+  play: async ({ canvasElement }) => {
+    const dialog = await openAddToList(canvasElement);
+
+    await userEvent.click(dialog.getByRole("button", { name: "追加" }));
+
+    await expect(dialog.getByRole("button", { name: "追加" })).toBeDisabled();
+  },
+};
+
+export const AddToListLoading: Story = {
+  name: "list-s10: 「リストに追加」ダイアログは、開いてから読み込み終えるまでスケルトンを表示し、自分のリストが無いときは「リストがありません。」とリスト管理画面（`/lists`）へのリンクを表示する",
+  beforeEach: () => {
+    void pending(["listMembership", alice.did]);
+  },
+  play: async ({ canvasElement }) => {
+    const dialog = await openAddToList(canvasElement);
+    await expect(
+      dialog.getByRole("status", { name: "読み込み中" }),
+    ).toBeVisible();
+
+    queryClient.setQueryData(["listMembership", alice.did], { lists: [] });
+
+    await expect(
+      await dialog.findByRole("link", { name: "リストを作成" }),
+    ).toHaveAttribute("href", "/lists");
   },
 };

@@ -6,6 +6,7 @@ import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
 import { FollowButtonContainer } from "@/app/features/account/follow-button-container";
+import { AddToListContainer } from "@/app/features/list/add-to-list-container";
 import { TimelineFeed } from "@/app/features/timeline/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
@@ -68,12 +69,16 @@ export function ProfileContainer({ handle }: Props) {
         untracked={!!data && !data.backfillStatus}
         followedBy={!!profile?.viewer?.followedBy}
         action={
-          profile &&
-          !data?.isSelf && (
-            <FollowButtonContainer
-              did={profile.did}
-              viewerFollowing={profile.viewer?.following}
-            />
+          profile && (
+            <div className="flex items-center gap-2">
+              {!data?.isSelf && (
+                <FollowButtonContainer
+                  did={profile.did}
+                  viewerFollowing={profile.viewer?.following}
+                />
+              )}
+              <AddToListContainer did={profile.did} />
+            </div>
           )
         }
       />

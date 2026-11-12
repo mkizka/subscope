@@ -18,6 +18,7 @@ import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-u
 import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
 import { deleteListUseCaseFactory } from "./application/list/delete-list-use-case";
+import { getListMembershipUseCaseFactory } from "./application/list/get-list-membership-use-case";
 import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
 import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
 import { removeListMemberUseCaseFactory } from "./application/list/remove-list-member-use-case";
@@ -232,6 +233,11 @@ export const di = await createRegistry()
     "getListPageUseCase",
     ["listQuery", "backfillQuery"],
     getListPageUseCaseFactory,
+  )
+  .service(
+    "getListMembershipUseCase",
+    ["listQuery"],
+    getListMembershipUseCaseFactory,
   )
   .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
   .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
