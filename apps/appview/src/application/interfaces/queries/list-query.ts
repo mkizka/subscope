@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
+import type { AtUri, AtUriString } from "@atproto/syntax";
 
 import type { ListDto, ListItemDto } from "../../dto/list-dto.js";
 
@@ -16,4 +16,8 @@ export interface IListQuery {
     limit: number;
     cursor?: string;
   }) => Promise<ListItemDto[]>;
+  findItemsBySubject: (params: {
+    listUris: AtUri[];
+    subjectDid: Did;
+  }) => Promise<(ListItemDto & { listUri: AtUriString })[]>;
 }

@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
+import type { AtUri, AtUriString } from "@atproto/syntax";
 
 import type {
   ListDto,
@@ -9,13 +9,13 @@ import type { IListQuery } from "../../../application/interfaces/queries/list-qu
 
 export class InMemoryListQuery implements IListQuery {
   private lists: ListDto[] = [];
-  private items: (ListItemDto & { listUri: string })[] = [];
+  private items: (ListItemDto & { listUri: AtUriString })[] = [];
 
   add(list: ListDto): void {
     this.lists.push(list);
   }
 
-  addItem(item: ListItemDto & { listUri: string }): void {
+  addItem(item: ListItemDto & { listUri: AtUriString }): void {
     this.items.push(item);
   }
 
@@ -42,6 +42,19 @@ export class InMemoryListQuery implements IListQuery {
     const keys = uris.map((uri) => uri.toString());
     return Promise.resolve(
       this.lists.filter((list) => keys.includes(list.uri)),
+    );
+  }
+
+  findItemsBySubject(params: {
+    listUris: AtUri[];
+    subjectDid: Did;
+  }): Promise<(ListItemDto & { listUri: AtUriString })[]> {
+    const keys = params.listUris.map((uri) => uri.toString());
+    return Promise.resolve(
+      this.items.filter(
+        (item) =>
+          keys.includes(item.listUri) && item.subjectDid === params.subjectDid,
+      ),
     );
   }
 

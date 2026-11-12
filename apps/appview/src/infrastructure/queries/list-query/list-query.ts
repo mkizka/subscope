@@ -1,5 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
-import { asAtUriString, type AtUri } from "@atproto/syntax";
+import { asAtUriString, type AtUri, type AtUriString } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
@@ -72,6 +72,33 @@ export class ListQuery implements IListQuery {
       .limit(params.limit);
     return items.map((item) => ({
       uri: asAtUriString(item.uri),
+      subjectDid: asDid(item.subjectDid),
+      createdAt: item.createdAt,
+    }));
+  }
+
+  async findItemsBySubject(params: {
+    listUris: AtUri[];
+    subjectDid: Did;
+  }): Promise<(ListItemDto & { listUri: AtUriString })[]> {
+    if (params.listUris.length === 0) {
+      return [];
+    }
+    const items = await this.db
+      .select()
+      .from(schema.listItems)
+      .where(
+        and(
+          inArray(
+            schema.listItems.listUri,
+            params.listUris.map((uri) => uri.toString()),
+          ),
+          eq(schema.listItems.subjectDid, params.subjectDid),
+        ),
+      );
+    return items.map((item) => ({
+      uri: asAtUriString(item.uri),
+      listUri: asAtUriString(item.listUri),
       subjectDid: asDid(item.subjectDid),
       createdAt: item.createdAt,
     }));

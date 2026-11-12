@@ -276,6 +276,15 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getLists-1: 指定したアカウントが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
+## app.bsky.graph.getListsWithMembership
+
+認証したアカウントが作成したリスト(curatelistとmodlist)を、指定したactorがそのリストに含まれているかの情報とともに返す。認証は必須。
+
+- getListsWithMembership-1: 認証がないリクエストには401を返す
+- getListsWithMembership-2: 閲覧者が作成したリストだけをlistViewで返し、他のアカウントのリストは含めない
+- getListsWithMembership-3: actorがリストに含まれている場合は、listItemにlist itemのuriとactorのprofileViewを入れる
+- getListsWithMembership-4: purposesを指定すると、その用途のリストだけを返す
+
 ## me.subsco.graph.getServerMemberFollowers
 
 指定したアカウントをフォローしているメンバーをprofileViewで返す。認証は不要。limitとcursorでページングする。
