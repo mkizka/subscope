@@ -25,6 +25,7 @@ import { InMemoryRecordRepository } from "../infrastructure/repositories/record-
 import { InMemoryRecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
+import { InMemoryWebPushSender } from "../infrastructure/web-push-sender/web-push-sender.in-memory.js";
 import type { Env } from "./env.js";
 import { createWorkerRegistry } from "./registry.js";
 
@@ -39,6 +40,9 @@ export const testEnv = {
   MODERATION_URL: "https://mod.bsky.app",
   TAP_CONCURRENCY: 64,
   DATABASE_POOL_MAX: 32,
+  VAPID_PUBLIC_KEY: undefined,
+  VAPID_PRIVATE_KEY: undefined,
+  VAPID_SUBJECT: undefined,
 } satisfies Env;
 
 // prettier-ignore
@@ -68,6 +72,7 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
+  .replaceService("webPushSender", asClassArgs(InMemoryWebPushSender))
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("syncWorker", {} as never);
 

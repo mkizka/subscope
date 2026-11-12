@@ -23,11 +23,17 @@ interface ScheduledCheckBackfill {
   attempt: number;
 }
 
+interface ScheduledSendPushNotification {
+  recordUri: AtUri;
+  recipientDid: Did;
+}
+
 export class InMemoryJobScheduler implements IJobScheduler {
   private fetchRecordJobs: ScheduledFetchRecord[] = [];
   private resolveDidJobs: ScheduledResolveDid[] = [];
   private syncTapRepoJobs: ScheduledSyncTapRepo[] = [];
   private checkBackfillJobs: ScheduledCheckBackfill[] = [];
+  private sendPushNotificationJobs: ScheduledSendPushNotification[] = [];
   private aggregatePostStatsUris: AtUri[] = [];
   private aggregateAccountStatsDids: Did[] = [];
 
@@ -51,6 +57,13 @@ export class InMemoryJobScheduler implements IJobScheduler {
 
   async scheduleCheckBackfill(did: Did, attempt: number): Promise<void> {
     this.checkBackfillJobs.push({ did, attempt });
+  }
+
+  async scheduleSendPushNotification(
+    recordUri: AtUri,
+    recipientDid: Did,
+  ): Promise<void> {
+    this.sendPushNotificationJobs.push({ recordUri, recipientDid });
   }
 
   async scheduleAggregatePostStats(uri: AtUri): Promise<void> {
@@ -77,6 +90,10 @@ export class InMemoryJobScheduler implements IJobScheduler {
     return this.checkBackfillJobs;
   }
 
+  getSendPushNotificationJobs(): readonly ScheduledSendPushNotification[] {
+    return this.sendPushNotificationJobs;
+  }
+
   getAggregatePostStatsUris(): readonly AtUri[] {
     return this.aggregatePostStatsUris;
   }
@@ -90,6 +107,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.resolveDidJobs = [];
     this.syncTapRepoJobs = [];
     this.checkBackfillJobs = [];
+    this.sendPushNotificationJobs = [];
     this.aggregatePostStatsUris = [];
     this.aggregateAccountStatsDids = [];
   }

@@ -16,6 +16,11 @@ type CheckBackfillData = {
   attempt: number;
 };
 
+type SendPushNotificationData = {
+  recordUri: string;
+  recipientDid: Did;
+};
+
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
@@ -23,6 +28,7 @@ export type JobData = {
   aggregateAccountStats: AggregateAccountStatsData;
   syncTapRepo: Did;
   checkBackfill: CheckBackfillData;
+  sendPushNotification: SendPushNotificationData;
 };
 
 export type QueueName = keyof JobData;

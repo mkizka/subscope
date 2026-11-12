@@ -74,6 +74,18 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
+  async scheduleSendPushNotification(
+    recordUri: AtUri,
+    recipientDid: Did,
+  ): Promise<void> {
+    const uriString = recordUri.toString();
+    await this.jobQueue.add({
+      queueName: "sendPushNotification",
+      jobName: `${uriString}:${recipientDid}`,
+      data: { recordUri: uriString, recipientDid },
+    });
+  }
+
   async scheduleAggregatePostStats(uri: AtUri): Promise<void> {
     await this.jobQueue.addBatchItems({
       queueName: "aggregatePostStats",
