@@ -7,4 +7,4 @@ export const loggerManagerFactory = ({
   env,
 }: {
   env: Pick<Env, "LOG_LEVEL">;
-}): ILoggerManager => new LoggerManager(env.LOG_LEVEL);
+}): ILoggerManager => new LoggerManager(env);

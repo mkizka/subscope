@@ -13,7 +13,4 @@ export const dbFactory = ({
   env: Pick<Env, "DATABASE_URL">;
   loggerManager: ILoggerManager;
 }): DatabaseClient =>
-  databaseFactory(
-    connectionPoolFactory({ databaseUrl: env.DATABASE_URL }),
-    loggerManager,
-  );
+  databaseFactory(connectionPoolFactory({ env }), loggerManager);

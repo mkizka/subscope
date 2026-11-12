@@ -18,7 +18,7 @@ describe("統計の集計", () => {
       .withExposedPorts(6379)
       .start();
     redisUrl = `redis://${container.getHost()}:${container.getMappedPort(6379)}`;
-    jobQueue = new JobQueue(redisUrl);
+    jobQueue = new JobQueue({ REDIS_URL: redisUrl });
     jobScheduler = new JobScheduler(jobQueue);
     queue = new Queue("aggregatePostStats", { connection: { url: redisUrl } });
     accountQueue = new Queue("aggregateAccountStats", {

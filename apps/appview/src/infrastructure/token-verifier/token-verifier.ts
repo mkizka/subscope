@@ -3,11 +3,12 @@ import { AuthRequiredError, verifyJwt } from "@atproto/xrpc-server";
 import type { IDidResolver } from "@repo/common/interface";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
+import type { Env } from "../../shared/env.js";
 
 export class TokenVerifier implements ITokenVerifier {
   constructor(
     private readonly didResolver: IDidResolver,
-    private readonly serviceDid: string,
+    private readonly env: Pick<Env, "SERVICE_DID">,
   ) {}
 
   async verify(params: { token: string; nsid: string }) {
@@ -17,7 +18,7 @@ export class TokenVerifier implements ITokenVerifier {
     };
     const payload = await verifyJwt(
       params.token,
-      this.serviceDid,
+      this.env.SERVICE_DID,
       params.nsid,
       getSigninKey,
     ).catch((error: unknown) => {

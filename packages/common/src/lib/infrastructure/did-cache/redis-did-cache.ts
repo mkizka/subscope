@@ -18,14 +18,14 @@ export class RedisDidCache implements IDidCache {
   private readonly staleTTL = HOUR;
 
   constructor(
-    redisUrl: string,
+    env: { REDIS_URL: string },
     private readonly metricReporter: IMetricReporter,
   ) {
     this.cache = new Keyv({
       namespace: "did-cache",
       // https://github.com/jaredwray/keyv/issues/1255
       useKeyPrefix: false,
-      store: createKeyvRedis<CacheVal>(redisUrl),
+      store: createKeyvRedis<CacheVal>(env.REDIS_URL),
     });
   }
 

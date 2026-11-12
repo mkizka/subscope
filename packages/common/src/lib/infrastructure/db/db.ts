@@ -6,15 +6,13 @@ import { Pool } from "pg";
 import type { ILoggerManager, Logger } from "../../interface/logger.js";
 
 export const connectionPoolFactory = ({
-  databaseUrl,
-  databasePoolMax,
+  env,
 }: {
-  databaseUrl: string;
-  databasePoolMax?: number;
+  env: { DATABASE_URL: string; DATABASE_POOL_MAX?: number };
 }) => {
   return new Pool({
-    connectionString: databaseUrl,
-    max: databasePoolMax,
+    connectionString: env.DATABASE_URL,
+    max: env.DATABASE_POOL_MAX,
   });
 };
 
