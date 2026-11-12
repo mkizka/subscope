@@ -11,7 +11,7 @@ const index: {
 const storyIds = Object.values(index.entries)
   .filter(
     (entry) =>
-      entry.importPath.includes("/pages/") && !entry.tags.includes("play"),
+      entry.importPath.includes("/pages/") && !entry.tags.includes("play-fn"),
   )
   .map((entry) => entry.id);
 

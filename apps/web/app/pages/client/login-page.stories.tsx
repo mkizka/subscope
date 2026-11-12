@@ -33,7 +33,6 @@ export const InviteCode: Story = {
 
 export const SetupNotice: Story = {
   name: "login-s1: 管理者がまだいないサーバーでは、最初にログインしたアカウントが管理者になることをログイン画面に出す",
-  tags: ["play"],
   args: {
     step: "setup",
   },
@@ -48,7 +47,6 @@ export const SetupNotice: Story = {
 
 export const Description: Story = {
   name: "login-s2: ログイン画面にはBlueskyのアカウントでログインする招待制のサーバーであることを出す",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText(
@@ -60,7 +58,6 @@ export const Description: Story = {
 
 export const InviteCodeSteps: Story = {
   name: "login-s3: 招待コードの入力を求めるときは「ログイン」「招待コード」の2段階の手順を出し、今が「招待コード」の段階であることを示す",
-  tags: ["play"],
   args: {
     step: "inviteCode",
   },
@@ -79,7 +76,6 @@ export const InviteCodeSteps: Story = {
 
 export const LoginSubmitting: Story = {
   name: "login-s4: 「ログイン」を押してから認証画面に移動するまで、ログインボタンを無効にしてスピナーを出す",
-  tags: ["play"],
   parameters: {
     pending: true,
   },
@@ -95,7 +91,6 @@ export const LoginSubmitting: Story = {
 
 export const MemberNotice: Story = {
   name: "login-s5: 管理者がいるサーバーのログイン画面には、登録していないアカウントはログイン後に招待コードの入力が必要なことを出す",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText(
@@ -107,7 +102,6 @@ export const MemberNotice: Story = {
 
 export const InviteCodeSubmitting: Story = {
   name: "login-s6: 「登録する」を押してから結果が出るまで、登録ボタンを無効にしてスピナーを出す",
-  tags: ["play"],
   args: {
     step: "inviteCode",
   },
@@ -140,7 +134,6 @@ export const InviteCodeError: Story = {
 
 export const Tabs: Story = {
   name: "login-s7: 管理者がいるサーバーのログイン画面には「ログイン」「新規登録」のタブを出し、最初は「ログイン」を選ぶ",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const tabs = within(canvasElement).getAllByRole("tab");
     await expect(tabs.map((tab) => tab.textContent)).toEqual([
@@ -153,7 +146,6 @@ export const Tabs: Story = {
 
 export const RegisterFields: Story = {
   name: "login-s8: 「新規登録」タブにはハンドルと招待コードの入力欄を出す",
-  tags: ["play"],
   args: {
     tab: "register",
   },
@@ -166,7 +158,6 @@ export const RegisterFields: Story = {
 
 export const SetupWithoutTabs: Story = {
   name: "login-s9: 管理者がまだいないサーバーのログイン画面には、タブを出さない",
-  tags: ["play"],
   args: {
     step: "setup",
   },

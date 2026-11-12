@@ -5,7 +5,7 @@ const config: StorybookConfig = {
   staticDirs: ["../public"],
   framework: "@storybook/react-vite",
   addons: ["@storybook/addon-vitest"],
-  tags: { play: { defaultFilterSelection: "exclude" } },
+  tags: { "play-fn": { defaultFilterSelection: "exclude" } },
 };
 
 export default config;

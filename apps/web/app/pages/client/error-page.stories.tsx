@@ -27,7 +27,6 @@ export const NotFound: Story = {
 
 export const HomeLink: Story = {
   name: "error-s1: 「ホームに戻る」を押すとトップページに移動する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByRole("link", { name: "ホームに戻る" }),

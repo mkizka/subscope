@@ -53,7 +53,6 @@ export const Default: Story = {};
 
 export const NotFound: Story = {
   name: "search-s3: 一致する投稿がないときは「投稿が見つかりません」と表示する",
-  tags: ["play"],
   parameters: { path: "/search?q=nobody" },
   play: async ({ canvasElement }) => {
     await expect(
@@ -68,7 +67,6 @@ export const Accounts: Story = {
 
 export const AccountsNotFound: Story = {
   name: "search-s1: 一致するアカウントがないときは「ユーザーが見つかりません」と表示する",
-  tags: ["play"],
   parameters: { path: "/search?q=nobody&tab=accounts" },
   play: async ({ canvasElement }) => {
     await expect(
@@ -79,7 +77,6 @@ export const AccountsNotFound: Story = {
 
 export const Empty: Story = {
   name: "search-s7: 検索語がないときは、検索欄の下に探せる対象（追跡アカウントと投稿）の説明を出す",
-  tags: ["play"],
   parameters: { path: "/search" },
   play: async ({ canvasElement }) => {
     await expect(
@@ -93,7 +90,6 @@ export const Empty: Story = {
 
 export const FromUrl: Story = {
   name: "search-s2: URLに `?q=検索語` があると、検索欄にその語を入れて、投稿タブで検索結果を表示する",
-  tags: ["play"],
   parameters: { path: "/search?q=alice" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -106,7 +102,6 @@ export const FromUrl: Story = {
 
 export const Submitting: Story = {
   name: "search-s4: 検索ボタンは検索結果を読み込み終えるまでスピナーを出して押せなくする",
-  tags: ["play"],
   beforeEach: () => pendingSearch("posts", "alice"),
   play: async ({ canvasElement }) => {
     const button = within(canvasElement).getByRole("button", { name: "検索" });
@@ -118,7 +113,6 @@ export const Submitting: Story = {
 
 export const AccountSyncStatus: Story = {
   name: "search-s5: アカウントの検索結果には過去の投稿の同期状態を表示する",
-  tags: ["play"],
   parameters: { path: "/search?q=alice&tab=accounts" },
   beforeEach: () => {
     search("accounts", "alice", {
@@ -134,7 +128,6 @@ export const AccountSyncStatus: Story = {
 
 export const Loading: Story = {
   name: "search-s6: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => pendingSearch("posts", "alice"),
   play: async ({ canvasElement }) => {
     await expect(
@@ -158,7 +151,6 @@ const openHistory = async (canvasElement: HTMLElement) => {
 
 export const HistoryList: Story = {
   name: "search-s8: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する",
-  tags: ["play"],
   parameters: { path: "/search?q=word5" },
   beforeEach: seedHistory(
     Array.from({ length: 11 }, (_, i) => `word${11 - i}`),
@@ -178,7 +170,6 @@ export const HistoryList: Story = {
 
 export const HistorySelect: Story = {
   name: "search-s9: 履歴の語を選ぶと、検索欄にその語を入れて検索する",
-  tags: ["play"],
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -194,7 +185,6 @@ export const HistorySelect: Story = {
 
 export const HistoryRemove: Story = {
   name: "search-s10: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる",
-  tags: ["play"],
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -216,7 +206,6 @@ export const HistoryRemove: Story = {
 
 export const HistoryClosesOnSearch: Story = {
   name: "search-s11: 検索を実行すると、履歴を閉じる",
-  tags: ["play"],
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo", "baz"]),
   play: async ({ canvasElement }) => {
@@ -234,7 +223,6 @@ export const HistoryClosesOnSearch: Story = {
 
 export const NoSidebarSearch: Story = {
   name: "layout-s11: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない",
-  tags: ["play"],
   globals: { viewport: { value: "desktop" } },
   play: async ({ canvasElement }) => {
     const sidebar = within(canvasElement).getAllByRole("complementary").at(-1);

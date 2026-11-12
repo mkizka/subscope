@@ -47,7 +47,6 @@ const hasSpinner = (button: HTMLElement) =>
 
 export const Deleting: Story = {
   name: "list-s2: リスト詳細の「…」ボタンは削除してリスト一覧に戻るまでスピナーを出して押せなくする",
-  tags: ["play"],
   parameters: { pending: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -68,7 +67,6 @@ export const Deleting: Story = {
 
 export const MemberSubmitting: Story = {
   name: "list-s3: リストのメンバーの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする",
-  tags: ["play"],
   parameters: {
     path: "/alice.bsky.social/lists/1?tab=members",
     pending: true,
@@ -91,7 +89,6 @@ export const MemberSubmitting: Story = {
 
 export const MemberSyncStatus: Story = {
   name: "list-s4: 「メンバー」タブの追跡アカウントには、過去の投稿の同期状態を表示する",
-  tags: ["play"],
   parameters: { path: "/alice.bsky.social/lists/1?tab=members" },
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof listLoader>>(
@@ -124,7 +121,6 @@ export const MemberSyncStatus: Story = {
 
 export const Loading: Story = {
   name: "list-s6: リスト詳細を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["list", alice.handle, "1"] });
     void queryClient.query({
