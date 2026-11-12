@@ -81,7 +81,11 @@ export const di = await createRegistry()
     ["oauthStateStore", "oauthSessionStore", "loggerManager", "env"],
     oauthClientFactory,
   )
-  .service("cookieSessionStorage", ["env"], cookieSessionStorageFactory)
+  .service(
+    "cookieSessionStorage",
+    ["env", "oauthClient"],
+    cookieSessionStorageFactory,
+  )
   .service("subscopeQuery", ["env", "oauthClient"], subscopeQueryFactory)
   .service("subscopeCommand", ["oauthClient"], subscopeCommandFactory)
   .service("getLoginStepUseCase", ["subscopeQuery"], getLoginStepUseCaseFactory)

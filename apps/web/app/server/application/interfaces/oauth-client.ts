@@ -8,6 +8,7 @@ export interface IOAuthClient {
   ) => Promise<{ client: Client; state: string | null }>;
   restore: (did: string) => Promise<Client | null>;
   getAccountUrl: (did: string) => Promise<string | null>;
+  scope: string;
   clientMetadata: object;
   jwks: NodeOAuthClient["jwks"];
 }

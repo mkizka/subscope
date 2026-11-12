@@ -119,6 +119,7 @@ export const oauthClientFactory = async ({
         return null;
       }
     },
+    scope,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     clientMetadata: client.clientMetadata,
     jwks: client.jwks,
