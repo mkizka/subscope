@@ -136,4 +136,20 @@ test.describe("フォロー・フォロワー", () => {
 
     await expect(page).toHaveURL("/alice.test");
   });
+
+  test("follow-list-e8: 「知り合い」タブ（`?filter=known`）には、自分がフォローしているアカウントのうちそのアカウントをフォローしている人だけを、自分がフォローした新しい順に一覧表示する", async ({
+    page,
+  }) => {
+    await follow("bob.test", "carol.test");
+    await page.goto("/carol.test/followers");
+
+    await page.getByRole("tab", { name: "知り合い" }).click();
+
+    await expect(page).toHaveURL("/carol.test/followers?filter=known");
+    const accounts = page.getByRole("main").getByRole("listitem");
+    await expect(async () => {
+      await page.reload();
+      await expect(accounts).toHaveText([/Bob/], { timeout: 1000 });
+    }).toPass();
+  });
 });

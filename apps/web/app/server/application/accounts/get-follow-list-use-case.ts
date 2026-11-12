@@ -10,7 +10,8 @@ export interface IGetFollowListUseCase {
     did: string,
     account: AtIdentifierString,
     kind: "follows" | "followers",
-    filter?: "registered",
+    filter?: "registered" | "known",
+    cursor?: string,
   ) => Promise<FollowListDto>;
 }
 
@@ -23,9 +24,12 @@ export const getFollowListUseCaseFactory = ({
   backfillQuery: IBackfillQuery;
   followQuery: IFollowQuery;
 }): IGetFollowListUseCase => ({
-  async execute(did, account, kind, filter) {
-    let list = await accountQuery.findFollowList(did, account, kind);
-    if (kind === "followers") {
+  async execute(did, account, kind, filter, cursor) {
+    let list =
+      kind === "followers" && filter === "known"
+        ? await accountQuery.findKnownFollowers(did, account, cursor)
+        : await accountQuery.findFollowList(did, account, kind);
+    if (kind === "followers" && filter !== "known") {
       const { total, dids } = await followQuery.findRegisteredFollowers(
         account,
         filter === "registered" ? 100 : 1,

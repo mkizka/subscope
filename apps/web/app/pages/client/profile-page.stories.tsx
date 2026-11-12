@@ -3,6 +3,7 @@ import { expect, screen, userEvent, waitFor, within } from "storybook/test";
 
 import {
   alice,
+  bob,
   type Data,
   infinite,
   queryClient,
@@ -255,6 +256,56 @@ export const FollowedBy: Story = {
       main(canvasElement).getByText("フォローされています"),
     ).toBeVisible();
   },
+};
+
+const knownFollowers = {
+  count: 14,
+  followers: [
+    { ...bob },
+    { did: "did:plc:carol", handle: "carol.bsky.social" } as const,
+    {
+      did: "did:plc:dave",
+      handle: "dave.bsky.social",
+      displayName: "Dave",
+    } as const,
+  ],
+};
+
+export const KnownFollowers: Story = {
+  name: "profile-s12: 自分がフォローしているアカウントのうちそのアカウントをフォローしている人（知り合い）がいる全体ページには、フォロー数の下に知り合いのアイコン（最大3人）と名前（最大2人）、残りの人数を「Bob、Carolほか12人がフォローしています」の形で表示し、選ぶとフォロワー一覧の「知り合い」タブに移動する",
+  beforeEach: () => {
+    seed({
+      profile: {
+        ...alice,
+        followsCount: 120,
+        followersCount: 345,
+        viewer: { knownFollowers },
+      },
+    });
+  },
+  play: async ({ canvasElement }) => {
+    const link = main(canvasElement).getByRole("link", {
+      name: "Bob、carol.bsky.socialほか12人がフォローしています",
+    });
+    await expect(link).toHaveAttribute(
+      "href",
+      "/alice.bsky.social/followers?filter=known",
+    );
+  },
+};
+
+export const NoKnownFollowers: Story = {
+  name: "profile-s13: 知り合いがいない全体ページと自分の全体ページには、知り合いの行を表示しない",
+  play: async ({ canvasElement }) => {
+    await expect(main(canvasElement).getByText("345")).toBeVisible();
+    await expect(
+      main(canvasElement).queryByText(/がフォローしています/),
+    ).toBeNull();
+  },
+};
+
+export const KnownFollowersView: Story = {
+  beforeEach: KnownFollowers.beforeEach,
 };
 
 export const UntrackedBadge: Story = {
