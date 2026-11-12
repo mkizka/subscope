@@ -41,7 +41,7 @@ export function PushSetting({
   return (
     <section className="space-y-4 p-4">
       <h2 className="text-caption text-muted">この端末</h2>
-      <div className="flex items-center gap-3 px-3">
+      <div className="flex items-start gap-3 px-3">
         <BellIcon className="size-6 shrink-0" aria-hidden />
         <div className="min-w-0 flex-1">
           <div id="push-setting-label" className="text-body">
@@ -54,7 +54,7 @@ export function PushSetting({
             </div>
           )}
         </div>
-        {isPending && <LoaderCircle className="size-4 animate-spin" />}
+        {isPending && <LoaderCircle className="mt-1 size-4 animate-spin" />}
         <button
           type="button"
           role="switch"
