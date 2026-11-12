@@ -24,6 +24,7 @@ const meta = {
           ...post("at://a/2", "選んだ投稿です"),
           replyCount: 1,
           repostCount: 1,
+          quoteCount: 2,
           likeCount: 8,
         },
         replies: [
@@ -90,6 +91,9 @@ export const FocusedPost: Story = {
     ).toBeVisible();
     await expect(
       within(focused).getByText("件のリポスト", { exact: false }),
+    ).toBeVisible();
+    await expect(
+      within(focused).getByText("件の引用", { exact: false }),
     ).toBeVisible();
     await expect(
       within(focused).getByText("件のいいね", { exact: false }),

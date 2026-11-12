@@ -3,6 +3,7 @@ import {
   threadViewPost,
 } from "@repo/client/app/bsky/feed/defs";
 import getPostThread from "@repo/client/app/bsky/feed/getPostThread";
+import getQuotes from "@repo/client/app/bsky/feed/getQuotes";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { IThreadQuery } from "@/app/server/application/interfaces/thread-query";
@@ -13,6 +14,18 @@ export const threadQueryFactory = ({
 }: {
   oauthClient: IOAuthClient;
 }): IThreadQuery => ({
+  async findQuotes(did, uri, cursor) {
+    const agent = await oauthClient.restore(did);
+    if (!agent) throw new Error("OAuth session not found");
+    const { posts, cursor: next } = await agent.call(getQuotes, {
+      uri,
+      cursor,
+    });
+    return {
+      posts: posts.map((post) => toTimelinePost({ post })),
+      cursor: next,
+    };
+  },
   async findThread(did, uri) {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("OAuth session not found");

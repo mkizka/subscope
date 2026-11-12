@@ -26,6 +26,7 @@ export type PostCardProps = {
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
+  quoteCount?: number;
   createdAt?: string;
   images?: PostImage[];
   video?: PostVideoData;

@@ -20,6 +20,7 @@ const meta = {
         ...post(2, "選んだ投稿です", "bob.bsky.social"),
         replyCount: 2,
         repostCount: 3,
+        quoteCount: 2,
         likeCount: 8,
       },
       replies: [

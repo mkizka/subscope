@@ -1,6 +1,6 @@
 import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
@@ -48,13 +48,20 @@ function FocusedPost({
   createdAt,
   replyCount,
   repostCount,
+  quoteCount,
   likeCount,
   toolbar,
+  ...post
 }: TimelinePost & { toolbar: ReactNode }) {
   const hydrated = useHydrated();
   const counts = [
     { count: replyCount, label: "返信" },
     { count: repostCount, label: "リポスト" },
+    {
+      count: quoteCount,
+      label: "引用",
+      to: `${threadPath({ authorHandle, ...post })}/quotes`,
+    },
     { count: likeCount, label: "いいね" },
   ].filter(({ count }) => !!count);
   return (
@@ -100,11 +107,20 @@ function FocusedPost({
       )}
       {counts.length > 0 && (
         <div className="flex gap-4 border-b border-line py-2 text-label text-muted">
-          {counts.map(({ count, label }) => (
-            <span key={label}>
-              <b className="text-ink">{count}</b>件の{label}
-            </span>
-          ))}
+          {counts.map(({ count, label, to }) => {
+            const content = (
+              <>
+                <b className="text-ink">{count}</b>件の{label}
+              </>
+            );
+            return to ? (
+              <Link key={label} to={to} className="hover:underline">
+                {content}
+              </Link>
+            ) : (
+              <span key={label}>{content}</span>
+            );
+          })}
         </div>
       )}
       <div className="mt-2">{toolbar}</div>

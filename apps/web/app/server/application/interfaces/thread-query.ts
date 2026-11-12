@@ -11,4 +11,9 @@ export interface IThreadQuery {
     post: TimelinePostDto;
     replies: TimelinePostDto[][];
   } | null>;
+  findQuotes: (
+    did: string,
+    uri: AtUriString,
+    cursor?: string,
+  ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
 }
