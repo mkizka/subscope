@@ -92,7 +92,7 @@ export default defineRailway(() => {
       COOKIE_SECRET: preserve(),
       PRIVATE_KEY_ES256_B64: preserve(),
       ADMIN_API_TOKEN: preserve(),
-      VAPID_PUBLIC_KEY: preserve(),
+      VAPID_PUBLIC_KEY: "${{Worker.VAPID_PUBLIC_KEY}}",
     },
   });
 
