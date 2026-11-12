@@ -11,6 +11,41 @@ import { z } from "zodV4";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { Env } from "@/app/server/env";
 
+const rpcMethods = [
+  "app.bsky.actor.getProfile",
+  "app.bsky.actor.getProfiles",
+  "app.bsky.actor.searchActors",
+  "app.bsky.actor.searchActorsTypeahead",
+  "app.bsky.feed.getActorLikes",
+  "app.bsky.feed.getAuthorFeed",
+  "app.bsky.feed.getListFeed",
+  "app.bsky.feed.getPosts",
+  "app.bsky.feed.getPostThread",
+  "app.bsky.feed.getTimeline",
+  "app.bsky.feed.searchPosts",
+  "app.bsky.graph.getFollowers",
+  "app.bsky.graph.getFollows",
+  "app.bsky.graph.getList",
+  "app.bsky.graph.getLists",
+  "app.bsky.notification.getUnreadCount",
+  "app.bsky.notification.listNotifications",
+  "app.bsky.notification.updateSeen",
+  "me.subsco.admin.banAccount",
+  "me.subsco.admin.createInviteCode",
+  "me.subsco.admin.deleteInviteCode",
+  "me.subsco.admin.getBannedAccounts",
+  "me.subsco.admin.getInviteCodes",
+  "me.subsco.admin.grantAdmin",
+  "me.subsco.admin.listServerMembers",
+  "me.subsco.admin.registerAdmin",
+  "me.subsco.admin.unbanAccount",
+  "me.subsco.admin.verifyAccess",
+  "me.subsco.server.getFollowedAccounts",
+  "me.subsco.server.getLocalTimeline",
+  "me.subsco.sync.getRegistrationStatus",
+  "me.subsco.sync.registerAccount",
+];
+
 const issuerSchema = z.object({ issuer: z.string() });
 
 export const oauthClientFactory = async ({
@@ -32,13 +67,16 @@ export const oauthClientFactory = async ({
     | "ATPROTO_HANDLE_RESOLVER_URL"
   >;
 }): Promise<IOAuthClient> => {
-  const appviewAud = encodeURIComponent(`${env.APPVIEW_DID}#bsky_appview`);
+  const rpcParams = new URLSearchParams([
+    ...rpcMethods.map((lxm) => ["lxm", lxm]),
+    ["aud", `${env.APPVIEW_DID}#bsky_appview`],
+  ]);
   const scope = [
     "atproto",
     "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
     "repo:app.bsky.graph.list",
     "blob:image/*",
-    `rpc:*?aud=${appviewAud}`,
+    `rpc?${rpcParams}`,
   ].join(" ");
   const redirectUri = `${env.PUBLIC_URL}/oauth/callback`;
 
