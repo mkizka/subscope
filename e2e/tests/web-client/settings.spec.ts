@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("設定", () => {
-  test("settings-e2: 「アカウント管理」はログインに使った認可サーバーの `/account` を新しいタブで開くリンクにする", async ({
+  test("settings-e2: 「アカウント設定」はログインに使った認可サーバーの `/account` を新しいタブで開くリンクにする", async ({
     page,
   }) => {
     await page.goto("/settings");
 
     const link = page
       .getByRole("main")
-      .getByRole("link", { name: "アカウント管理" });
+      .getByRole("link", { name: "アカウント設定" });
     await expect(link).toHaveAttribute("href", "http://localhost:2583/account");
     await expect(link).toHaveAttribute("target", "_blank");
   });

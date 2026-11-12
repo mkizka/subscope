@@ -85,7 +85,7 @@ export const Account: Story = {
 };
 
 export const AccountNote: Story = {
-  name: "settings-s2: 「アカウント管理」の下に、認可サーバーのホスト名を使って「{ホスト名} で設定できます」と表示する",
+  name: "settings-s2: 「アカウント設定」の下に、認可サーバーのホスト名を使って「{ホスト名} で設定できます」と表示する",
   play: async ({ canvasElement }) => {
     const main = within(await within(canvasElement).findByRole("main"));
 
@@ -207,13 +207,13 @@ export const PushSettingDismissed: Story = {
 };
 
 export const PushSettingUnavailable: Story = {
-  name: "pushSetting-s7: サーバーにVAPID鍵が設定されていないときは、「この端末」のセクションを表示しない",
+  name: "pushSetting-s7: サーバーにVAPID鍵が設定されていないときは、「通知」のセクションを表示しない",
   play: async ({ canvasElement }) => {
     await within(canvasElement).findByRole("heading", { name: "アカウント" });
 
     await waitFor(() =>
       expect(
-        within(canvasElement).queryByRole("heading", { name: "この端末" }),
+        within(canvasElement).queryByRole("heading", { name: "通知" }),
       ).toBeNull(),
     );
   },

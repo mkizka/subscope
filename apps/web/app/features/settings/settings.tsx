@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
+import { Button } from "@/app/components/ui/button";
 
 type Props = {
   avatarUrl?: string;
@@ -46,7 +47,7 @@ export function Settings({
             "
           >
             <div className="min-w-0">
-              <div className="text-body">アカウント管理</div>
+              <div className="text-body">アカウント設定</div>
               <div className="truncate text-caption text-muted">
                 {new URL(accountUrl).host} で設定できます
               </div>
@@ -69,17 +70,10 @@ export function Settings({
             onLogout();
           }}
         >
-          <button
-            type="submit"
-            className="
-              flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body
-              text-danger
-              hover:bg-surface-2
-            "
-          >
-            <LogOutIcon className="size-4 shrink-0" aria-hidden />
+          <Button type="submit" variant="secondary">
+            <LogOutIcon className="size-4" />
             ログアウト
-          </button>
+          </Button>
         </Form>
       </section>
     </>
