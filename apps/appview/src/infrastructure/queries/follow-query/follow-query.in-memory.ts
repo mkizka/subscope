@@ -77,6 +77,28 @@ export class InMemoryFollowQuery implements IFollowQuery {
     );
   }
 
+  findKnownFollowers(params: {
+    viewerDid: Did;
+    subjectDid: Did;
+    limit: number;
+    cursor?: string;
+  }): Promise<FollowerDto[]> {
+    const followers = this.follows
+      .filter((follow) => follow.subjectDid === params.subjectDid)
+      .map((follow) => follow.accountDid);
+    return Promise.resolve(
+      this.findPage(
+        (follow) =>
+          follow.accountDid === params.viewerDid &&
+          followers.includes(follow.subjectDid),
+        params,
+      ).map((follow) => ({
+        accountDid: follow.subjectDid,
+        sortAt: follow.sortAt,
+      })),
+    );
+  }
+
   findFolloweeDids(accountDid: Did): Promise<Did[]> {
     return Promise.resolve(
       this.follows

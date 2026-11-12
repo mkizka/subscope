@@ -20,6 +20,7 @@ import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { SearchPostsV2 } from "./app/bsky/feed/searchPostsV2.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
+import type { GetKnownFollowers } from "./app/bsky/graph/getKnownFollowers.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
 import type { GetListsWithMembership } from "./app/bsky/graph/getListsWithMembership.js";
@@ -59,6 +60,7 @@ export const lexRouterFactory = (
   getListFeed: GetListFeed,
   getFollows: GetFollows,
   getFollowers: GetFollowers,
+  getKnownFollowers: GetKnownFollowers,
   getList: GetList,
   getLists: GetLists,
   getListsWithMembership: GetListsWithMembership,
@@ -108,6 +110,7 @@ export const lexRouterFactory = (
     getListFeed,
     getFollows,
     getFollowers,
+    getKnownFollowers,
     getList,
     getLists,
     getListsWithMembership,

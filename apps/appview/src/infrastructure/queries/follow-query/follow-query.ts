@@ -3,6 +3,7 @@ import { asAtUriString } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt, type SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 import type {
   FollowDto,
@@ -58,6 +59,42 @@ export class FollowQuery implements IFollowQuery {
       eq(schema.follows.subjectDid, params.accountDid),
       params,
     );
+    return results.map((result) => ({
+      accountDid: asDid(result.accountDid),
+      sortAt: result.sortAt,
+    }));
+  }
+
+  async findKnownFollowers(params: {
+    viewerDid: Did;
+    subjectDid: Did;
+    limit: number;
+    cursor?: string;
+  }): Promise<FollowerDto[]> {
+    const knownFollow = alias(schema.follows, "known_follow");
+    const results = await this.db
+      .select({
+        accountDid: schema.follows.subjectDid,
+        sortAt: schema.follows.sortAt,
+      })
+      .from(schema.follows)
+      .innerJoin(
+        knownFollow,
+        and(
+          eq(knownFollow.accountDid, schema.follows.subjectDid),
+          eq(knownFollow.subjectDid, params.subjectDid),
+        ),
+      )
+      .where(
+        and(
+          eq(schema.follows.accountDid, params.viewerDid),
+          params.cursor
+            ? lt(schema.follows.sortAt, new Date(params.cursor))
+            : undefined,
+        ),
+      )
+      .orderBy(desc(schema.follows.sortAt))
+      .limit(params.limit);
     return results.map((result) => ({
       accountDid: asDid(result.accountDid),
       sortAt: result.sortAt,
