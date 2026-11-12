@@ -1,12 +1,11 @@
 import { execSync, spawn } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { TestNetworkNoAppView } from "@atproto/dev-env";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
-import { GenericContainer } from "testcontainers";
+import { GenericContainer, PullPolicy } from "testcontainers";
 
 const PORTS = {
   plc: 2582,
@@ -96,13 +95,15 @@ const tap = await new GenericContainer("ghcr.io/bluesky-social/indigo/tap:0.1")
   })
   .start();
 
-const blobProxy = createServer((req, res) => {
-  const [, , , , did = "", cid = ""] = (req.url ?? "").split("/");
-  const url = new URL("/xrpc/com.atproto.sync.getBlob", PDS_URL);
-  url.searchParams.set("did", did);
-  url.searchParams.set("cid", cid.split("@")[0] ?? "");
-  res.writeHead(302, { location: url.href }).end();
-}).listen(PORTS.blobProxy);
+const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:0")
+  .withPullPolicy(PullPolicy.alwaysPull())
+  .withNetworkMode("host")
+  .withEnvironment({
+    PORT: String(PORTS.blobProxy),
+    PLC_DIRECTORY_URL: PLC_URL,
+    DISABLE_SSRF_PROTECTION: "true",
+  })
+  .start();
 
 process.stdout.write(
   "Test accounts: alice.test, bob.test, carol.test, dave.test, erin.test, frank.test, grace.test, heidi.test / password\n",
@@ -124,8 +125,7 @@ const app = spawn(process.argv.slice(2).join(" "), {
 
 app.on("exit", async () => {
   await network.close();
-  blobProxy.close();
-  await Promise.all([tap.stop(), redis.stop(), postgres.stop()]);
+  await Promise.all([tap.stop(), atblob.stop(), redis.stop(), postgres.stop()]);
   await rm(tmp, { recursive: true, force: true });
   process.exit();
 });
