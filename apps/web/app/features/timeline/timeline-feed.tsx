@@ -76,8 +76,9 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
       {refreshing && (
         <div
           className="
-            sticky top-25.25 z-raised h-0
+            sticky top-25.25 z-raised h-0 transition-[top]
             lg:top-11.25
+            max-lg:[main:has(>header[data-visible=false])_&]:top-11.25
           "
         >
           <div
