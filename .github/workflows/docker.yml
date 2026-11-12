@@ -13,7 +13,7 @@ jobs:
       matrix:
         target:
           - appview
-          - admin
+          - web
           - worker
     permissions:
       packages: write
