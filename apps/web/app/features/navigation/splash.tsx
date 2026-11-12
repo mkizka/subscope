@@ -1,6 +1,7 @@
 export function Splash({ leaving }: { leaving: boolean }) {
   return (
     <div
+      data-testid="splash"
       className={`
         fixed inset-0 z-overlay flex flex-col items-center justify-center gap-4
         bg-surface text-ink transition-opacity duration-300
@@ -19,9 +20,6 @@ export function Splash({ leaving }: { leaving: boolean }) {
         className="size-20"
       />
       <div className="text-title">Subscope</div>
-      <div role="status" className="text-label text-muted">
-        読み込み中
-      </div>
     </div>
   );
 }

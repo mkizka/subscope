@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("起動時のスプラッシュ", () => {
-  test("splash-e1: 自分の情報の取得が終わるまで、ロゴと「読み込み中」と読み込み中のプログレスバーを全画面で表示する", async ({
+  test("splash-e1: 自分の情報の取得が終わるまで、ロゴと読み込み中のプログレスバーを全画面で表示する", async ({
     page,
   }) => {
     let release = () => {};
@@ -13,11 +13,11 @@ test.describe("起動時のスプラッシュ", () => {
 
     await page.goto("/");
 
-    const splash = page.getByText("読み込み中", { exact: true });
+    const splash = page.getByTestId("splash");
     await expect(
       page.getByText("Subscope", { exact: true }).first(),
     ).toBeVisible();
-    const box = await splash.locator("..").boundingBox();
+    const box = await splash.boundingBox();
     const viewport = page.viewportSize();
     expect(box?.x).toBe(0);
     expect(box?.width).toBeGreaterThan((viewport?.width ?? 0) - 20);
@@ -35,11 +35,11 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    await expect(page.getByText("読み込み中", { exact: true })).toBeVisible();
+    await expect(page.getByTestId("splash")).toBeVisible();
 
     release();
 
-    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
+    await expect(page.getByTestId("splash")).toBeHidden();
     const nav = page.getByRole("navigation");
     await expect(nav.getByRole("link", { name: "リスト" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "プロフィール" })).toBeVisible();
@@ -50,7 +50,7 @@ test.describe("起動時のスプラッシュ", () => {
     page,
   }) => {
     await page.goto("/");
-    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
+    await expect(page.getByTestId("splash")).toBeHidden();
 
     await page
       .getByRole("navigation")
@@ -58,7 +58,7 @@ test.describe("起動時のスプラッシュ", () => {
       .click();
 
     await expect(page).toHaveURL("/notifications");
-    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
+    await expect(page.getByTestId("splash")).toBeHidden();
   });
 
   test("splash-e5: 自分の情報の取得が終わると、スプラッシュを約300msかけてフェードして消す", async ({
@@ -71,7 +71,7 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    const splash = page.getByText("読み込み中", { exact: true }).locator("..");
+    const splash = page.getByTestId("splash");
     await expect(splash).toHaveCSS("opacity", "1");
     await page.evaluate(() => {
       Object.assign(window, { faded: false });
@@ -105,7 +105,7 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    const status = page.getByText("読み込み中", { exact: true });
+    const status = page.getByTestId("splash");
     await expect(status).toBeVisible();
     await page.evaluate(() => {
       Object.assign(window, { faded: false });
@@ -137,6 +137,6 @@ test.describe("起動時のスプラッシュ（JS無効）", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByText("読み込み中", { exact: true })).toBeVisible();
+    await expect(page.getByTestId("splash")).toBeVisible();
   });
 });
