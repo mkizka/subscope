@@ -47,7 +47,7 @@ export function Settings({
             "
           >
             <div className="min-w-0">
-              <div className="text-body">アカウント管理</div>
+              <div className="text-body">アカウント設定</div>
               <div className="truncate text-caption text-muted">
                 {new URL(accountUrl).host} で設定できます
               </div>

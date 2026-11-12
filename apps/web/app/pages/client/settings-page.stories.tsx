@@ -85,7 +85,7 @@ export const Account: Story = {
 };
 
 export const AccountNote: Story = {
-  name: "settings-s2: 「アカウント管理」の下に、認可サーバーのホスト名を使って「{ホスト名} で設定できます」と表示する",
+  name: "settings-s2: 「アカウント設定」の下に、認可サーバーのホスト名を使って「{ホスト名} で設定できます」と表示する",
   play: async ({ canvasElement }) => {
     const main = within(await within(canvasElement).findByRole("main"));
 
