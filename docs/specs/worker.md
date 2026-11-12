@@ -133,8 +133,9 @@ deleted は取り消せないため、アカウントと一緒にそのレコー
 - resolveDid-2: ハンドルが同じDIDに解決できないときは handle.invalid を保存する
 - resolveDid-3: すでに handle.invalid 以外のハンドルを持つアカウントのハンドルは上書きしない
 - resolveDid-4: Tapのidentityイベントのハンドルが handle.invalid のときは、DIDドキュメントからハンドルを解決し直す
+- resolveDid-5: DIDが登録されていないときは、再試行せずに終える
 
-DIDドキュメントのハンドルは本人以外も自由に書けるため、公式AppViewと同じくハンドルからDIDへの解決と照らしてから保存する。Tapもidentityイベントで同じ検証をしてハンドルを送るので、すでにあるハンドルはそちらを優先する。ただしTapはハンドルの解決に一時的に失敗したときも handle.invalid を送り、開発環境の`.test`のハンドルは常に解決できないため、handle.invalid だけは自分でも解決し直す。
+DIDドキュメントのハンドルは本人以外も自由に書けるため、公式AppViewと同じくハンドルからDIDへの解決と照らしてから保存する。Tapもidentityイベントで同じ検証をしてハンドルを送るので、すでにあるハンドルはそちらを優先する。ただしTapはハンドルの解決に一時的に失敗したときも handle.invalid を送り、開発環境の`.test`のハンドルは常に解決できないため、handle.invalid だけは自分でも解決し直す。DIDが登録されていない場合は再試行しても結果が変わらないため、ジョブを失敗させない。それ以外の解決の失敗は一時的な障害でありうるため再試行する。
 
 `ATPROTO_HANDLE_RESOLVER_URL`を設定すると、ハンドルはDNSやHTTPSではなくそのサーバーの`com.atproto.identity.resolveHandle`で解決する。`.test`のハンドルを使う開発環境向けの設定である。
 

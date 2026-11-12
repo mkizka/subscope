@@ -5,12 +5,13 @@ import type { ISubscopeCommand } from "@/app/server/application/interfaces/subsc
 import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
 
 type OAuthCallbackResult =
-  | { did: string }
+  | { did: string; invalidInviteCode: boolean }
   | {
       error:
         | "oauth_callback_failed"
         | "setup_status_check_failed"
-        | "admin_registration_failed";
+        | "admin_registration_failed"
+        | "registration_failed";
     };
 
 export interface IOAuthCallbackUseCase {
@@ -32,8 +33,11 @@ export const oauthCallbackUseCaseFactory = ({
   return {
     async execute(params) {
       let did;
+      let inviteCode;
       try {
-        did = (await oauthClient.callback(params)).assertDid;
+        const { client, state } = await oauthClient.callback(params);
+        did = client.assertDid;
+        inviteCode = state;
       } catch (e) {
         logger.error(e, "OAuth callback failed");
         return { error: "oauth_callback_failed" };
@@ -56,7 +60,15 @@ export const oauthCallbackUseCaseFactory = ({
         return { error: "admin_registration_failed" };
       }
 
-      return { did };
+      if (initialized && inviteCode) {
+        const result = await subscopeCommand.subscribe(did, inviteCode);
+        if (result === "failed") {
+          return { error: "registration_failed" };
+        }
+        return { did, invalidInviteCode: result === "invalidInviteCode" };
+      }
+
+      return { did, invalidInviteCode: false };
     },
   };
 };

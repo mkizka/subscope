@@ -82,13 +82,13 @@ export const oauthClientFactory = ({
     new Client(session, { service: `${env.APPVIEW_DID}#bsky_appview` });
 
   return {
-    async authorize(identifier) {
-      const url = await client.authorize(identifier);
+    async authorize(identifier, state) {
+      const url = await client.authorize(identifier, { state });
       return url.toString();
     },
     async callback(params) {
-      const { session } = await client.callback(params);
-      return createAgent(session);
+      const { session, state } = await client.callback(params);
+      return { client: createAgent(session), state };
     },
     async restore(did) {
       try {

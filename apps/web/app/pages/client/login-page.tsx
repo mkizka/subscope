@@ -1,13 +1,16 @@
 import { CheckIcon } from "lucide-react";
 
+import { Tabs } from "@/app/components/ui/tabs";
 import { InviteCodeFormContainer } from "@/app/features/login/invite-code-form-container";
 import { LoginFormContainer } from "@/app/features/login/login-form-container";
 
 type Props = {
   step: "setup" | "login" | "inviteCode";
+  tab?: "login" | "register";
+  inviteCodeError?: string;
 };
 
-export function LoginPage({ step }: Props) {
+export function LoginPage({ step, tab = "login", inviteCodeError }: Props) {
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
       <div
@@ -27,6 +30,18 @@ export function LoginPage({ step }: Props) {
           招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。
         </p>
         {step === "login" && (
+          <Tabs
+            tabs={[
+              { to: "/login", label: "ログイン", selected: tab === "login" },
+              {
+                to: "/login?tab=register",
+                label: "新規登録",
+                selected: tab === "register",
+              },
+            ]}
+          />
+        )}
+        {step === "login" && tab === "login" && (
           <p className="text-label text-muted">
             このサーバーに登録していないアカウントは、ログイン後に招待コードの入力が必要です
           </p>
@@ -56,9 +71,11 @@ export function LoginPage({ step }: Props) {
           </>
         )}
         {step === "inviteCode" ? (
-          <InviteCodeFormContainer />
+          <InviteCodeFormContainer error={inviteCodeError} />
         ) : (
-          <LoginFormContainer />
+          <LoginFormContainer
+            withInviteCode={step === "login" && tab === "register"}
+          />
         )}
       </div>
     </main>
