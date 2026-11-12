@@ -101,4 +101,20 @@ test.describe("プッシュ通知", () => {
       .toBeGreaterThan(0);
     expect(loggedOut.receiver.requests).toEqual([]);
   });
+
+  test("pushSetting-e4: サーバーへの購読の削除に失敗しても、その端末のブラウザの購読は解除する", async ({
+    newDevice,
+  }) => {
+    const device = await newDevice();
+    await turnOn(device);
+    await device.page.route("**/api/push-subscription", (route) =>
+      route.request().method() === "DELETE" ? route.abort() : route.continue(),
+    );
+
+    await device.page.getByRole("button", { name: "オフにする" }).click();
+
+    await expect(
+      device.page.getByRole("button", { name: "オンにする" }),
+    ).toBeVisible();
+  });
 });
