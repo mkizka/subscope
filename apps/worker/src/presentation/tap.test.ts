@@ -75,8 +75,10 @@ describe("Tapからのイベント受信", () => {
       services.metricReporter,
       services.indexCommitUseCase,
       services.upsertIdentityUseCase,
-      `http://localhost:${address.port}`,
-      tapConcurrency,
+      {
+        TAP_URL: `http://localhost:${address.port}`,
+        TAP_CONCURRENCY: tapConcurrency,
+      },
     );
     void subscriber.start();
     socket = await connection;

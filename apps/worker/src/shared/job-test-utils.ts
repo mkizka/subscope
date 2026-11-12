@@ -1,6 +1,6 @@
 import assert from "node:assert";
 
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
 import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
@@ -54,19 +54,22 @@ export const setupJobTest = async () => {
       await services.checkBackfillUseCase.execute(job);
     }
   };
+  const sendPushNotification = (recordUri: string, recipientDid: string) =>
+    services.sendPushNotificationUseCase.execute({
+      recordUri,
+      recipientDid: asDid(recipientDid),
+      jobLogger: new InMemoryJobLogger(),
+    });
   const runSendPushNotificationJobs = async () => {
     const jobs = [...services.jobScheduler.getSendPushNotificationJobs()];
     services.jobScheduler.clear();
     for (const { recordUri, recipientDid } of jobs) {
-      await services.sendPushNotificationUseCase.execute({
-        recordUri: recordUri.toString(),
-        recipientDid,
-        jobLogger: new InMemoryJobLogger(),
-      });
+      await sendPushNotification(recordUri.toString(), recipientDid);
     }
   };
   return {
     indexCommit,
+    sendPushNotification,
     runSendPushNotificationJobs,
     webPushSender: services.webPushSender,
     runSyncTapRepoJobs,

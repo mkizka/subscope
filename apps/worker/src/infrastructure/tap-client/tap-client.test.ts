@@ -14,7 +14,7 @@ describe("TapClient", () => {
   beforeEach(() => {
     mockAddRepos.mockResolvedValue(undefined);
     mockRemoveRepos.mockResolvedValue(undefined);
-    tapClient = new TapClient(tapUrl);
+    tapClient = new TapClient({ TAP_URL: tapUrl });
   });
 
   describe("addRepo", () => {

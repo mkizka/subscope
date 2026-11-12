@@ -5,18 +5,25 @@ import type {
   PushPayload,
   PushSubscription,
 } from "../../application/interfaces/external/web-push-sender.js";
+import type { Env } from "../../shared/env.js";
 
 const TTL_SECONDS = 24 * 60 * 60;
 
 export class WebPushSender implements IWebPushSender {
   constructor(
-    private readonly vapidPublicKey: string | undefined,
-    private readonly vapidPrivateKey: string | undefined,
-    private readonly vapidSubject: string | undefined,
+    private readonly env: Pick<
+      Env,
+      "VAPID_PUBLIC_KEY" | "VAPID_PRIVATE_KEY" | "VAPID_SUBJECT"
+    >,
   ) {}
 
   async send(subscription: PushSubscription, payload: PushPayload) {
-    if (!this.vapidPublicKey || !this.vapidPrivateKey || !this.vapidSubject) {
+    const {
+      VAPID_PUBLIC_KEY: publicKey,
+      VAPID_PRIVATE_KEY: privateKey,
+      VAPID_SUBJECT: subject,
+    } = this.env;
+    if (!publicKey || !privateKey || !subject) {
       throw new Error("VAPID keys are not configured");
     }
     // web-pushの送信関数はhttpsにしか送れないので、暗号化したリクエストだけ作ってfetchで送る
@@ -29,9 +36,9 @@ export class WebPushSender implements IWebPushSender {
       {
         TTL: TTL_SECONDS,
         vapidDetails: {
-          subject: this.vapidSubject,
-          publicKey: this.vapidPublicKey,
-          privateKey: this.vapidPrivateKey,
+          subject,
+          publicKey,
+          privateKey,
         },
       },
     );

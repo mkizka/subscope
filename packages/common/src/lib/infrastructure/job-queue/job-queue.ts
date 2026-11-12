@@ -39,9 +39,9 @@ export class JobQueue implements IJobQueue {
   };
   private readonly redis: Redis;
 
-  constructor(redisUrl: string) {
-    this.redis = new Redis(redisUrl, { lazyConnect: true });
-    const queueOptions = createQueueOptionsBuilder(redisUrl);
+  constructor(env: { REDIS_URL: string }) {
+    this.redis = new Redis(env.REDIS_URL, { lazyConnect: true });
+    const queueOptions = createQueueOptionsBuilder(env.REDIS_URL);
     this.queues = {
       resolveDid: new Queue("resolveDid", queueOptions(withRetry)),
       fetchRecord: new Queue("fetchRecord", queueOptions(withRetry)),

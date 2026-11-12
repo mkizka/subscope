@@ -4,6 +4,8 @@ import type { RequestHandler, Router } from "express";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
+import type { Env } from "../shared/env.js";
+
 export class AppViewServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
@@ -13,11 +15,13 @@ export class AppViewServer {
     lexRouter: RequestHandler,
     healthRouter: Router,
     wellKnownRouter: Router,
-    private readonly port: number,
+    private readonly env: Pick<Env, "NODE_ENV" | "PORT">,
   ) {
     this.logger = loggerManager.createLogger("AppViewServer");
     this.app = express();
-    this.app.use(loggingMiddleware(this.logger));
+    this.app.use(
+      loggingMiddleware(this.logger, env.NODE_ENV === "development"),
+    );
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
@@ -25,8 +29,8 @@ export class AppViewServer {
   }
 
   start() {
-    this.app.listen(this.port, () => {
-      this.logger.info(`AppView server listening on port ${this.port}`);
+    this.app.listen(this.env.PORT, () => {
+      this.logger.info(`AppView server listening on port ${this.env.PORT}`);
     });
   }
 }

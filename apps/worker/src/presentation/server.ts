@@ -6,6 +6,7 @@ import express, { type Router } from "express";
 import promBundle from "express-prom-bundle";
 
 import type { ScheduleBackfillChecksUseCase } from "../application/use-cases/async/schedule-backfill-checks-use-case.js";
+import type { Env } from "../shared/env.js";
 import type { LabelSubscriber } from "./label-subscriber.js";
 import type { TapSubscriber } from "./tap.js";
 import type { SyncWorker } from "./worker.js";
@@ -23,18 +24,20 @@ export class WorkerServer {
     private readonly jobQueue: IJobQueue,
     private readonly scheduleBackfillChecksUseCase: ScheduleBackfillChecksUseCase,
     healthRouter: Router,
-    private readonly port: number,
+    private readonly env: Pick<Env, "NODE_ENV" | "PORT">,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
-    this.app.use(loggingMiddleware(this.logger));
+    this.app.use(
+      loggingMiddleware(this.logger, env.NODE_ENV === "development"),
+    );
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(healthRouter);
   }
 
   start() {
-    this.server = this.app.listen(this.port, async () => {
-      this.logger.info(`Worker server listening on port ${this.port}`);
+    this.server = this.app.listen(this.env.PORT, async () => {
+      this.logger.info(`Worker server listening on port ${this.env.PORT}`);
       this.tapSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Tap subscriber threw");
       });
