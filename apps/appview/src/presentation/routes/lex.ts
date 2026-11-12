@@ -14,6 +14,7 @@ import type { GetLikes } from "./app/bsky/feed/getLikes.js";
 import type { GetListFeed } from "./app/bsky/feed/getListFeed.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
+import type { GetQuotes } from "./app/bsky/feed/getQuotes.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
@@ -94,6 +95,7 @@ export const lexRouterFactory = (
   getBannedAccounts: GetBannedAccounts,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
+  getQuotes: GetQuotes,
   getFeedGenerators: GetFeedGenerators,
   getPosts: GetPosts,
   getPostThreadV2: GetPostThreadV2,
@@ -143,6 +145,7 @@ export const lexRouterFactory = (
     getBannedAccounts,
     getLikes,
     getRepostedBy,
+    getQuotes,
     getFeedGenerators,
     getPosts,
     getPostThreadV2,

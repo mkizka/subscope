@@ -92,6 +92,29 @@ export class PostQuery implements IPostQuery {
     return posts.map(toPostDto);
   }
 
+  async findQuotes(params: {
+    uri: string;
+    limit: number;
+    cursor?: Date;
+  }): Promise<PostDto[]> {
+    const posts = await this.db.query.posts.findMany({
+      where: and(
+        inArray(
+          schema.posts.uri,
+          this.db
+            .select({ uri: schema.postEmbedRecords.postUri })
+            .from(schema.postEmbedRecords)
+            .where(eq(schema.postEmbedRecords.uri, params.uri)),
+        ),
+        params.cursor && lt(schema.posts.sortAt, params.cursor),
+      ),
+      orderBy: desc(schema.posts.sortAt),
+      limit: params.limit,
+      with: withEmbeds,
+    });
+    return posts.map(toPostDto);
+  }
+
   async search(params: {
     query: string;
     limit: number;
