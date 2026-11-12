@@ -153,6 +153,13 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 - getRepostedBy-1: 指定した投稿をリポストしたアカウントをprofileViewで返す
 - getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
+## app.bsky.feed.getQuotes
+
+指定した投稿を引用した投稿を新しい順に返す。認証は任意。
+
+- getQuotes-1: 指定した投稿を引用した投稿をpostViewで返す
+- getQuotes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+
 ## app.bsky.feed.getFeedGenerators
 
 指定したフィードジェネレーターの情報を返す。認証は任意。

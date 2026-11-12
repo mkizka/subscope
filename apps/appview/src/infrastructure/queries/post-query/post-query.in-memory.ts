@@ -24,6 +24,10 @@ export class InMemoryPostQuery implements IPostQuery {
     throw new Error("Not implemented");
   }
 
+  findQuotes(): Promise<PostDto[]> {
+    throw new Error("Not implemented");
+  }
+
   search(): Promise<PostDto[]> {
     throw new Error("Not implemented");
   }
