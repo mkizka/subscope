@@ -6,7 +6,7 @@
 
 atprotoアカウントでOAuthログインし、メンバーでなければ招待コードで登録する。ログイン前に見せる画面はこのログイン画面（`/login`）だけにする。
 
-OAuthで要求する権限は、`transition:generic`を使わず、webが実際に使う投稿・スレッドゲート・いいね・リポスト・フォロー・リスト・リストアイテムのレコード、画像のアップロード、AppViewへのXRPC呼び出しだけに絞る。XRPC呼び出しはワイルドカードを使わず、permission set(`me.subsco.authFull`と`app.bsky.authViewAll`)で許可する。個別の権限指定に対応していないPDSはサポートしない。
+OAuthで要求する権限は、`transition:generic`を使わず、webが実際に使う投稿・スレッドゲート・いいね・リポスト・フォロー・リスト・リストアイテムのレコード、画像のアップロード、AppViewへのXRPC呼び出しだけに絞る。本番ではXRPC呼び出しをpermission set(`me.subsco.authFull`と`app.bsky.authViewAll`)で許可する。ローカルのDID(`did:web:localhost%3A3001`)は`%`を含み、permission setのaudとして解釈できないため、ローカルだけ`rpc:*`を使う。個別の権限指定に対応していないPDSはサポートしない。
 
 - login-e1: 最初にログインしたアカウントを管理者として登録する
 - login-e2: ログインしていないときにトップページを開くと、ログイン画面に移動する
