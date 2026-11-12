@@ -3,6 +3,7 @@ import { useSubmit } from "react-router";
 import { useMe } from "@/app/features/navigation/side-nav-container";
 import { disablePush } from "@/app/lib/push-setting";
 
+import { PushSettingContainer } from "./push-setting-container";
 import { Settings } from "./settings";
 
 export function SettingsContainer({
@@ -25,6 +26,7 @@ export function SettingsContainer({
       displayName={me?.displayName}
       handle={me?.handle}
       accountUrl={accountUrl}
+      pushSetting={<PushSettingContainer />}
       onLogout={() => void logout()}
     />
   );

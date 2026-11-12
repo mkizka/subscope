@@ -1,4 +1,5 @@
 import { ExternalLinkIcon, LogOutIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -9,6 +10,7 @@ type Props = {
   displayName?: string;
   handle?: string;
   accountUrl: string | null;
+  pushSetting: ReactNode;
   onLogout: () => void;
 };
 
@@ -17,6 +19,7 @@ export function Settings({
   displayName,
   handle,
   accountUrl,
+  pushSetting,
   onLogout,
 }: Props) {
   return (
@@ -68,6 +71,7 @@ export function Settings({
           </Button>
         </Form>
       </section>
+      {pushSetting}
     </>
   );
 }

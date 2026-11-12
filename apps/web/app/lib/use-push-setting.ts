@@ -1,14 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  disablePush,
-  enablePush,
-  fetchPushSettingState,
-} from "@/app/lib/push-setting";
+import { disablePush, enablePush, fetchPushSettingState } from "./push-setting";
 
-import { PushSetting } from "./push-setting";
-
-export function PushSettingContainer() {
+export function usePushSetting() {
   const queryClient = useQueryClient();
   const { data: state } = useQuery({
     queryKey: ["pushSetting"],
@@ -25,14 +19,10 @@ export function PushSettingContainer() {
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["pushSetting"] }),
   });
-
-  if (!state || state === "unavailable") return null;
-  return (
-    <PushSetting
-      state={state}
-      isPending={toggle.isPending}
-      permissionDismissed={toggle.data === "default"}
-      onToggle={() => toggle.mutate()}
-    />
-  );
+  return {
+    state,
+    isPending: toggle.isPending,
+    permissionDismissed: toggle.data === "default",
+    toggle: () => toggle.mutate(),
+  };
 }

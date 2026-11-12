@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { loader } from "@/app/routes/api.notifications";
 
 import { NotificationPanel } from "./notification-panel";
-import { PushSettingContainer } from "./push-setting-container";
+import { PushPromptContainer } from "./push-prompt-container";
 
 type NotificationsResponse = Awaited<ReturnType<typeof loader>>["data"];
 
@@ -69,7 +69,7 @@ export function NotificationPanelContainer() {
   return (
     <div ref={ref}>
       <NotificationPanel
-        pushSetting={<PushSettingContainer />}
+        pushPrompt={<PushPromptContainer />}
         notifications={notifications}
         onLoadMore={fetchNextPage}
         hasNextPage={hasNextPage && !isFetchingNextPage}
