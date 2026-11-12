@@ -5,7 +5,7 @@ import type { ILoggerManager, LogLevel } from "../../interface/logger.js";
 export class LoggerManager implements ILoggerManager {
   private readonly rootLogger;
 
-  constructor(logLevel: LogLevel) {
+  constructor(env: { LOG_LEVEL: LogLevel }) {
     this.rootLogger = pino({
       customLevels: {
         error: 50,
@@ -14,7 +14,7 @@ export class LoggerManager implements ILoggerManager {
         debug: 20,
       },
       useOnlyCustomLevels: true,
-      level: logLevel,
+      level: env.LOG_LEVEL,
       // disable pid and hostname in logs
       base: null,
       formatters: {

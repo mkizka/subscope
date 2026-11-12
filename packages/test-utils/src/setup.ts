@@ -15,10 +15,9 @@ declare module "vitest" {
 
 // prettier-ignore
 const testRegistry = createRegistry()
-  .value("logLevel", "error" as const)
-  .value("databaseUrl", inject("databaseUrl"))
-  .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
-  .service("connectionPool", ["databaseUrl"], connectionPoolFactory)
+  .value("env", { LOG_LEVEL: "error" as const, DATABASE_URL: inject("databaseUrl") })
+  .service("loggerManager", ["env"], asClassArgs(LoggerManager))
+  .service("connectionPool", ["env"], connectionPoolFactory)
   .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
   .service("transactionManager", ["db"], asClassArgs(TransactionManager));
 

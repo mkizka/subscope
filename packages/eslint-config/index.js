@@ -56,6 +56,23 @@ const noEnvImport = {
   },
 };
 
+const noEnvValue = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    return {
+      "CallExpression[callee.property.name='value'] > MemberExpression[object.name='env']"(
+        node,
+      ) {
+        context.report({
+          node,
+          message:
+            'envの個別の項目をvalueで登録しないでください。.value("env", env)で渡し、利用側で["env"]を受け取ってください。',
+        });
+      },
+    };
+  },
+};
+
 export const config = [
   ...mkizka,
   {
@@ -64,12 +81,14 @@ export const config = [
         rules: {
           "effect-padding": effectPadding,
           "no-env-import": noEnvImport,
+          "no-env-value": noEnvValue,
         },
       },
     },
     rules: {
       "local/effect-padding": "error",
       "local/no-env-import": "error",
+      "local/no-env-value": "error",
       "no-restricted-syntax": [
         "error",
         {

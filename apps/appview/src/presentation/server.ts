@@ -15,8 +15,7 @@ export class AppViewServer {
     lexRouter: RequestHandler,
     healthRouter: Router,
     wellKnownRouter: Router,
-    private readonly port: number,
-    env: Pick<Env, "NODE_ENV">,
+    private readonly env: Pick<Env, "NODE_ENV" | "PORT">,
   ) {
     this.logger = loggerManager.createLogger("AppViewServer");
     this.app = express();
@@ -30,8 +29,8 @@ export class AppViewServer {
   }
 
   start() {
-    this.app.listen(this.port, () => {
-      this.logger.info(`AppView server listening on port ${this.port}`);
+    this.app.listen(this.env.PORT, () => {
+      this.logger.info(`AppView server listening on port ${this.env.PORT}`);
     });
   }
 }

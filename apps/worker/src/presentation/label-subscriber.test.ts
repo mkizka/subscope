@@ -45,7 +45,7 @@ describe("モデレーションサービスからのラベル受信", () => {
         new TransactionManager(ctx.db),
       ),
       labelCursorStore,
-      moderationUrl,
+      { MODERATION_URL: moderationUrl },
     );
     void subscriber.start();
     return connection;

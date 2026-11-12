@@ -10,6 +10,7 @@ import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-re
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import type { SendPushNotificationUseCase } from "../application/use-cases/async/send-push-notification-use-case.js";
 import type { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
+import type { Env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
 const SECONDS = 1000;
@@ -45,7 +46,7 @@ export class SyncWorker {
     syncTapRepoUseCase: SyncTapRepoUseCase,
     checkBackfillUseCase: CheckBackfillUseCase,
     sendPushNotificationUseCase: SendPushNotificationUseCase,
-    redisUrl: string,
+    env: Pick<Env, "REDIS_URL">,
   ) {
     const createWorker = <T extends keyof JobData>(
       name: T,
@@ -55,7 +56,7 @@ export class SyncWorker {
       return new Worker<JobData[T]>(name, process, {
         autorun: false,
         connection: {
-          url: redisUrl,
+          url: env.REDIS_URL,
         },
         settings: {
           backoffStrategy,
