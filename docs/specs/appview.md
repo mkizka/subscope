@@ -87,12 +87,15 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 - getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す
 - getProfile-6: プロフィールレコードのlinksが指す app.bsky.actor.link レコードを、linksの順にprofileLinkViewで返す
 - getProfile-7: 保存されていないリンクとテイクダウンされたリンクは、linksに含めない
+- getProfile-8: 閲覧者がフォローしているフォロワーを、閲覧者がフォローした新しい順に最大5件、総数とともにviewer.knownFollowersに入れる
+- getProfile-9: 該当するフォロワーがいない場合、未ログインの場合、閲覧者自身の場合は、viewer.knownFollowersを含めない
 
 ## app.bsky.actor.getProfiles
 
 指定した複数アカウントの詳細なプロフィールを返す。認証は任意。
 
 - getProfiles-1: DIDとハンドルのどちらでも指定でき、見つかったアカウントだけを指定した順に返す
+- getProfiles-2: 閲覧者がフォローしているフォロワーがいるアカウントには、viewer.knownFollowersを含める
 
 ## app.bsky.actor.searchActors
 

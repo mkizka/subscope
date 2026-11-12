@@ -99,6 +99,14 @@ export class InMemoryFollowQuery implements IFollowQuery {
     );
   }
 
+  async countKnownFollowers(params: {
+    viewerDid: Did;
+    subjectDid: Did;
+  }): Promise<number> {
+    const all = await this.findKnownFollowers({ ...params, limit: Infinity });
+    return all.length;
+  }
+
   findFolloweeDids(accountDid: Did): Promise<Did[]> {
     return Promise.resolve(
       this.follows

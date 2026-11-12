@@ -54,6 +54,7 @@ type Repositories = {
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
 
 export class ViewContext {
+  private readonly followQuery: IFollowQuery;
   private readonly profiles: Batch<Did, ProfileDto>;
   private readonly labels: Batch<string, LabelDto[]>;
   private readonly following: Batch<Did, FollowDto>;
@@ -73,6 +74,7 @@ export class ViewContext {
     repos: Repositories,
     readonly viewer: Viewer,
   ) {
+    this.followQuery = repos.followQuery;
     const viewerDid = viewer.viewerDid;
     const none = () => Promise.resolve([]);
     this.profiles = Batch.one(
@@ -248,6 +250,19 @@ export class ViewContext {
       this.followedBy.load(did),
     ]);
     return { following: following?.uri, followedBy: followedBy?.uri };
+  }
+
+  async knownFollowers(did: Did) {
+    const viewerDid = this.viewer.viewerDid;
+    if (!viewerDid || viewerDid === did) {
+      return undefined;
+    }
+    const params = { viewerDid, subjectDid: did };
+    const [followers, count] = await Promise.all([
+      this.followQuery.findKnownFollowers({ ...params, limit: 5 }),
+      this.followQuery.countKnownFollowers(params),
+    ]);
+    return { count, dids: followers.map((follower) => follower.accountDid) };
   }
 
   async viewerPostState(uri: string) {

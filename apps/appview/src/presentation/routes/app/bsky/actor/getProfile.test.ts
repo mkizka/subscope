@@ -2,6 +2,7 @@ import { asAtIdentifierString } from "@atproto/syntax";
 import getProfile from "@repo/client/app/bsky/actor/getProfile";
 import {
   accountFactory,
+  followFactory,
   labelFactory,
   profileFactory,
   recordFactory,
@@ -13,6 +14,38 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
 describe("app.bsky.actor.getProfile", () => {
   const { ctx } = testSetup;
+
+  const createAccount = () =>
+    accountFactory(ctx.db)
+      .use((t) => t.withProfile({}))
+      .create();
+
+  type Account = Awaited<ReturnType<typeof createAccount>>;
+
+  const createFollow = (account: Account, followee: Account, date: Date) =>
+    followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ accountDid: () => account.did })
+            .create(),
+        followee: () => followee,
+      })
+      .props({ createdAt: () => date, indexedAt: () => date })
+      .create();
+
+  const setupKnownFollowers = async (count: number) => {
+    const viewer = await createAccount();
+    const subject = await createAccount();
+    const known: Account[] = [];
+    for (let i = 0; i < count; i++) {
+      const other = await createAccount();
+      await createFollow(viewer, other, new Date(2025, 0, i + 1));
+      await createFollow(other, subject, new Date());
+      known.push(other);
+    }
+    return { viewer, subject, known };
+  };
 
   test("getProfile-1: 指定したアカウントのprofileViewDetailedを返す", async () => {
     // arrange
@@ -190,5 +223,51 @@ describe("app.bsky.actor.getProfile", () => {
     expect(res.links?.map((link) => link.url)).toEqual([
       "https://example.com/visible",
     ]);
+  });
+
+  test("getProfile-8: 閲覧者がフォローしているフォロワーを、フォローした新しい順に最大5件、総数とともにviewer.knownFollowersに入れる", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const { viewer, subject, known } = await setupKnownFollowers(6);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getProfile, {
+      actor: asAtIdentifierString(subject.did),
+    });
+
+    // assert
+    expect(res.viewer?.knownFollowers?.count).toBe(6);
+    expect(res.viewer?.knownFollowers?.followers.map((a) => a.did)).toEqual(
+      known
+        .slice(1)
+        .reverse()
+        .map((a) => a.did),
+    );
+  });
+
+  test("getProfile-9: 該当するフォロワーがいない場合、未ログインの場合、閲覧者自身の場合は、viewer.knownFollowersを含めない", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const { viewer, subject } = await setupKnownFollowers(1);
+    const stranger = await createAccount();
+
+    // act
+    const anonymous = await client.call(getProfile, {
+      actor: asAtIdentifierString(subject.did),
+    });
+    loginAs(stranger.did);
+    const noKnown = await client.call(getProfile, {
+      actor: asAtIdentifierString(subject.did),
+    });
+    loginAs(viewer.did);
+    const self = await client.call(getProfile, {
+      actor: asAtIdentifierString(viewer.did),
+    });
+
+    // assert
+    expect(anonymous.viewer?.knownFollowers).toBeUndefined();
+    expect(noKnown.viewer?.knownFollowers).toBeUndefined();
+    expect(self.viewer?.knownFollowers).toBeUndefined();
   });
 });
