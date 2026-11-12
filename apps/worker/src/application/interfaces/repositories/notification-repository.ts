@@ -13,5 +13,5 @@ export interface INotificationRepository {
   save: (params: {
     ctx: TransactionContext;
     notifications: Notification[];
-  }) => Promise<void>;
+  }) => Promise<Pick<Notification, "recordUri" | "recipientDid">[]>;
 }

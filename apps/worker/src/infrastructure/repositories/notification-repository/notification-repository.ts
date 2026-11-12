@@ -14,13 +14,17 @@ export class NotificationRepository implements INotificationRepository {
   }: {
     ctx: TransactionContext;
     notifications: Notification[];
-  }): Promise<void> {
-    if (notifications.length === 0) return;
-    await ctx.db
+  }) {
+    if (notifications.length === 0) return [];
+    return await ctx.db
       .insert(schema.notifications)
       .values(
         notifications.map((n) => ({ ...n, sortAt: sanitizeDate(n.sortAt) })),
       )
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning({
+        recordUri: schema.notifications.recordUri,
+        recipientDid: schema.notifications.recipientDid,
+      });
   }
 }

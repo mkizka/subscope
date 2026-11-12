@@ -60,9 +60,17 @@ export const setupJobTest = async () => {
       recipientDid: asDid(recipientDid),
       jobLogger: new InMemoryJobLogger(),
     });
+  const runSendPushNotificationJobs = async () => {
+    const jobs = [...services.jobScheduler.getSendPushNotificationJobs()];
+    services.jobScheduler.clear();
+    for (const { recordUri, recipientDid } of jobs) {
+      await sendPushNotification(recordUri.toString(), recipientDid);
+    }
+  };
   return {
     indexCommit,
     sendPushNotification,
+    runSendPushNotificationJobs,
     webPushSender: services.webPushSender,
     runSyncTapRepoJobs,
     runCheckBackfillJobs,

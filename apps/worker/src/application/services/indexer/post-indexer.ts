@@ -1,8 +1,4 @@
-import type {
-  AfterCommitContext,
-  IJobScheduler,
-  TransactionContext,
-} from "@repo/common/interface";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
 import { feedItemFromPost } from "../../dto/feed-item.js";
@@ -12,12 +8,10 @@ import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
-import type {
-  INotificationRepository,
-  Notification,
-} from "../../interfaces/repositories/notification-repository.js";
+import type { Notification } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { NotificationService } from "../notification-service.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
 
@@ -27,7 +21,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postQuery: IPostQuery,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly registrationQuery: IRegistrationQuery,
-    private readonly notificationRepository: INotificationRepository,
+    private readonly notificationService: NotificationService,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
@@ -64,7 +58,7 @@ export class PostIndexer implements ICollectionIndexer {
   }
 
   private async createNotifications(
-    ctx: TransactionContext,
+    ctx: AfterCommitContext,
     record: Record,
     post: Post,
   ) {
@@ -120,7 +114,7 @@ export class PostIndexer implements ICollectionIndexer {
         sortAt: getSortAt(post),
       });
     }
-    await this.notificationRepository.save({
+    await this.notificationService.create({
       ctx,
       notifications: [...notifications.values()],
     });
