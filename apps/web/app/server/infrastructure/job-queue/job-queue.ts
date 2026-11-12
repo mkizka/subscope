@@ -1,8 +1,10 @@
 import { JobQueue } from "@repo/common/infrastructure";
 import type { IJobQueue } from "@repo/common/interface";
 
+import type { Env } from "@/app/server/env";
+
 export const jobQueueFactory = ({
-  redisUrl,
+  env,
 }: {
-  redisUrl: string;
-}): IJobQueue => new JobQueue(redisUrl);
+  env: Pick<Env, "REDIS_URL">;
+}): IJobQueue => new JobQueue(env.REDIS_URL);

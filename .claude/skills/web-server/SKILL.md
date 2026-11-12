@@ -44,7 +44,7 @@ export const timelineQueryFactory = ({
 ```
 
 - 名前は `{名前}Factory`、戻り値の interface は `I{名前}` とし、同じファイルから export する
-- 環境変数は `di.ts` で `.value("名前", env.XXX)` として DI に載せ、factory の引数で受け取る。`env.ts` は `di.ts` 以外から import しない
+- 環境変数は `di.ts` で `.value("env", env)` の1つのvalueとして載せ、factoryは `{ env }: { env: Pick<Env, "XXX"> }` で必要なキーだけ受け取る。`env.ts` は `di.ts` と型の import 以外で使わない
 - ライブラリのクラスは関数内に閉じ込め、interface に出さない(例: `oauthClientFactory` は `NodeOAuthClient` を内部に持つ)
 
 ## DI

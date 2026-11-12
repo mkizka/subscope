@@ -1,19 +1,18 @@
 import { createCookieSessionStorage } from "react-router";
 
 import type { ICookieSessionStorage } from "@/app/server/application/interfaces/cookie-session-storage";
+import type { Env } from "@/app/server/env";
 export const cookieSessionStorageFactory = ({
-  cookieSecret,
-  nodeEnv,
+  env,
 }: {
-  cookieSecret: string;
-  nodeEnv: string;
+  env: Pick<Env, "COOKIE_SECRET" | "NODE_ENV">;
 }): ICookieSessionStorage => {
   const storage = createCookieSessionStorage<{ did: string }>({
     cookie: {
       name: "subscope_session",
-      secrets: [cookieSecret],
+      secrets: [env.COOKIE_SECRET],
       httpOnly: true,
-      secure: nodeEnv === "production",
+      secure: env.NODE_ENV === "production",
       maxAge: 30 * 24 * 60 * 60,
       sameSite: "lax",
     },

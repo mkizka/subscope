@@ -9,7 +9,7 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
 export const loader = async () => {
   return data({
-    serviceDid: `${di.appviewDid}#bsky_appview`,
+    serviceDid: `${di.env.APPVIEW_DID}#bsky_appview`,
     operator: await di.subscopeQuery.findOperator(),
   });
 };

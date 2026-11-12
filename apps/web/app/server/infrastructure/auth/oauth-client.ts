@@ -9,6 +9,7 @@ import type { ILoggerManager } from "@repo/common/interface";
 import { z } from "zodV4";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
+import type { Env } from "@/app/server/env";
 
 const issuerSchema = z.object({ issuer: z.string() });
 
@@ -16,24 +17,22 @@ export const oauthClientFactory = async ({
   oauthStateStore,
   oauthSessionStore,
   loggerManager,
-  isProduction,
-  publicUrl,
-  appviewDid,
-  privateKeyEs256B64,
-  atprotoPlcUrl,
-  atprotoHandleResolverUrl,
+  env,
 }: {
   oauthStateStore: NodeSavedStateStore;
   oauthSessionStore: NodeSavedSessionStore;
   loggerManager: ILoggerManager;
-  isProduction: boolean;
-  publicUrl: string;
-  appviewDid: `did:${string}:${string}`;
-  privateKeyEs256B64: string;
-  atprotoPlcUrl: string;
-  atprotoHandleResolverUrl: string | undefined;
+  env: Pick<
+    Env,
+    | "isProduction"
+    | "PUBLIC_URL"
+    | "APPVIEW_DID"
+    | "PRIVATE_KEY_ES256_B64"
+    | "ATPROTO_PLC_URL"
+    | "ATPROTO_HANDLE_RESOLVER_URL"
+  >;
 }): Promise<IOAuthClient> => {
-  const appviewAud = encodeURIComponent(`${appviewDid}#bsky_appview`);
+  const appviewAud = encodeURIComponent(`${env.APPVIEW_DID}#bsky_appview`);
   const scope = [
     "atproto",
     "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
@@ -41,14 +40,14 @@ export const oauthClientFactory = async ({
     "blob:image/*",
     `rpc:*?aud=${appviewAud}`,
   ].join(" ");
-  const redirectUri = `${publicUrl}/oauth/callback`;
+  const redirectUri = `${env.PUBLIC_URL}/oauth/callback`;
 
-  const clientMetadata = isProduction
+  const clientMetadata = env.isProduction
     ? {
         client_name: "Subscope",
-        client_id: `${publicUrl}/oauth/client-metadata.json`,
-        client_uri: publicUrl,
-        jwks_uri: `${publicUrl}/oauth/jwks.json`,
+        client_id: `${env.PUBLIC_URL}/oauth/client-metadata.json`,
+        client_uri: env.PUBLIC_URL,
+        jwks_uri: `${env.PUBLIC_URL}/oauth/jwks.json`,
         redirect_uris: [redirectUri],
         scope,
         grant_types: ["authorization_code", "refresh_token"],
@@ -69,10 +68,10 @@ export const oauthClientFactory = async ({
         dpop_bound_access_tokens: true,
       };
 
-  const keyset = isProduction
+  const keyset = env.isProduction
     ? [
         await JoseKey.fromImportable(
-          Buffer.from(privateKeyEs256B64, "base64").toString(),
+          Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString(),
           "key1",
         ),
       ]
@@ -81,16 +80,16 @@ export const oauthClientFactory = async ({
   const client = new NodeOAuthClient({
     clientMetadata,
     keyset,
-    allowHttp: !isProduction,
-    plcDirectoryUrl: atprotoPlcUrl,
-    handleResolver: atprotoHandleResolverUrl,
+    allowHttp: !env.isProduction,
+    plcDirectoryUrl: env.ATPROTO_PLC_URL,
+    handleResolver: env.ATPROTO_HANDLE_RESOLVER_URL,
     stateStore: oauthStateStore,
     sessionStore: oauthSessionStore,
   });
   const logger = loggerManager.createLogger("oauthClient");
 
   const createAgent = (session: ConstructorParameters<typeof Client>[0]) =>
-    new Client(session, { service: `${appviewDid}#bsky_appview` });
+    new Client(session, { service: `${env.APPVIEW_DID}#bsky_appview` });
 
   return {
     async authorize(identifier, state) {
