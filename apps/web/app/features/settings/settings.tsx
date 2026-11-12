@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
-import { Button } from "@/app/components/ui/button";
 
 type Props = {
   avatarUrl?: string;
@@ -26,7 +25,7 @@ export function Settings({
     <>
       <h1 className="p-4 pb-2 text-title">設定</h1>
       <section className="p-4">
-        <div className="flex items-center gap-3 rounded-xl border border-line p-4">
+        <div className="flex items-center gap-3 px-3">
           <Avatar src={avatarUrl} />
           <div className="min-w-0">
             <div className="truncate text-body font-bold">{displayName}</div>
@@ -35,7 +34,7 @@ export function Settings({
         </div>
       </section>
       <section className="space-y-4 p-4">
-        <h2 className="text-caption text-muted">アカウント</h2>
+        <h2 className="text-label font-bold">アカウント</h2>
         {accountUrl && (
           <a
             href={accountUrl}
@@ -70,10 +69,17 @@ export function Settings({
             onLogout();
           }}
         >
-          <Button type="submit" variant="secondary">
-            <LogOutIcon className="size-4" />
+          <button
+            type="submit"
+            className="
+              flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body
+              text-danger
+              hover:bg-surface-2
+            "
+          >
+            <LogOutIcon className="size-4 shrink-0" aria-hidden />
             ログアウト
-          </Button>
+          </button>
         </Form>
       </section>
     </>

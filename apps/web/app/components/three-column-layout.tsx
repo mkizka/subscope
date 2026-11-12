@@ -12,12 +12,14 @@ type Props = {
   children: ReactNode;
   hideServerCard?: boolean;
   hideSearch?: boolean;
+  hideCompose?: boolean;
 };
 
 export const ThreeColumnLayout = ({
   children,
   hideServerCard,
   hideSearch,
+  hideCompose,
 }: Props) => {
   return (
     <div className="flex min-h-screen justify-center bg-surface text-ink">
@@ -38,14 +40,16 @@ export const ThreeColumnLayout = ({
       >
         <MobileHeaderContainer />
         {children}
-        <ComposeButton
-          className="
-            fixed right-4 bottom-20 z-nav flex size-14 items-center
-            justify-center rounded-full bg-brand text-on-brand shadow-lg
-            hover:opacity-90
-            lg:hidden
-          "
-        />
+        {!hideCompose && (
+          <ComposeButton
+            className="
+              fixed right-4 bottom-20 z-nav flex size-14 items-center
+              justify-center rounded-full bg-brand text-on-brand shadow-lg
+              hover:opacity-90
+              lg:hidden
+            "
+          />
+        )}
         <BottomTabsContainer />
       </main>
       <aside

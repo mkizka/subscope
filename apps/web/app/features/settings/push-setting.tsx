@@ -62,7 +62,7 @@ export function PushSetting({ state, isPending, onToggle }: Props) {
   const isOn = state === "on";
   return (
     <section className="space-y-4 p-4">
-      <h2 className="text-caption text-muted">この端末</h2>
+      <h2 className="text-label font-bold">この端末</h2>
       <div className="flex items-center gap-3 px-3">
         <BellIcon className="size-6 shrink-0" aria-hidden />
         <div id="push-setting-label" className="min-w-0 flex-1 text-body">
