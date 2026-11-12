@@ -80,7 +80,7 @@ export const config = [
       "**/shared/env.ts",
       "**/server/env.ts",
       "**/drizzle.config.ts",
-      "apps/web/server.js",
+      "**/server.js",
     ],
     rules: { "no-restricted-properties": "off" },
   },
