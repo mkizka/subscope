@@ -95,7 +95,7 @@ const tap = await new GenericContainer("ghcr.io/bluesky-social/indigo/tap:0.1")
   })
   .start();
 
-const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:latest")
+const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:0")
   .withPullPolicy(PullPolicy.alwaysPull())
   .withNetworkMode("host")
   .withEnvironment({
