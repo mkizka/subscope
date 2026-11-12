@@ -21,7 +21,7 @@ const subscriptionSchema = z.object({
 });
 
 export const loader = () => {
-  return data({ publicKey: di.env.VAPID_PUBLIC_KEY ?? null });
+  return data({ publicKey: di.env.VAPID_PUBLIC_KEY || null });
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {

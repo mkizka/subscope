@@ -18,6 +18,7 @@
 6. Grafanaの `GF_SECURITY_ADMIN_PASSWORD` をダッシュボードで設定する(未設定だとGrafanaは起動しない)
 7. `railway.ts` の `domains` に書いたカスタムドメインのDNSレコードを、ダッシュボードの表示どおりに設定する
 8. 運用の調査でClaudeなどにメトリクスを読ませる場合は、GrafanaでViewerロールのサービスアカウントのトークンを作る
+9. プッシュ通知を使う場合は、`npx web-push generate-vapid-keys` で鍵を作り、Workerの `VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY`・`VAPID_SUBJECT`をダッシュボードで設定する(`VAPID_SUBJECT` は `mailto:` かhttpsのURL。Webの `VAPID_PUBLIC_KEY` はWorkerの値を参照する)。未設定でも起動し、プッシュ通知の切り替えが出ないだけになる
 
 ## 運用の調査
 
