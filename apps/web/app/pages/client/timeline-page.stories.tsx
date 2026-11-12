@@ -81,7 +81,6 @@ const tweet = {
 
 export const LinkCard: Story = {
   name: "link-card-s1: リンクカードのサムネイル・タイトル・説明を投稿の中に表示し、選ぶとリンク先を新しいタブで開く",
-  tags: ["play"],
   beforeEach: () => {
     setPost({
       uri: "https://example.com/link-card",
@@ -106,7 +105,6 @@ export const LinkCard: Story = {
 
 export const TweetEmbed: Story = {
   name: "link-card-s2: リンク先がx.com・twitter.comのツイートの場合は、リンクカードの代わりにツイートを埋め込んで表示する",
-  tags: ["play"],
   beforeEach: () => {
     setPost(tweet);
   },
@@ -126,7 +124,6 @@ export const TweetEmbed: Story = {
 
 export const TweetEmbedClick: Story = {
   name: "link-card-s3: 埋め込んだツイートの中を選んだ場合は、投稿の詳細へ遷移せずツイート側の操作を優先する",
-  tags: ["play"],
   beforeEach: () => {
     setPost(tweet);
   },
@@ -215,7 +212,6 @@ const openViewer = async (canvasElement: HTMLElement, alt: string) => {
 
 export const ImageViewerOpen: Story = {
   name: "image-viewer-s1: 投稿画像を選ぶと、スレッドは開かずに元サイズの画像を拡大して表示する",
-  tags: ["play"],
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像");
@@ -226,7 +222,6 @@ export const ImageViewerOpen: Story = {
 
 export const ImageViewerNavigate: Story = {
   name: "image-viewer-s2: 画像が複数あるときは、前後の画像に切り替えられる",
-  tags: ["play"],
   beforeEach: withImages(["画像1", "画像2"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像1");
@@ -244,7 +239,6 @@ export const ImageViewerNavigate: Story = {
 
 export const ImageViewerAlt: Story = {
   name: "image-viewer-s3: 拡大した画像の下にALTを表示する",
-  tags: ["play"],
   beforeEach: withImages(["ALTの文章"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "ALTの文章");
@@ -255,7 +249,6 @@ export const ImageViewerAlt: Story = {
 
 export const ImageViewerClose: Story = {
   name: "image-viewer-s4: 閉じるボタンかEscキーで閉じる",
-  tags: ["play"],
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像");
@@ -272,7 +265,6 @@ export const ImageViewerClose: Story = {
 
 export const ImageViewerSwipe: Story = {
   name: "image-viewer-s5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる",
-  tags: ["play"],
   beforeEach: withImages(["画像1", "画像2"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像1");
@@ -322,7 +314,6 @@ export const ImageViewerSwipe: Story = {
 
 export const ImageViewerZoom: Story = {
   name: "image-viewer-s6: 拡大表示した画像はピンチ操作か拡大ボタンでさらにズームできる",
-  tags: ["play"],
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像");
@@ -389,7 +380,6 @@ const article = (root: HTMLElement, text: string) => {
 
 export const DeleteOnlyOwnPost: Story = {
   name: "post-toolbar-s1: 「…」メニューの削除は自分の投稿にだけ表示する",
-  tags: ["play"],
   beforeEach: withToolbarPosts,
   play: async ({ canvasElement }) => {
     const mine = article(canvasElement, "自分の投稿");
@@ -407,7 +397,6 @@ export const DeleteOnlyOwnPost: Story = {
 
 export const LikedHeartFilled: Story = {
   name: "post-toolbar-s2: いいね済みの投稿のいいねボタンはハートを塗りつぶして表示する",
-  tags: ["play"],
   beforeEach: withToolbarPosts,
   play: async ({ canvasElement }) => {
     const heart = (text: string) =>
@@ -435,7 +424,6 @@ const setBackfillStatus = (
 
 export const BackfillInProgress: Story = {
   name: "backfillBanner-s1: 自分の同期中は「過去の投稿を同期しています」の帯を出す",
-  tags: ["play"],
   beforeEach: () => setBackfillStatus("inProgress"),
   play: async ({ canvasElement }) => {
     await expect(
@@ -446,7 +434,6 @@ export const BackfillInProgress: Story = {
 
 export const BackfillError: Story = {
   name: "backfillBanner-s2: 自分の同期がエラーなら、「過去の投稿を同期できていません」の帯を出す",
-  tags: ["play"],
   beforeEach: () => setBackfillStatus("error"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -459,7 +446,6 @@ export const BackfillError: Story = {
 
 export const BackfillCompleted: Story = {
   name: "backfillBanner-s3: 自分の同期が終わっていれば、帯を出さない",
-  tags: ["play"],
   beforeEach: () => setBackfillStatus("completed"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -497,7 +483,6 @@ const setImagePost = (images: number) => () => {
 
 export const SingleImage: Story = {
   name: "post-images-s1: 画像が1枚のときは、投稿の幅いっぱいに表示する",
-  tags: ["play"],
   beforeEach: setImagePost(1),
   play: async ({ canvasElement }) => {
     const post = within(canvasElement).getByRole("article");
@@ -511,7 +496,6 @@ export const SingleImage: Story = {
 
 export const ManyImages: Story = {
   name: "post-images-s2: 画像が5枚以上のときは、横スクロールで表示する",
-  tags: ["play"],
   beforeEach: setImagePost(5),
   play: async ({ canvasElement }) => {
     const post = within(canvasElement).getByRole("article");
@@ -560,7 +544,6 @@ const player = (canvasElement: HTMLElement) =>
 
 export const VideoCenteredPlay: Story = {
   name: "post-video-s1: 停止中は動画の中央に再生ボタンを表示する",
-  tags: ["play"],
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
     await player(canvasElement);
@@ -572,7 +555,6 @@ export const VideoCenteredPlay: Story = {
 
 export const VideoTime: Story = {
   name: "post-video-s2: 再生ボタンの横に、経過時間と動画の長さを表示する",
-  tags: ["play"],
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
     await player(canvasElement);
@@ -584,7 +566,6 @@ export const VideoTime: Story = {
 
 export const VideoThumbnailAndLabel: Story = {
   name: "post-video-s3: 動画はサムネイルを表示し、ALTをプレイヤーのラベルにする",
-  tags: ["play"],
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
     const el = await player(canvasElement);
@@ -594,7 +575,6 @@ export const VideoThumbnailAndLabel: Story = {
 
 export const QuotedVideo: Story = {
   name: "post-video-s4: 引用された投稿に付いた動画を、引用した投稿の中に表示する",
-  tags: ["play"],
   beforeEach: withVideoPosts({
     quote: { authorHandle: "bob.bsky.social", text: "引用された動画", video },
   }),
@@ -660,7 +640,6 @@ const writeAlt = async (dialogElement: HTMLElement, n: number, alt: string) => {
 
 export const PostFormTextLimit: Story = {
   name: "post-form-s1: 300字を超えると投稿できない",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
     const textbox = dialog.getByRole("textbox", { name: "投稿内容" });
@@ -676,7 +655,6 @@ export const PostFormTextLimit: Story = {
 
 export const PostFormImageLimit: Story = {
   name: "post-form-s2: 画像は4枚まで添付できる",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialogElement = await openCompose(canvasElement);
     const dialog = within(dialogElement);
@@ -692,7 +670,6 @@ export const PostFormImageLimit: Story = {
 
 export const PostFormAuthor: Story = {
   name: "post-form-s3: 入力欄に添えて、自分のアイコン・名前・ハンドルを表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
 
@@ -702,7 +679,6 @@ export const PostFormAuthor: Story = {
 
 export const PostFormReply: Story = {
   name: "post-form-s4: 返信するときは、自分の名前の上に返信先の投稿の投稿者名・ハンドル・本文を表示し、投稿ボタンを「返信」にする",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openComposeFromPost(canvasElement, "返信"));
     const target = dialog.getByRole("article", { name: "返信先" });
@@ -718,7 +694,6 @@ export const PostFormReply: Story = {
 
 export const PostFormQuote: Story = {
   name: "post-form-s5: 引用するときは、入力欄の下に引用先の投稿の投稿者名と本文を枠で囲んで表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openComposeFromPost(canvasElement, "引用"));
     const quote = dialog.getByRole("blockquote");
@@ -730,7 +705,6 @@ export const PostFormQuote: Story = {
 
 export const PostFormReplyRules: Story = {
   name: "post-form-s6: 返信できる人の設定は入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
 
@@ -747,7 +721,6 @@ export const PostFormReplyRules: Story = {
 
 export const PostFormReplyHidesRules: Story = {
   name: "post-form-s7: 返信するときは、返信できる人の設定を表示しない",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialog = within(await openComposeFromPost(canvasElement, "返信"));
 
@@ -760,7 +733,6 @@ export const PostFormReplyHidesRules: Story = {
 
 export const PostFormMobile: Story = {
   name: "post-form-s8: モバイルでは、ソフトウェアキーボードで入力欄が隠れないよう、投稿欄を画面の上寄せで開く",
-  tags: ["play"],
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
     await openCompose(canvasElement);
@@ -775,7 +747,6 @@ export const PostFormMobile: Story = {
 
 export const PostFormAltBadge: Story = {
   name: "post-form-s9: 添付した画像には、ALTが未入力なら「+ ALT」、入力済みなら「ALT」のバッジを重ね、押すとその画像のALTを入力するダイアログを開く",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialogElement = await openCompose(canvasElement);
     const dialog = within(dialogElement);
@@ -799,7 +770,6 @@ export const PostFormAltBadge: Story = {
 
 export const PostFormAltLimit: Story = {
   name: "post-form-s10: ALTは2000字を超えると保存できない",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const dialogElement = await openCompose(canvasElement);
     const dialog = within(dialogElement);
@@ -862,7 +832,6 @@ export const QuoteText: Story = {
     },
   }),
   name: "quote-s1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const q = quote(canvasElement);
     await expect(q).toHaveTextContent("Alice");
@@ -877,7 +846,6 @@ export const QuoteWithMedia: Story = {
     quote: { authorHandle: "alice.bsky.social", text: "引用される投稿" },
   }),
   name: "quote-s2: 画像付きで引用した投稿は、画像と引用している投稿の両方を表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByRole("img", { name: "引用した投稿の画像" }),
@@ -895,7 +863,6 @@ export const QuoteImages: Story = {
     },
   }),
   name: "quote-s3: 引用される投稿に付いた画像を、引用した投稿の中に表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(quote(canvasElement)).getByRole("img", {
@@ -914,7 +881,6 @@ export const QuoteAvatar: Story = {
     },
   }),
   name: "quote-s4: 引用されている投稿の投稿者のアバターを、引用した投稿の中に表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(quote(canvasElement).querySelector("img")).toHaveAttribute(
       "src",
@@ -932,7 +898,6 @@ export const QuoteExternal: Story = {
     },
   }),
   name: "quote-s5: 引用される投稿に付いたリンクカードを、引用した投稿の中に表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(quote(canvasElement)).getByRole("link", {
@@ -945,7 +910,6 @@ export const QuoteExternal: Story = {
 export const QuoteDeleted: Story = {
   ...quoting({ quoteUnavailable: "notFound" }),
   name: "quote-s6: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(quote(canvasElement)).toHaveTextContent("削除されました");
   },
@@ -960,7 +924,6 @@ export const QuoteFeed: Story = {
     },
   }),
   name: "quote-s7: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const q = quote(canvasElement);
     await expect(q).toHaveTextContent("フィード名");
@@ -978,7 +941,6 @@ export const QuoteLink: Story = {
     },
   }),
   name: "quote-s8: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(quote(canvasElement)).getByRole("link", {
@@ -1026,7 +988,6 @@ const link = (text: string, label: string, feature: Partial<TextLink>) => {
 
 export const Counts: Story = {
   name: "timeline-s1: いいね数・リポスト数は1以上のときだけ表示する",
-  tags: ["play"],
   beforeEach: () => {
     setPosts([
       post("反応あり", { likeCount: 1, repostCount: 1 }),
@@ -1048,7 +1009,6 @@ export const Counts: Story = {
 
 export const ExternalLink: Story = {
   name: "timeline-s2: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする",
-  tags: ["play"],
   beforeEach: () => {
     const label = "example.com/timeline...";
     setPosts([
@@ -1073,7 +1033,6 @@ export const ExternalLink: Story = {
 
 export const Mention: Story = {
   name: "timeline-s3: 本文のうちfacetsでメンションが付いた範囲は、そのアカウントのプロフィール全体ページへのリンクにする",
-  tags: ["play"],
   beforeEach: () => {
     setPosts([
       post("mention", {
@@ -1092,7 +1051,6 @@ export const Mention: Story = {
 
 export const LoadingMore: Story = {
   name: "timeline-s4: 続きの古い投稿を読み込み終えるまで、一覧の下にスピナーを表示する",
-  tags: ["play"],
   beforeEach: () => {
     setPosts([post("1")], "next");
     const spy = spyOn(window, "fetch").mockReturnValue(new Promise(() => {}));
@@ -1107,7 +1065,6 @@ export const LoadingMore: Story = {
 
 export const Loading: Story = {
   name: "timeline-s5: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまで、アイコン・名前・本文・ツールバーを持つ投稿の形のスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["timeline"] });
     queryClient
@@ -1128,7 +1085,6 @@ export const Loading: Story = {
 
 export const ThreadOrder: Story = {
   name: "timeline-s6: 一覧の中に返信先の投稿があれば、間に別の投稿があっても返信先を上にして古い順に並べ、アイコンの間を線で繋げる",
-  tags: ["play"],
   beforeEach: () => {
     const root = post("起点");
     setPosts([
@@ -1163,7 +1119,6 @@ const reposted = () => {
 
 export const RepostAboveAvatar: Story = {
   name: "timeline-s7: リポストした人の表示は投稿者のアイコンより上の行に出す",
-  tags: ["play"],
   beforeEach: reposted,
   play: async ({ canvasElement }) => {
     const canvas = within(within(canvasElement).getByRole("article"));
@@ -1176,7 +1131,6 @@ export const RepostAboveAvatar: Story = {
 
 export const AuthorHandle: Story = {
   name: "timeline-s8: 投稿には投稿者の名前の隣にハンドルを表示する",
-  tags: ["play"],
   beforeEach: () => {
     setPosts([post("handle")]);
   },
@@ -1191,7 +1145,6 @@ export const AuthorHandle: Story = {
 
 export const RepostLink: Story = {
   name: "timeline-s9: 「○○がリポスト」をタップすると、○○のプロフィール全体ページを開く",
-  tags: ["play"],
   beforeEach: reposted,
   play: async ({ canvasElement }) => {
     await expect(
@@ -1202,7 +1155,6 @@ export const RepostLink: Story = {
 
 export const Hashtag: Story = {
   name: "timeline-s10: 本文のうちfacetsでハッシュタグが付いた範囲は、そのハッシュタグを投稿タブで検索する検索ページ（`/search?q=%23タグ`）へのリンクにする",
-  tags: ["play"],
   beforeEach: () => {
     setPosts([
       post("tag", {
@@ -1219,7 +1171,6 @@ export const Hashtag: Story = {
 
 export const OmittedPosts: Story = {
   name: "timeline-s11: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する。この表示は最後の投稿のスレッドページへのリンクにする",
-  tags: ["play"],
   beforeEach: () => {
     const chain = [post("t1")];
     for (const n of [2, 3, 4, 5]) {

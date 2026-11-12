@@ -84,7 +84,6 @@ const main = (canvasElement: HTMLElement) =>
 
 export const Self: Story = {
   name: "profile-s1: 自分のプロフィールにはフォローボタンを出さない",
-  tags: ["play"],
   beforeEach: () => {
     seed({ isSelf: true });
   },
@@ -97,7 +96,6 @@ export const Self: Story = {
 
 export const FollowSubmitting: Story = {
   name: "profile-s2: フォローボタンは押した結果を画面に反映し終えるまで押せない",
-  tags: ["play"],
   parameters: { pending: true },
   beforeEach: () => {
     seed({
@@ -122,7 +120,6 @@ export const FollowSubmitting: Story = {
 
 export const SyncStatus: Story = {
   name: "profile-s3: 追跡アカウントの全体ページにはそのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       main(canvasElement).getByText("同期済み", { exact: true }),
@@ -132,7 +129,6 @@ export const SyncStatus: Story = {
 
 export const Loading: Story = {
   name: "profile-s4: プロフィールを開くと、読み込みを待たずに画面を表示し、読み込み終えるまでバナー・アイコン・名前・自己紹介2行と投稿の場所のスケルトンを表示する。ハンドル・タブ・フォロー数は読み込み後に表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["profile", alice.handle] });
     void pending(["profile", alice.handle, ""]);
@@ -150,7 +146,6 @@ export const Loading: Story = {
 
 export const TabLoading: Story = {
   name: "profile-s5: タブを切り替えると、ヘッダーとタブはそのままにして、投稿の場所だけ読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     void pending(["profile", alice.handle, "media"]);
   },
@@ -178,7 +173,6 @@ const listsRoute = {
 
 export const TabLoadingFromLists: Story = {
   name: "profile-s6: 「リスト」タブから他のタブに切り替えても、ヘッダーとタブはそのままにして、投稿の場所だけ読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   parameters: { path: "/alice.bsky.social/lists", route: listsRoute },
   beforeEach: () => {
     void pending(["lists", alice.handle]);
@@ -198,7 +192,6 @@ export const TabLoadingFromLists: Story = {
 
 export const Links: Story = {
   name: "profile-s7: プロフィールの自己紹介の下に、プロフィールに設定されたリンクを、枠付きの丸いボタンとして折り返しながら並べて表示する。表示名（なければドメイン）を選ぶと、リンク先を新しいタブで開く",
-  tags: ["play"],
   beforeEach: () => {
     seed({
       profile: {
@@ -235,7 +228,6 @@ export const Links: Story = {
 
 export const AvatarFallback: Story = {
   name: "profile-s8: アイコン画像を設定していないアカウントには、人型のシルエットをアイコンの代わりに表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       main(canvasElement)
@@ -247,7 +239,6 @@ export const AvatarFallback: Story = {
 
 export const FollowedBy: Story = {
   name: "profile-s9: 自分をフォローしているアカウントのプロフィール全体ページには、ハンドルの横に「フォローされています」を表示する",
-  tags: ["play"],
   beforeEach: () => {
     seed({
       profile: {
@@ -267,7 +258,6 @@ export const FollowedBy: Story = {
 
 export const UntrackedBadge: Story = {
   name: "profile-s10: 追跡アカウントでない全体ページには、ハンドルの横に「同期対象外」を表示する",
-  tags: ["play"],
   beforeEach: () => {
     seed({ backfillStatus: undefined });
   },
@@ -280,7 +270,6 @@ export const UntrackedBadge: Story = {
 
 export const UntrackedNotice: Story = {
   name: "profile-s11: 追跡アカウントでない全体ページには、タブの下に「このアカウントのデータはサーバーに同期されていません。フォローすると同期を開始します。」を全てのタブで表示する",
-  tags: ["play"],
   beforeEach: () => {
     seed({ backfillStatus: undefined });
     seed({ backfillStatus: undefined, tab: "likes" }, "likes");
@@ -303,7 +292,6 @@ const svg = (color: string): `data:${string}` =>
 
 export const ImageViewerProfile: Story = {
   name: "image-viewer-s7: プロフィール全体ページのアイコンかバナーを選ぶと、その画像を拡大して表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData(
       ["profile", alice.handle, ""],
@@ -341,7 +329,6 @@ export const ImageViewerProfile: Story = {
 
 export const ListsLoading: Story = {
   name: "list-s5: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   parameters: {
     path: "/alice.bsky.social/lists",
     route: listsRoute,
@@ -363,7 +350,6 @@ export const ListsLoading: Story = {
 
 export const TabsStayInPlaceOnSlowScroll: Story = {
   name: "layout-s16: モバイルでタブがまだ画面上端に届いていないうちにヘッダーが隠れても、タブはその場から動かさず、下の投稿との間に隙間を作らない",
-  tags: ["play"],
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
     canvasElement

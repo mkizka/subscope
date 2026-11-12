@@ -23,7 +23,6 @@ export const Default: Story = {};
 
 export const About: Story = {
   name: "server-s1: 見出し「サーバーについて」の下に、Subscopeの概要と、見出し「仕組み」「Subscopeが目指すもの」の説明を表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -43,7 +42,6 @@ export const About: Story = {
 
 export const TabCounts: Story = {
   name: "server-s2: 「メンバー」「誰かがフォロー」のタブを表示し、タブ見出しに各タブの人数を出す",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole("tab", { name: "メンバー 2" })).toBeVisible();
@@ -55,7 +53,6 @@ export const TabCounts: Story = {
 
 export const MemberDetails: Story = {
   name: "server-s3: 「メンバー」タブではメンバーの一覧（名前、ハンドル、自己紹介）を表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
       ["clientServerMembers", ""],
@@ -77,7 +74,6 @@ export const MemberDetails: Story = {
 
 export const OperatorBadge: Story = {
   name: "server-s4: 管理者には「運営者」ラベルを表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText("運営者", { selector: "li *" }),
@@ -87,7 +83,6 @@ export const OperatorBadge: Story = {
 
 export const SyncStatus: Story = {
   name: "server-s5: 一覧のアカウントには名前の下の行に過去の投稿の同期状態を表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
       ["clientServerMembers", ""],
@@ -108,7 +103,6 @@ export const SyncStatus: Story = {
 
 export const FollowerCount: Story = {
   name: "server-s6: 「誰かがフォロー」タブには、フォローしているメンバーの数を「n人からフォロー」と表示する",
-  tags: ["play"],
   parameters: { path: "/server?tab=tracked" },
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof trackedLoader>>(
@@ -128,7 +122,6 @@ export const FollowerCount: Story = {
 
 export const AccountsLoading: Story = {
   name: "server-s7: 一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["clientServerMembers"] });
     queryClient.removeQueries({ queryKey: ["trackedAccounts"] });
@@ -152,7 +145,6 @@ export const AccountsLoading: Story = {
 
 export const NoSearchResult: Story = {
   name: "server-s8: 検索に一致するアカウントがないときは「アカウントが見つかりません」を表示する",
-  tags: ["play"],
   parameters: { path: "/server?q=zzzzzz" },
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
@@ -169,7 +161,6 @@ export const NoSearchResult: Story = {
 
 export const ServerInfoLoading: Story = {
   name: "server-s9: 運営者とサーバーDIDは、読み込み終えるまで値の場所にスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["server"] });
     void queryClient

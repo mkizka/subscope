@@ -23,7 +23,6 @@ export const Default: Story = {};
 
 export const Account: Story = {
   name: "settings-s1: 自分のアイコン、表示名、ハンドルを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof meLoader>>(["me"], {
       did: alice.did,
@@ -48,7 +47,6 @@ export const Account: Story = {
 
 export const AccountNote: Story = {
   name: "settings-s2: 「アカウント管理」の下に、認可サーバーのホスト名を使って「{ホスト名} で設定できます」と表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const main = within(await within(canvasElement).findByRole("main"));
 

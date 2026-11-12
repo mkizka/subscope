@@ -74,7 +74,6 @@ export const NoReplies: Story = {
 
 export const FocusedPost: Story = {
   name: "thread-s1: 選んだ投稿は本文を大きくし、投稿日時と返信・リポスト・いいねの件数を表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const focused = within(canvasElement).getByRole("article", {
       name: "選んだ投稿",
@@ -100,7 +99,6 @@ export const FocusedPost: Story = {
 
 export const Toolbars: Story = {
   name: "thread-s2: スレッドの投稿にも投稿のツールバーを表示する",
-  tags: ["play"],
   play: async ({ canvasElement }) => {
     const articles = within(canvasElement).getAllByRole("article");
 
@@ -115,7 +113,6 @@ export const Toolbars: Story = {
 
 export const Loading: Story = {
   name: "thread-s3: スレッドを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまで選んだ投稿・返信を書く欄・返信の場所の形のスケルトンを表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["thread", alice.handle] });
     queryClient
@@ -136,7 +133,6 @@ export const Loading: Story = {
 
 export const QuotedFeed: Story = {
   name: "quote-s9: スレッドで選んだ投稿がフィードジェネレーターを引用している場合も、quote-s7と同じ枠を表示する",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof threadLoader>>(
       ["thread", alice.handle, "selected"],

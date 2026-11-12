@@ -44,7 +44,6 @@ const rightColumn = (canvasElement: HTMLElement) => {
 
 export const SideNavCurrent: Story = {
   name: "layout-s1: 左カラムのメニューで、今いるページの項目を強調する",
-  tags: ["play"],
   globals: desktop,
   play: async ({ canvasElement }) => {
     const nav = sideNav(canvasElement);
@@ -61,7 +60,6 @@ export const SideNavCurrent: Story = {
 
 export const SideNavHandle: Story = {
   name: "layout-s2: 左カラムのアカウント欄に、自分のハンドルを表示する",
-  tags: ["play"],
   globals: desktop,
   play: async ({ canvasElement }) => {
     await expect(
@@ -72,7 +70,6 @@ export const SideNavHandle: Story = {
 
 export const ServerCard: Story = {
   name: "layout-s3: 右カラムに、見出し「サーバーについて」と「SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。」を出したカードを表示し、カード全体を `/server` へのリンクにする",
-  tags: ["play"],
   globals: desktop,
   play: async ({ canvasElement }) => {
     const card = rightColumn(canvasElement).getByRole("link", {
@@ -88,7 +85,6 @@ export const ServerCard: Story = {
 
 export const TabBarCurrent: Story = {
   name: "layout-s4: モバイルでは下のタブで今いるページの項目を強調する",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const tabs = tabBar(canvasElement);
@@ -114,7 +110,6 @@ const openDrawer = async (canvasElement: HTMLElement) => {
 
 export const DrawerItems: Story = {
   name: "layout-s5: モバイルのドロワーにはPCの左カラムと同じメニュー項目を並べる",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const pcItems = [...canvasElement.querySelectorAll("aside nav a")].map(
@@ -131,7 +126,6 @@ export const DrawerItems: Story = {
 
 export const ServerMenu: Story = {
   name: "layout-s6: 左カラムとモバイルのドロワーのメニューの「サーバー」から `/server` に移動できる",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const drawer = await openDrawer(canvasElement);
@@ -147,7 +141,6 @@ export const ServerMenu: Story = {
 
 export const SettingsMenu: Story = {
   name: "layout-s15: 左カラムとモバイルのドロワーのメニューの「設定」から `/settings` に移動できる",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const drawer = await openDrawer(canvasElement);
@@ -176,7 +169,6 @@ const openHistory = async (canvasElement: HTMLElement) => {
 
 export const HistoryList: Story = {
   name: "layout-s7: 右カラムの検索ボックスにフォーカスして何も入力していないとき、過去に検索した語を新しい順に最大10件、検索ボックスの下に表示する",
-  tags: ["play"],
   globals: desktop,
   beforeEach: () =>
     seedHistory(Array.from({ length: 11 }, (_, i) => `word${11 - i}`)),
@@ -192,7 +184,6 @@ export const HistoryList: Story = {
 
 export const HistorySelect: Story = {
   name: "layout-s8: 右カラムの履歴の語を選ぶと、その語で検索する",
-  tags: ["play"],
   globals: desktop,
   beforeEach: () => seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -207,7 +198,6 @@ export const HistorySelect: Story = {
 
 export const HistoryRemove: Story = {
   name: "layout-s9: 右カラムの履歴の語は個別に、または「履歴を全て削除」で全て削除できる",
-  tags: ["play"],
   globals: desktop,
   beforeEach: () => seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -232,7 +222,6 @@ export const HistoryRemove: Story = {
 
 export const Skeleton: Story = {
   name: "layout-s12: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す",
-  tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["timeline"] });
     queryClient
@@ -256,7 +245,6 @@ export const Skeleton: Story = {
 
 export const TabBarIconOnly: Story = {
   name: "layout-s13: モバイルでは下のタブにラベル文字を出さず、アイコンだけを表示する",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const tabs = tabBar(canvasElement);
@@ -269,7 +257,6 @@ export const TabBarIconOnly: Story = {
 
 export const StackingOrder: Story = {
   name: "layout-s14: 重なり順は下から、本文・埋め込み、浮かせた表示、固定の見出し、固定の下タブ、検索候補の順にする",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const z = (el: Element) => Number(getComputedStyle(el).zIndex);
@@ -286,7 +273,6 @@ export const StackingOrder: Story = {
 
 export const TabsPinnedOnScroll: Story = {
   name: "layout-s10: モバイルでは、タブのあるページ（タイムライン・プロフィール・サーバーなど）は、ヘッダーを隠すとタブだけを画面上端に残し、ヘッダーの再表示と同時にタブをその下へ戻す",
-  tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
     const main = canvasElement.querySelector("main");
