@@ -27,7 +27,10 @@ async function open(page: Page, text: string) {
   const post = page.getByRole("article").filter({ hasText: text });
   await page.goto("/");
   await expect(async () => {
-    await page.reload();
+    await Promise.all([
+      page.waitForResponse((res) => res.url().includes("/api/timeline")),
+      page.reload(),
+    ]);
     await expect(post).toBeVisible({ timeout: 1000 });
   }).toPass();
   return post;
