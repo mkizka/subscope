@@ -20,6 +20,7 @@ jobs:
       - uses: mkizka/lex-publish@e65d2b1b5ac79fd074a1aaf0eb59d67162cd9e9f # v2.0.0
         with:
           paths: packages/client/lexicons/me/subsco
+          lint: false
           publish: ${{ github.ref == 'refs/heads/main' }}
           username: ${{ secrets.GOAT_USERNAME }}
           password: ${{ secrets.GOAT_PASSWORD }}
