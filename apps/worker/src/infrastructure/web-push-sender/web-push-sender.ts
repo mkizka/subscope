@@ -46,6 +46,7 @@ export class WebPushSender implements IWebPushSender {
       method: request.method,
       headers: request.headers,
       body: new Uint8Array(request.body),
+      signal: AbortSignal.timeout(10_000),
     });
     if (response.status === 404 || response.status === 410) return "gone";
     if (!response.ok) {
