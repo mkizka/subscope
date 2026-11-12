@@ -26,8 +26,8 @@ export const Loading: Story = {
 };
 
 export const WithHistory: Story = {
-  args: { history: ["Bluesky", "#atproto", "alice"] },
-  play: ({ canvasElement }) => {
-    canvasElement.querySelector("input")?.focus();
+  args: {
+    history: ["Bluesky", "#atproto", "alice"],
+    inputProps: { name: "q", autoFocus: true },
   },
 };
