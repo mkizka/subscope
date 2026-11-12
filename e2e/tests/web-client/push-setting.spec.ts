@@ -25,9 +25,11 @@ const test = base.extend<{ newDevice: () => Promise<Device> }>({
 });
 
 const turnOn = async ({ page }: Device) => {
-  await page.goto("/notifications");
-  await page.getByRole("button", { name: "オンにする" }).click();
-  await expect(page.getByRole("button", { name: "オフにする" })).toBeVisible();
+  await page.goto("/settings");
+  await page.getByRole("switch", { name: "プッシュ通知" }).click();
+  await expect(
+    page.getByRole("switch", { name: "プッシュ通知" }),
+  ).toBeChecked();
 };
 
 const likeAlicePost = async (text: string) => {
@@ -47,7 +49,7 @@ const likeAlicePost = async (text: string) => {
 };
 
 test.describe("プッシュ通知", () => {
-  test("pushSetting-e1: 「オンにする」を押すと、通知が追加されたときにその端末へプッシュ通知を送る", async ({
+  test("pushSetting-e1: 設定ページのスイッチをオンにすると、通知が追加されたときにその端末へプッシュ通知を送る", async ({
     newDevice,
   }) => {
     const device = await newDevice();
@@ -63,17 +65,17 @@ test.describe("プッシュ通知", () => {
       .toMatchObject([{ title: "Bobさんがいいねしました", body: text }]);
   });
 
-  test("pushSetting-e2: 「オフにする」を押すと、その端末へプッシュ通知を送らない", async ({
+  test("pushSetting-e2: 設定ページのスイッチをオフにすると、その端末へプッシュ通知を送らない", async ({
     newDevice,
   }) => {
     const turnedOff = await newDevice();
     const other = await newDevice();
     await turnOn(turnedOff);
     await turnOn(other);
-    await turnedOff.page.getByRole("button", { name: "オフにする" }).click();
+    await turnedOff.page.getByRole("switch", { name: "プッシュ通知" }).click();
     await expect(
-      turnedOff.page.getByRole("button", { name: "オンにする" }),
-    ).toBeVisible();
+      turnedOff.page.getByRole("switch", { name: "プッシュ通知" }),
+    ).not.toBeChecked();
 
     await likeAlicePost(`pushSetting-e2: ${new Date().toISOString()}`);
 
@@ -111,10 +113,25 @@ test.describe("プッシュ通知", () => {
       route.request().method() === "DELETE" ? route.abort() : route.continue(),
     );
 
-    await device.page.getByRole("button", { name: "オフにする" }).click();
+    await device.page.getByRole("switch", { name: "プッシュ通知" }).click();
 
     await expect(
-      device.page.getByRole("button", { name: "オンにする" }),
-    ).toBeVisible();
+      device.page.getByRole("switch", { name: "プッシュ通知" }),
+    ).not.toBeChecked();
+  });
+
+  test("pushSetting-e5: 通知ページの案内の「オンにする」を押すと、その端末へプッシュ通知を送るようにして、案内を消す", async ({
+    newDevice,
+  }) => {
+    const { page } = await newDevice();
+    await page.goto("/notifications");
+
+    await page.getByRole("button", { name: "オンにする" }).click();
+
+    await expect(page.getByText("プッシュ通知を受け取る")).toBeHidden();
+    await page.goto("/settings");
+    await expect(
+      page.getByRole("switch", { name: "プッシュ通知" }),
+    ).toBeChecked();
   });
 });

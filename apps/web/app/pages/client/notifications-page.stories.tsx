@@ -1,6 +1,6 @@
 import { asDatetimeString } from "@atproto/syntax";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import {
   bob,
@@ -136,104 +136,42 @@ export const IconAndAvatar: Story = {
   },
 };
 
-export const PushSettingOff: Story = {
-  name: "pushSetting-s1: 受け取らない設定のときは「プッシュ通知はオフです」と「オンにする」ボタンを表示する",
+export const PushPromptOff: Story = {
+  name: "pushSetting-s8: 受け取らない設定のときだけ、通知一覧の上に「プッシュ通知を受け取る」の案内と「オンにする」ボタンを表示する。受け取る設定・ブロック中・非対応・読み込み中・VAPID鍵なしのときは表示しない",
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.getByText("プッシュ通知はオフです")).toBeVisible();
+    await expect(canvas.getByText("プッシュ通知を受け取る")).toBeVisible();
     await expect(
       canvas.getByRole("button", { name: "オンにする" }),
     ).toBeVisible();
-  },
-};
 
-export const PushSettingOn: Story = {
-  name: "pushSetting-s2: 受け取る設定のときは「プッシュ通知はオンです」と「オフにする」ボタンを表示する",
-  beforeEach: pushSetting("on"),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    for (const state of [
+      "on",
+      "denied",
+      "unsupported",
+      "unavailable",
+    ] as const) {
+      pushSetting(state)();
+      await waitFor(() =>
+        expect(canvas.queryByText("プッシュ通知を受け取る")).toBeNull(),
+      );
+    }
 
-    await expect(canvas.getByText("プッシュ通知はオンです")).toBeVisible();
-    await expect(
-      canvas.getByRole("button", { name: "オフにする" }),
-    ).toBeVisible();
-  },
-};
-
-export const PushSettingDenied: Story = {
-  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、ボタンを出さず「ブラウザで通知がブロックされています。ブラウザの設定から許可してください」と表示する",
-  beforeEach: pushSetting("denied"),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(
-      canvas.getByText(
-        "ブラウザで通知がブロックされています。ブラウザの設定から許可してください",
-      ),
-    ).toBeVisible();
-    await expect(canvas.queryByRole("button", { name: /にする$/ })).toBeNull();
-  },
-};
-
-export const PushSettingUnsupported: Story = {
-  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、ボタンを出さず「このブラウザはプッシュ通知に対応していません。iPhoneとiPadではホーム画面に追加すると使えます」と表示する",
-  beforeEach: pushSetting("unsupported"),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(
-      canvas.getByText(
-        "このブラウザはプッシュ通知に対応していません。iPhoneとiPadではホーム画面に追加すると使えます",
-      ),
-    ).toBeVisible();
-    await expect(canvas.queryByRole("button", { name: /にする$/ })).toBeNull();
-  },
-};
-
-export const PushSettingToggling: Story = {
-  name: "pushSetting-s5: 切り替えている間は、ボタンを押せなくしてスピナーを表示する",
-  beforeEach: () => {
     pushSetting("off")();
-    const original = Notification.requestPermission.bind(Notification);
-    Notification.requestPermission = () => new Promise(() => {});
-    return () => {
-      Notification.requestPermission = original;
-    };
-  },
-  play: async ({ canvasElement }) => {
-    const button = within(canvasElement).getByRole("button", {
-      name: "オンにする",
-    });
-
-    await userEvent.click(button);
-
-    await expect(button).toBeDisabled();
-    await expect(button.querySelector(".animate-spin")).not.toBeNull();
+    await expect(
+      await canvas.findByText("プッシュ通知を受け取る"),
+    ).toBeVisible();
   },
 };
 
-export const PushSettingDismissed: Story = {
-  name: "pushSetting-s6: 「オンにする」を押して通知の許可ダイアログが選択されずに閉じたときは、「アドレスバーのアイコンから通知を許可してください」と表示する",
-  beforeEach: () => {
-    pushSetting("off")();
-    const original = Notification.requestPermission.bind(Notification);
-    Notification.requestPermission = () => Promise.resolve("default");
-    return () => {
-      Notification.requestPermission = original;
-    };
-  },
+export const SettingsLink: Story = {
+  name: "pushSetting-s9: 通知ページの見出しの右端に、設定ページへ移動する「通知の設定」ボタンを表示する",
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await userEvent.click(canvas.getByRole("button", { name: "オンにする" }));
-
     await expect(
-      await canvas.findByText(
-        "アドレスバーのアイコンから通知を許可してください",
-      ),
-    ).toBeVisible();
+      within(canvasElement).getByRole("link", { name: "通知の設定" }),
+    ).toHaveAttribute("href", "/settings");
   },
 };
 

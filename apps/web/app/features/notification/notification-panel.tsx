@@ -8,11 +8,14 @@ import {
   Repeat2Icon,
   UserPlusIcon,
 } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { NotificationsSkeleton } from "@/app/components/rows-skeleton";
 import { Avatar } from "@/app/components/ui/avatar";
+import { buttonClass } from "@/app/components/ui/button";
 
 type Notification = {
   uri: string;
@@ -25,7 +28,7 @@ type Notification = {
 };
 
 type Props = {
-  pushSetting?: ReactNode;
+  pushPrompt?: ReactNode;
   notifications: Notification[];
   onLoadMore: () => void;
   hasNextPage: boolean;
@@ -70,7 +73,7 @@ const reasons: Record<
 };
 
 export function NotificationPanel({
-  pushSetting,
+  pushPrompt,
   notifications,
   onLoadMore,
   hasNextPage,
@@ -78,8 +81,21 @@ export function NotificationPanel({
 }: Props) {
   return (
     <section aria-label="通知">
-      <h2 className="border-b border-line px-4 py-3 text-title">通知</h2>
-      {pushSetting}
+      <div
+        className="
+          flex items-center justify-between border-b border-line py-1 pr-2 pl-4
+        "
+      >
+        <h2 className="text-title">通知</h2>
+        <Link
+          to="/settings"
+          aria-label="通知の設定"
+          className={buttonClass({ variant: "ghost" })}
+        >
+          <SettingsIcon className="size-6" />
+        </Link>
+      </div>
+      {pushPrompt}
       {isLoading ? (
         <NotificationsSkeleton />
       ) : notifications.length === 0 ? (
