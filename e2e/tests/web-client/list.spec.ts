@@ -365,17 +365,29 @@ test.describe("リスト", () => {
     const dialog = page.getByRole("dialog", { name: "リストに追加" });
     const row = dialog.getByRole("listitem").filter({ hasText: name });
 
-    await expect(async () => {
-      await page.reload();
-      await main.getByRole("button", { name: "その他" }).click();
-      await page.getByRole("button", { name: "リストに追加" }).click();
-      await expect(row).toBeVisible({ timeout: 1000 });
-    }).toPass();
-    await row.getByRole("button", { name: "追加" }).click();
+    const reopen = async (button: "追加" | "削除") => {
+      await expect(async () => {
+        await page.reload();
+        await main.getByRole("button", { name: "その他" }).click();
+        await page.getByRole("button", { name: "リストに追加" }).click();
+        await expect(row.getByRole("button", { name: button })).toBeVisible({
+          timeout: 1000,
+        });
+      }).toPass();
+    };
 
-    await expect(row.getByRole("button", { name: "削除" })).toBeVisible();
-    await row.getByRole("button", { name: "削除" }).click();
-    await expect(row.getByRole("button", { name: "追加" })).toBeVisible();
+    await reopen("追加");
+    const click = async (button: "追加" | "削除") => {
+      const submitted = page.waitForResponse((res) =>
+        res.url().includes("/api/list-members"),
+      );
+      await row.getByRole("button", { name: button }).click();
+      await submitted;
+    };
+    await click("追加");
+    await reopen("削除");
+    await click("削除");
+    await reopen("追加");
 
     await page.goto("/alice.test");
     await expect(main.getByRole("button", { name: "その他" })).toBeVisible();
