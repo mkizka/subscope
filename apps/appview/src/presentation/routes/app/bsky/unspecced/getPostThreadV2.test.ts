@@ -78,7 +78,7 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
     ]);
   });
 
-  test("getPostThreadV2-3: 存在しない投稿は、depth 0のthreadItemNotFoundとして返す", async () => {
+  test("getPostThreadV2-3: 存在しない投稿はdepth 0のthreadItemNotFoundとして返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const anchor = "at://did:plc:notfound/app.bsky.feed.post/notfound";

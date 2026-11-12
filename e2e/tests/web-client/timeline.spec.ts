@@ -210,7 +210,7 @@ test.describe("タイムライン", () => {
     await expect(page).toHaveURL("/");
   });
 
-  test("timeline-e4: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
+  test("timeline-e4: 投稿の時刻はブラウザの現在時刻からの経過時間で表示する", async ({
     page,
     request,
   }) => {

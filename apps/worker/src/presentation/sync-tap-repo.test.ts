@@ -139,7 +139,7 @@ describe("Tapへの登録", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("tap-6: メンバーは、フォローを外されてもTapから外さない", async () => {
+  test("tap-6: メンバーはフォローを外されてもTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const serverMember = await accountFactory(ctx.db)

@@ -96,7 +96,7 @@ export const Self: Story = {
 };
 
 export const FollowSubmitting: Story = {
-  name: "profile-s2: フォローボタンは、押した結果を画面に反映し終えるまで押せない",
+  name: "profile-s2: フォローボタンは押した結果を画面に反映し終えるまで押せない",
   tags: ["play"],
   parameters: { pending: true },
   beforeEach: () => {
@@ -121,7 +121,7 @@ export const FollowSubmitting: Story = {
 };
 
 export const SyncStatus: Story = {
-  name: "profile-s3: 追跡アカウントの全体ページには、そのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する",
+  name: "profile-s3: 追跡アカウントの全体ページにはそのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する",
   tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(

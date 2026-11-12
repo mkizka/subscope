@@ -47,7 +47,7 @@ export const SetupNotice: Story = {
 };
 
 export const Description: Story = {
-  name: "login-s2: ログイン画面には、Blueskyのアカウントでログインする招待制のサーバーであることを出す",
+  name: "login-s2: ログイン画面にはBlueskyのアカウントでログインする招待制のサーバーであることを出す",
   tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(

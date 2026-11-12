@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("設定", () => {
-  test("settings-e2: 「アカウント管理」は、ログインに使った認可サーバーの `/account` を新しいタブで開くリンクにする", async ({
+  test("settings-e2: 「アカウント管理」はログインに使った認可サーバーの `/account` を新しいタブで開くリンクにする", async ({
     page,
   }) => {
     await page.goto("/settings");

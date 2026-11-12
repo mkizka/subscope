@@ -184,7 +184,7 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
   });
 
-  test("feedViewPost-1: リプライには、スレッドの起点と親の投稿をreplyに含める", async () => {
+  test("feedViewPost-1: リプライにはスレッドの起点と親の投稿をreplyに含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
@@ -232,7 +232,7 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
   });
 
-  test("feedViewPost-3: リポストには、リポストしたアカウントとリポストの日時をreasonに含める", async () => {
+  test("feedViewPost-3: リポストにはリポストしたアカウントとリポストの日時をreasonに含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();

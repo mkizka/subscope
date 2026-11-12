@@ -44,7 +44,7 @@ const emptyData = (handle: string, kind: "follows" | "followers") => {
 };
 
 export const SyncStatus: Story = {
-  name: "follow-list-s1: 一覧の追跡アカウントには、過去の投稿の同期状態を表示する",
+  name: "follow-list-s1: 一覧の追跡アカウントには過去の投稿の同期状態を表示する",
   tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof followListLoader>>(

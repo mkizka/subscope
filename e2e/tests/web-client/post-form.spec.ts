@@ -77,7 +77,7 @@ test.describe("投稿欄", () => {
     await expect(page.getByRole("img", { name: alt })).toBeAttached();
   });
 
-  test("post-form-e3: 返信できる人の設定は、投稿と同じrkeyのthreadgateに保存する", async ({
+  test("post-form-e3: 返信できる人の設定は投稿と同じrkeyのthreadgateに保存する", async ({
     page,
     request,
   }) => {
@@ -124,7 +124,7 @@ test.describe("投稿欄", () => {
     expect(value.text).toBe(text);
   });
 
-  test("post-form-e5: 添付した画像には、公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
+  test("post-form-e5: 添付した画像には公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
     page,
     request,
   }) => {

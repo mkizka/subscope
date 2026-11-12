@@ -89,7 +89,7 @@ test.describe("スレッド", () => {
     await expect(page).toHaveURL(search);
   });
 
-  test("thread-e5: 直下の返信の下には、返信への返信を1件ずつたどって並べる", async ({
+  test("thread-e5: 直下の返信の下には返信への返信を1件ずつたどって並べる", async ({
     page,
   }) => {
     const target = await post("thread-e5: 投稿");
@@ -120,7 +120,7 @@ test.describe("スレッド", () => {
   test.describe(() => {
     test.use({ timezoneId: "Pacific/Kiritimati" });
 
-    test("thread-e6: 選んだ投稿の投稿日時は、ブラウザのタイムゾーンで表示する", async ({
+    test("thread-e6: 選んだ投稿の投稿日時はブラウザのタイムゾーンで表示する", async ({
       page,
     }) => {
       const text = "thread-e6: 投稿";

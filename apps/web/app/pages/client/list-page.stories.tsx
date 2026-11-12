@@ -46,7 +46,7 @@ const hasSpinner = (button: HTMLElement) =>
   button.querySelector(".animate-spin") !== null;
 
 export const Deleting: Story = {
-  name: "list-s2: リスト詳細の「…」ボタンは、削除してリスト一覧に戻るまでスピナーを出して押せなくする",
+  name: "list-s2: リスト詳細の「…」ボタンは削除してリスト一覧に戻るまでスピナーを出して押せなくする",
   tags: ["play"],
   parameters: { pending: true },
   play: async ({ canvasElement }) => {

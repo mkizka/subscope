@@ -101,7 +101,7 @@ describe("ラベラーの指定", () => {
     );
   });
 
-  test("labelers-4: テイクダウンは、`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する", async () => {
+  test("labelers-4: テイクダウンは`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する", async () => {
     // arrange
     const post = await createPost();
     await createLabel(post, labelerB, "!takedown");

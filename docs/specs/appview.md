@@ -28,7 +28,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 - labels-5: 投稿のビューの labels に、投稿レコードのセルフラベルを含める
 - labels-6: 引用された投稿のビューの labels に、その投稿に付いたラベルを含める
 
-セルフラベルは、レコードの作成者をsrc、レコードのURIとCIDをuriとcid、レコードのcreatedAtをctsとしたラベルとして返す。
+セルフラベルはレコードの作成者をsrc、レコードのURIとCIDをuriとcid、レコードのcreatedAtをctsとしたラベルとして返す。
 
 ## ラベラーの指定
 
@@ -37,22 +37,22 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 - labelers-1: labels には、`atproto-accept-labelers` ヘッダーで指定されたラベラーが付けたラベルだけを含める
 - labelers-2: `atproto-accept-labelers` ヘッダーがないか不正な場合は、すべてのラベラーのラベルを labels に含める
 - labelers-3: `atproto-accept-labelers` ヘッダーで指定されたラベラーを、応答の `atproto-content-labelers` ヘッダーで返す
-- labelers-4: テイクダウンは、`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する
+- labelers-4: テイクダウンは`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する
 
-ヘッダーの `redact` パラメーターは、応答の `atproto-content-labelers` ヘッダーにそのまま返すだけで、テイクダウンの適用には使わない。
+ヘッダーの `redact` パラメーターは応答の `atproto-content-labelers` ヘッダーにそのまま返すだけで、テイクダウンの適用には使わない。
 
 ## 返信制限
 
 スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
 
-- threadgate-1: スレッドの起点の投稿は、そのthreadgateをthreadgateに含める
+- threadgate-1: スレッドの起点の投稿はそのthreadgateをthreadgateに含める
 - threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする
 - threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする
 - threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする
 - threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする
 - threadgate-6: allowのlistRuleで指定したリストのうちインデックスしたものを、threadgate.listsにlistViewBasicとして含める
 
-リストに入っているかは、インデックスしたlistitemで判定する。
+リストに入っているかはインデックスしたlistitemで判定する。
 
 ## 引用制限
 
@@ -65,16 +65,16 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 投稿に埋め込まれた画像・動画・リンクカード・引用を、postViewのembedに公式AppViewと同じ形で返す。
 
-- embed-1: gallery埋め込みの画像は、引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す
-- embed-2: 動画の埋め込みは、再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す
+- embed-1: gallery埋め込みの画像は引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す
+- embed-2: 動画の埋め込みは再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す
 
 ## フィード
 
 getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPostで返す。
 
-- feedViewPost-1: リプライには、スレッドの起点と親の投稿をreplyに含める
+- feedViewPost-1: リプライにはスレッドの起点と親の投稿をreplyに含める
 - feedViewPost-2: 起点や親の投稿が見つからない場合、replyのその投稿をnotFoundPostにする
-- feedViewPost-3: リポストには、リポストしたアカウントとリポストの日時をreasonに含める
+- feedViewPost-3: リポストにはリポストしたアカウントとリポストの日時をreasonに含める
 
 ## app.bsky.actor.getProfile
 
@@ -194,7 +194,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 - getPostThreadV2-1: 親投稿を負のdepth、アンカー投稿をdepth 0、リプライを正のdepthとして、上から順にthreadに含める
 - getPostThreadV2-2: aboveがfalseのとき、親投稿を含めない
-- getPostThreadV2-3: 存在しない投稿は、depth 0のthreadItemNotFoundとして返す
+- getPostThreadV2-3: 存在しない投稿はdepth 0のthreadItemNotFoundとして返す
 
 ## app.bsky.feed.getAuthorFeed
 
@@ -224,7 +224,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 まとめるのは1ページ内の通知だけで、ページをまたいだ同じ投稿へのいいねは別のグループになる。
 
 - getGroupedNotifications-1: 認証がないリクエストには401を返す
-- getGroupedNotifications-2: 同じ投稿へのいいねとリポストは、種類ごとに1つのグループにまとめる
+- getGroupedNotifications-2: 同じ投稿へのいいねとリポストは種類ごとに1つのグループにまとめる
 - getGroupedNotifications-3: フィードジェネレーターへのいいねは、フィードジェネレーターごとに1つのグループにまとめる
 - getGroupedNotifications-4: フォローは1つのグループにまとめる
 - getGroupedNotifications-5: 返信・引用・メンションはまとめずに1件ずつ返す
@@ -309,7 +309,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.server.getOperator
 
-サーバーの運営者のprofileViewを返す。運営者は、管理者のうち最初にサーバーに登録した1人。認証は不要。
+サーバーの運営者のprofileViewを返す。運営者は管理者のうち最初にサーバーに登録した1人。認証は不要。
 
 - getOperator-1: 管理者のうち最初に登録したメンバー1人だけをoperatorにprofileViewで返す
 - getOperator-2: 管理者がいなければoperatorを含めない

@@ -54,7 +54,7 @@ export const TabCounts: Story = {
 };
 
 export const MemberDetails: Story = {
-  name: "server-s3: 「メンバー」タブでは、メンバーの一覧（名前、ハンドル、自己紹介）を表示する",
+  name: "server-s3: 「メンバー」タブではメンバーの一覧（名前、ハンドル、自己紹介）を表示する",
   tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
@@ -86,7 +86,7 @@ export const OperatorBadge: Story = {
 };
 
 export const SyncStatus: Story = {
-  name: "server-s5: 一覧のアカウントには、名前の下の行に過去の投稿の同期状態を表示する",
+  name: "server-s5: 一覧のアカウントには名前の下の行に過去の投稿の同期状態を表示する",
   tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
