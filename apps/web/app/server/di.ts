@@ -38,6 +38,7 @@ import {
   getLocalTimelineUseCaseFactory,
   getTimelineUseCaseFactory,
 } from "./application/timeline/get-timeline-use-case";
+import { env, isProduction } from "./env";
 import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
@@ -66,18 +67,46 @@ import { threadQueryFactory } from "./infrastructure/thread/thread-query";
 import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 
 export const di = await createRegistry()
-  .service("loggerManager", loggerManagerFactory)
-  .service("db", ["loggerManager"], dbFactory)
-  .service("jobQueue", jobQueueFactory)
+  .value("nodeEnv", env.NODE_ENV)
+  .value("isProduction", isProduction)
+  .value("port", env.PORT)
+  .value("logLevel", env.LOG_LEVEL)
+  .value("redisUrl", env.REDIS_URL)
+  .value("databaseUrl", env.DATABASE_URL)
+  .value("publicUrl", env.PUBLIC_URL)
+  .value("appviewUrl", env.APPVIEW_URL)
+  .value("appviewDid", env.APPVIEW_DID)
+  .value("cookieSecret", env.COOKIE_SECRET)
+  .value("privateKeyEs256B64", env.PRIVATE_KEY_ES256_B64)
+  .value("adminApiToken", env.ADMIN_API_TOKEN)
+  .value("atprotoPlcUrl", env.ATPROTO_PLC_URL)
+  .value("atprotoHandleResolverUrl", env.ATPROTO_HANDLE_RESOLVER_URL)
+  .service("loggerManager", ["logLevel"], loggerManagerFactory)
+  .service("db", ["databaseUrl", "loggerManager"], dbFactory)
+  .service("jobQueue", ["redisUrl"], jobQueueFactory)
   .service("oauthStateStore", ["db"], stateStoreFactory)
   .service("oauthSessionStore", ["db"], sessionStoreFactory)
   .service(
     "oauthClient",
-    ["oauthStateStore", "oauthSessionStore", "loggerManager"],
+    [
+      "oauthStateStore",
+      "oauthSessionStore",
+      "loggerManager",
+      "isProduction",
+      "publicUrl",
+      "appviewDid",
+      "privateKeyEs256B64",
+      "atprotoPlcUrl",
+      "atprotoHandleResolverUrl",
+    ],
     oauthClientFactory,
   )
-  .service("cookieSessionStorage", cookieSessionStorageFactory)
-  .service("subscopeQuery", ["oauthClient"], subscopeQueryFactory)
+  .service(
+    "cookieSessionStorage",
+    ["cookieSecret", "nodeEnv"],
+    cookieSessionStorageFactory,
+  )
+  .service("subscopeQuery", ["appviewUrl", "oauthClient"], subscopeQueryFactory)
   .service("subscopeCommand", ["oauthClient"], subscopeCommandFactory)
   .service("getLoginStepUseCase", ["subscopeQuery"], getLoginStepUseCaseFactory)
   .service(
@@ -90,7 +119,7 @@ export const di = await createRegistry()
     ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service("backfillQuery", backfillQueryFactory)
+  .service("backfillQuery", ["appviewUrl"], backfillQueryFactory)
   .service(
     "getServerMembersUseCase",
     ["subscopeQuery", "backfillQuery"],
@@ -173,7 +202,7 @@ export const di = await createRegistry()
     deleteInviteCodeUseCaseFactory,
   )
   .service("accountQuery", ["oauthClient"], accountQueryFactory)
-  .service("followQuery", followQueryFactory)
+  .service("followQuery", ["appviewUrl"], followQueryFactory)
   .service("getMeUseCase", ["accountQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["accountQuery"], getProfileUseCaseFactory)
   .service(
