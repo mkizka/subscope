@@ -8,6 +8,7 @@ import type { AggregatePostStatsUseCase } from "../application/use-cases/async/a
 import type { CheckBackfillUseCase } from "../application/use-cases/async/check-backfill-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
+import type { SendPushNotificationUseCase } from "../application/use-cases/async/send-push-notification-use-case.js";
 import type { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
 import type { Env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
@@ -44,6 +45,7 @@ export class SyncWorker {
     aggregateAccountStatsUseCase: AggregateAccountStatsUseCase,
     syncTapRepoUseCase: SyncTapRepoUseCase,
     checkBackfillUseCase: CheckBackfillUseCase,
+    sendPushNotificationUseCase: SendPushNotificationUseCase,
     env: Pick<Env, "REDIS_URL">,
   ) {
     const createWorker = <T extends keyof JobData>(
@@ -114,6 +116,16 @@ export class SyncWorker {
       createWorker("checkBackfill", async (job) => {
         await checkBackfillUseCase.execute(job.data);
       }),
+      createWorker(
+        "sendPushNotification",
+        async (job) => {
+          await sendPushNotificationUseCase.execute({
+            ...job.data,
+            jobLogger: createJobLogger(job),
+          });
+        },
+        { concurrency: 16 },
+      ),
     ];
   }
 

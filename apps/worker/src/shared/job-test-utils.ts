@@ -1,6 +1,6 @@
 import assert from "node:assert";
 
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
 import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
@@ -14,7 +14,9 @@ import { testSetup } from "@repo/test-utils";
 import type { LabelData } from "../application/interfaces/repositories/label-repository.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
+import { InMemoryWebPushSender } from "../infrastructure/web-push-sender/web-push-sender.in-memory.js";
 import { indexCommitCommandFactory } from "../presentation/tap.js";
+import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 import { createWorkerRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";
 
@@ -27,6 +29,7 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
   .replaceService("labelFetcher", asClassArgs(InMemoryLabelFetcher))
+  .replaceService("webPushSender", asClassArgs(InMemoryWebPushSender))
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("syncWorker", {} as never);
 
@@ -51,8 +54,16 @@ export const setupJobTest = async () => {
       await services.checkBackfillUseCase.execute(job);
     }
   };
+  const sendPushNotification = (recordUri: string, recipientDid: string) =>
+    services.sendPushNotificationUseCase.execute({
+      recordUri,
+      recipientDid: asDid(recipientDid),
+      jobLogger: new InMemoryJobLogger(),
+    });
   return {
     indexCommit,
+    sendPushNotification,
+    webPushSender: services.webPushSender,
     runSyncTapRepoJobs,
     runCheckBackfillJobs,
     scheduleBackfillChecks: () =>

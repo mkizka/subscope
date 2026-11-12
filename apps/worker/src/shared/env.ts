@@ -21,6 +21,22 @@ const schema = z.object({
   }),
   MODERATION_URL: z.url().default("https://mod.bsky.app"),
   TAP_CONCURRENCY: z.coerce.number().default(64),
+  VAPID_PUBLIC_KEY: match({
+    prod: z.string().optional(),
+    dev: z
+      .string()
+      .default(
+        "BE-yfiTXTZBW7fGBJFpzslYpc1PUzl_aUvcOV70r1V7cU2jvzvpLW1m3LJiwXUCqItMcvIACzVOPsTtM6sgoKRM",
+      ),
+  }),
+  VAPID_PRIVATE_KEY: match({
+    prod: z.string().optional(),
+    dev: z.string().default("04xf8iXz4kTTsD3pErGesfVeof-iD8OjyNO6eGNR868"),
+  }),
+  VAPID_SUBJECT: match({
+    prod: z.string().optional(),
+    dev: z.string().default("mailto:dev@example.com"),
+  }),
   DATABASE_POOL_MAX: z.coerce.number().default(32),
 });
 

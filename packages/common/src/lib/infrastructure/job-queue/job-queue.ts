@@ -55,6 +55,7 @@ export class JobQueue implements IJobQueue {
       ),
       syncTapRepo: new Queue("syncTapRepo", queueOptions(withRetry)),
       checkBackfill: new Queue("checkBackfill", queueOptions(withRetry)),
+      sendPushNotification: new Queue("sendPushNotification", queueOptions()),
     };
   }
 
