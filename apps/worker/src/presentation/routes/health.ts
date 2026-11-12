@@ -1,21 +1,21 @@
 import { Router } from "express";
 
-type HealthEnv = {
-  nodeEnv: string;
-  logLevel: string;
-  port: number;
-};
+import type { Env } from "../../shared/env.js";
 
 export const healthRouterFactory = ({
-  nodeEnv,
-  logLevel,
-  port,
-}: HealthEnv): Router => {
+  env,
+}: {
+  env: Pick<Env, "NODE_ENV" | "LOG_LEVEL" | "PORT">;
+}): Router => {
   const router = Router();
   router.get("/health", (_, res) => {
     res.json({
       status: "ok",
-      env: { NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port },
+      env: {
+        NODE_ENV: env.NODE_ENV,
+        LOG_LEVEL: env.LOG_LEVEL,
+        PORT: env.PORT,
+      },
     });
   });
   return router;

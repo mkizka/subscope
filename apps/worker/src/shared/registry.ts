@@ -104,11 +104,11 @@ import type { Env } from "./env.js";
 export const createWorkerRegistry = (env: Env) =>
   createRegistry()
     // envs
+    .value("env", env)
     .value("databaseUrl", env.DATABASE_URL)
     .value("databasePoolMax", env.DATABASE_POOL_MAX)
     .value("redisUrl", env.REDIS_URL)
     .value("logLevel", env.LOG_LEVEL)
-    .value("nodeEnv", env.NODE_ENV)
     .value("plcUrl", env.PLC_URL)
     .value("handleResolverUrl", env.ATPROTO_HANDLE_RESOLVER_URL)
     .value("tapUrl", env.TAP_URL)
@@ -178,7 +178,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "redisUrl"], asClassArgs(SyncWorker))
     // presentation
-    .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
+    .service("healthRouter", ["env"], healthRouterFactory)
     .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "tapUrl", "tapConcurrency"], asClassArgs(TapSubscriber))
     .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "moderationUrl"], asClassArgs(LabelSubscriber))
-    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "port"], asClassArgs(WorkerServer));
+    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "port", "env"], asClassArgs(WorkerServer));
