@@ -13,7 +13,7 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 const endpointSchema = z
   .url()
   .max(2048)
-  .refine((value) => !di.isProduction || value.startsWith("https://"));
+  .refine((value) => !di.env.isProduction || value.startsWith("https://"));
 
 const subscriptionSchema = z.object({
   endpoint: endpointSchema,
@@ -21,7 +21,7 @@ const subscriptionSchema = z.object({
 });
 
 export const loader = () => {
-  return data({ publicKey: di.vapidPublicKey ?? null });
+  return data({ publicKey: di.env.VAPID_PUBLIC_KEY ?? null });
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {

@@ -9,11 +9,13 @@ import getRegistrationStatus, {
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
-import { env } from "@/app/server/env";
+import type { Env } from "@/app/server/env";
 
 export const subscopeQueryFactory = ({
+  env,
   oauthClient,
 }: {
+  env: Pick<Env, "APPVIEW_URL">;
   oauthClient: IOAuthClient;
 }): ISubscopeQuery => {
   const publicClient = new Client(env.APPVIEW_URL);

@@ -4,12 +4,16 @@ import getBackfillStatuses from "@repo/client/me/subsco/sync/getBackfillStatuses
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
-import { env } from "@/app/server/env";
+import type { Env } from "@/app/server/env";
 
 const isBackfillStatus = (status: string): status is BackfillStatus =>
   status === "inProgress" || status === "completed" || status === "error";
 
-export const backfillQueryFactory = (): IBackfillQuery => {
+export const backfillQueryFactory = ({
+  env,
+}: {
+  env: Pick<Env, "APPVIEW_URL">;
+}): IBackfillQuery => {
   const publicClient = new Client(env.APPVIEW_URL);
   return {
     async findTrackedStatuses(dids) {

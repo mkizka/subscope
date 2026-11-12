@@ -1,13 +1,13 @@
-import { env } from "@/app/server/env";
+import { di } from "@/app/server/di";
 
 export const loader = () => {
   return Response.json({
     status: "ok",
     env: {
-      NODE_ENV: env.NODE_ENV,
-      LOG_LEVEL: env.LOG_LEVEL,
-      PORT: env.PORT,
-      PUBLIC_URL: env.PUBLIC_URL,
+      NODE_ENV: di.env.NODE_ENV,
+      LOG_LEVEL: di.env.LOG_LEVEL,
+      PORT: di.env.PORT,
+      PUBLIC_URL: di.env.PUBLIC_URL,
     },
   });
 };

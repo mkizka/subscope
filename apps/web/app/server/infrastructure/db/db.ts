@@ -4,11 +4,13 @@ import {
 } from "@repo/common/infrastructure";
 import type { DatabaseClient, ILoggerManager } from "@repo/common/interface";
 
-import { env } from "@/app/server/env";
+import type { Env } from "@/app/server/env";
 
 export const dbFactory = ({
+  env,
   loggerManager,
 }: {
+  env: Pick<Env, "DATABASE_URL">;
   loggerManager: ILoggerManager;
 }): DatabaseClient =>
   databaseFactory(

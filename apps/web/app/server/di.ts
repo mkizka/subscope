@@ -40,7 +40,7 @@ import {
   getLocalTimelineUseCaseFactory,
   getTimelineUseCaseFactory,
 } from "./application/timeline/get-timeline-use-case";
-import { env, isProduction } from "./env";
+import { env } from "./env";
 import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
@@ -70,20 +70,19 @@ import { threadQueryFactory } from "./infrastructure/thread/thread-query";
 import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 
 export const di = await createRegistry()
-  .value("isProduction", isProduction)
-  .value("vapidPublicKey", env.VAPID_PUBLIC_KEY)
-  .service("loggerManager", loggerManagerFactory)
-  .service("db", ["loggerManager"], dbFactory)
-  .service("jobQueue", jobQueueFactory)
+  .value("env", env)
+  .service("loggerManager", ["env"], loggerManagerFactory)
+  .service("db", ["env", "loggerManager"], dbFactory)
+  .service("jobQueue", ["env"], jobQueueFactory)
   .service("oauthStateStore", ["db"], stateStoreFactory)
   .service("oauthSessionStore", ["db"], sessionStoreFactory)
   .service(
     "oauthClient",
-    ["oauthStateStore", "oauthSessionStore", "loggerManager"],
+    ["oauthStateStore", "oauthSessionStore", "loggerManager", "env"],
     oauthClientFactory,
   )
-  .service("cookieSessionStorage", cookieSessionStorageFactory)
-  .service("subscopeQuery", ["oauthClient"], subscopeQueryFactory)
+  .service("cookieSessionStorage", ["env"], cookieSessionStorageFactory)
+  .service("subscopeQuery", ["env", "oauthClient"], subscopeQueryFactory)
   .service("subscopeCommand", ["oauthClient"], subscopeCommandFactory)
   .service("getLoginStepUseCase", ["subscopeQuery"], getLoginStepUseCaseFactory)
   .service(
@@ -96,7 +95,7 @@ export const di = await createRegistry()
     ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service("backfillQuery", backfillQueryFactory)
+  .service("backfillQuery", ["env"], backfillQueryFactory)
   .service(
     "getServerMembersUseCase",
     ["subscopeQuery", "backfillQuery"],
@@ -190,7 +189,7 @@ export const di = await createRegistry()
     deleteInviteCodeUseCaseFactory,
   )
   .service("accountQuery", ["oauthClient"], accountQueryFactory)
-  .service("followQuery", followQueryFactory)
+  .service("followQuery", ["env"], followQueryFactory)
   .service("getMeUseCase", ["accountQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["accountQuery"], getProfileUseCaseFactory)
   .service(

@@ -1,8 +1,7 @@
 import { fromError } from "zod-validation-error";
 import { z } from "zodV4";
 
-export const isProduction =
-  process.env.NODE_ENV === "production" && !process.env.E2E;
+const isProduction = process.env.NODE_ENV === "production" && !process.env.E2E;
 
 const match = <Prod, Default>({ prod, dev }: { prod: Prod; dev: Default }) => {
   return isProduction ? prod : dev;
@@ -65,6 +64,7 @@ const schema = z
   })
   .transform((val) => ({
     ...val,
+    isProduction,
     APPVIEW_DID:
       val.APPVIEW_DID ??
       `did:web:${encodeURIComponent(new URL(val.APPVIEW_URL).host)}`,
@@ -77,3 +77,5 @@ export const env = (() => {
     throw fromError(e);
   }
 })();
+
+export type Env = typeof env;

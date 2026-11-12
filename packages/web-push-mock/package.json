@@ -2,10 +2,19 @@
   "name": "@repo/web-push-mock",
   "version": "0.0.0",
   "type": "module",
+  "description": "A fake Web Push service for end-to-end tests: a local receiver that decrypts RFC 8291 payloads and a PushManager stub for browsers.",
+  "license": "MIT",
   "private": true,
   "exports": {
     ".": "./src/index.ts"
   },
+  "keywords": [
+    "web-push",
+    "push-notification",
+    "testing",
+    "mock",
+    "vapid"
+  ],
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
@@ -14,11 +23,13 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
     "@repo/eslint-config": "workspace:*",
+    "@repo/vitest": "workspace:*",
     "@tsconfig/node-lts": "24.0.1",
     "@types/node": "26.6.5",
+    "@types/web-push": "3.6.4",
     "eslint": "10.13.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "web-push": "3.6.7"
   }
 }

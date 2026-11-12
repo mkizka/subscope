@@ -1,7 +1,7 @@
 import { expect, test as base } from "@playwright/test";
-import { openDevice } from "@repo/web-push-mock";
 
 import { createRecord, follow, putRecord } from "../../helpers/pds";
+import { openDevice } from "../../helpers/push";
 
 type Device = Awaited<ReturnType<typeof openDevice>>;
 
@@ -57,7 +57,9 @@ test.describe("プッシュ通知", () => {
     await likeAlicePost(text);
 
     await expect
-      .poll(() => device.receiver.messages, { timeout: 30_000 })
+      .poll(() => device.receiver.requests.map((push) => push.json()), {
+        timeout: 30_000,
+      })
       .toMatchObject([{ title: "Bobさんがいいねしました", body: text }]);
   });
 
@@ -76,9 +78,9 @@ test.describe("プッシュ通知", () => {
     await likeAlicePost(`pushSetting-e2: ${new Date().toISOString()}`);
 
     await expect
-      .poll(() => other.receiver.messages.length, { timeout: 30_000 })
+      .poll(() => other.receiver.requests.length, { timeout: 30_000 })
       .toBeGreaterThan(0);
-    expect(turnedOff.receiver.messages).toEqual([]);
+    expect(turnedOff.receiver.requests).toEqual([]);
   });
 
   test("pushSetting-e3: ログアウトすると、その端末へプッシュ通知を送らない", async ({
@@ -95,8 +97,8 @@ test.describe("プッシュ通知", () => {
     await likeAlicePost(`pushSetting-e3: ${new Date().toISOString()}`);
 
     await expect
-      .poll(() => other.receiver.messages.length, { timeout: 30_000 })
+      .poll(() => other.receiver.requests.length, { timeout: 30_000 })
       .toBeGreaterThan(0);
-    expect(loggedOut.receiver.messages).toEqual([]);
+    expect(loggedOut.receiver.requests).toEqual([]);
   });
 });

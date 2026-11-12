@@ -1,14 +1,34 @@
 import {
   createDecipheriv,
   createECDH,
+  createPublicKey,
+  createVerify,
   hkdfSync,
   randomBytes,
 } from "node:crypto";
+import type { IncomingHttpHeaders } from "node:http";
 import { createServer } from "node:http";
 
-import type { Browser } from "@playwright/test";
+export type PushSubscriptionData = {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+};
 
-export type PushMessage = { title: string; body: string; tag: string };
+export type ReceivedPush = {
+  headers: IncomingHttpHeaders;
+  body: Buffer;
+  text: string;
+  json: () => Record<string, unknown>;
+};
+
+export type PushReceiverOptions = {
+  status?: number;
+  vapidPublicKey?: string;
+};
+
+const parseJson = (text: string): { exp?: number } & Record<string, unknown> =>
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  JSON.parse(text) as never;
 
 const readBody = async (request: AsyncIterable<Buffer>) => {
   const chunks: Buffer[] = [];
@@ -16,11 +36,10 @@ const readBody = async (request: AsyncIterable<Buffer>) => {
   return Buffer.concat(chunks);
 };
 
-// RFC 8291(aes128gcm)の復号
 const decrypt = (
   body: Buffer,
   keys: { ecdh: ReturnType<typeof createECDH>; auth: Buffer },
-): PushMessage => {
+) => {
   const salt = body.subarray(0, 16);
   const idLength = body.readUInt8(20);
   const serverPublicKey = body.subarray(21, 21 + idLength);
@@ -51,64 +70,137 @@ const decrypt = (
     decipher.update(encrypted.subarray(0, -16)),
     decipher.final(),
   ]);
-  const plain = padded.subarray(0, padded.lastIndexOf(2)).toString();
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return JSON.parse(plain) as PushMessage;
+  let end = padded.length;
+  while (end > 0 && padded[end - 1] === 0) end--;
+  return padded.subarray(0, end - 1);
 };
 
-const createPushReceiver = async () => {
+const verifyVapid = (authorization: string | undefined, publicKey: string) => {
+  const token = /\bt=([\w-]+)\.([\w-]+)\.([\w-]+)/.exec(authorization ?? "");
+  const key = /\bk=([\w-]+)/.exec(authorization ?? "");
+  if (!token || key?.[1] !== publicKey) return false;
+  const [, header, payload, signature] = token;
+  const claims = parseJson(Buffer.from(payload ?? "", "base64url").toString());
+  if (!claims.exp || claims.exp * 1000 < Date.now()) return false;
+  const jwk = {
+    kty: "EC",
+    crv: "P-256",
+    x: Buffer.from(publicKey, "base64url")
+      .subarray(1, 33)
+      .toString("base64url"),
+    y: Buffer.from(publicKey, "base64url").subarray(33).toString("base64url"),
+  };
+  return createVerify("sha256")
+    .update(`${header}.${payload}`)
+    .verify(
+      {
+        key: createPublicKey({ key: jwk, format: "jwk" }),
+        dsaEncoding: "ieee-p1363",
+      },
+      Buffer.from(signature ?? "", "base64url"),
+    );
+};
+
+export const createPushReceiver = async (options: PushReceiverOptions = {}) => {
   const ecdh = createECDH("prime256v1");
   ecdh.generateKeys();
   const auth = randomBytes(16);
-  const messages: PushMessage[] = [];
+  const requests: ReceivedPush[] = [];
+  const receiver = {
+    status: options.status ?? 201,
+    requests,
+    subscription: {
+      endpoint: "",
+      keys: {
+        p256dh: ecdh.getPublicKey().toString("base64url"),
+        auth: auth.toString("base64url"),
+      },
+    } satisfies PushSubscriptionData,
+    close: () => server.close(),
+  };
   const server = createServer((request, response) => {
-    void readBody(request).then((body) => {
-      messages.push(decrypt(body, { ecdh, auth }));
-      response.writeHead(201).end();
+    void readBody(request).then((raw) => {
+      if (
+        options.vapidPublicKey &&
+        !verifyVapid(request.headers.authorization, options.vapidPublicKey)
+      ) {
+        response.writeHead(401).end();
+        return;
+      }
+      if (receiver.status >= 400) {
+        response.writeHead(receiver.status).end();
+        return;
+      }
+      try {
+        const body = decrypt(raw, { ecdh, auth });
+        const text = body.toString();
+        requests.push({
+          headers: request.headers,
+          body,
+          text,
+          json: () => parseJson(text),
+        });
+        response.writeHead(receiver.status).end();
+      } catch {
+        response.writeHead(400).end();
+      }
     });
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
   if (typeof address !== "object" || !address) throw new Error("no address");
-  return {
-    messages,
-    subscription: {
-      endpoint: `http://127.0.0.1:${address.port}/push`,
-      p256dh: ecdh.getPublicKey().toString("base64url"),
-      auth: auth.toString("base64url"),
-    },
-    close: () => server.close(),
-  };
+  receiver.subscription.endpoint = `http://127.0.0.1:${address.port}/push`;
+  return receiver;
 };
 
-// 本物のプッシュサーバーは使えないので、ブラウザの購読を、テスト内の受け口へ向いた購読に差し替える
-export const openDevice = async (
-  browser: Browser,
-  options: { baseURL: string; storageState: string },
+// Must stay self-contained: it is serialized and run inside the page.
+export const installPushManagerMock = (
+  subscription: PushSubscriptionData,
+  storageKey = "mockPushSubscribed",
 ) => {
-  const receiver = await createPushReceiver();
-  const context = await browser.newContext(options);
-  await context.grantPermissions(["notifications"], {
-    origin: options.baseURL,
+  let memory = false;
+  const read = () => {
+    try {
+      return localStorage.getItem(storageKey) !== null;
+    } catch {
+      return memory;
+    }
+  };
+  const write = (value: boolean) => {
+    memory = value;
+    try {
+      if (value) localStorage.setItem(storageKey, "1");
+      else localStorage.removeItem(storageKey);
+    } catch {
+      // in-memory fallback
+    }
+  };
+  const mock = {
+    endpoint: subscription.endpoint,
+    expirationTime: null,
+    toJSON: () => ({
+      endpoint: subscription.endpoint,
+      expirationTime: null,
+      keys: subscription.keys,
+    }),
+    unsubscribe: () => {
+      write(false);
+      return Promise.resolve(true);
+    },
+  };
+  Object.assign(PushManager.prototype, {
+    subscribe: () => {
+      write(true);
+      return Promise.resolve(mock);
+    },
+    getSubscription: () => Promise.resolve(read() ? mock : null),
+    permissionState: () => Promise.resolve("granted"),
   });
-  await context.addInitScript(({ endpoint, p256dh, auth }) => {
-    const key = "mockPushSubscribed";
-    const subscription = {
-      endpoint,
-      toJSON: () => ({ endpoint, keys: { p256dh, auth } }),
-      unsubscribe: () => {
-        localStorage.removeItem(key);
-        return Promise.resolve(true);
-      },
-    };
-    Object.assign(PushManager.prototype, {
-      subscribe: () => {
-        localStorage.setItem(key, "1");
-        return Promise.resolve(subscription);
-      },
-      getSubscription: () =>
-        Promise.resolve(localStorage.getItem(key) ? subscription : null),
-    });
-  }, receiver.subscription);
-  return { context, page: await context.newPage(), receiver };
 };
+
+// For drivers that take a script string instead of a function.
+export const pushManagerMockScript = (
+  subscription: PushSubscriptionData,
+  storageKey?: string,
+) =>
+  `(${installPushManagerMock.toString()})(${JSON.stringify(subscription)}, ${JSON.stringify(storageKey)})`;
