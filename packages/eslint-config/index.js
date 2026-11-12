@@ -38,12 +38,38 @@ const effectPadding = {
   },
 };
 
+const noEnvImport = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    return {
+      ImportDeclaration(node) {
+        if (node.importKind === "type") return;
+        if (/(^|\/)env(\.js)?$/.test(node.source.value)) {
+          context.report({
+            node,
+            message:
+              "env.tsの値はDIの配線(di.ts・registry.ts・エントリーポイント)でだけ読み、ほかはEnv型かDIのvalueで受け取ってください。",
+          });
+        }
+      },
+    };
+  },
+};
+
 export const config = [
   ...mkizka,
   {
-    plugins: { local: { rules: { "effect-padding": effectPadding } } },
+    plugins: {
+      local: {
+        rules: {
+          "effect-padding": effectPadding,
+          "no-env-import": noEnvImport,
+        },
+      },
+    },
     rules: {
       "local/effect-padding": "error",
+      "local/no-env-import": "error",
       "no-restricted-syntax": [
         "error",
         {
@@ -83,6 +109,15 @@ export const config = [
       "**/server.js",
     ],
     rules: { "no-restricted-properties": "off" },
+  },
+  {
+    files: [
+      "**/server/di.ts",
+      "**/shared/registry.ts",
+      "**/src/worker.ts",
+      "**/src/appview.ts",
+    ],
+    rules: { "local/no-env-import": "off" },
   },
   {
     files: ["**/*.in-memory.ts"],
