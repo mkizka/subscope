@@ -17,8 +17,16 @@ export const threadQueryFactory = ({
   async findQuotes(did, uri, cursor) {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("OAuth session not found");
-    const { posts, cursor: next } = await agent.call(getQuotes, {
+    const { thread } = await agent.call(getPostThread, {
       uri,
+      depth: 0,
+      parentHeight: 0,
+    });
+    if (!threadViewPost.matches(thread)) {
+      throw new Error("Post not found");
+    }
+    const { posts, cursor: next } = await agent.call(getQuotes, {
+      uri: thread.post.uri,
       cursor,
     });
     return {
