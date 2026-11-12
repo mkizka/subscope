@@ -58,6 +58,7 @@ export default defineRailway(() => {
     env: {
       PORT: "8080",
       DID_CACHE: "redis",
+      BLOB_CACHE_MAX_BYTES: "0",
       REDIS_URL: cache.env.REDIS_URL,
     },
   });
