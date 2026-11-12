@@ -161,6 +161,11 @@ export const PushPromptOff: Story = {
         expect(canvas.queryByText("プッシュ通知を受け取る")).toBeNull(),
       );
     }
+
+    pushSetting("off")();
+    await expect(
+      await canvas.findByText("プッシュ通知を受け取る"),
+    ).toBeVisible();
   },
 };
 
