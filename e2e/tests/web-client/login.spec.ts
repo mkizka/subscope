@@ -1,3 +1,5 @@
+import { createHmac } from "node:crypto";
+
 import { expect, test } from "@playwright/test";
 
 import { login, register } from "../../helpers/login";
@@ -89,5 +91,35 @@ test.describe("ログイン", () => {
     await expect(page.getByRole("alert")).toHaveText(
       "招待コードが無効または期限切れです",
     );
+  });
+
+  test("login-e8: ログイン後にOAuthで要求する権限が変わった場合、ログイン画面に移動する", async ({
+    page,
+    context,
+  }) => {
+    await login(page);
+    const secret = "9k+IXwNgwmTlwte3xCOm+iy1qhUkKku7+wUpveFPe9y2";
+    const cookie = (await context.cookies()).find(
+      (c) => c.name === "subscope_session",
+    );
+    if (!cookie) throw new Error("session cookie not found");
+    const signed = decodeURIComponent(cookie.value);
+    const data: unknown = JSON.parse(
+      atob(signed.slice(0, signed.lastIndexOf("."))),
+    );
+    const value = btoa(
+      JSON.stringify(Object.assign({}, data, { scope: "atproto" })),
+    );
+    const signature = createHmac("sha256", secret)
+      .update(value)
+      .digest("base64")
+      .replace(/=+$/, "");
+    await context.addCookies([
+      { ...cookie, value: encodeURIComponent(`${value}.${signature}`) },
+    ]);
+
+    await page.goto("/");
+
+    await expect(page).toHaveURL("/login");
   });
 });
