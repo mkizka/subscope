@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Subscope",
+      "detail": "Use Subscope on your behalf.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "inheritAud": true,
+          "lxm": [
+            "me.subsco.admin.banAccount",
+            "me.subsco.admin.createInviteCode",
+            "me.subsco.admin.deleteInviteCode",
+            "me.subsco.admin.getBannedAccounts",
+            "me.subsco.admin.getInviteCodes",
+            "me.subsco.admin.grantAdmin",
+            "me.subsco.admin.listServerMembers",
+            "me.subsco.admin.registerAdmin",
+            "me.subsco.admin.unbanAccount",
+            "me.subsco.admin.verifyAccess",
+            "me.subsco.graph.getServerMemberFollowers",
+            "me.subsco.server.getFollowedAccounts",
+            "me.subsco.server.getLocalTimeline",
+            "me.subsco.server.getOperator",
+            "me.subsco.server.getServerMembers",
+            "me.subsco.server.getSetupStatus",
+            "me.subsco.sync.getBackfillStatuses",
+            "me.subsco.sync.getRegistrationStatus",
+            "me.subsco.sync.registerAccount"
+          ]
+        }
+      ]
+    }
+  }
+}

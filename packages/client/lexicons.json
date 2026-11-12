@@ -90,6 +90,7 @@
     "me.subsco.admin.revokeAdmin",
     "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
+    "me.subsco.authFull",
     "me.subsco.graph.getServerMemberFollowers",
     "me.subsco.server.getFollowedAccounts",
     "me.subsco.server.getLocalTimeline",
@@ -397,6 +398,10 @@
     "me.subsco.admin.verifyAccess": {
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
+    },
+    "me.subsco.authFull": {
+      "uri": "file://./lexicons/me/subsco/authFull.json",
+      "cid": "bafyreibfkme55tefccydu7w5sapyncshvfrj6buhrigj66iubcqqaw5mva"
     },
     "me.subsco.graph.getServerMemberFollowers": {
       "uri": "file://./lexicons/me/subsco/graph/getServerMemberFollowers.json",
