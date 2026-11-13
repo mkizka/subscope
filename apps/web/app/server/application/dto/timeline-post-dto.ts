@@ -75,4 +75,5 @@ export type TimelinePostDto = {
     description?: string;
   };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
+  reasonPin?: boolean;
 };

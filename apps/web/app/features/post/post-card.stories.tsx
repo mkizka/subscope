@@ -37,6 +37,19 @@ export const WithRepost: Story = {
   },
 };
 
+export const Pinned: Story = {
+  args: {
+    authorHandle: "alice.bsky.social",
+    authorDisplayName: "Alice",
+    text: "ピン留めされた投稿です。",
+    replyCount: 0,
+    repostCount: 0,
+    likeCount: 0,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    reasonPin: true,
+  },
+};
+
 export const NoDisplayName: Story = {
   args: {
     authorHandle: "charlie.bsky.social",

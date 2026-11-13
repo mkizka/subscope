@@ -78,6 +78,7 @@ export const accountQueryFactory = ({
               limit: 20,
               cursor,
               filter: filters[tab],
+              includePins: tab === "posts",
             });
       return {
         posts:

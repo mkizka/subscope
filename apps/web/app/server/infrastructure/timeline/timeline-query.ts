@@ -197,5 +197,6 @@ export function toTimelinePost({
       reason && "by" in reason
         ? { byDisplayName: reason.by.displayName, byHandle: reason.by.handle }
         : undefined,
+    reasonPin: reason?.$type === "app.bsky.feed.defs#reasonPin" || undefined,
   };
 }

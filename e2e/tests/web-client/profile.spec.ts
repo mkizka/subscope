@@ -276,6 +276,39 @@ test.describe("プロフィール", () => {
     ).toHaveCount(2);
   });
 
+  test("profile-e12: 全体ページの「投稿」タブの1ページ目では、プロフィールでピン留めした投稿を先頭に表示し、投稿の上にリポストと同じ位置で「ピン留め」を出す。元の位置には重ねて表示しない", async ({
+    page,
+  }) => {
+    const pinned = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "profile-e12: ピン留め",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "profile-e12: 新しい投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+      pinnedPost: pinned,
+    });
+    await page.goto("/alice.test");
+    const main = page.getByRole("main");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(/^profile-e12: /)).toHaveText(
+        ["profile-e12: ピン留め", "profile-e12: 新しい投稿"],
+        { timeout: 1000 },
+      );
+    }).toPass();
+    await expect(
+      main
+        .getByRole("article")
+        .filter({ hasText: "profile-e12: ピン留め" })
+        .getByText("ピン留め", { exact: true }),
+    ).toBeVisible();
+  });
+
   test("profile-e9: 「リプライ」タブでは、返信先の投稿が一覧にない場合、リプライの上に返信先を表示して線で繋げる", async ({
     page,
   }) => {
