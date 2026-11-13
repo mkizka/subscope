@@ -6,6 +6,7 @@ import {
   PDS_URL,
   putRecord,
   resolveHandle,
+  uploadBlob,
   uploadImage,
 } from "../../helpers/pds";
 
@@ -159,6 +160,42 @@ test.describe("プロフィール", () => {
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(image)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(main.getByText(text)).toHaveCount(0);
+  });
+
+  test("profile-e11: 全体ページの「動画」タブには動画付きの投稿だけを表示する", async ({
+    page,
+  }) => {
+    const video = `profile-e11の動画付き ${Date.now()}`;
+    const text = `profile-e11のテキストのみ ${Date.now()}`;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: video,
+      embed: {
+        $type: "app.bsky.embed.video",
+        video: await uploadBlob(
+          "alice.test",
+          new Uint8Array([0, 0, 0, 24]),
+          "video/mp4",
+        ),
+        alt: video,
+        aspectRatio: { width: 16, height: 9 },
+      },
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+    await page.route("https://video.bsky.app/watch/**/thumbnail.jpg", (route) =>
+      route.fulfill({ status: 404 }),
+    );
+    await page.goto("/alice.test?tab=video");
+    const main = page.getByRole("main");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(video)).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(main.getByText(text)).toHaveCount(0);
   });
