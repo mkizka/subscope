@@ -5,7 +5,7 @@ import type { SubjectLikeDto } from "../../../application/dto/like-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ILikeQuery } from "../../interfaces/queries/like-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
-import type { ViewContextFactory } from "../../views/view-context.js";
+import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 export class GetLikesUseCase {
   constructor(
@@ -16,6 +16,7 @@ export class GetLikesUseCase {
 
   async execute(
     params: AppBskyFeedGetLikes.$Params,
+    viewer: Viewer,
   ): Promise<AppBskyFeedGetLikes.$OutputBody> {
     const paginator = createCursorPaginator<SubjectLikeDto>({
       limit: params.limit,
@@ -29,7 +30,7 @@ export class GetLikesUseCase {
       }),
     );
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.viewContextFactory.create(viewer);
     const likes = await Promise.all(
       page.items.map(
         async (like): Promise<AppBskyFeedGetLikes.Like | undefined> => {

@@ -4,7 +4,7 @@ import type { PostDto } from "../../dto/post-dto.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
 import type { PostViews } from "../../views/post-views.js";
-import type { ViewContextFactory } from "../../views/view-context.js";
+import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 export class GetQuotesUseCase {
   constructor(
@@ -15,6 +15,7 @@ export class GetQuotesUseCase {
 
   async execute(
     params: AppBskyFeedGetQuotes.$Params,
+    viewer: Viewer,
   ): Promise<AppBskyFeedGetQuotes.$OutputBody> {
     const paginator = createCursorPaginator<PostDto>({
       limit: params.limit,
@@ -28,7 +29,7 @@ export class GetQuotesUseCase {
       }),
     );
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.viewContextFactory.create(viewer);
     const posts = await Promise.all(
       paginationResult.items.map((post) =>
         this.postViews.postView(post.uri, ctx),

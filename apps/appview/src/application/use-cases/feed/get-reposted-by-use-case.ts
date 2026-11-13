@@ -4,7 +4,7 @@ import type { RepostDto } from "../../../application/dto/repost-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { IRepostQuery } from "../../interfaces/queries/repost-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
-import type { ViewContextFactory } from "../../views/view-context.js";
+import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 export class GetRepostedByUseCase {
   constructor(
@@ -15,6 +15,7 @@ export class GetRepostedByUseCase {
 
   async execute(
     params: AppBskyFeedGetRepostedBy.$Params,
+    viewer: Viewer,
   ): Promise<AppBskyFeedGetRepostedBy.$OutputBody> {
     const paginator = createCursorPaginator<RepostDto>({
       limit: params.limit,
@@ -28,7 +29,7 @@ export class GetRepostedByUseCase {
       }),
     );
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.viewContextFactory.create(viewer);
     const repostedBy = await Promise.all(
       paginationResult.items.map((repost) =>
         this.profileViews.view(repost.accountDid, ctx),

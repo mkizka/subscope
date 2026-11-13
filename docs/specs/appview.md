@@ -149,6 +149,7 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 
 - getLikes-1: 指定した投稿にいいねしたアカウントをprofileViewで返す
 - getLikes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getLikes-3: 閲覧者がフォローしているアカウントには、viewer.followingを含める
 
 ## app.bsky.feed.getRepostedBy
 
@@ -156,6 +157,7 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 
 - getRepostedBy-1: 指定した投稿をリポストしたアカウントをprofileViewで返す
 - getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getRepostedBy-3: 閲覧者がフォローしているアカウントには、viewer.followingを含める
 
 ## app.bsky.feed.getQuotes
 
@@ -163,18 +165,21 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 
 - getQuotes-1: 指定した投稿を引用した投稿をpostViewで返す
 - getQuotes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getQuotes-3: 閲覧者がフォローしているアカウントの投稿には、author.viewer.followingを含める
 
 ## app.bsky.feed.getFeedGenerators
 
 指定したフィードジェネレーターの情報を返す。認証は任意。
 
 - getFeedGenerators-1: 指定したフィードジェネレーターをgeneratorViewで返す
+- getFeedGenerators-2: 閲覧者がフォローしている作成者には、creator.viewer.followingを含める
 
 ## app.bsky.feed.searchPosts
 
 本文が検索クエリに一致する投稿を新しい順に返す。認証は任意。
 
 - searchPosts-1: 本文がクエリに一致する投稿をpostViewで返す
+- searchPosts-2: 閲覧者がフォローしているアカウントの投稿には、author.viewer.followingを含める
 
 ## app.bsky.feed.searchPostsV2
 
@@ -184,6 +189,7 @@ searchPostsの後継で、公式クライアントの投稿検索はこれを使
 - searchPostsV2-2: queryを省略した場合、authorsで絞り込んだ投稿を返す
 - searchPostsV2-3: repliesOnlyがtrueの場合、返信だけを返す。それ以外の場合、返信は含めない
 - searchPostsV2-4: queryもauthorsも無い場合、空の配列を返す
+- searchPostsV2-5: 閲覧者がフォローしているアカウントの投稿には、author.viewer.followingを含める
 
 authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
