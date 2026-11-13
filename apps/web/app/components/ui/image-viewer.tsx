@@ -19,6 +19,22 @@ const labels = {
   "Zoom out": "縮小",
 };
 
+let pendingBack: Promise<void> | null = null;
+
+function backAndWait() {
+  pendingBack = new Promise<void>((resolve) => {
+    window.addEventListener(
+      "popstate",
+      () => {
+        pendingBack = null;
+        resolve();
+      },
+      { once: true },
+    );
+  });
+  history.back();
+}
+
 type Props = {
   images: ViewerImage[];
   index: number;
@@ -33,16 +49,27 @@ export function ImageViewer({ images, index, onIndexChange }: Props) {
 
   useEffect(() => {
     if (!open) return;
+    let started = false;
+    let cancelled = false;
     let closedByPopState = false;
-    history.pushState("imageViewer", "");
     const onPopState = () => {
       closedByPopState = true;
       onIndexChangeRef.current(-1);
     };
-    window.addEventListener("popstate", onPopState);
+    const start = () => {
+      if (cancelled) return;
+      started = true;
+      history.pushState("imageViewer", "");
+      window.addEventListener("popstate", onPopState);
+    };
+    if (pendingBack) void pendingBack.then(start);
+    else start();
     return () => {
+      cancelled = true;
       window.removeEventListener("popstate", onPopState);
-      if (!closedByPopState && history.state === "imageViewer") history.back();
+      if (started && !closedByPopState && history.state === "imageViewer") {
+        backAndWait();
+      }
     };
   }, [open]);
 
