@@ -32,6 +32,7 @@ import type { IPushNotificationQuery } from "../application/interfaces/queries/p
 import type { IRegistrationQuery } from "../application/interfaces/queries/registration-query.js";
 import type { IAccountRepository } from "../application/interfaces/repositories/account-repository.js";
 import type { IAccountStatsRepository } from "../application/interfaces/repositories/account-stats-repository.js";
+import type { IBlockRepository } from "../application/interfaces/repositories/block-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
 import type { IFollowRepository } from "../application/interfaces/repositories/follow-repository.js";
 import type { IGeneratorRepository } from "../application/interfaces/repositories/generator-repository.js";
@@ -49,6 +50,7 @@ import type { IRecordRevRepository } from "../application/interfaces/repositorie
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
 import { IndexRecordService } from "../application/services/index-record-service.js";
+import { BlockIndexer } from "../application/services/indexer/block-indexer.js";
 import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
 import { GateIndexer } from "../application/services/indexer/gate-indexer.js";
 import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
@@ -84,6 +86,7 @@ import { PushNotificationQuery } from "../infrastructure/queries/push-notificati
 import { RegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.js";
 import { AccountRepository } from "../infrastructure/repositories/account-repository/account-repository.js";
 import { AccountStatsRepository } from "../infrastructure/repositories/account-stats-repository/account-stats-repository.js";
+import { BlockRepository } from "../infrastructure/repositories/block-repository/block-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
 import { FollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.js";
@@ -142,6 +145,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("generatorRepository", asClassArgs<IGeneratorRepository>()(GeneratorRepository))
     .service("listRepository", asClassArgs<IListRepository>()(ListRepository))
     .service("listItemRepository", asClassArgs<IListItemRepository>()(ListItemRepository))
+    .service("blockRepository", asClassArgs<IBlockRepository>()(BlockRepository))
     .service("likeRepository", asClassArgs<ILikeRepository>()(LikeRepository))
     .service("postStatsRepository", asClassArgs<IPostStatsRepository>()(PostStatsRepository))
     .service("repostRepository", asClassArgs<IRepostRepository>()(RepostRepository))
@@ -162,11 +166,12 @@ export const createWorkerRegistry = (env: Env) =>
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
     .service("listItemIndexer", ["listItemRepository", "indexAccountService"], asClassArgs(ListItemIndexer))
+    .service("blockIndexer", ["blockRepository", "indexAccountService"], asClassArgs(BlockIndexer))
     .service("gateIndexer", asClassArgs(GateIndexer))
     .service("linkIndexer", asClassArgs(LinkIndexer))
     .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(LikeIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(RepostIndexer))
-    .service("indexRecordService", ["recordRepository", "indexAccountService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
+    .service("indexRecordService", ["recordRepository", "indexAccountService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer", "blockIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("resolveDidUseCase", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidUseCase"], asClassArgs(UpsertIdentityUseCase))

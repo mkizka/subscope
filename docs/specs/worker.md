@@ -16,7 +16,7 @@ ackしなかったイベントはTapが一定時間後に再送する。処理�
 
 ## レコードのインデックス
 
-Tapから受け取ったコミットのレコードをDBに保存・削除する。対象のコレクションは post、repost、like、follow、profile、feed generator、list、listitem、threadgate、postgate。
+Tapから受け取ったコミットのレコードをDBに保存・削除する。対象のコレクションは post、repost、like、follow、block、profile、feed generator、list、listitem、threadgate、postgate。
 
 - index-1: 作成・更新されたレコードを保存する
 - index-2: 削除されたレコードを削除する
