@@ -20,6 +20,7 @@ const tabLabels = {
   posts: "投稿",
   replies: "リプライ",
   media: "メディア",
+  video: "動画",
   likes: "いいね",
 };
 
@@ -51,7 +52,7 @@ export function ProfileContainer({ handle }: Props) {
   });
 
   const data = pages?.pages[0];
-  const tabs = ["posts", "replies", "media", "likes"] as const;
+  const tabs = ["posts", "replies", "media", "video", "likes"] as const;
   const { profile } = data ?? {};
   return (
     <>

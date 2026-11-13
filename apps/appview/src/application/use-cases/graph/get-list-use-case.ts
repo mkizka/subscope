@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { $OutputBody } from "@repo/client/app/bsky/graph/getList";
 
@@ -18,10 +19,11 @@ export class GetListUseCase {
 
   async execute(params: {
     listUri: AtUri;
+    viewerDid: Did | null;
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody | null> {
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
     const list = await this.listViews.view(params.listUri.toString(), ctx);
     if (!list) return null;
 

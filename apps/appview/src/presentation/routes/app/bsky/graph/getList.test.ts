@@ -2,6 +2,7 @@ import { asAtUriString } from "@atproto/syntax";
 import getList from "@repo/client/app/bsky/graph/getList";
 import {
   accountFactory,
+  followFactory,
   listFactory,
   listItemFactory,
   recordFactory,
@@ -60,5 +61,34 @@ describe("app.bsky.graph.getList", () => {
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 400 });
+  });
+
+  test("getList-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await accountFactory(ctx.db).create();
+    const list = await listFactory(ctx.db).create();
+    const subject = await accountFactory(ctx.db)
+      .use((t) => t.withProfile({}))
+      .create();
+    await listItemFactory(ctx.db)
+      .vars({ list: () => list, subject: () => subject })
+      .create();
+    const follow = await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ accountDid: () => viewer.did })
+            .create(),
+        followee: () => subject,
+      })
+      .create();
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getList, { list: asAtUriString(list.uri) });
+
+    // assert
+    expect(res.items[0]?.subject.viewer?.following).toBe(follow.uri);
   });
 });
