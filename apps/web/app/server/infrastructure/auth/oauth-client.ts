@@ -37,6 +37,7 @@ export const oauthClientFactory = async ({
     "atproto",
     "repo?collection=app.bsky.feed.post&collection=app.bsky.feed.threadgate&collection=app.bsky.feed.like&collection=app.bsky.feed.repost&collection=app.bsky.graph.follow&collection=app.bsky.graph.listitem&action=create&action=delete",
     "repo:app.bsky.graph.list",
+    "repo:app.bsky.actor.profile?action=create&action=update",
     "blob:image/*",
     `include:me.subsco.authFull?aud=${appviewAud}`,
     `include:app.bsky.authViewAll?aud=${appviewAud}`,
