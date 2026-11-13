@@ -144,6 +144,7 @@ export function toTimelinePost({
     cid: post.cid,
     viewerLike: post.viewer?.like,
     viewerRepost: post.viewer?.repost,
+    viewerPinned: post.viewer?.pinned,
     replyRoot: postRecord.matches(post.record)
       ? post.record.reply?.root
       : undefined,

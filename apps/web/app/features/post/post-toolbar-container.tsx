@@ -4,6 +4,7 @@ import { z } from "zodV4";
 
 import { useMe } from "@/app/features/navigation/side-nav-container";
 import type { TimelinePost } from "@/app/features/timeline/timeline-feed";
+import type { action as pinPostAction } from "@/app/routes/api.pinned-post";
 import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";
 
@@ -20,6 +21,12 @@ export const reactionSchema = z.object({
 export const deletePostSchema = z.object({
   uri: z.string(),
   redirectTo: z.literal("/").optional(),
+});
+
+export const pinPostSchema = z.object({
+  uri: z.string(),
+  cid: z.string(),
+  pinned: z.enum(["true", "false"]),
 });
 
 type Props = TimelinePost & { deleteRedirectTo?: "/" };
@@ -62,6 +69,10 @@ export function PostToolbarContainer(props: Props) {
   const openCompose = useCompose();
   const me = useMe();
   const deleter = useFetcher<typeof deletePostAction>();
+  const pinner = useFetcher<typeof pinPostAction>();
+  const pinned = pinner.formData
+    ? pinner.formData.get("pinned") === "true"
+    : (pinner.data?.pinned ?? !!props.viewerPinned);
   const [minReplyCount, setMinReplyCount] = useState(0);
   const replyCount = Math.max(props.replyCount ?? 0, minReplyCount);
   return (
@@ -82,6 +93,17 @@ export function PostToolbarContainer(props: Props) {
               void deleter.submit(
                 { uri: props.uri, redirectTo: props.deleteRedirectTo ?? "" },
                 { method: "post", action: "/api/posts" },
+              )
+          : undefined
+      }
+      pinned={pinned}
+      pinBusy={pinner.state !== "idle"}
+      onPin={
+        me && props.uri.startsWith(`at://${me.did}/`)
+          ? () =>
+              void pinner.submit(
+                { uri: props.uri, cid: props.cid, pinned: String(!pinned) },
+                { method: "post", action: "/api/pinned-post" },
               )
           : undefined
       }

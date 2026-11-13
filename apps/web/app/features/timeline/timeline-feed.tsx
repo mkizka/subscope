@@ -10,6 +10,7 @@ export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   cid: string;
   viewerLike?: string;
   viewerRepost?: string;
+  viewerPinned?: boolean;
   replyRoot?: { uri: string; cid: string };
   replyParentUri?: string;
 };

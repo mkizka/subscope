@@ -25,6 +25,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const Pinnable: Story = {
+  args: { onPin: fn() },
+};
+
+export const Pinned: Story = {
+  args: { onPin: fn(), pinned: true },
+};
+
 export const Deletable: Story = {
   args: { onDelete: fn() },
 };
