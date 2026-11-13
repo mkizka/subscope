@@ -167,3 +167,12 @@ export const SetupWithoutTabs: Story = {
     ).not.toBeInTheDocument();
   },
 };
+
+export const PassportButton: Story = {
+  name: "login-s10: ログインタブには「@passportでログイン」ボタンを出す",
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole("link", { name: "@passportでログイン" }),
+    ).toHaveAttribute("href", "/login/atpassport");
+  },
+};
