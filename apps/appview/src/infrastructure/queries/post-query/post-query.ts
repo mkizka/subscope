@@ -2,7 +2,17 @@ import { asDid } from "@atproto/did";
 import { asAtUriString, type AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
-import { and, asc, desc, eq, ilike, inArray, isNull, lt } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+} from "drizzle-orm";
 
 import type { PostDto } from "../../../application/dto/post-dto.js";
 import type { IPostQuery } from "../../../application/interfaces/queries/post-query.js";
@@ -116,15 +126,23 @@ export class PostQuery implements IPostQuery {
   }
 
   async search(params: {
-    query: string;
+    query?: string;
+    authorDids?: string[];
+    repliesOnly?: boolean;
     limit: number;
     cursor?: Date;
   }): Promise<PostDto[]> {
-    const escapedQuery = params.query.replace(/[%_]/g, "\\$&");
+    const escapedQuery = params.query?.replace(/[%_]/g, "\\$&");
     const posts = await this.db.query.posts.findMany({
       where: and(
-        ilike(schema.posts.text, `%${escapedQuery}%`),
-        isNull(schema.posts.replyParentUri),
+        escapedQuery
+          ? ilike(schema.posts.text, `%${escapedQuery}%`)
+          : undefined,
+        params.authorDids &&
+          inArray(schema.posts.accountDid, params.authorDids),
+        params.repliesOnly
+          ? isNotNull(schema.posts.replyParentUri)
+          : isNull(schema.posts.replyParentUri),
         params.cursor && lt(schema.posts.sortAt, params.cursor),
       ),
       orderBy: desc(schema.posts.sortAt),

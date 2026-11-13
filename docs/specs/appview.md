@@ -180,8 +180,11 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 searchPostsの後継で、公式クライアントの投稿検索はこれを使う。認証は任意。
 
 - searchPostsV2-1: 本文がqueryに一致する投稿をpostViewで返す
+- searchPostsV2-2: queryを省略した場合、authorsで絞り込んだ投稿を返す
+- searchPostsV2-3: repliesOnlyがtrueの場合、返信だけを返す。それ以外の場合、返信は含めない
+- searchPostsV2-4: queryもauthorsも無い場合、空の配列を返す
 
-query以外の絞り込みパラメータ(authors、sortなど)は今は無視する。
+authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 ## app.bsky.feed.getPosts
 
