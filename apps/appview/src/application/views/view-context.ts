@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
 import type { AccountStatsDto } from "../dto/account-stats-dto.js";
+import type { BlockDto } from "../dto/block-dto.js";
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LabelDto } from "../dto/label-dto.js";
@@ -14,6 +15,7 @@ import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { RepostDto } from "../dto/repost-dto.js";
 import type { IAccountStatsQuery } from "../interfaces/queries/account-stats-query.js";
+import type { IBlockQuery } from "../interfaces/queries/block-query.js";
 import type { IFollowQuery } from "../interfaces/queries/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/queries/generator-query.js";
 import {
@@ -49,6 +51,7 @@ type Repositories = {
   accountStatsQuery: IAccountStatsQuery;
   listQuery: IListQuery;
   listItemQuery: IListItemQuery;
+  blockQuery: IBlockQuery;
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
@@ -59,6 +62,8 @@ export class ViewContext {
   private readonly labels: Batch<string, LabelDto[]>;
   private readonly following: Batch<Did, FollowDto>;
   private readonly followedBy: Batch<Did, FollowDto>;
+  private readonly blocking: Batch<Did, BlockDto>;
+  private readonly blockedBy: Batch<Did, BlockDto>;
   private readonly posts: Batch<string, PostDto>;
   private readonly records: Batch<string, RecordDto>;
   private readonly postStats: Batch<string, PostStatsDto>;
@@ -104,6 +109,26 @@ export class ViewContext {
             })
         : none,
       (follow) => follow.accountDid,
+    );
+    this.blocking = Batch.one(
+      viewerDid
+        ? (subjectDids) =>
+            repos.blockQuery.findBlocks({
+              accountDids: [viewerDid],
+              subjectDids,
+            })
+        : none,
+      (block) => block.subjectDid,
+    );
+    this.blockedBy = Batch.one(
+      viewerDid
+        ? (accountDids) =>
+            repos.blockQuery.findBlocks({
+              accountDids,
+              subjectDids: [viewerDid],
+            })
+        : none,
+      (block) => block.accountDid,
     );
     this.posts = Batch.one(
       (uris) => repos.postQuery.findByUris(toAtUris(uris)),
@@ -244,12 +269,30 @@ export class ViewContext {
     return this.accountStatsBatch.load(did);
   }
 
+  async blockState(did: Did) {
+    const [blocking, blockedBy] = await Promise.all([
+      this.blocking.load(did),
+      this.blockedBy.load(did),
+    ]);
+    return {
+      blocking: blocking?.uri,
+      blockedBy: this.viewer.viewerDid ? !!blockedBy : undefined,
+    };
+  }
+
   async viewerState(did: Did) {
-    const [following, followedBy] = await Promise.all([
+    const [following, followedBy, { blocking, blockedBy }] = await Promise.all([
       this.following.load(did),
       this.followedBy.load(did),
+      this.blockState(did),
     ]);
-    return { following: following?.uri, followedBy: followedBy?.uri };
+    const blocked = !!blocking || !!blockedBy;
+    return {
+      following: blocked ? undefined : following?.uri,
+      followedBy: blocked ? undefined : followedBy?.uri,
+      blocking,
+      blockedBy,
+    };
   }
 
   async knownFollowers(did: Did) {
@@ -298,6 +341,7 @@ export class ViewContextFactory {
     accountStatsQuery: IAccountStatsQuery,
     listQuery: IListQuery,
     listItemQuery: IListItemQuery,
+    blockQuery: IBlockQuery,
   ) {
     this.repos = {
       profileQuery,
@@ -312,6 +356,7 @@ export class ViewContextFactory {
       accountStatsQuery,
       listQuery,
       listItemQuery,
+      blockQuery,
     };
   }
 
