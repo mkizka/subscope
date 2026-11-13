@@ -4,6 +4,7 @@ import {
   accountFactory,
   followFactory,
   labelFactory,
+  postFactory,
   profileFactory,
   recordFactory,
   testSetup,
@@ -269,5 +270,40 @@ describe("app.bsky.actor.getProfile", () => {
     expect(anonymous.viewer?.knownFollowers).toBeUndefined();
     expect(noKnown.viewer?.knownFollowers).toBeUndefined();
     expect(self.viewer?.knownFollowers).toBeUndefined();
+  });
+
+  test("getProfile-10: プロフィールレコードのpinnedPostを、pinnedPostに含める", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const account = await accountFactory(ctx.db).create();
+    const post = await postFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.post")
+            .vars({ account: () => account })
+            .create(),
+      })
+      .create();
+    const record = await recordFactory(ctx.db, "app.bsky.actor.profile")
+      .vars({ account: () => account })
+      .props({
+        uri: () => `at://${account.did}/app.bsky.actor.profile/self`,
+        json: () => ({
+          $type: "app.bsky.actor.profile",
+          pinnedPost: { uri: post.uri, cid: post.cid },
+        }),
+      })
+      .create();
+    await profileFactory(ctx.db)
+      .vars({ record: () => record })
+      .create();
+
+    // act
+    const res = await client.call(getProfile, {
+      actor: asAtIdentifierString(account.did),
+    });
+
+    // assert
+    expect(res.pinnedPost).toEqual({ uri: post.uri, cid: post.cid });
   });
 });

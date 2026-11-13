@@ -5,6 +5,7 @@ import {
   postEmbedVideoFactory,
   postFactory,
   postFeedItemFactory,
+  profileFactory,
   recordFactory,
   repostFactory,
   repostFeedItemFactory,
@@ -13,6 +14,26 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
+
+const pinPost = async (
+  db: Parameters<typeof recordFactory>[0],
+  account: { did: string },
+  post: { uri: string; cid: string },
+) => {
+  const record = await recordFactory(db, "app.bsky.actor.profile")
+    .vars({ accountDid: () => account.did })
+    .props({
+      uri: () => `at://${account.did}/app.bsky.actor.profile/self`,
+      json: () => ({
+        $type: "app.bsky.actor.profile",
+        pinnedPost: { uri: post.uri, cid: post.cid },
+      }),
+    })
+    .create();
+  await profileFactory(db)
+    .vars({ record: () => record })
+    .create();
+};
 
 describe("app.bsky.feed.getAuthorFeed", () => {
   const { ctx } = testSetup;
@@ -205,5 +226,69 @@ describe("app.bsky.feed.getAuthorFeed", () => {
 
     // assert
     expect(res.feed).toMatchObject([{ post: { uri: videoPost.uri } }]);
+  });
+
+  test("getAuthorFeed-7: includePinsがtrueで1ページ目のとき、プロフィールのピン留め投稿を先頭にreasonPin付きで返し、元の位置からは除く", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const author = await accountFactory(ctx.db)
+      .props({ handle: () => "alice.test" })
+      .create();
+    const pinned = await createPost(author);
+    const newer = await createPost(author);
+    await pinPost(ctx.db, author, pinned);
+
+    // act
+    const res = await client.call(getAuthorFeed, {
+      actor: "alice.test",
+      includePins: true,
+    });
+    const withoutPins = await client.call(getAuthorFeed, {
+      actor: "alice.test",
+    });
+
+    // assert
+    expect(res.feed.map((item) => item.post.uri)).toEqual([
+      pinned.uri,
+      newer.uri,
+    ]);
+    expect(res.feed[0]?.reason?.$type).toBe("app.bsky.feed.defs#reasonPin");
+    expect(res.feed[1]?.reason).toBeUndefined();
+    expect(withoutPins.feed.map((item) => item.post.uri).toSorted()).toEqual(
+      [pinned.uri, newer.uri].toSorted(),
+    );
+    expect(withoutPins.feed.every((item) => !item.reason)).toBe(true);
+  });
+
+  test("getAuthorFeed-8: cursorがあるページと、アカウント以外の投稿がピン留めされている場合は、ピン留め投稿を先頭に入れない", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const author = await accountFactory(ctx.db)
+      .props({ handle: () => "alice.test" })
+      .create();
+    const bob = await accountFactory(ctx.db)
+      .props({ handle: () => "bob.test" })
+      .create();
+    const other = await postFactory(ctx.db).create();
+    const own = await createPost(author);
+    const bobPost = await createPost(bob);
+    await pinPost(ctx.db, bob, other);
+
+    // act
+    const notOwn = await client.call(getAuthorFeed, {
+      actor: "bob.test",
+      includePins: true,
+    });
+    await pinPost(ctx.db, author, own);
+    const paged = await client.call(getAuthorFeed, {
+      actor: "alice.test",
+      includePins: true,
+      cursor: new Date(Date.now() + 60_000).toISOString(),
+    });
+
+    // assert
+    expect(notOwn.feed.map((item) => item.post.uri)).toEqual([bobPost.uri]);
+    expect(paged.feed.map((item) => item.post.uri)).toEqual([own.uri]);
+    expect(paged.feed[0]?.reason).toBeUndefined();
   });
 });

@@ -89,6 +89,7 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 - getProfile-7: 保存されていないリンクとテイクダウンされたリンクは、linksに含めない
 - getProfile-8: 閲覧者がフォローしているフォロワーを、閲覧者がフォローした新しい順に最大5件、総数とともにviewer.knownFollowersに入れる
 - getProfile-9: 該当するフォロワーがいない場合、未ログインの場合、閲覧者自身の場合は、viewer.knownFollowersを含めない
+- getProfile-10: プロフィールレコードのpinnedPostを、pinnedPostに含める
 
 ## app.bsky.actor.getProfiles
 
@@ -193,6 +194,7 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 - getPosts-1: 指定したURIの順に投稿を並べる
 - getPosts-2: 存在しない投稿は含めない
 - getPosts-3: 閲覧者がいいね・リポストした投稿は、そのURIをviewer.likeとviewer.repostに含める
+- getPosts-4: 閲覧者のプロフィールにピン留めされた投稿は、viewer.pinnedをtrueにする
 
 ## app.bsky.feed.getPostThread
 
@@ -219,6 +221,8 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 - getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない
 - getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアカウント自身の投稿であるものだけを含める
 - getAuthorFeed-6: filterがposts_with_videoのとき、動画を添付したアカウント自身の投稿だけを返し、リポストは含めない
+- getAuthorFeed-7: includePinsがtrueで1ページ目のとき、プロフィールのピン留め投稿を先頭にreasonPin付きで返し、元の位置からは除く
+- getAuthorFeed-8: cursorがあるページと、アカウント以外の投稿がピン留めされている場合は、ピン留め投稿を先頭に入れない
 
 ## app.bsky.notification.listNotifications
 

@@ -45,9 +45,12 @@ export class PostViews {
     if (!record || !author) {
       return undefined;
     }
-    const [replyDisabled, threadgate] = await Promise.all([
+    const [replyDisabled, threadgate, pinnedPost] = await Promise.all([
       gate && this.replyDisabled(rootUri, gate, ctx),
       gate && rootUri === uri ? this.threadgateView(gate, ctx) : undefined,
+      ctx.viewer.viewerDid
+        ? this.profileViews.pinnedPost(ctx.viewer.viewerDid, ctx)
+        : undefined,
     ]);
     return {
       $type: "app.bsky.feed.defs#postView",
@@ -63,6 +66,7 @@ export class PostViews {
       viewer: {
         repost: viewer.repost?.uri,
         like: viewer.like?.uri,
+        pinned: pinnedPost?.uri === uri,
         replyDisabled,
         embeddingDisabled:
           postgate && this.embeddingDisabled(post.accountDid, postgate, ctx),
