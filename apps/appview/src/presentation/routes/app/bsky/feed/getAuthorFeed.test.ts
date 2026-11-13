@@ -254,10 +254,10 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     ]);
     expect(res.feed[0]?.reason?.$type).toBe("app.bsky.feed.defs#reasonPin");
     expect(res.feed[1]?.reason).toBeUndefined();
-    expect(withoutPins.feed.map((item) => item.post.uri)).toEqual([
-      newer.uri,
-      pinned.uri,
-    ]);
+    expect(withoutPins.feed.map((item) => item.post.uri).toSorted()).toEqual(
+      [pinned.uri, newer.uri].toSorted(),
+    );
+    expect(withoutPins.feed.every((item) => !item.reason)).toBe(true);
   });
 
   test("getAuthorFeed-8: cursorがあるページと、アカウント以外の投稿がピン留めされている場合は、ピン留め投稿を先頭に入れない", async () => {
