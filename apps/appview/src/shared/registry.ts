@@ -296,7 +296,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getUnreadCountUseCase", ["notificationQuery"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
     .service("searchPosts", ["searchPostsUseCase"], asClassArgs(SearchPosts))
-    .service("searchPostsV2", ["searchPostsUseCase"], asClassArgs(SearchPostsV2))
+    .service("searchPostsV2", ["searchPostsUseCase", "handleMiddleware"], asClassArgs(SearchPostsV2))
     .service("getActorLikes", ["getActorLikesUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetActorLikes))
     .service("getAuthorFeed", ["getAuthorFeedUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetAuthorFeed))
     .service("getFeedGenerators", ["getFeedGeneratorsUseCase"], asClassArgs(GetFeedGenerators))

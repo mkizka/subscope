@@ -7,7 +7,9 @@ import type { PostViews } from "../../views/post-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 type SearchPostsParams = {
-  q: string;
+  q?: string;
+  authorDids?: string[];
+  repliesOnly?: boolean;
   limit: number;
   cursor?: string;
 };
@@ -20,7 +22,8 @@ export class SearchPostsUseCase {
   ) {}
 
   async execute(params: SearchPostsParams): Promise<$OutputBody> {
-    if (!params.q.trim()) {
+    const query = params.q?.trim();
+    if (!query && !params.authorDids?.length) {
       return {
         posts: [],
         cursor: undefined,
@@ -32,7 +35,9 @@ export class SearchPostsUseCase {
       getCursor: (post) => post.sortAt.toISOString(),
     });
     const posts = await this.postQuery.search({
-      query: params.q,
+      query,
+      authorDids: params.authorDids,
+      repliesOnly: params.repliesOnly,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
     });
