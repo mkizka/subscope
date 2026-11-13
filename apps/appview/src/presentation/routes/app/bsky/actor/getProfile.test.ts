@@ -4,6 +4,7 @@ import {
   accountFactory,
   followFactory,
   labelFactory,
+  postFactory,
   profileFactory,
   recordFactory,
   testSetup,
@@ -275,12 +276,22 @@ describe("app.bsky.actor.getProfile", () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
-    const post = { uri: `at://${account.did}/app.bsky.feed.post/1`, cid: "c" };
+    const post = await postFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.post")
+            .vars({ account: () => account })
+            .create(),
+      })
+      .create();
     const record = await recordFactory(ctx.db, "app.bsky.actor.profile")
       .vars({ account: () => account })
       .props({
         uri: () => `at://${account.did}/app.bsky.actor.profile/self`,
-        json: () => ({ $type: "app.bsky.actor.profile", pinnedPost: post }),
+        json: () => ({
+          $type: "app.bsky.actor.profile",
+          pinnedPost: { uri: post.uri, cid: post.cid },
+        }),
       })
       .create();
     await profileFactory(ctx.db)
@@ -293,6 +304,6 @@ describe("app.bsky.actor.getProfile", () => {
     });
 
     // assert
-    expect(res.pinnedPost).toEqual(post);
+    expect(res.pinnedPost).toEqual({ uri: post.uri, cid: post.cid });
   });
 });

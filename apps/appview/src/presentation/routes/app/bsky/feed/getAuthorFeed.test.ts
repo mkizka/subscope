@@ -266,13 +266,17 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     const author = await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
+    const bob = await accountFactory(ctx.db)
+      .props({ handle: () => "bob.test" })
+      .create();
     const other = await postFactory(ctx.db).create();
     const own = await createPost(author);
-    await pinPost(ctx.db, author, other);
+    const bobPost = await createPost(bob);
+    await pinPost(ctx.db, bob, other);
 
     // act
     const notOwn = await client.call(getAuthorFeed, {
-      actor: "alice.test",
+      actor: "bob.test",
       includePins: true,
     });
     await pinPost(ctx.db, author, own);
@@ -283,7 +287,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     });
 
     // assert
-    expect(notOwn.feed.map((item) => item.post.uri)).toEqual([own.uri]);
+    expect(notOwn.feed.map((item) => item.post.uri)).toEqual([bobPost.uri]);
     expect(paged.feed.map((item) => item.post.uri)).toEqual([own.uri]);
     expect(paged.feed[0]?.reason).toBeUndefined();
   });
