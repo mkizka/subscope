@@ -10,6 +10,7 @@ import {
   postEmbedRecordFactory,
   postEmbedVideoFactory,
   postFactory,
+  profileFactory,
   recordFactory,
   repostFactory,
   testSetup,
@@ -17,6 +18,26 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
+
+const pinPost = async (
+  db: Parameters<typeof recordFactory>[0],
+  account: { did: string },
+  post: { uri: string; cid: string },
+) => {
+  const record = await recordFactory(db, "app.bsky.actor.profile")
+    .vars({ accountDid: () => account.did })
+    .props({
+      uri: () => `at://${account.did}/app.bsky.actor.profile/self`,
+      json: () => ({
+        $type: "app.bsky.actor.profile",
+        pinnedPost: { uri: post.uri, cid: post.cid },
+      }),
+    })
+    .create();
+  await profileFactory(db)
+    .vars({ record: () => record })
+    .create();
+};
 
 describe("app.bsky.feed.getPosts", () => {
   const { ctx } = testSetup;
@@ -181,6 +202,24 @@ describe("app.bsky.feed.getPosts", () => {
     expect(res.posts).toMatchObject([
       { viewer: { like: like.uri, repost: repost.uri } },
     ]);
+  });
+
+  test("getPosts-4: 閲覧者のプロフィールにピン留めされた投稿は、viewer.pinnedをtrueにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await accountFactory(ctx.db).create();
+    const pinned = await createPost();
+    const other = await createPost();
+    await pinPost(ctx.db, viewer, pinned);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(pinned.uri), asAtUriString(other.uri)],
+    });
+
+    // assert
+    expect(res.posts.map((post) => post.viewer?.pinned)).toEqual([true, false]);
   });
 
   test("threadgate-1: スレッドの起点の投稿はそのthreadgateをthreadgateに含める", async () => {

@@ -1,6 +1,11 @@
 import type { Did } from "@atproto/did";
 import { getBlobCidString, isPlainObject } from "@atproto/lex";
-import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
+import {
+  asAtUriString,
+  AtUri,
+  type AtUriString,
+  toDatetimeString,
+} from "@atproto/syntax";
 import type * as AppBskyActorDefs from "@repo/client/app/bsky/actor/defs";
 import { validateRecord } from "@repo/common/utils";
 
@@ -44,11 +49,12 @@ export class ProfileViews {
     if (!profile) {
       return undefined;
     }
-    const [basic, stats, links, known] = await Promise.all([
+    const [basic, stats, links, known, pinnedPost] = await Promise.all([
       this.toBasic(profile, ctx),
       ctx.accountStats(did),
       this.links(did, ctx),
       ctx.knownFollowers(did),
+      this.pinnedPost(did, ctx),
     ]);
     const knownFollowers =
       known && known.count > 0
@@ -71,11 +77,29 @@ export class ProfileViews {
           )
         : undefined,
       links: links.length > 0 ? links : undefined,
+      pinnedPost,
       followersCount: stats?.followersCount ?? 0,
       followsCount: stats?.followsCount ?? 0,
       postsCount: stats?.postsCount ?? 0,
       indexedAt: toDatetimeString(profile.indexedAt),
     };
+  }
+
+  async pinnedPost(
+    did: Did,
+    ctx: ViewContext,
+  ): Promise<{ uri: AtUriString; cid: string } | undefined> {
+    const record = await ctx.record(
+      AtUri.make(did, "app.bsky.actor.profile", "self").toString(),
+    );
+    const ref = isPlainObject(record?.json) && record.json.pinnedPost;
+    if (!isPlainObject(ref)) {
+      return undefined;
+    }
+    const { uri, cid } = ref;
+    return typeof uri === "string" && typeof cid === "string"
+      ? { uri: asAtUriString(uri), cid }
+      : undefined;
   }
 
   private async links(

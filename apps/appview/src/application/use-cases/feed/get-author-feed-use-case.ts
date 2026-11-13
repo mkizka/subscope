@@ -1,10 +1,12 @@
 import { type Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import type * as AppBskyFeedGetAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { IAuthorFeedQuery } from "../../interfaces/queries/author-feed-query.js";
 import type { FeedViews } from "../../views/feed-views.js";
+import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 type Filter = AppBskyFeedGetAuthorFeed.$Params["filter"];
@@ -23,6 +25,7 @@ export class GetAuthorFeedUseCase {
     private readonly authorFeedQuery: IAuthorFeedQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly feedViews: FeedViews,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(
@@ -41,8 +44,40 @@ export class GetAuthorFeedUseCase {
     const page = paginator.extractPage(feedItems);
 
     const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const pinned =
+      params.includePins && !params.cursor
+        ? await this.profileViews.pinnedPost(params.accountDid, ctx)
+        : undefined;
+    const pinnedUri =
+      pinned && new AtUri(pinned.uri).host === params.accountDid
+        ? pinned.uri
+        : undefined;
+    const items: FeedItemDto[] = pinnedUri
+      ? [
+          {
+            uri: pinnedUri,
+            type: "post",
+            subjectUri: null,
+            accountDid: params.accountDid,
+            sortAt: new Date(),
+          },
+          ...page.items.filter(
+            (item) => item.type !== "post" || item.uri !== pinnedUri,
+          ),
+        ]
+      : page.items;
     const feed = await Promise.all(
-      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
+      items.map(async (item) => {
+        const view = await this.feedViews.feedViewPost(item, ctx);
+        return view && item.uri === pinnedUri && item.type === "post"
+          ? {
+              ...view,
+              reason: {
+                $type: "app.bsky.feed.defs#reasonPin" as const,
+              },
+            }
+          : view;
+      }),
     );
 
     return {
