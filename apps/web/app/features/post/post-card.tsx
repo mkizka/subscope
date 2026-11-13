@@ -3,6 +3,7 @@ import {
   HeartIcon,
   type LucideIcon,
   MessageCircleIcon,
+  PinIcon,
   RepeatIcon,
 } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
@@ -58,6 +59,7 @@ export type PostCardProps = {
     byDisplayName?: string;
     byHandle: string;
   };
+  reasonPin?: boolean;
   toolbar?: ReactNode;
   threadPath?: string;
   connectedAbove?: boolean;
@@ -281,6 +283,7 @@ export function PostCard({
   quoteUnavailable,
   quotedFeed,
   reasonRepost,
+  reasonPin,
   toolbar,
   threadPath,
   connectedAbove,
@@ -315,6 +318,12 @@ export function PostCard({
           aria-label="スレッドを開く"
           className="absolute inset-0"
         />
+      )}
+      {reasonPin && (
+        <div className="mb-1 flex items-center gap-3 text-caption text-muted">
+          <PinIcon className="ml-6 size-4 shrink-0" />
+          <span>ピン留め</span>
+        </div>
       )}
       {reasonRepost && (
         <div className="mb-1 flex items-center gap-3 text-caption text-muted">
