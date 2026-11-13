@@ -37,6 +37,7 @@ import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reac
 import { searchUseCaseFactory } from "./application/search/search-use-case";
 import {
   getQuotesUseCaseFactory,
+  getReactorsUseCaseFactory,
   getThreadUseCaseFactory,
 } from "./application/thread/get-thread-use-case";
 import { getBackfillStatusUseCaseFactory } from "./application/timeline/get-backfill-status-use-case";
@@ -226,6 +227,7 @@ export const di = await createRegistry()
   .service("threadQuery", ["oauthClient"], threadQueryFactory)
   .service("getThreadUseCase", ["threadQuery"], getThreadUseCaseFactory)
   .service("getQuotesUseCase", ["threadQuery"], getQuotesUseCaseFactory)
+  .service("getReactorsUseCase", ["threadQuery"], getReactorsUseCaseFactory)
   .service("listQuery", ["oauthClient"], listQueryFactory)
   .service("listCommand", ["oauthClient"], listCommandFactory)
   .service(

@@ -56,13 +56,21 @@ function FocusedPost({
   const hydrated = useHydrated();
   const counts = [
     { count: replyCount, label: "返信" },
-    { count: repostCount, label: "リポスト" },
+    {
+      count: repostCount,
+      label: "リポスト",
+      to: `${threadPath({ authorHandle, ...post })}/reposted-by`,
+    },
     {
       count: quoteCount,
       label: "引用",
       to: `${threadPath({ authorHandle, ...post })}/quotes`,
     },
-    { count: likeCount, label: "いいね" },
+    {
+      count: likeCount,
+      label: "いいね",
+      to: `${threadPath({ authorHandle, ...post })}/liked-by`,
+    },
   ].filter(({ count }) => !!count);
   return (
     <article
