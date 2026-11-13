@@ -11,7 +11,10 @@ import type { Route } from "./+types/api.profile.$handle";
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
 const toTab = (value: string | null): ProfileTab =>
-  value === "replies" || value === "media" || value === "likes"
+  value === "replies" ||
+  value === "media" ||
+  value === "video" ||
+  value === "likes"
     ? value
     : "posts";
 

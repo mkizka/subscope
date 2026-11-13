@@ -21,6 +21,7 @@ const filters = {
   posts: "posts_and_author_threads",
   replies: "posts_with_replies",
   media: "posts_with_media",
+  video: "posts_with_video",
 } as const;
 
 const withReplyParents = (feed: FeedViewPost[]) => {

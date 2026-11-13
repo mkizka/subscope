@@ -1,6 +1,6 @@
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 
-export type ProfileTab = "posts" | "replies" | "media" | "likes";
+export type ProfileTab = "posts" | "replies" | "media" | "video" | "likes";
 
 export type AccountDto = {
   did: string;
