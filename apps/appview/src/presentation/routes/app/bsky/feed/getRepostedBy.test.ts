@@ -2,6 +2,7 @@ import { asAtUriString } from "@atproto/syntax";
 import getRepostedBy from "@repo/client/app/bsky/feed/getRepostedBy";
 import {
   accountFactory,
+  followFactory,
   postFactory,
   recordFactory,
   repostFactory,
@@ -82,5 +83,42 @@ describe("app.bsky.feed.getRepostedBy", () => {
       middleAccount.did,
     ]);
     expect(secondPage.repostedBy.map((a) => a.did)).toEqual([oldAccount.did]);
+  });
+
+  test("getRepostedBy-3: 閲覧者がフォローしているアカウントには、viewer.followingを含める", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await accountFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.withProfile({}))
+      .create();
+    const post = await postFactory(ctx.db).create();
+    await repostFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.repost")
+            .vars({ account: () => account })
+            .create(),
+        subject: () => post,
+      })
+      .create();
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ account: () => viewer })
+            .create(),
+        followee: () => account,
+      })
+      .create();
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getRepostedBy, {
+      uri: asAtUriString(post.uri),
+    });
+
+    // assert
+    expect(res.repostedBy[0]?.viewer?.following).toBeDefined();
   });
 });

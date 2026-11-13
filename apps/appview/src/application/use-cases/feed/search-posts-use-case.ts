@@ -4,7 +4,7 @@ import type { PostDto } from "../../dto/post-dto.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
 import type { PostViews } from "../../views/post-views.js";
-import type { ViewContextFactory } from "../../views/view-context.js";
+import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 type SearchPostsParams = {
   q?: string;
@@ -21,7 +21,10 @@ export class SearchPostsUseCase {
     private readonly postViews: PostViews,
   ) {}
 
-  async execute(params: SearchPostsParams): Promise<$OutputBody> {
+  async execute(
+    params: SearchPostsParams,
+    viewer: Viewer,
+  ): Promise<$OutputBody> {
     const query = params.q?.trim();
     if (!query && !params.authorDids?.length) {
       return {
@@ -43,7 +46,7 @@ export class SearchPostsUseCase {
     });
     const paginationResult = paginator.extractPage(posts);
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.viewContextFactory.create(viewer);
     const postViews = await Promise.all(
       paginationResult.items.map((post) =>
         this.postViews.postView(post.uri, ctx),
