@@ -11,6 +11,7 @@ export type TimelinePostDto = {
   cid: string;
   viewerLike?: string;
   viewerRepost?: string;
+  viewerPinned?: boolean;
   replyRoot?: { uri: string; cid: string };
   replyParentUri?: string;
   authorAvatar?: string;

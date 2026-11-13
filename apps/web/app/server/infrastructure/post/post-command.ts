@@ -1,6 +1,8 @@
 import { RichText } from "@atproto/api";
 import { TID } from "@atproto/common-web";
+import { XrpcResponseError } from "@atproto/lex";
 import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
+import profileRecord from "@repo/client/app/bsky/actor/profile";
 import postRecord from "@repo/client/app/bsky/feed/post";
 import threadgate from "@repo/client/app/bsky/feed/threadgate";
 import * as facet from "@repo/client/app/bsky/richtext/facet";
@@ -97,6 +99,19 @@ export const postCommandFactory = ({
           : []),
       ]);
       return uri;
+    },
+    async pin(did, post) {
+      const agent = await restore(did);
+      const current = await agent.get(profileRecord).catch((e: unknown) => {
+        if (e instanceof XrpcResponseError && e.error === "RecordNotFound") {
+          return undefined;
+        }
+        throw e;
+      });
+      await agent.put(profileRecord, {
+        ...current?.value,
+        pinnedPost: post && toStrongRef(post),
+      });
     },
     async delete(did, uri) {
       const agent = await restore(did);

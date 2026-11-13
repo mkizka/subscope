@@ -4,6 +4,8 @@ import {
   LinkIcon,
   type LucideIcon,
   MessageCircleIcon,
+  PinIcon,
+  PinOffIcon,
   QuoteIcon,
   RepeatIcon,
   Trash2Icon,
@@ -21,11 +23,14 @@ type Props = {
   likeBusy?: boolean;
   repostBusy?: boolean;
   deleteBusy?: boolean;
+  pinned?: boolean;
+  pinBusy?: boolean;
   onLike: () => void;
   onRepost: () => void;
   onReply: () => void;
   onQuote: () => void;
   onCopyLink: () => void;
+  onPin?: () => void;
   onDelete?: () => void;
 };
 
@@ -75,11 +80,14 @@ export function PostToolbar({
   likeBusy,
   repostBusy,
   deleteBusy,
+  pinned,
+  pinBusy,
   onLike,
   onRepost,
   onReply,
   onQuote,
   onCopyLink,
+  onPin,
   onDelete,
 }: Props) {
   return (
@@ -128,6 +136,21 @@ export function PostToolbar({
               <LinkIcon className="size-4" />
               リンクをコピー
             </button>
+            {onPin && (
+              <button
+                type="button"
+                className={menuItemClass}
+                disabled={pinBusy}
+                onClick={onPin}
+              >
+                {pinned ? (
+                  <PinOffIcon className="size-4" />
+                ) : (
+                  <PinIcon className="size-4" />
+                )}
+                {pinned ? "ピン留めを外す" : "プロフィールにピン留め"}
+              </button>
+            )}
             {onDelete && (
               <button
                 type="button"

@@ -1,4 +1,9 @@
-import { expect, test } from "@playwright/test";
+import {
+  type APIRequestContext,
+  expect,
+  type Page,
+  test,
+} from "@playwright/test";
 
 import { createRecord, PDS_URL } from "../../helpers/pds";
 
@@ -260,4 +265,77 @@ test("post-toolbar-e8: 投稿のメニューの「リンクをコピー」で、
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
     `${new URL(page.url()).origin}/alice.test/post/${uri.split("/").pop()}`,
   );
+});
+
+const getProfileRecord = async (request: APIRequestContext, handle: string) =>
+  (
+    await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.getRecord?repo=${handle}&collection=app.bsky.actor.profile&rkey=self`,
+    )
+  ).text();
+
+const openPostMenu = async (page: Page, text: string) => {
+  await page.goto("/");
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await post.getByRole("button", { name: "投稿のメニュー" }).click();
+  return post;
+};
+
+test("post-toolbar-e9: 自分の投稿の「…」メニューの「プロフィールにピン留め」で、確認なしにプロフィールのピン留めをその投稿にし、ピン留め中の投稿では「ピン留めを外す」でピン留めを外す", async ({
+  page,
+  request,
+}) => {
+  const text = "post-toolbar-e9: 投稿";
+  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  const post = await openPostMenu(page, text);
+  await post.getByRole("button", { name: "プロフィールにピン留め" }).click();
+  await expect
+    .poll(() => getProfileRecord(request, "alice.test"))
+    .toContain(uri);
+
+  await post.getByRole("button", { name: "投稿のメニュー" }).click();
+  await post.getByRole("button", { name: "ピン留めを外す" }).click();
+  await expect
+    .poll(() => getProfileRecord(request, "alice.test"))
+    .not.toContain("pinnedPost");
+});
+
+test("post-toolbar-e10: 別の投稿がピン留め中のときに「プロフィールにピン留め」を押すと、確認なしにピン留めをその投稿へ入れ替える", async ({
+  page,
+  request,
+}) => {
+  const text = "post-toolbar-e10: 投稿";
+  const first = await createRecord("alice.test", "app.bsky.feed.post", {
+    text: "post-toolbar-e10: 先にピン留めする投稿",
+    createdAt: new Date().toISOString(),
+  });
+  const second = await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  const firstPost = await openPostMenu(
+    page,
+    "post-toolbar-e10: 先にピン留めする投稿",
+  );
+  await firstPost
+    .getByRole("button", { name: "プロフィールにピン留め" })
+    .click();
+  await expect
+    .poll(() => getProfileRecord(request, "alice.test"))
+    .toContain(first.uri);
+
+  const post = await openPostMenu(page, text);
+  await post.getByRole("button", { name: "プロフィールにピン留め" }).click();
+  await expect
+    .poll(() => getProfileRecord(request, "alice.test"))
+    .toContain(second.uri);
 });
