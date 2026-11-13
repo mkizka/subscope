@@ -17,6 +17,7 @@ export class GetFollowsUseCase {
 
   async execute(params: {
     accountDid: Did;
+    viewerDid: Did | null;
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody> {
@@ -32,7 +33,7 @@ export class GetFollowsUseCase {
       }),
     );
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
     const [subject, follows] = await Promise.all([
       this.profileViews.view(params.accountDid, ctx),
       Promise.all(

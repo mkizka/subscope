@@ -267,6 +267,7 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 - getFollowers-1: 指定したアカウントをsubjectに、そのフォロワーをfollowersにprofileViewで返す
 - getFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getFollowers-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める
 
 ## app.bsky.graph.getFollows
 
@@ -274,6 +275,7 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 - getFollows-1: 指定したアカウントをsubjectに、そのフォロー先をfollowsにprofileViewで返す
 - getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getFollows-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める
 
 ## app.bsky.graph.getKnownFollowers
 
@@ -289,6 +291,7 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 - getList-1: 指定したリストのlistViewと、リストに追加されたアカウントのprofileViewをitemsで返す
 - getList-2: 保存されていないリストには400を返す
+- getList-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める
 
 ## app.bsky.graph.getLists
 
