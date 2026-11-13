@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { Form } from "react-router";
 
-import { Button } from "@/app/components/ui/button";
+import { Button, buttonClass } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 
 type Props = {
@@ -46,6 +46,14 @@ export function LoginForm({
       <Button type="submit" loading={loading}>
         {inviteCodeInputProps ? "新規登録" : "ログイン"}
       </Button>
+      {!inviteCodeInputProps && (
+        <a
+          href="/login/atpassport"
+          className={buttonClass({ variant: "secondary" })}
+        >
+          @passportでログイン
+        </a>
+      )}
     </Form>
   );
 }

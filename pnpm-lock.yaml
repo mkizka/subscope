@@ -294,6 +294,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@atpassport/client':
+        specifier: 0.2.3
+        version: 0.2.3(react@19.3.1)
       '@atproto/api':
         specifier: 0.29.5
         version: 0.29.5
@@ -831,6 +834,14 @@ packages:
 
   '@adobe/css-tools@4.5.0':
     resolution: {integrity: sha512-6OzddxPio9UiWTCemp4N8cYLV2ZN1ncRnV1cVGtve7dhPOtRkleRyx32GQCYSwDYgaHU3USMm84tNsvKzRCa1Q==}
+
+  '@atpassport/client@0.2.3':
+    resolution: {integrity: sha512-JwFm5qZb0fOxRVNBxcR3uD9H59z0XhS8PURvcsVIHNP2dE7iyA3QtC9nXhIQbfnwyOFAISnRnwSwC4CINTKljA==}
+    peerDependencies:
+      react: '>=18.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@atproto-labs/did-resolver@0.3.11':
     resolution: {integrity: sha512-CeAC6VY3xaXQ8CaOXLz4EOopSvfcQBcuJvX3J5ew2nbf+BM0nes45ZvxUieP5ZlLPXbJborwJh5zDeJcYpwCFQ==}
@@ -7118,6 +7129,10 @@ packages:
 snapshots:
 
   '@adobe/css-tools@4.5.0': {}
+
+  '@atpassport/client@0.2.3(react@19.3.1)':
+    optionalDependencies:
+      react: 19.3.1
 
   '@atproto-labs/did-resolver@0.3.11':
     dependencies:

@@ -122,4 +122,33 @@ test.describe("ログイン", () => {
 
     await expect(page).toHaveURL("/login");
   });
+
+  test("login-e9: @passportから戻ってきたハンドルでOAuthログインを始める", async ({
+    page,
+  }) => {
+    const start = await page.request.get("/login/atpassport", {
+      maxRedirects: 0,
+    });
+    const atpstate = new URL(
+      start.headers()["location"] ?? "",
+    ).searchParams.get("atpstate");
+
+    await page.goto(
+      `/login/atpassport/callback?username=alice.test&atpstate=${atpstate}`,
+    );
+
+    await expect(page.getByRole("textbox", { name: "Password" })).toBeVisible();
+  });
+
+  test("login-e10: @passportからの戻りが自分の始めたものでなければ、ログイン画面に戻す", async ({
+    page,
+  }) => {
+    await page.request.get("/login/atpassport", { maxRedirects: 0 });
+
+    await page.goto(
+      "/login/atpassport/callback?username=alice.test&atpstate=forged",
+    );
+
+    await expect(page).toHaveURL("/login");
+  });
 });

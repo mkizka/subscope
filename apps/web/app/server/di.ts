@@ -49,6 +49,7 @@ import { env } from "./env";
 import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
+import { atPassportFactory } from "./infrastructure/auth/atpassport";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
 import { oauthClientFactory } from "./infrastructure/auth/oauth-client";
 import {
@@ -86,6 +87,7 @@ export const di = await createRegistry()
     ["oauthStateStore", "oauthSessionStore", "loggerManager", "env"],
     oauthClientFactory,
   )
+  .service("atPassport", ["env"], atPassportFactory)
   .service(
     "cookieSessionStorage",
     ["env", "oauthClient"],
