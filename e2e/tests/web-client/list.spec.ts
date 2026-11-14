@@ -355,7 +355,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e12: プロフィール全体ページのフォローボタンの右にある「…」メニューの「リストに追加」から、自分のリストにそのアカウントを追加・削除する（自分のプロフィールにも出す）", async ({
+  test("list-e12: プロフィール全体ページのフォローボタンの右にある「…」メニューの「リストに追加」から、自分のリストにそのアカウントを追加・削除する", async ({
     page,
   }) => {
     const name = `list-e12のリスト ${Date.now()}`;
@@ -388,8 +388,14 @@ test.describe("リスト", () => {
     await reopen("削除");
     await click("削除");
     await reopen("追加");
+  });
 
+  test("list-e13: 自分のプロフィール全体ページにも、フォローボタンの右の「…」メニューを表示する", async ({
+    page,
+  }) => {
     await page.goto("/alice.test");
-    await expect(main.getByRole("button", { name: "その他" })).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("button", { name: "その他" }),
+    ).toBeVisible();
   });
 });

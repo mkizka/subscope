@@ -263,7 +263,7 @@ const knownFollowers = {
 };
 
 export const KnownFollowers: Story = {
-  name: "profile-s12: 自分がフォローしているアカウントのうちそのアカウントをフォローしている人（知り合い）がいる全体ページには、フォロー数の下に知り合いのアイコン（最大3人）と名前（最大2人）、残りの人数を「Bob、Carolほか12人がフォローしています」の形で表示し、選ぶとフォロワー一覧の「知り合い」タブに移動する",
+  name: "profile-s12: 自分がフォローしているアカウントのうちそのアカウントをフォローしている人（知り合い）がいる全体ページには、フォロー数の下に知り合いのアイコン（最大3人）と名前（最大2人）、残りの人数を「Bob、Carolほか12人がフォローしています」の形で表示する",
   beforeEach: () => {
     seed({
       profile: {
@@ -275,13 +275,23 @@ export const KnownFollowers: Story = {
     });
   },
   play: async ({ canvasElement }) => {
-    const link = main(canvasElement).getByRole("link", {
-      name: "Bob、carol.bsky.socialほか12人がフォローしています",
-    });
-    await expect(link).toHaveAttribute(
-      "href",
-      "/alice.bsky.social/followers?filter=known",
-    );
+    await expect(
+      main(canvasElement).getByRole("link", {
+        name: "Bob、carol.bsky.socialほか12人がフォローしています",
+      }),
+    ).toBeVisible();
+  },
+};
+
+export const KnownFollowersLink: Story = {
+  name: "profile-s14: 知り合いの行を選ぶと、フォロワー一覧の「知り合い」タブに移動する",
+  beforeEach: KnownFollowers.beforeEach,
+  play: async ({ canvasElement }) => {
+    await expect(
+      main(canvasElement).getByRole("link", {
+        name: "Bob、carol.bsky.socialほか12人がフォローしています",
+      }),
+    ).toHaveAttribute("href", "/alice.bsky.social/followers?filter=known");
   },
 };
 
