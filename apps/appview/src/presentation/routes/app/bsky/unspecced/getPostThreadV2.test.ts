@@ -3,6 +3,7 @@ import getPostThreadV2 from "@repo/client/app/bsky/unspecced/getPostThreadV2";
 import {
   accountFactory,
   postFactory,
+  postStatsFactory,
   recordFactory,
   testSetup,
 } from "@repo/test-utils";
@@ -13,7 +14,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.unspecced.getPostThreadV2", () => {
   const { ctx } = testSetup;
 
-  const setupThread = async () => {
+  const setupAuthor = async () => {
     const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
@@ -24,6 +25,21 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
             .vars({ account: () => author })
             .create(),
       });
+    const createReply = (
+      parent: { uri: string; cid: string },
+      root: { uri: string; cid: string },
+      index: number,
+    ) => {
+      const at = new Date(Date.UTC(2026, 0, 1, 0, 0, index));
+      return createPost()
+        .use((t) => t.asReplyTo(parent, root))
+        .props({ createdAt: () => at, indexedAt: () => at });
+    };
+    return { createPost, createReply };
+  };
+
+  const setupThread = async () => {
+    const { createPost } = await setupAuthor();
     const root = await createPost().create();
     const anchor = await createPost()
       .use((t) => t.asReplyTo(root))
@@ -94,5 +110,82 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
         value: { $type: "app.bsky.unspecced.defs#threadItemNotFound" },
       },
     ]);
+  });
+
+  const setupReplies = async (count: number) => {
+    const { createReply, createPost } = await setupAuthor();
+    const anchor = await createPost().create();
+    const replies = [];
+    for (let i = 0; i < count; i++) {
+      replies.push(await createReply(anchor, anchor, i).create());
+    }
+    const [firstReply] = replies;
+    if (!firstReply) throw new Error("count must be 1 or more");
+    return { createReply, anchor, firstReply, replies };
+  };
+
+  test("getPostThreadV2-4: アンカー投稿への直接のリプライは、件数に関わらず全て含める", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const { anchor, replies } = await setupReplies(25);
+
+    // act
+    const res = await client.call(getPostThreadV2, {
+      anchor: asAtUriString(anchor.uri),
+      branchingFactor: 1,
+    });
+
+    // assert
+    expect(res.thread.slice(1).map(({ uri }) => uri)).toEqual(
+      replies.map(({ uri }) => uri),
+    );
+  });
+
+  test("getPostThreadV2-5: depth 1より深いリプライは、投稿ごとにbranchingFactor件までを古い順に含める", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const { createReply, anchor, firstReply } = await setupReplies(1);
+    const nested = [];
+    for (let i = 0; i < 3; i++) {
+      nested.push(await createReply(firstReply, anchor, i).create());
+    }
+
+    // act
+    const res = await client.call(getPostThreadV2, {
+      anchor: asAtUriString(anchor.uri),
+      branchingFactor: 2,
+    });
+
+    // assert
+    expect(res.thread.slice(2).map(({ uri }) => uri)).toEqual(
+      nested.slice(0, 2).map(({ uri }) => uri),
+    );
+  });
+
+  test("getPostThreadV2-6: 各threadItemPostのmoreRepliesに、replyCountから含めたリプライ数を引いた数(0未満は0)を返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const { anchor, firstReply } = await setupReplies(2);
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => Promise.resolve(anchor) })
+      .props({ replyCount: () => 5 })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => Promise.resolve(firstReply) })
+      .props({ replyCount: () => 3 })
+      .create();
+
+    // act
+    const res = await client.call(getPostThreadV2, {
+      anchor: asAtUriString(anchor.uri),
+      below: 1,
+    });
+
+    // assert
+    expect(
+      res.thread.map(({ value }) =>
+        "moreReplies" in value ? value.moreReplies : undefined,
+      ),
+    ).toEqual([3, 3, 0]);
   });
 });

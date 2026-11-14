@@ -27,11 +27,13 @@ describe("app.bsky.feed.searchPostsV2", () => {
             .vars({ account: () => author })
             .create(),
       })
-      .props({ text: () => "searchPostsV2で探す投稿" })
+      .props({ text: () => "searchPostsV2で探す投稿 foo" })
       .create();
 
     // act
-    const res = await client.call(searchPostsV2, { query: "searchPostsV2" });
+    const res = await client.call(searchPostsV2, {
+      query: "  foo searchPostsV2 ",
+    });
 
     // assert
     expect(res.posts).toMatchObject([
@@ -68,7 +70,7 @@ describe("app.bsky.feed.searchPostsV2", () => {
     expect(res.posts.map((p) => p.uri)).toEqual([post.uri]);
   });
 
-  test("searchPostsV2-3: repliesOnlyがtrueの場合、返信だけを返す。それ以外の場合、返信は含めない", async () => {
+  test("searchPostsV2-3: repliesOnlyがtrueなら返信だけ、excludeRepliesがtrueなら返信以外だけを返す。どちらも無ければ返信も含める", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await accountFactory(ctx.db).create();
@@ -97,11 +99,18 @@ describe("app.bsky.feed.searchPostsV2", () => {
     });
     const notReplies = await client.call(searchPostsV2, {
       authors: [asDid(author.did)],
+      excludeReplies: true,
+    });
+    const both = await client.call(searchPostsV2, {
+      authors: [asDid(author.did)],
     });
 
     // assert
     expect(replies.posts.map((p) => p.uri)).toEqual([reply.uri]);
     expect(notReplies.posts.map((p) => p.uri)).toEqual([root.uri]);
+    expect(both.posts.map((p) => p.uri).sort()).toEqual(
+      [root.uri, reply.uri].sort(),
+    );
   });
 
   test("searchPostsV2-4: queryもauthorsも無い場合、空の配列を返す", async () => {
@@ -148,5 +157,45 @@ describe("app.bsky.feed.searchPostsV2", () => {
 
     // assert
     expect(res.posts[0]?.author.viewer?.following).toBeDefined();
+  });
+
+  test("searchPostsV2-6: queryに`from:me`が含まれる場合、それを語として扱わず、閲覧者をauthorsに加える", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await accountFactory(ctx.db).create();
+    const other = await accountFactory(ctx.db).create();
+    const create = (account: typeof viewer) =>
+      postFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.feed.post")
+              .vars({ account: () => account })
+              .create(),
+        })
+        .props({ text: () => "hello" })
+        .create();
+    const post = await create(viewer);
+    await create(other);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(searchPostsV2, { query: "from:me hello" });
+
+    // assert
+    expect(res.posts.map((p) => p.uri)).toEqual([post.uri]);
+  });
+
+  test("searchPostsV2-7: 未ログインで`from:me`を含むqueryの場合、空の配列を返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    await postFactory(ctx.db)
+      .props({ text: () => "hello" })
+      .create();
+
+    // act
+    const res = await client.call(searchPostsV2, { query: "from:me hello" });
+
+    // assert
+    expect(res.posts).toEqual([]);
   });
 });

@@ -9,7 +9,7 @@ import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 type SearchPostsParams = {
   q?: string;
   authorDids?: string[];
-  repliesOnly?: boolean;
+  replies?: "only" | "exclude";
   limit: number;
   cursor?: string;
 };
@@ -25,8 +25,8 @@ export class SearchPostsUseCase {
     params: SearchPostsParams,
     viewer: Viewer,
   ): Promise<$OutputBody> {
-    const query = params.q?.trim();
-    if (!query && !params.authorDids?.length) {
+    const terms = params.q?.split(/\s+/).filter(Boolean) ?? [];
+    if (!terms.length && !params.authorDids?.length) {
       return {
         posts: [],
         cursor: undefined,
@@ -38,9 +38,9 @@ export class SearchPostsUseCase {
       getCursor: (post) => post.sortAt.toISOString(),
     });
     const posts = await this.postQuery.search({
-      query,
+      terms,
       authorDids: params.authorDids,
-      repliesOnly: params.repliesOnly,
+      replies: params.replies,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
     });

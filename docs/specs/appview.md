@@ -8,6 +8,17 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 - notImplemented-1: 実装していないXRPCには501とMethodNotImplementedを返す
 
+次のXRPCは、実装する予定がない。
+
+- `app.bsky.draft.*`
+- `app.bsky.notification.getPreferences`、`app.bsky.notification.putPreferencesV2`
+- `app.bsky.notification.putActivitySubscription`（`getGroupedNotifications`の`feed=activity`を含む）
+
+理由は2つある。
+
+- どれもSNSを便利にする機能で、基本機能の再現というPoCの目標に入らない。
+- PDSにない利用者の非公開データをAppViewのDBに保管する必要があり、保管するデータを増やしたくない。
+
 ## テイクダウン
 
 モデレーションサービスがテイクダウンしたアカウントや投稿と、PDSで停止されたアカウントを、APIの応答から隠す。データは消さないので、ラベルが取り消されたりアカウントが再開されたりすれば元に戻る。
@@ -40,20 +51,6 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 - labelers-4: テイクダウンは`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する
 
 ヘッダーの `redact` パラメーターは応答の `atproto-content-labelers` ヘッダーにそのまま返すだけで、テイクダウンの適用には使わない。
-
-## ブロック
-
-閲覧者とアカウントの間のブロックを、プロフィールのビューの viewer に載せる。公式クライアントはこれを見て、ブロック中の表示やブロック解除のボタンを出す。また、ブロック相手の投稿とリポストを応答から隠す。
-
-- block-1: 閲覧者がブロックしているアカウントには、ブロックレコードのURIを viewer.blocking に入れる
-- block-2: 閲覧者をブロックしているアカウントには、viewer.blockedBy を true にする
-- block-3: どちらかの向きにブロックがあるアカウントには、viewer.following と viewer.followedBy を含めない
-- block-4: どちらかの向きにブロックがあるアカウントの投稿は応答に含めない
-- block-5: どちらかの向きにブロックがあるアカウントのリポストは応答に含めない
-
-ブロックはメンバーとそのフォロー先が作ったものしか保存しないため、保存対象外のアカウントが閲覧者をブロックしても viewer.blockedBy は true にならない。
-
-公式AppViewがblockedPostやviewBlockedに置き換える箇所(スレッドの親、リプライの親、引用など)も、今は見つからない投稿と同じ扱いにする。
 
 ## 返信制限
 
@@ -199,13 +196,20 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 
 searchPostsの後継で、公式クライアントの投稿検索はこれを使う。認証は任意。
 
-- searchPostsV2-1: 本文がqueryに一致する投稿をpostViewで返す
+- searchPostsV2-1: queryを空白で区切った語をすべて本文に含む投稿をpostViewで返す
 - searchPostsV2-2: queryを省略した場合、authorsで絞り込んだ投稿を返す
-- searchPostsV2-3: repliesOnlyがtrueの場合、返信だけを返す。それ以外の場合、返信は含めない
+- searchPostsV2-3: repliesOnlyがtrueなら返信だけ、excludeRepliesがtrueなら返信以外だけを返す。どちらも無ければ返信も含める
 - searchPostsV2-4: queryもauthorsも無い場合、空の配列を返す
 - searchPostsV2-5: 閲覧者がフォローしているアカウントの投稿には、author.viewer.followingを含める
+- searchPostsV2-6: queryに`from:me`が含まれる場合、それを語として扱わず、閲覧者をauthorsに加える
+- searchPostsV2-7: 未ログインで`from:me`を含むqueryの場合、空の配列を返す
 
-authors以外の絞り込みパラメータ(sortなど)は今は無視する。
+次のパラメータは対応を見送り、無視する。PoCとして公式クライアントの基本機能の再現を優先し、これらは無くても結果が返る便利機能のため。
+
+- sort=top(常に新しい順で返す)
+- since、until
+- languages
+- `to:me`(queryに含まれていても、ただの語として扱う)
 
 ## app.bsky.feed.getPosts
 
@@ -225,11 +229,16 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 ## app.bsky.unspecced.getPostThreadV2
 
-アンカー投稿を中心に、親投稿とリプライを深さ付きの平坦なリストで返す。認証は任意。branchingFactorとsortは無視し、hasOtherRepliesは常にfalseを返す。
+アンカー投稿を中心に、親投稿とリプライを深さ付きの平坦なリストで返す。認証は任意。リプライは古い順に並べる。sortは、PoCでは基本機能を優先するため無視し、hasOtherRepliesは常にfalseを返す。
+
+threadgateのhiddenRepliesは反映せず、隠されたリプライも通常の位置に返す。hiddenByThreadgateは常にfalseを返し、getPostThreadOtherV2は実装しない。PoCでは基本機能の再現を優先し、スレッド主がリプライを隠す機能はSNSを便利にする補助機能のため後回しにした。
 
 - getPostThreadV2-1: 親投稿を負のdepth、アンカー投稿をdepth 0、リプライを正のdepthとして、上から順にthreadに含める
 - getPostThreadV2-2: aboveがfalseのとき、親投稿を含めない
 - getPostThreadV2-3: 存在しない投稿はdepth 0のthreadItemNotFoundとして返す
+- getPostThreadV2-4: アンカー投稿への直接のリプライは、件数に関わらず全て含める
+- getPostThreadV2-5: depth 1より深いリプライは、投稿ごとにbranchingFactor件までを古い順に含める
+- getPostThreadV2-6: 各threadItemPostのmoreRepliesに、replyCountから含めたリプライ数を引いた数(0未満は0)を返す
 
 ## app.bsky.feed.getAuthorFeed
 
@@ -259,6 +268,8 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 閲覧者宛ての通知を、まとめた形で返す。認証が必要。公式アプリの通知画面はこのAPIだけを使う。
 
 まとめるのは1ページ内の通知だけで、ページをまたいだ同じ投稿へのいいねは別のグループになる。
+
+`feed=people-i-follow`は実装しない。「すべて」タブの通知をフォロー中のアカウントに絞るだけのフィルターで、501を返しても通知という基本機能は欠けないため、基本機能の再現を優先するPoCの方針で見送る。
 
 - getGroupedNotifications-1: 認証がないリクエストには401を返す
 - getGroupedNotifications-2: 同じ投稿へのいいねとリポストは種類ごとに1つのグループにまとめる

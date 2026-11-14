@@ -208,32 +208,6 @@ export const followFactory = (db: Database) =>
       subjectDid: async ({ vars }) => (await vars.followee).did,
     });
 
-export const blockFactory = (db: Database) =>
-  factory
-    .define(
-      {
-        props: {
-          uri: later<string>(),
-          cid: later<string>(),
-          accountDid: later<string>(),
-          subjectDid: later<string>(),
-          createdAt: () => faker.date.recent(),
-          indexedAt: () => faker.date.recent(),
-        },
-        vars: {
-          record: () => recordFactory(db, "app.bsky.graph.block").create(),
-          subject: () => accountFactory(db).create(),
-        },
-      },
-      (props) => create(db, schema.blocks, props),
-    )
-    .props({
-      uri: async ({ vars }) => (await vars.record).uri,
-      cid: async ({ vars }) => (await vars.record).cid,
-      accountDid: async ({ vars }) => (await vars.record).accountDid,
-      subjectDid: async ({ vars }) => (await vars.subject).did,
-    });
-
 export const likeFactory = (db: Database) =>
   factory
     .define(

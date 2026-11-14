@@ -16,14 +16,26 @@ export class SearchPostsV2 {
     router.add(searchPostsV2, {
       auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const authorDids = params.authors
-          ? await this.handleMiddleware.resolveHandleOrDids(params.authors)
-          : undefined;
+        const words = params.query?.split(/\s+/).filter(Boolean) ?? [];
+        const fromMe = words.includes("from:me");
+        if (fromMe && !viewerDid) {
+          return { body: { posts: [] } };
+        }
+        const authorDids = [
+          ...(params.authors
+            ? await this.handleMiddleware.resolveHandleOrDids(params.authors)
+            : []),
+          ...(fromMe && viewerDid ? [viewerDid] : []),
+        ];
         const result = await this.searchPostsUseCase.execute(
           {
-            q: params.query,
-            authorDids,
-            repliesOnly: params.repliesOnly,
+            q: words.filter((word) => word !== "from:me").join(" "),
+            authorDids: authorDids.length ? authorDids : undefined,
+            replies: params.repliesOnly
+              ? "only"
+              : params.excludeReplies
+                ? "exclude"
+                : undefined,
             limit: params.limit,
             cursor: params.cursor,
           },

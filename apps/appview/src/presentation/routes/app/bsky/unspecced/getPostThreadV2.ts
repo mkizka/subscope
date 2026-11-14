@@ -24,6 +24,7 @@ export class GetPostThreadV2 {
           uri,
           above: params.above,
           below: params.below,
+          branchingFactor: params.branchingFactor,
           viewerDid: viewerDid || undefined,
         });
         return { body };

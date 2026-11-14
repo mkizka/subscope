@@ -25,7 +25,6 @@ import type { IInviteCodeRepository } from "../application/interfaces/invite-cod
 import type { IAccountQuery } from "../application/interfaces/queries/account-query.js";
 import type { IAccountStatsQuery } from "../application/interfaces/queries/account-stats-query.js";
 import type { IAuthorFeedQuery } from "../application/interfaces/queries/author-feed-query.js";
-import type { IBlockQuery } from "../application/interfaces/queries/block-query.js";
 import type { IFollowQuery } from "../application/interfaces/queries/follow-query.js";
 import type { IGeneratorQuery } from "../application/interfaces/queries/generator-query.js";
 import type { IInviteCodeQuery } from "../application/interfaces/queries/invite-code-query.js";
@@ -107,7 +106,6 @@ import { InviteCodeRepository } from "../infrastructure/invite-code-repository/i
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { AccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.js";
 import { AuthorFeedQuery } from "../infrastructure/queries/author-feed-query/author-feed-query.js";
-import { BlockQuery } from "../infrastructure/queries/block-query/block-query.js";
 import { FollowQuery } from "../infrastructure/queries/follow-query/follow-query.js";
 import { GeneratorQuery } from "../infrastructure/queries/generator-query/generator-query.js";
 import { InviteCodeQuery } from "../infrastructure/queries/invite-code-query/invite-code-query.js";
@@ -214,7 +212,6 @@ export const createAppRegistry = (env: Env) =>
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
-    .service("blockQuery", ["db"], asClassArgs<IBlockQuery>()(BlockQuery))
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
     .service("inviteCodeQuery", ["db"], asClassArgs<IInviteCodeQuery>()(InviteCodeQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
@@ -229,7 +226,7 @@ export const createAppRegistry = (env: Env) =>
     .service("adminMiddleware", ["authVerifierMiddleware", "accountRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
-    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "accountStatsQuery", "listQuery", "listItemQuery", "blockQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "accountStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))

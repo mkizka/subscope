@@ -26,7 +26,7 @@ export class FeedViews {
       this.replyRef(postUri, ctx),
       item.type === "repost" ? this.reasonRepost(item, ctx) : undefined,
     ]);
-    if (!post || (item.type === "repost" && !reason)) {
+    if (!post) {
       return undefined;
     }
     return {
@@ -71,12 +71,11 @@ export class FeedViews {
     item: FeedItemDto,
     ctx: ViewContext,
   ): Promise<$Typed<AppBskyFeedDefs.ReasonRepost> | undefined> {
-    const [repost, by, blocked] = await Promise.all([
+    const [repost, by] = await Promise.all([
       ctx.repost(item.uri),
       this.profileViews.basic(item.accountDid, ctx),
-      ctx.isBlocked(item.accountDid),
     ]);
-    if (!repost || !by || blocked) {
+    if (!repost || !by) {
       return undefined;
     }
     return {
