@@ -252,7 +252,7 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "notfound",
+        terms: ["notfound"],
         limit: 10,
       });
 
@@ -275,7 +275,7 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "hello",
+        terms: ["hello"],
         limit: 10,
       });
 
@@ -299,7 +299,7 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "hello",
+        terms: ["hello"],
         limit: 10,
       });
 
@@ -334,7 +334,8 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "search",
+        terms: ["search"],
+        replies: "exclude",
         limit: 10,
       });
 
@@ -365,7 +366,7 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "search",
+        terms: ["search"],
         limit: 2,
       });
 
@@ -402,7 +403,7 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "search",
+        terms: ["search"],
         limit: 10,
         cursor: cursorDate,
       });
@@ -410,6 +411,32 @@ describe("PostQuery", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]?.uri).toBe(post1.uri);
+    });
+
+    test("複数の語をすべて含む投稿だけを返す", async () => {
+      // arrange
+      const account = await accountFactory(ctx.db).create();
+      const create = (text: string) =>
+        postFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.feed.post")
+                .vars({ account: () => account })
+                .create(),
+          })
+          .props({ text: () => text })
+          .create();
+      const post = await create("foo and bar");
+      await create("foo only");
+
+      // act
+      const result = await postQuery.search({
+        terms: ["bar", "foo"],
+        limit: 10,
+      });
+
+      // assert
+      expect(result.map((p) => p.uri)).toEqual([post.uri]);
     });
 
     test("検索クエリに含まれるワイルドカード文字はエスケープされる", async () => {
@@ -437,7 +464,7 @@ describe("PostQuery", () => {
 
       // act
       const result = await postQuery.search({
-        query: "100%",
+        terms: ["100%"],
         limit: 10,
       });
 

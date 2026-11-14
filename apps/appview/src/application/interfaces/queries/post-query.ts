@@ -11,9 +11,9 @@ export interface IPostQuery {
     cursor?: Date;
   }) => Promise<PostDto[]>;
   search: (params: {
-    query?: string;
+    terms: string[];
     authorDids?: string[];
-    repliesOnly?: boolean;
+    replies?: "only" | "exclude";
     limit: number;
     cursor?: Date;
   }) => Promise<PostDto[]>;
