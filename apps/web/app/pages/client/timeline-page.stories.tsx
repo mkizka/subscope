@@ -1169,15 +1169,17 @@ export const Hashtag: Story = {
   },
 };
 
+const omittedBeforeEach = () => {
+  const chain = [post("t1")];
+  for (const n of [2, 3, 4, 5]) {
+    chain.push(post(`t${n}`, { replyParentUri: chain.at(-1)?.uri }));
+  }
+  setPosts(chain.reverse());
+};
+
 export const OmittedPosts: Story = {
-  name: "timeline-s11: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する。この表示は最後の投稿のスレッドページへのリンクにする",
-  beforeEach: () => {
-    const chain = [post("t1")];
-    for (const n of [2, 3, 4, 5]) {
-      chain.push(post(`t${n}`, { replyParentUri: chain.at(-1)?.uri }));
-    }
-    setPosts(chain.reverse());
-  },
+  name: "timeline-s11: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示する",
+  beforeEach: omittedBeforeEach,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -1187,8 +1189,28 @@ export const OmittedPosts: Story = {
       expect.stringContaining("t4"),
       expect.stringContaining("t5"),
     ]);
-    const omitted = canvas.getByTestId("omitted-posts");
-    await expect(omitted).toHaveTextContent("2件の投稿");
-    await expect(omitted).toHaveAttribute("href", "/alice.bsky.social/post/t5");
+  },
+};
+
+export const OmittedPostsCount: Story = {
+  name: "timeline-s12: 線で繋げた投稿を省略した場合は、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する",
+  beforeEach: omittedBeforeEach,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId("omitted-posts")).toHaveTextContent(
+      "2件の投稿",
+    );
+  },
+};
+
+export const OmittedPostsLink: Story = {
+  name: "timeline-s13: 省略した投稿の件数の表示は、最後の投稿のスレッドページへのリンクにする",
+  beforeEach: omittedBeforeEach,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId("omitted-posts")).toHaveAttribute(
+      "href",
+      "/alice.bsky.social/post/t5",
+    );
   },
 };
