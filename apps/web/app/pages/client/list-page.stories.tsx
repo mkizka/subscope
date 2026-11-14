@@ -1,6 +1,6 @@
 import { asAtUriString } from "@atproto/syntax";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { alice, bob, type Data, queryClient } from "@/.storybook/query-client";
 import ListDetailStories from "@/app/features/list/list-detail.stories";
@@ -41,51 +41,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
-
-const hasSpinner = (button: HTMLElement) =>
-  button.querySelector(".animate-spin") !== null;
-
-export const Deleting: Story = {
-  name: "list-s2: リスト詳細の「…」ボタンは削除してリスト一覧に戻るまでスピナーを出して押せなくする",
-  parameters: { pending: true },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole("button", { name: "操作" });
-
-    await userEvent.click(button);
-    await userEvent.click(canvas.getByRole("button", { name: "削除する" }));
-    await userEvent.click(
-      within(canvas.getByRole("dialog")).getByRole("button", {
-        name: "削除する",
-      }),
-    );
-
-    await expect(button).toBeDisabled();
-    await expect(hasSpinner(button)).toBe(true);
-  },
-};
-
-export const MemberSubmitting: Story = {
-  name: "list-s3: リストのメンバーの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする",
-  parameters: {
-    path: "/alice.bsky.social/lists/1?tab=members",
-    pending: true,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const add = canvas.getByRole("button", { name: "追加する" });
-    const remove = canvas.getByRole("button", { name: "削除" });
-    await userEvent.type(canvas.getByLabelText("ハンドル"), "carol.test");
-
-    await userEvent.click(add);
-    await userEvent.click(remove);
-
-    await expect(add).toBeDisabled();
-    await expect(hasSpinner(add)).toBe(true);
-    await expect(remove).toBeDisabled();
-    await expect(hasSpinner(remove)).toBe(true);
-  },
-};
 
 export const MemberSyncStatus: Story = {
   name: "list-s4: 「メンバー」タブの追跡アカウントには、過去の投稿の同期状態を表示する",

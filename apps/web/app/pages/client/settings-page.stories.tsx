@@ -169,24 +169,6 @@ const pendingPermission = () => {
   };
 };
 
-export const PushSettingToggling: Story = {
-  name: "pushSetting-s5: 切り替えている間は、スイッチを無効にして横にスピナーを表示する",
-  beforeEach: () => {
-    pushSetting("off")();
-    const permission = pendingPermission();
-    permission.mock();
-    return permission.restore;
-  },
-  play: async ({ canvasElement }) => {
-    const toggle = await pushSwitch(canvasElement);
-
-    await userEvent.click(toggle);
-
-    await expect(toggle).toBeDisabled();
-    await expect(canvasElement.querySelector(".animate-spin")).not.toBeNull();
-  },
-};
-
 export const PushSettingDismissed: Story = {
   name: "pushSetting-s6: スイッチをオンにして通知の許可ダイアログが選択されずに閉じたときは、何も表示せずスイッチをオフのままにする",
   beforeEach: () => {

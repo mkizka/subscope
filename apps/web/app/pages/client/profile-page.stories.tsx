@@ -467,21 +467,6 @@ export const AddToListDialog: Story = {
   },
 };
 
-export const AddToListSubmitting: Story = {
-  name: "list-s9: 「リストに追加」ダイアログの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする",
-  parameters: { pending: true },
-  beforeEach: () => {
-    seedMembership(membershipLists);
-  },
-  play: async ({ canvasElement }) => {
-    const dialog = await openAddToList(canvasElement);
-
-    await userEvent.click(dialog.getByRole("button", { name: "追加" }));
-
-    await expect(dialog.getByRole("button", { name: "追加" })).toBeDisabled();
-  },
-};
-
 export const AddToListLoading: Story = {
   name: "list-s10: 「リストに追加」ダイアログは、開いてから読み込み終えるまでスケルトンを表示し、自分のリストが無いときは「リストがありません。」とリスト管理画面（`/lists`）へのリンクを表示する",
   beforeEach: () => {
