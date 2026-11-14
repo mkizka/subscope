@@ -1,4 +1,9 @@
-import { type APIRequestContext, expect, test } from "@playwright/test";
+import {
+  type APIRequestContext,
+  expect,
+  type Page,
+  test,
+} from "@playwright/test";
 
 import { createRecord, follow, PDS_URL, putRecord } from "../../helpers/pds";
 
@@ -99,7 +104,7 @@ test.describe("タイムライン", () => {
     ).toHaveCount(0);
   });
 
-  test("timeline-e8: 表示中は60秒ごとに投稿を自動で読み込み直し、読み込み中は一覧の上部に、スピナー付きの「更新中」の表示を投稿の上、上部のタブの下に重ねて浮かせ、スクロールしても上部のタブとの位置関係を変えず、タブと一緒に動く", async ({
+  test("timeline-e8: 表示中は60秒ごとに投稿を自動で読み込み直す", async ({
     page,
     request,
   }) => {
@@ -111,6 +116,25 @@ test.describe("タイムライン", () => {
         timeout: 1000,
       });
     }).toPass();
+    const newText = `timeline-e8-new: ${Date.now()}`;
+    await createPosts(request, [newText]);
+    await expect(async () => {
+      await page.clock.fastForward(60_000);
+      await expect(page.getByText(newText)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
+  const openRefreshing = async (
+    page: Page,
+    request: APIRequestContext,
+    label: string,
+  ) => {
+    await createPosts(request, [`${label}: ${Date.now()}`]);
+    await page.clock.install();
+    await expect(async () => {
+      await page.goto("/");
+      await expect(page.getByText(`${label}:`)).toBeVisible({ timeout: 1000 });
+    }).toPass();
     const spinner = page.getByRole("status", { name: "タイムラインを更新中" });
     await expect(spinner).toBeHidden();
     let release: (v: unknown) => void = () => {};
@@ -119,12 +143,20 @@ test.describe("タイムライン", () => {
       await gate;
       await route.continue();
     });
-    const newText = `timeline-e8-new: ${Date.now()}`;
-    await createPosts(request, [newText]);
-
     await page.clock.fastForward(60_000);
-
     await expect(spinner).toBeVisible();
+    return { spinner, release: () => release(undefined) };
+  };
+
+  test("timeline-e10: 自動更新の読み込み中は、一覧の上部に、スピナー付きの「更新中」の表示を投稿の上、上部のタブの下に重ねて浮かせる", async ({
+    page,
+    request,
+  }) => {
+    const { spinner, release } = await openRefreshing(
+      page,
+      request,
+      "timeline-e10",
+    );
     const isOnTop = await spinner.evaluate((el) => {
       if (el.parentElement) el.parentElement.style.pointerEvents = "auto";
       const rect = el.getBoundingClientRect();
@@ -135,6 +167,19 @@ test.describe("タイムライン", () => {
       return el.contains(hit);
     });
     expect(isOnTop).toBe(true);
+    release();
+    await expect(spinner).toBeHidden();
+  });
+
+  test("timeline-e11: 「更新中」の表示は、スクロールしても上部のタブとの位置関係を変えず、タブと一緒に動く", async ({
+    page,
+    request,
+  }) => {
+    const { spinner, release } = await openRefreshing(
+      page,
+      request,
+      "timeline-e11",
+    );
     await page.addStyleTag({ content: "main { min-height: 3000px }" });
     const tablist = page.getByRole("tablist");
     const gap = async () =>
@@ -146,15 +191,11 @@ test.describe("タイムライン", () => {
       expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
     }).toPass();
     expect(await gap()).toBe(gapBefore);
-    release(undefined);
+    release();
     await expect(spinner).toBeHidden();
-    await expect(async () => {
-      await page.clock.fastForward(60_000);
-      await expect(page.getByText(newText)).toBeVisible({ timeout: 1000 });
-    }).toPass();
   });
 
-  test("timeline-e9: 表示中のタイムラインと同じものを指すメニューのホーム、またはフォロー中・ローカルのタブをタップすると、先頭へスクロールして投稿を読み込み直し、読み込み中は timeline-e8 と同じ「更新中」の表示を出す", async ({
+  test("timeline-e9: 表示中のタイムラインと同じものを指すメニューのホーム、またはフォロー中・ローカルのタブをタップすると、先頭へスクロールして投稿を読み込み直し、読み込み中は timeline-e10 と同じ「更新中」の表示を出す", async ({
     page,
     request,
   }) => {

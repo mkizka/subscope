@@ -137,7 +137,7 @@ export const IconAndAvatar: Story = {
 };
 
 export const PushPromptOff: Story = {
-  name: "pushSetting-s8: 受け取らない設定のときだけ、通知一覧の上に「プッシュ通知を受け取る」の案内と「オンにする」ボタンを表示する。受け取る設定・ブロック中・非対応・読み込み中・VAPID鍵なしのときは表示しない",
+  name: "pushSetting-s8: 受け取らない設定のときは、通知一覧の上に「プッシュ通知を受け取る」の案内と「オンにする」ボタンを表示する",
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -146,6 +146,15 @@ export const PushPromptOff: Story = {
     await expect(
       canvas.getByRole("button", { name: "オンにする" }),
     ).toBeVisible();
+  },
+};
+
+export const PushPromptHidden: Story = {
+  name: "pushSetting-s12: 通知一覧の上の案内は、受け取る設定・ブロック中・非対応・読み込み中・VAPID鍵なしのときは表示しない",
+  beforeEach: pushSetting("off"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText("プッシュ通知を受け取る")).toBeVisible();
 
     for (const state of [
       "on",
