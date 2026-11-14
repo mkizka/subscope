@@ -135,7 +135,7 @@ const openHistory = async (canvasElement: HTMLElement) => {
 };
 
 export const HistoryList: Story = {
-  name: "search-s8: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する",
+  name: "searchHistory-s1: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する",
   parameters: { path: "/search?q=word5" },
   beforeEach: seedHistory(
     Array.from({ length: 11 }, (_, i) => `word${11 - i}`),
@@ -154,7 +154,7 @@ export const HistoryList: Story = {
 };
 
 export const HistorySelect: Story = {
-  name: "search-s9: 履歴の語を選ぶと、検索欄にその語を入れて検索する",
+  name: "searchHistory-s2: 履歴の語を選ぶと、検索欄にその語を入れて検索する",
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -169,7 +169,7 @@ export const HistorySelect: Story = {
 };
 
 export const HistoryRemove: Story = {
-  name: "search-s10: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる",
+  name: "searchHistory-s3: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる",
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
