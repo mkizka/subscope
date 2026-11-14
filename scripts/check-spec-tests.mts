@@ -21,7 +21,7 @@ const collect = (files: string[], res: RegExp[]) => {
   return ids;
 };
 
-const specs = collect(globSync("docs/specs/*.md"), [SPEC_ID]);
+const specs = collect(globSync("docs/specs/**/*.md"), [SPEC_ID]);
 const tests = collect(
   globSync("{apps,packages,e2e}/**/*.{test,spec,stories}.{ts,tsx}", {
     exclude: (name) => name.includes("node_modules"),
