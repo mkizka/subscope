@@ -8,6 +8,17 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 - notImplemented-1: 実装していないXRPCには501とMethodNotImplementedを返す
 
+次のXRPCは、実装する予定がない。
+
+- `app.bsky.draft.*`
+- `app.bsky.notification.getPreferences`、`app.bsky.notification.putPreferencesV2`
+- `app.bsky.notification.putActivitySubscription`（`getGroupedNotifications`の`feed=activity`を含む）
+
+理由は2つある。
+
+- どれもSNSを便利にする機能で、基本機能の再現というPoCの目標に入らない。
+- PDSにない利用者の非公開データをAppViewのDBに保管する必要があり、保管するデータを増やしたくない。
+
 ## テイクダウン
 
 モデレーションサービスがテイクダウンしたアカウントや投稿と、PDSで停止されたアカウントを、APIの応答から隠す。データは消さないので、ラベルが取り消されたりアカウントが再開されたりすれば元に戻る。
