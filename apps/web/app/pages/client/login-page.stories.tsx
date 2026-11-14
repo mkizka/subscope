@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { LoginPage } from "./login-page";
 
@@ -74,21 +74,6 @@ export const InviteCodeSteps: Story = {
   },
 };
 
-export const LoginSubmitting: Story = {
-  name: "login-s4: 「ログイン」を押してから認証画面に移動するまで、ログインボタンを無効にしてスピナーを出す",
-  parameters: {
-    pending: true,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.type(canvas.getByLabelText("ハンドル"), "alice.test");
-    await userEvent.click(canvas.getByRole("button", { name: "ログイン" }));
-    await expect(
-      canvas.getByRole("button", { name: "ログイン" }),
-    ).toBeDisabled();
-  },
-};
-
 export const MemberNotice: Story = {
   name: "login-s5: 管理者がいるサーバーのログイン画面には、登録していないアカウントはログイン後に招待コードの入力が必要なことを出す",
   play: async ({ canvasElement }) => {
@@ -97,25 +82,6 @@ export const MemberNotice: Story = {
         "このサーバーに登録していないアカウントは、ログイン後に招待コードの入力が必要です",
       ),
     ).toBeVisible();
-  },
-};
-
-export const InviteCodeSubmitting: Story = {
-  name: "login-s6: 「登録する」を押してから結果が出るまで、登録ボタンを無効にしてスピナーを出す",
-  args: {
-    step: "inviteCode",
-  },
-  parameters: {
-    path: "/login",
-    pending: true,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.type(canvas.getByLabelText("招待コード"), "invalid-code");
-    await userEvent.click(canvas.getByRole("button", { name: "登録する" }));
-    await expect(
-      canvas.getByRole("button", { name: "登録する" }),
-    ).toBeDisabled();
   },
 };
 

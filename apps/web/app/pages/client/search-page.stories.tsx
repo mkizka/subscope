@@ -101,7 +101,7 @@ export const FromUrl: Story = {
 };
 
 export const Submitting: Story = {
-  name: "search-s4: 検索ボタンは検索結果を読み込み終えるまでスピナーを出して押せなくする",
+  name: "submitting-s1: ボタンやスイッチは、送信や切り替えが終わるまでスピナーを出して無効にする",
   beforeEach: () => pendingSearch("posts", "alice"),
   play: async ({ canvasElement }) => {
     const button = within(canvasElement).getByRole("button", { name: "検索" });
