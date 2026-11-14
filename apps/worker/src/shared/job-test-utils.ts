@@ -13,6 +13,7 @@ import { testSetup } from "@repo/test-utils";
 
 import type { LabelData } from "../application/interfaces/repositories/label-repository.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
+import { InMemoryRepoStatusFetcher } from "../infrastructure/repo-status-fetcher/repo-status-fetcher.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import { InMemoryWebPushSender } from "../infrastructure/web-push-sender/web-push-sender.in-memory.js";
 import { indexCommitCommandFactory } from "../presentation/tap.js";
@@ -24,6 +25,7 @@ import { testEnv } from "./test-utils.js";
 const jobTestRegistry = createWorkerRegistry(testEnv)
   .replaceValue("db", testSetup.ctx.db)
   .replaceService("tapClient", asClassArgs(InMemoryTapClient))
+  .replaceService("repoStatusFetcher", asClassArgs(InMemoryRepoStatusFetcher))
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
@@ -82,6 +84,7 @@ export const setupJobTest = async () => {
       services.checkBackfillUseCase.execute({ did, attempt }),
     indexLabel: (label: LabelData) => services.indexLabelUseCase.execute(label),
     tapClient: services.tapClient,
+    repoStatusFetcher: services.repoStatusFetcher,
     labelFetcher: services.labelFetcher,
   };
 };

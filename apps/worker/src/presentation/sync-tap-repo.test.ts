@@ -256,6 +256,27 @@ describe("バックフィルの状態の確認", () => {
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
   });
 
+  test("backfill-6: Tapの状態が error でリレーが削除済みと答えるアカウントは、Tapから外して完了として保存し、確認を止める", async () => {
+    // arrange
+    const { checkBackfill, tapClient, repoStatusFetcher, jobScheduler } =
+      await setupJobTest();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const did = asDid(serverMember.did);
+    await tapClient.addRepo(did);
+    tapClient.setRepoState(did, "error");
+    repoStatusFetcher.setDeleted(did);
+
+    // act
+    await checkBackfill(did, 1);
+
+    // assert
+    expect(await findBackfillStatus(did)).toBe("completed");
+    expect(tapClient.getRegisteredDids()).toEqual([]);
+    expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
+  });
+
   test("backfill-5: 起動時に、状態をまだ確認していない追跡アカウントを確認する", async () => {
     // arrange
     const { indexCommit, scheduleBackfillChecks, jobScheduler } =

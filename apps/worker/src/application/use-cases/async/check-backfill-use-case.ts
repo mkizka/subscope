@@ -5,6 +5,7 @@ import type {
 } from "@repo/common/interface";
 
 import type { BackfillStatus } from "../../../domain/account.js";
+import type { IRepoStatusFetcher } from "../../interfaces/external/repo-status-fetcher.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
@@ -20,6 +21,7 @@ const toBackfillStatus = (tapState: string): BackfillStatus => {
 export class CheckBackfillUseCase {
   constructor(
     private readonly tapClient: ITapClient,
+    private readonly repoStatusFetcher: IRepoStatusFetcher,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly accountRepository: IAccountRepository,
     private readonly jobScheduler: IJobScheduler,
@@ -38,7 +40,16 @@ export class CheckBackfillUseCase {
     if (!account) {
       return;
     }
-    const status = toBackfillStatus(await this.tapClient.getRepoState(did));
+    const tapState = await this.tapClient.getRepoState(did);
+    if (tapState === "error" && (await this.repoStatusFetcher.isDeleted(did))) {
+      await this.tapClient.removeRepo(did);
+      account.updateBackfillStatus("completed");
+      await this.transactionManager.transaction((ctx) =>
+        this.accountRepository.save({ ctx, account }),
+      );
+      return;
+    }
+    const status = toBackfillStatus(tapState);
     account.updateBackfillStatus(status);
     await this.transactionManager.transaction((ctx) =>
       this.accountRepository.save({ ctx, account }),

@@ -19,6 +19,7 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("http://localhost:2480"),
   }),
+  RELAY_URL: z.url().default("https://relay1.us-east.bsky.network"),
   MODERATION_URL: z.url().default("https://mod.bsky.app"),
   TAP_CONCURRENCY: z.coerce.number().default(64),
   VAPID_PUBLIC_KEY: match({
