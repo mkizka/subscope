@@ -210,6 +210,9 @@ searchPostsの後継で、公式クライアントの投稿検索はこれを使
 - since、until
 - languages
 - `to:me`(queryに含まれていても、ただの語として扱う)
+- hashtags、mentions、domains、urls(絞り込みには使わない)
+
+hashtags、mentions、domains、urlsを無視する理由は、公式AppView内蔵の検索実装(atprotoのpackages/bsky/src/data-plane/server/routes/search.ts)も本文のLIKEとauthorsの先頭しか見ず、これらを無視しているため。本番のbskyでは別の検索サービスが絞り込みを担っている。公式アプリ1.137系はハッシュタグ画面でqueryを空にしてhashtagsだけを送るため、その版では0件になる。現在の本番の公式アプリは旧APIのsearchPostsを`q=#タグ`で呼び、本文検索で見つかる。
 
 ## app.bsky.feed.getPosts
 
