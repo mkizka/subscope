@@ -80,7 +80,7 @@ const tweet = {
 };
 
 export const LinkCard: Story = {
-  name: "link-card-s1: リンクカードのサムネイル・タイトル・説明を投稿の中に表示し、選ぶとリンク先を新しいタブで開く",
+  name: "linkCard-s1: リンクカードのサムネイル・タイトル・説明を投稿の中に表示し、選ぶとリンク先を新しいタブで開く",
   beforeEach: () => {
     setPost({
       uri: "https://example.com/link-card",
@@ -104,7 +104,7 @@ export const LinkCard: Story = {
 };
 
 export const TweetEmbed: Story = {
-  name: "link-card-s2: リンク先がx.com・twitter.comのツイートの場合は、リンクカードの代わりにツイートを埋め込んで表示する",
+  name: "linkCard-s2: リンク先がx.com・twitter.comのツイートの場合は、リンクカードの代わりにツイートを埋め込んで表示する",
   beforeEach: () => {
     setPost(tweet);
   },
@@ -123,7 +123,7 @@ export const TweetEmbed: Story = {
 };
 
 export const TweetEmbedClick: Story = {
-  name: "link-card-s3: 埋め込んだツイートの中を選んだ場合は、投稿の詳細へ遷移せずツイート側の操作を優先する",
+  name: "linkCard-s3: 埋め込んだツイートの中を選んだ場合は、投稿の詳細へ遷移せずツイート側の操作を優先する",
   beforeEach: () => {
     setPost(tweet);
   },
@@ -211,7 +211,7 @@ const openViewer = async (canvasElement: HTMLElement, alt: string) => {
 };
 
 export const ImageViewerOpen: Story = {
-  name: "image-viewer-s1: 投稿画像を選ぶと、スレッドは開かずに元サイズの画像を拡大して表示する",
+  name: "imageViewer-s1: 投稿画像を選ぶと、スレッドは開かずに元サイズの画像を拡大して表示する",
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像");
@@ -221,7 +221,7 @@ export const ImageViewerOpen: Story = {
 };
 
 export const ImageViewerNavigate: Story = {
-  name: "image-viewer-s2: 画像が複数あるときは、前後の画像に切り替えられる",
+  name: "imageViewer-s2: 画像が複数あるときは、前後の画像に切り替えられる",
   beforeEach: withImages(["画像1", "画像2"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像1");
@@ -238,7 +238,7 @@ export const ImageViewerNavigate: Story = {
 };
 
 export const ImageViewerAlt: Story = {
-  name: "image-viewer-s3: 拡大した画像の下にALTを表示する",
+  name: "imageViewer-s3: 拡大した画像の下にALTを表示する",
   beforeEach: withImages(["ALTの文章"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "ALTの文章");
@@ -248,7 +248,7 @@ export const ImageViewerAlt: Story = {
 };
 
 export const ImageViewerClose: Story = {
-  name: "image-viewer-s4: 閉じるボタンかEscキーで閉じる",
+  name: "imageViewer-s4: 閉じるボタンかEscキーで閉じる",
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像");
@@ -264,7 +264,7 @@ export const ImageViewerClose: Story = {
 };
 
 export const ImageViewerSwipe: Story = {
-  name: "image-viewer-s5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる",
+  name: "imageViewer-s5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる",
   beforeEach: withImages(["画像1", "画像2"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像1");
@@ -313,7 +313,7 @@ export const ImageViewerSwipe: Story = {
 };
 
 export const ImageViewerZoom: Story = {
-  name: "image-viewer-s6: 拡大表示した画像はピンチ操作か拡大ボタンでさらにズームできる",
+  name: "imageViewer-s6: 拡大表示した画像はピンチ操作か拡大ボタンでさらにズームできる",
   beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
     const viewer = await openViewer(canvasElement, "画像");
@@ -379,7 +379,7 @@ const article = (root: HTMLElement, text: string) => {
 };
 
 export const DeleteOnlyOwnPost: Story = {
-  name: "post-toolbar-s1: 「…」メニューの削除は自分の投稿にだけ表示する",
+  name: "postToolbar-s1: 「…」メニューの削除は自分の投稿にだけ表示する",
   beforeEach: withToolbarPosts,
   play: async ({ canvasElement }) => {
     const mine = article(canvasElement, "自分の投稿");
@@ -396,7 +396,7 @@ export const DeleteOnlyOwnPost: Story = {
 };
 
 export const LikedHeartFilled: Story = {
-  name: "post-toolbar-s2: いいね済みの投稿のいいねボタンはハートを塗りつぶして表示する",
+  name: "postToolbar-s2: いいね済みの投稿のいいねボタンはハートを塗りつぶして表示する",
   beforeEach: withToolbarPosts,
   play: async ({ canvasElement }) => {
     const heart = (text: string) =>
@@ -482,7 +482,7 @@ const setImagePost = (images: number) => () => {
 };
 
 export const SingleImage: Story = {
-  name: "post-images-s1: 画像が1枚のときは、投稿の幅いっぱいに表示する",
+  name: "postImages-s1: 画像が1枚のときは、投稿の幅いっぱいに表示する",
   beforeEach: setImagePost(1),
   play: async ({ canvasElement }) => {
     const post = within(canvasElement).getByRole("article");
@@ -495,7 +495,7 @@ export const SingleImage: Story = {
 };
 
 export const ManyImages: Story = {
-  name: "post-images-s2: 画像が5枚以上のときは、横スクロールで表示する",
+  name: "postImages-s2: 画像が5枚以上のときは、横スクロールで表示する",
   beforeEach: setImagePost(5),
   play: async ({ canvasElement }) => {
     const post = within(canvasElement).getByRole("article");
@@ -543,7 +543,7 @@ const player = (canvasElement: HTMLElement) =>
   });
 
 export const VideoCenteredPlay: Story = {
-  name: "post-video-s1: 停止中は動画の中央に再生ボタンを表示する",
+  name: "postVideo-s1: 停止中は動画の中央に再生ボタンを表示する",
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
     await player(canvasElement);
@@ -554,7 +554,7 @@ export const VideoCenteredPlay: Story = {
 };
 
 export const VideoTime: Story = {
-  name: "post-video-s2: 再生ボタンの横に、経過時間と動画の長さを表示する",
+  name: "postVideo-s2: 再生ボタンの横に、経過時間と動画の長さを表示する",
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
     await player(canvasElement);
@@ -565,7 +565,7 @@ export const VideoTime: Story = {
 };
 
 export const VideoThumbnailAndLabel: Story = {
-  name: "post-video-s3: 動画はサムネイルを表示し、ALTをプレイヤーのラベルにする",
+  name: "postVideo-s3: 動画はサムネイルを表示し、ALTをプレイヤーのラベルにする",
   beforeEach: withVideoPosts({ video }),
   play: async ({ canvasElement }) => {
     const el = await player(canvasElement);
@@ -574,7 +574,7 @@ export const VideoThumbnailAndLabel: Story = {
 };
 
 export const QuotedVideo: Story = {
-  name: "post-video-s4: 引用された投稿に付いた動画を、引用した投稿の中に表示する",
+  name: "postVideo-s4: 引用された投稿に付いた動画を、引用した投稿の中に表示する",
   beforeEach: withVideoPosts({
     quote: { authorHandle: "bob.bsky.social", text: "引用された動画", video },
   }),
@@ -639,7 +639,7 @@ const writeAlt = async (dialogElement: HTMLElement, n: number, alt: string) => {
 };
 
 export const PostFormTextLimit: Story = {
-  name: "post-form-s1: 300字を超えると投稿できない",
+  name: "postForm-s1: 300字を超えると投稿できない",
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
     const textbox = dialog.getByRole("textbox", { name: "投稿内容" });
@@ -654,7 +654,7 @@ export const PostFormTextLimit: Story = {
 };
 
 export const PostFormImageLimit: Story = {
-  name: "post-form-s2: 画像は4枚まで添付できる",
+  name: "postForm-s2: 画像は4枚まで添付できる",
   play: async ({ canvasElement }) => {
     const dialogElement = await openCompose(canvasElement);
     const dialog = within(dialogElement);
@@ -669,7 +669,7 @@ export const PostFormImageLimit: Story = {
 };
 
 export const PostFormAuthor: Story = {
-  name: "post-form-s3: 入力欄に添えて、自分のアイコン・名前・ハンドルを表示する",
+  name: "postForm-s3: 入力欄に添えて、自分のアイコン・名前・ハンドルを表示する",
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
 
@@ -678,7 +678,7 @@ export const PostFormAuthor: Story = {
 };
 
 export const PostFormReply: Story = {
-  name: "post-form-s4: 返信するときは、自分の名前の上に返信先の投稿の投稿者名・ハンドル・本文を表示し、投稿ボタンを「返信」にする",
+  name: "postForm-s4: 返信するときは、自分の名前の上に返信先の投稿の投稿者名・ハンドル・本文を表示し、投稿ボタンを「返信」にする",
   play: async ({ canvasElement }) => {
     const dialog = within(await openComposeFromPost(canvasElement, "返信"));
     const target = dialog.getByRole("article", { name: "返信先" });
@@ -693,7 +693,7 @@ export const PostFormReply: Story = {
 };
 
 export const PostFormQuote: Story = {
-  name: "post-form-s5: 引用するときは、入力欄の下に引用先の投稿の投稿者名と本文を枠で囲んで表示する",
+  name: "postForm-s5: 引用するときは、入力欄の下に引用先の投稿の投稿者名と本文を枠で囲んで表示する",
   play: async ({ canvasElement }) => {
     const dialog = within(await openComposeFromPost(canvasElement, "引用"));
     const quote = dialog.getByRole("blockquote");
@@ -704,7 +704,7 @@ export const PostFormQuote: Story = {
 };
 
 export const PostFormReplyRules: Story = {
-  name: "post-form-s6: 返信できる人の設定は入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ",
+  name: "postForm-s6: 返信できる人の設定は入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ",
   play: async ({ canvasElement }) => {
     const dialog = within(await openCompose(canvasElement));
 
@@ -720,7 +720,7 @@ export const PostFormReplyRules: Story = {
 };
 
 export const PostFormReplyHidesRules: Story = {
-  name: "post-form-s7: 返信するときは、返信できる人の設定を表示しない",
+  name: "postForm-s7: 返信するときは、返信できる人の設定を表示しない",
   play: async ({ canvasElement }) => {
     const dialog = within(await openComposeFromPost(canvasElement, "返信"));
 
@@ -732,7 +732,7 @@ export const PostFormReplyHidesRules: Story = {
 };
 
 export const PostFormMobile: Story = {
-  name: "post-form-s8: モバイルでは、ソフトウェアキーボードで入力欄が隠れないよう、投稿欄を画面の上寄せで開く",
+  name: "postForm-s8: モバイルでは、ソフトウェアキーボードで入力欄が隠れないよう、投稿欄を画面の上寄せで開く",
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
     await openCompose(canvasElement);
@@ -746,7 +746,7 @@ export const PostFormMobile: Story = {
 };
 
 export const PostFormAltBadge: Story = {
-  name: "post-form-s9: 添付した画像には、ALTが未入力なら「+ ALT」、入力済みなら「ALT」のバッジを重ね、押すとその画像のALTを入力するダイアログを開く",
+  name: "postForm-s9: 添付した画像には、ALTが未入力なら「+ ALT」、入力済みなら「ALT」のバッジを重ね、押すとその画像のALTを入力するダイアログを開く",
   play: async ({ canvasElement }) => {
     const dialogElement = await openCompose(canvasElement);
     const dialog = within(dialogElement);
@@ -755,7 +755,7 @@ export const PostFormAltBadge: Story = {
       dialog.getByRole("button", { name: `画像${n}のALTを編集` });
     await expect(badge(1)).toHaveTextContent("+ ALT");
 
-    await writeAlt(dialogElement, 1, "post-form-s9");
+    await writeAlt(dialogElement, 1, "postForm-s9");
 
     await expect(badge(1)).toHaveTextContent(/^ALT$/);
     await expect(badge(2)).toHaveTextContent("+ ALT");
@@ -764,12 +764,12 @@ export const PostFormAltBadge: Story = {
       dialog
         .getByRole("dialog", { name: "ALTを追加" })
         .querySelector("textarea, input"),
-    ).toHaveValue("post-form-s9");
+    ).toHaveValue("postForm-s9");
   },
 };
 
 export const PostFormAltLimit: Story = {
-  name: "post-form-s10: ALTは2000字を超えると保存できない",
+  name: "postForm-s10: ALTは2000字を超えると保存できない",
   play: async ({ canvasElement }) => {
     const dialogElement = await openCompose(canvasElement);
     const dialog = within(dialogElement);

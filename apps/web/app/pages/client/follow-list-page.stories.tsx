@@ -48,7 +48,7 @@ const emptyData = (
 };
 
 export const SyncStatus: Story = {
-  name: "follow-list-s1: 一覧の追跡アカウントには過去の投稿の同期状態を表示する",
+  name: "followList-s1: 一覧の追跡アカウントには過去の投稿の同期状態を表示する",
   beforeEach: () => {
     queryClient.setQueryData(
       ["follow-list", alice.handle, "follows", "all"],
@@ -66,7 +66,7 @@ export const SyncStatus: Story = {
 };
 
 export const Loading: Story = {
-  name: "follow-list-s2: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する",
+  name: "followList-s2: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["follow-list", alice.handle] });
     queryClient
@@ -88,7 +88,7 @@ export const Loading: Story = {
 };
 
 export const FollowersTabs: Story = {
-  name: "follow-list-s3: フォロワー一覧に「すべて」「知り合い」「メンバー」のタブを表示し、「メンバー」には人数を添える",
+  name: "followList-s3: フォロワー一覧に「すべて」「知り合い」「メンバー」のタブを表示し、「メンバー」には人数を添える",
   args: { kind: "followers" },
   parameters: { path: "/alice.bsky.social/followers" },
   beforeEach: () => {
@@ -110,7 +110,7 @@ export const FollowersTabs: Story = {
 };
 
 export const FollowsEmpty: Story = {
-  name: "follow-list-s4: 読み込みが終わって0件のときは、フォロー一覧には「フォローしているアカウントはありません」を表示する",
+  name: "followList-s4: 読み込みが終わって0件のときは、フォロー一覧には「フォローしているアカウントはありません」を表示する",
   args: { handle: "dave.bsky.social" },
   beforeEach: () => emptyData("dave.bsky.social", "follows"),
   play: async ({ canvasElement }) => {
@@ -121,7 +121,7 @@ export const FollowsEmpty: Story = {
 };
 
 export const FollowersEmpty: Story = {
-  name: "follow-list-s5: 読み込みが終わって0件のときは、フォロワー一覧には「フォロワーはいません」を表示する",
+  name: "followList-s5: 読み込みが終わって0件のときは、フォロワー一覧には「フォロワーはいません」を表示する",
   args: { handle: "dave.bsky.social", kind: "followers" },
   beforeEach: () => emptyData("dave.bsky.social", "followers"),
   play: async ({ canvasElement }) => {
@@ -148,7 +148,7 @@ export const KnownFollowers: Story = {
 };
 
 export const KnownFollowersEmpty: Story = {
-  name: "follow-list-s6: 「知り合い」タブの読み込みが終わって0件のときは、「知り合いのフォロワーはいません」を表示する",
+  name: "followList-s6: 「知り合い」タブの読み込みが終わって0件のときは、「知り合いのフォロワーはいません」を表示する",
   args: { handle: "dave.bsky.social", kind: "followers" },
   parameters: {
     path: "/dave.bsky.social/followers?filter=known",

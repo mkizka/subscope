@@ -68,7 +68,7 @@ const serverMembersData = (
 });
 
 export const MemberCount: Story = {
-  name: "admin-accounts-s1: 見出しの横にメンバーの人数を出す",
+  name: "adminAccounts-s1: 見出しの横にメンバーの人数を出す",
   beforeEach: () => {
     queryClient.setQueryData(
       ["serverMembers"],
@@ -84,7 +84,7 @@ export const MemberCount: Story = {
 };
 
 export const BannedAccounts: Story = {
-  name: "admin-accounts-s2: 「停止中」タブにはサーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す",
+  name: "adminAccounts-s2: 「停止中」タブにはサーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す",
   parameters: { path: "/admin/registered-accounts?tab=banned" },
   beforeEach: () => {
     queryClient.setQueryData(["bannedAccounts"], {
@@ -108,7 +108,7 @@ export const BannedAccounts: Story = {
 };
 
 export const BackfillBadges: Story = {
-  name: "admin-accounts-s3: 「メンバー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す",
+  name: "adminAccounts-s3: 「メンバー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す",
   beforeEach: () => {
     queryClient.setQueryData(["serverMembers"], {
       pages: [
@@ -151,7 +151,7 @@ export const BackfillBadges: Story = {
 };
 
 export const ServerMembersLoading: Story = {
-  name: "admin-accounts-s4: メンバーの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
+  name: "adminAccounts-s4: メンバーの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     void queryClient.query({
       queryKey: ["serverMembers"],
