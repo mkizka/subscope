@@ -120,7 +120,7 @@ test.describe("プッシュ通知", () => {
     ).not.toBeChecked();
   });
 
-  test("pushSetting-e5: 通知ページの案内の「オンにする」を押すと、その端末へプッシュ通知を送るようにして、案内を消す", async ({
+  test("pushSetting-e5: 通知ページの案内の「オンにする」を押すと、その端末へプッシュ通知を送るようにして、案内を「プッシュ通知をオンにしました」に変える", async ({
     newDevice,
   }) => {
     const { page } = await newDevice();
@@ -128,7 +128,8 @@ test.describe("プッシュ通知", () => {
 
     await page.getByRole("button", { name: "オンにする" }).click();
 
-    await expect(page.getByText("プッシュ通知を受け取る")).toBeHidden();
+    await expect(page.getByText("プッシュ通知をオンにしました")).toBeVisible();
+    await expect(page.getByRole("button", { name: "オンにする" })).toBeHidden();
     await page.goto("/settings");
     await expect(
       page.getByRole("switch", { name: "プッシュ通知" }),
