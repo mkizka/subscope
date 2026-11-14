@@ -186,6 +186,8 @@ export class ProfileViews {
         $type: "app.bsky.actor.defs#viewerState",
         following: viewerState.following,
         followedBy: viewerState.followedBy,
+        blocking: viewerState.blocking,
+        blockedBy: viewerState.blockedBy,
       },
       labels: [
         ...toLabelViews(didLabels),
