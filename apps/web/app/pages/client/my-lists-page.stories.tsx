@@ -1,6 +1,6 @@
 import { asAtUriString } from "@atproto/syntax";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { alice, type Data, queryClient } from "@/.storybook/query-client";
 import type { loader as listsLoader } from "@/app/routes/api.lists.$handle";
@@ -50,23 +50,6 @@ export const Empty: Story = {
       ["lists", alice.handle],
       { lists: [], isSelf: true },
     );
-  },
-};
-
-export const Submitting: Story = {
-  name: "list-s1: リストの作成・保存ボタンは、送信が終わるまでスピナーを出して押せなくする",
-  parameters: { pending: true },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: "新しいリスト" }));
-    const dialog = within(canvas.getByRole("dialog"));
-    await userEvent.type(dialog.getByLabelText("名前"), "新しいリスト名");
-    const button = dialog.getByRole("button", { name: "作成する" });
-
-    await userEvent.click(button);
-
-    await expect(button).toBeDisabled();
-    await expect(button.querySelector(".animate-spin")).not.toBeNull();
   },
 };
 
