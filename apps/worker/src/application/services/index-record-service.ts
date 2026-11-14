@@ -10,7 +10,6 @@ import type { Record } from "../dto/record.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexAccountService } from "./index-account-service.js";
-import type { BlockIndexer } from "./indexer/block-indexer.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";
 import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
@@ -47,7 +46,6 @@ export class IndexRecordService {
     listItemIndexer: ListItemIndexer,
     gateIndexer: GateIndexer,
     linkIndexer: LinkIndexer,
-    blockIndexer: BlockIndexer,
   ) {
     this.indexers = {
       "app.bsky.feed.post": postIndexer,
@@ -55,7 +53,6 @@ export class IndexRecordService {
       "app.bsky.feed.repost": repostIndexer,
       "app.bsky.actor.profile": profileIndexer,
       "app.bsky.actor.link": linkIndexer,
-      "app.bsky.graph.block": blockIndexer,
       "app.bsky.graph.follow": followIndexer,
       "app.bsky.feed.like": likeIndexer,
       "app.bsky.graph.list": listIndexer,

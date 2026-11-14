@@ -232,6 +232,13 @@
       "when": 1794612094336,
       "tag": "0032_add-blocks",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794655128353,
+      "tag": "0033_drop-blocks",
+      "breakpoints": true
     }
   ]
 }
