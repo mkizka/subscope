@@ -51,19 +51,7 @@
 
 ### 管理画面
 
-- [管理画面仕様](./specs/web-admin.md) の機能を新 UI で実装
-
-## v1.0 に必要なバックエンドの追加実装
-
-Web クライアントの v1 機能を満たすため、以下を実装する。
-
-- 通知
-  - `app.bsky.notification.listNotifications`
-  - `app.bsky.notification.getUnreadCount`
-  - `app.bsky.notification.updateSeen`
-- リスト
-  - `app.bsky.graph.list` / `app.bsky.graph.listitem` のインデックス
-  - `app.bsky.graph.getList` / `app.bsky.graph.getLists` / `app.bsky.feed.getListFeed`
+- [管理画面仕様](./specs/web-admin.md) の機能を実装
 
 ## v1.0 の対象外
 

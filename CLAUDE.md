@@ -84,8 +84,6 @@ Reactコンポーネントは以下の方針で実装しています。
   - apps/web/DESIGN.md
 - Lexiconのインデックス実装追加ガイド
   - docs/dev/lexicon-implementation.md
-- Identity Event処理
-  - docs/dev/identity-event-handling.md
 - リポジトリとクエリサービスの使い分け
   - docs/dev/repository-and-query.md
 - appviewのビュー生成(ViewContext、*Views)
@@ -119,7 +117,7 @@ Reactコンポーネントは以下の方針で実装しています。
 - 見出しはAPIの名前か機能・画面の名前とし、直後にその機能が何をするかを1〜2文で書く
 - 仕様項目は「〜の場合、〜を返す」というテストの条件ではなく、「〜する」「〜は含めない」という振る舞いのルールを1つだけ書く
 - IDは`{見出しの短い名前}-{連番}`とする。見出しの短い名前はcamelCaseにする(例: getTimeline-1, postForm-e1)
-  - webは`{見出しの短い名前}-e{連番}`(E2E)か`{見出しの短い名前}-s{連番}`(play)とする(例: login-e1, login-s1)。既存の`-{連番}`のIDは、見出しごとのテスト移行で振り直す
+  - webは`{見出しの短い名前}-e{連番}`(E2E)か`{見出しの短い名前}-s{連番}`(play)とする(例: login-e1, login-s1)
   - 連番は見出しごと(webはeとsそれぞれ)に、追加した順に次の番号を振る。項目を削除しても詰めず、仕様書内の並び順も問わない
 - 理由や補足などテストできない記述はIDなしの地の文にする
 
