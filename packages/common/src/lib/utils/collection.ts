@@ -7,7 +7,6 @@ import post from "@repo/client/app/bsky/feed/post";
 import postgate from "@repo/client/app/bsky/feed/postgate";
 import repost from "@repo/client/app/bsky/feed/repost";
 import threadgate from "@repo/client/app/bsky/feed/threadgate";
-import block from "@repo/client/app/bsky/graph/block";
 import follow from "@repo/client/app/bsky/graph/follow";
 import list from "@repo/client/app/bsky/graph/list";
 import listitem from "@repo/client/app/bsky/graph/listitem";
@@ -21,7 +20,6 @@ export const SUPPORTED_COLLECTION_SCHEMAS = {
   "app.bsky.feed.postgate": postgate,
   "app.bsky.feed.repost": repost,
   "app.bsky.feed.threadgate": threadgate,
-  "app.bsky.graph.block": block,
   "app.bsky.graph.follow": follow,
   "app.bsky.graph.list": list,
   "app.bsky.graph.listitem": listitem,

@@ -71,28 +71,6 @@ export const follows = pgTable(
   ],
 );
 
-export const blocks = pgTable(
-  "blocks",
-  {
-    uri: varchar({ length: 256 })
-      .primaryKey()
-      .references(() => records.uri, { onDelete: "cascade" }),
-    cid: varchar({ length: 256 }).notNull(),
-    accountDid: varchar({ length: 256 })
-      .notNull()
-      .references(() => accounts.did, { onDelete: "cascade" }),
-    subjectDid: varchar({ length: 256 })
-      .notNull()
-      .references(() => accounts.did, { onDelete: "cascade" }),
-    createdAt: timestamp().notNull(),
-    indexedAt: timestamp().notNull(),
-  },
-  (table) => [
-    index("blocks_account_subject_idx").on(table.accountDid, table.subjectDid),
-    index("blocks_subject_account_idx").on(table.subjectDid, table.accountDid),
-  ],
-);
-
 export const profiles = pgTable(
   "profiles",
   {

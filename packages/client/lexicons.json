@@ -52,7 +52,6 @@
     "app.bsky.feed.searchPosts",
     "app.bsky.feed.searchPostsV2",
     "app.bsky.feed.threadgate",
-    "app.bsky.graph.block",
     "app.bsky.graph.defs",
     "app.bsky.graph.follow",
     "app.bsky.graph.getFollowers",
@@ -247,10 +246,6 @@
     "app.bsky.feed.threadgate": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.feed.threadgate",
       "cid": "bafyreiht77wd6duduz4yqp62m6dwma5dy7gdihps4g2nd73acfzqlglvdi"
-    },
-    "app.bsky.graph.block": {
-      "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.block",
-      "cid": "bafyreifalnveckyi2375ek5b5uyg4ef23mktcdktmgiwwsb3rygdls7owm"
     },
     "app.bsky.graph.defs": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.graph.defs",

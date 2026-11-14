@@ -64,12 +64,10 @@ Web クライアントの v1 機能を満たすため、以下を実装する。
 - リスト
   - `app.bsky.graph.list` / `app.bsky.graph.listitem` のインデックス
   - `app.bsky.graph.getList` / `app.bsky.graph.getLists` / `app.bsky.feed.getListFeed`
-- ブロック
-  - `app.bsky.graph.block` のインデックス
 
 ## v1.0 の対象外
 
 - カスタムフィード
-- ミュート
+- ブロック・ミュート
 - DM
 - スターターパック

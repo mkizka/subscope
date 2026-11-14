@@ -225,13 +225,6 @@
       "when": 1794394673676,
       "tag": "0031_talented_silver_samurai",
       "breakpoints": true
-    },
-    {
-      "idx": 32,
-      "version": "7",
-      "when": 1794612094336,
-      "tag": "0032_add-blocks",
-      "breakpoints": true
     }
   ]
 }
