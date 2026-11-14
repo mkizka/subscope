@@ -10,6 +10,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 次のXRPCは、実装する予定がない。
 
+- `app.bsky.bookmark.*`（`viewer.bookmarked`と`bookmarkCount`も返さない）
 - `app.bsky.draft.*`
 - `app.bsky.notification.getPreferences`、`app.bsky.notification.putPreferencesV2`
 - `app.bsky.notification.putActivitySubscription`（`getGroupedNotifications`の`feed=activity`を含む）
@@ -18,6 +19,8 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 - どれもSNSを便利にする機能で、基本機能の再現というPoCの目標に入らない。
 - PDSにない利用者の非公開データをAppViewのDBに保管する必要があり、保管するデータを増やしたくない。
+
+ブックマークは自分だけが見る非公開の保存リストで、無くても基本体験は変わらない。そのため見送る。公式クライアントでブックマークボタンを押すとエラーになり、ブックマーク一覧も開けない。
 
 ## テイクダウン
 
