@@ -6,7 +6,6 @@
 
 - getFollowers-1: 指定したアカウントをsubjectに、そのフォロワーをfollowersにprofileViewで返す
 - getFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
-- getFollowers-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める
 
 ## app.bsky.graph.getFollows
 
@@ -14,7 +13,6 @@
 
 - getFollows-1: 指定したアカウントをsubjectに、そのフォロー先をfollowsにprofileViewで返す
 - getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
-- getFollows-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める
 
 ## app.bsky.graph.getKnownFollowers
 
@@ -30,7 +28,6 @@
 
 - getList-1: 指定したリストのlistViewと、リストに追加されたアカウントのprofileViewをitemsで返す
 - getList-2: 保存されていないリストには400を返す
-- getList-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める
 
 ## app.bsky.graph.getLists
 

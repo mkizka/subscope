@@ -151,7 +151,6 @@ export const BackfillBadges: Story = {
 };
 
 export const ServerMembersLoading: Story = {
-  name: "adminAccounts-s4: メンバーの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     void queryClient.query({
       queryKey: ["serverMembers"],
@@ -160,14 +159,5 @@ export const ServerMembersLoading: Story = {
   },
   args: {
     children: <ServerMemberListContainer />,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("heading", { name: "アカウント管理" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
   },
 };

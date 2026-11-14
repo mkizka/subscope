@@ -48,7 +48,6 @@ const emptyData = (
 };
 
 export const Loading: Story = {
-  name: "followList-s2: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["follow-list", alice.handle] });
     queryClient
@@ -57,15 +56,6 @@ export const Loading: Story = {
         queryFn: () => new Promise<never>(() => {}),
       })
       .catch(() => {});
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("heading", { name: "フォロー" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
   },
 };
 

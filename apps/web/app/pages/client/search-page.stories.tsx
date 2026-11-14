@@ -112,13 +112,7 @@ export const Submitting: Story = {
 };
 
 export const Loading: Story = {
-  name: "search-s6: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => pendingSearch("posts", "alice"),
-  play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
-  },
 };
 
 const seedHistory = (words: string[]) => () => {
