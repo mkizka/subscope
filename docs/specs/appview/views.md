@@ -60,6 +60,12 @@
 - embed-1: gallery埋め込みの画像は引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す
 - embed-2: 動画の埋め込みは再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す
 
+## フォロー状態
+
+閲覧者がフォローしているアカウントには、どのAPIでも同じようにviewer.followingを返す。
+
+- viewerFollowing-1: 閲覧者がフォローしているアカウントのビュー(profileViewのほか、投稿のauthor、フィードジェネレーターのcreatorなど)には、viewer.followingにそのフォローのURIを含める
+
 ## フィード
 
 getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPostで返す。

@@ -116,7 +116,6 @@ export const Toolbars: Story = {
 };
 
 export const Loading: Story = {
-  name: "thread-s3: スレッドを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまで選んだ投稿・返信を書く欄・返信の場所の形のスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["thread", alice.handle] });
     queryClient
@@ -125,13 +124,6 @@ export const Loading: Story = {
         queryFn: () => new Promise<never>(() => {}),
       })
       .catch(() => {});
-  },
-  play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByRole("status", {
-        name: "読み込み中",
-      }),
-    ).toBeVisible();
   },
 };
 

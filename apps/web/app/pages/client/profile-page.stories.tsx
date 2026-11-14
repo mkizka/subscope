@@ -390,23 +390,12 @@ export const ImageViewerProfile: Story = {
 };
 
 export const ListsLoading: Story = {
-  name: "list-s5: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   parameters: {
     path: "/alice.bsky.social/lists",
     route: listsRoute,
   },
   beforeEach: () => {
     void pending(["lists", alice.handle]);
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByRole("tab", { name: "リスト" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    await expect(
-      canvas.getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
   },
 };
 

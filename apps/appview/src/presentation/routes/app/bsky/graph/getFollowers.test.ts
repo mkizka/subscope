@@ -84,40 +84,4 @@ describe("app.bsky.graph.getFollowers", () => {
     ]);
     expect(secondPage.followers.map((a) => a.did)).toEqual([oldAccount.did]);
   });
-
-  test("getFollowers-3: 認証した場合、閲覧者がフォローしているアカウントはviewer.followingを含める", async () => {
-    // arrange
-    const { client, loginAs } = await setupApiTest();
-    const create = () =>
-      accountFactory(ctx.db)
-        .use((t) => t.withProfile({}))
-        .create();
-    const follow = (
-      account: Awaited<ReturnType<typeof create>>,
-      followee: Awaited<ReturnType<typeof create>>,
-    ) =>
-      followFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.graph.follow")
-              .vars({ accountDid: () => account.did })
-              .create(),
-          followee: () => followee,
-        })
-        .create();
-    const viewer = await create();
-    const account = await create();
-    const other = await create();
-    await follow(other, account);
-    const viewerFollow = await follow(viewer, other);
-    loginAs(viewer.did);
-
-    // act
-    const res = await client.call(getFollowers, {
-      actor: asAtIdentifierString(account.did),
-    });
-
-    // assert
-    expect(res.followers[0]?.viewer?.following).toBe(viewerFollow.uri);
-  });
 });
