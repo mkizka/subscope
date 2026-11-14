@@ -25,7 +25,17 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
             .vars({ account: () => author })
             .create(),
       });
-    return { createPost };
+    const createReply = (
+      parent: { uri: string; cid: string },
+      root: { uri: string; cid: string },
+      index: number,
+    ) => {
+      const at = new Date(Date.UTC(2026, 0, 1, 0, 0, index));
+      return createPost()
+        .use((t) => t.asReplyTo(parent, root))
+        .props({ createdAt: () => at, indexedAt: () => at });
+    };
+    return { createPost, createReply };
   };
 
   const setupThread = async () => {
@@ -103,19 +113,15 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
   });
 
   const setupReplies = async (count: number) => {
-    const { createPost } = await setupAuthor();
+    const { createReply, createPost } = await setupAuthor();
     const anchor = await createPost().create();
     const replies = [];
     for (let i = 0; i < count; i++) {
-      replies.push(
-        await createPost()
-          .use((t) => t.asReplyTo(anchor))
-          .create(),
-      );
+      replies.push(await createReply(anchor, anchor, i).create());
     }
     const [firstReply] = replies;
     if (!firstReply) throw new Error("count must be 1 or more");
-    return { createPost, anchor, firstReply, replies };
+    return { createReply, anchor, firstReply, replies };
   };
 
   test("getPostThreadV2-4: アンカー投稿への直接のリプライは、件数に関わらず全て含める", async () => {
@@ -138,14 +144,10 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
   test("getPostThreadV2-5: depth 1より深いリプライは、投稿ごとにbranchingFactor件までを古い順に含める", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const { createPost, anchor, firstReply } = await setupReplies(1);
+    const { createReply, anchor, firstReply } = await setupReplies(1);
     const nested = [];
     for (let i = 0; i < 3; i++) {
-      nested.push(
-        await createPost()
-          .use((t) => t.asReplyTo(firstReply, anchor))
-          .create(),
-      );
+      nested.push(await createReply(firstReply, anchor, i).create());
     }
 
     // act
