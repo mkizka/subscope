@@ -115,7 +115,7 @@ Reactコンポーネントは以下の方針で実装しています。
 
 ### 仕様書の書き方
 
-- docs/specs には web-client.md、web-admin.md、appview.md、worker.md のみを置き、1ファイルで1アプリの振る舞いを定める
+- docs/specs には web-client.md、web-admin.md、worker.md と、appview/ 以下の機能ごとのファイル(index.md、views.md、actor.md、feed.md、notification.md、graph.md、subsco.md)のみを置き、1アプリの振る舞いを定める
 - 見出しはAPIの名前か機能・画面の名前とし、直後にその機能が何をするかを1〜2文で書く
 - 仕様項目は「〜の場合、〜を返す」というテストの条件ではなく、「〜する」「〜は含めない」という振る舞いのルールを1つだけ書く
 - IDは`{見出しの短い名前}-{連番}`とする。見出しの短い名前はcamelCaseにする(例: getTimeline-1, postForm-e1)
