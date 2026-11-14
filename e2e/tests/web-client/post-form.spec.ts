@@ -38,7 +38,7 @@ test.describe("投稿欄", () => {
     }).toPass();
   });
 
-  test("post-form-e1: 新規投稿ボタンで投稿欄を開き、投稿すると投稿欄を閉じて、投稿した内容を再読み込みなしでタイムラインの一番上に表示する", async ({
+  test("postForm-e1: 新規投稿ボタンで投稿欄を開き、投稿すると投稿欄を閉じて、投稿した内容を再読み込みなしでタイムラインの一番上に表示する", async ({
     page,
     request,
   }) => {
@@ -56,20 +56,20 @@ test.describe("投稿欄", () => {
         record: { displayName: "Alice" },
       },
     });
-    const text = `post-form-e1: ${Date.now()}`;
+    const text = `postForm-e1: ${Date.now()}`;
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
 
     await expect(
       page.getByRole("textbox", { name: "投稿内容" }),
     ).not.toBeVisible();
-    await expect(page.getByText(/^post-form-e1: /).first()).toHaveText(text);
+    await expect(page.getByText(/^postForm-e1: /).first()).toHaveText(text);
   });
 
-  test("post-form-e2: 画像にALTを付けて添付でき、タイムラインの投稿にALT付きで表示する", async ({
+  test("postForm-e2: 画像にALTを付けて添付でき、タイムラインの投稿にALT付きで表示する", async ({
     page,
   }) => {
-    const alt = `post-form-e2: ${Date.now()}`;
+    const alt = `postForm-e2: ${Date.now()}`;
     await page.getByLabel("画像を追加").setInputFiles(image("a.png"));
     await writeAlt(page, 1, alt);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
@@ -77,11 +77,11 @@ test.describe("投稿欄", () => {
     await expect(page.getByRole("img", { name: alt })).toBeAttached();
   });
 
-  test("post-form-e3: 返信できる人の設定は投稿と同じrkeyのthreadgateに保存する", async ({
+  test("postForm-e3: 返信できる人の設定は投稿と同じrkeyのthreadgateに保存する", async ({
     page,
     request,
   }) => {
-    const text = `post-form-e3: ${Date.now()}`;
+    const text = `postForm-e3: ${Date.now()}`;
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("button", { name: "誰でも返信できます" }).click();
     await page.getByRole("checkbox", { name: "フォロワー" }).check();
@@ -124,11 +124,11 @@ test.describe("投稿欄", () => {
     expect(value.text).toBe(text);
   });
 
-  test("post-form-e5: 添付した画像には公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
+  test("postForm-e5: 添付した画像には公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
     page,
     request,
   }) => {
-    const text = `post-form-e5: ${Date.now()}`;
+    const text = `postForm-e5: ${Date.now()}`;
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByLabel("画像を追加").setInputFiles(wideImage);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
@@ -162,11 +162,11 @@ test.describe("投稿欄", () => {
     });
   });
 
-  test("post-form-e4: 本文のURLとハッシュタグには、その範囲にfacetsを付ける", async ({
+  test("postForm-e4: 本文のURLとハッシュタグには、その範囲にfacetsを付ける", async ({
     page,
     request,
   }) => {
-    const text = `post-form-e4: ${Date.now()} 日本語 example.com/post-form-6 #subscope`;
+    const text = `postForm-e4: ${Date.now()} 日本語 example.com/postForm-6 #subscope`;
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
     await expect(
@@ -190,12 +190,12 @@ test.describe("投稿欄", () => {
       {
         index: {
           byteStart: urlStart,
-          byteEnd: urlStart + bytes("example.com/post-form-6"),
+          byteEnd: urlStart + bytes("example.com/postForm-6"),
         },
         features: [
           {
             $type: "app.bsky.richtext.facet#link",
-            uri: "https://example.com/post-form-6",
+            uri: "https://example.com/postForm-6",
           },
         ],
       },

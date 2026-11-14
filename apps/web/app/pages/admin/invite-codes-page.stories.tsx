@@ -50,7 +50,7 @@ const setCodes = (
   );
 
 export const Used: Story = {
-  name: "invite-codes-s1: 使用済みの招待コードは削除できない",
+  name: "inviteCodes-s1: 使用済みの招待コードは削除できない",
   beforeEach: () => {
     setCodes([
       {
@@ -72,7 +72,7 @@ export const Used: Story = {
 };
 
 export const Copy: Story = {
-  name: "invite-codes-s2: 未使用で期限内の招待コードはコードの横のボタンでコードをクリップボードにコピーできる",
+  name: "inviteCodes-s2: 未使用で期限内の招待コードはコードの横のボタンでコードをクリップボードにコピーできる",
   beforeEach: () => {
     setCodes([
       {
@@ -94,7 +94,7 @@ export const Copy: Story = {
 };
 
 export const UsedBy: Story = {
-  name: "invite-codes-s3: 使用済みの招待コードには使用者のアバターと名前を出す",
+  name: "inviteCodes-s3: 使用済みの招待コードには使用者のアバターと名前を出す",
   beforeEach: () => {
     setCodes([
       {
@@ -121,7 +121,7 @@ export const UsedBy: Story = {
 };
 
 export const Loading: Story = {
-  name: "invite-codes-s4: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
+  name: "inviteCodes-s4: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["inviteCodes"] });
     void queryClient.query({

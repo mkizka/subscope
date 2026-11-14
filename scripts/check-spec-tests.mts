@@ -1,7 +1,7 @@
 import { globSync, readFileSync } from "node:fs";
 
-const ID = String.raw`["'\`]([A-Za-z][A-Za-z0-9]*-[es]?\d+):`;
-const SPEC_ID = /^- ([A-Za-z][A-Za-z0-9]*-[es]?\d+):/gm;
+const ID = String.raw`["'\`]([A-Za-z][A-Za-z0-9-]*-[es]?\d+):`;
+const SPEC_ID = /^- ([A-Za-z][A-Za-z0-9-]*-[es]?\d+):/gm;
 const TEST_ID = new RegExp(
   String.raw`(?:\b(?:test|it)(?:\.\w+)?|\))\(\s*${ID}`,
   "g",
