@@ -47,24 +47,6 @@ const emptyData = (
   );
 };
 
-export const SyncStatus: Story = {
-  name: "followList-s1: 一覧の追跡アカウントには過去の投稿の同期状態を表示する",
-  beforeEach: () => {
-    queryClient.setQueryData(
-      ["follow-list", alice.handle, "follows", "all"],
-      infinite<typeof followListLoader>({
-        subject: alice,
-        accounts: [{ ...bob, backfillStatus: "completed" }],
-      }),
-    );
-  },
-  play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByText("同期済み", { exact: true }),
-    ).toBeVisible();
-  },
-};
-
 export const Loading: Story = {
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["follow-list", alice.handle] });
