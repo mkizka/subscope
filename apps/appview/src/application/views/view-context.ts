@@ -230,11 +230,7 @@ export class ViewContext {
     if (!post || !visible) {
       return undefined;
     }
-    const [author, blocked] = await Promise.all([
-      this.profile(post.accountDid),
-      this.isBlocked(post.accountDid),
-    ]);
-    return author && !blocked ? post : undefined;
+    return (await this.profile(post.accountDid)) ? post : undefined;
   }
 
   async labelsOf(subject: string) {
@@ -282,11 +278,6 @@ export class ViewContext {
       blocking: blocking?.uri,
       blockedBy: this.viewer.viewerDid ? !!blockedBy : undefined,
     };
-  }
-
-  async isBlocked(did: Did) {
-    const { blocking, blockedBy } = await this.blockState(did);
-    return !!blocking || !!blockedBy;
   }
 
   async viewerState(did: Did) {
