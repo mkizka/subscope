@@ -101,4 +101,27 @@ test.describe("レイアウト（モバイル）", () => {
     await page.evaluate(() => window.scrollTo(0, 900));
     await expect(menuButton).toBeInViewport();
   });
+
+  test("cache-e1: 一度表示した画面に戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
+    page,
+  }) => {
+    const alice = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "@alice.test" });
+    await expect(async () => {
+      await page.goto("/search?q=alice&tab=accounts");
+      await expect(alice).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "通知", exact: true })
+      .click();
+    await expect(page).toHaveURL("/notifications");
+    await page.route("**/api/search*", () => {});
+
+    await page.goBack();
+
+    await expect(alice).toBeVisible();
+  });
 });
