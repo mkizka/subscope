@@ -234,6 +234,8 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 アンカー投稿を中心に、親投稿とリプライを深さ付きの平坦なリストで返す。認証は任意。branchingFactorとsortは無視し、hasOtherRepliesは常にfalseを返す。
 
+threadgateのhiddenRepliesは反映せず、隠されたリプライも通常の位置に返す。hiddenByThreadgateは常にfalseを返し、getPostThreadOtherV2は実装しない。PoCでは基本機能の再現を優先し、スレッド主がリプライを隠す機能はSNSを便利にする補助機能のため後回しにした。
+
 - getPostThreadV2-1: 親投稿を負のdepth、アンカー投稿をdepth 0、リプライを正のdepthとして、上から順にthreadに含める
 - getPostThreadV2-2: aboveがfalseのとき、親投稿を含めない
 - getPostThreadV2-3: 存在しない投稿はdepth 0のthreadItemNotFoundとして返す
