@@ -52,16 +52,6 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ヘッダーの `redact` パラメーターは応答の `atproto-content-labelers` ヘッダーにそのまま返すだけで、テイクダウンの適用には使わない。
 
-## ブロック
-
-閲覧者とアカウントの間のブロックを、プロフィールのビューの viewer に載せる。公式クライアントはこれを見て、ブロック中の表示やブロック解除のボタンを出す。
-
-- block-1: 閲覧者がブロックしているアカウントには、ブロックレコードのURIを viewer.blocking に入れる
-- block-2: 閲覧者をブロックしているアカウントには、viewer.blockedBy を true にする
-- block-3: どちらかの向きにブロックがあるアカウントには、viewer.following と viewer.followedBy を含めない
-
-ブロックはメンバーとそのフォロー先が作ったものしか保存しないため、保存対象外のアカウントが閲覧者をブロックしても viewer.blockedBy は true にならない。
-
 ## 返信制限
 
 スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
