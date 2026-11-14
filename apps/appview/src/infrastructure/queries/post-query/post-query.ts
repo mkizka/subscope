@@ -126,23 +126,25 @@ export class PostQuery implements IPostQuery {
   }
 
   async search(params: {
-    query?: string;
+    terms: string[];
     authorDids?: string[];
-    repliesOnly?: boolean;
+    replies?: "only" | "exclude";
     limit: number;
     cursor?: Date;
   }): Promise<PostDto[]> {
-    const escapedQuery = params.query?.replace(/[%_]/g, "\\$&");
     const posts = await this.db.query.posts.findMany({
       where: and(
-        escapedQuery
-          ? ilike(schema.posts.text, `%${escapedQuery}%`)
-          : undefined,
+        ...params.terms.map((term) =>
+          ilike(schema.posts.text, `%${term.replace(/[%_\\]/g, "\\$&")}%`),
+        ),
         params.authorDids &&
           inArray(schema.posts.accountDid, params.authorDids),
-        params.repliesOnly
+        params.replies === "only"
           ? isNotNull(schema.posts.replyParentUri)
-          : isNull(schema.posts.replyParentUri),
+          : undefined,
+        params.replies === "exclude"
+          ? isNull(schema.posts.replyParentUri)
+          : undefined,
         params.cursor && lt(schema.posts.sortAt, params.cursor),
       ),
       orderBy: desc(schema.posts.sortAt),

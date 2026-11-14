@@ -14,9 +14,10 @@ export class SearchPosts {
     router.add(searchPosts, {
       auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const result = await this.searchPostsUseCase.execute(params, {
-          viewerDid,
-        });
+        const result = await this.searchPostsUseCase.execute(
+          { ...params, replies: "exclude" },
+          { viewerDid },
+        );
         return { body: result };
       },
     });
