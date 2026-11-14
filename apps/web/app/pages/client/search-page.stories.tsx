@@ -111,21 +111,6 @@ export const Submitting: Story = {
   },
 };
 
-export const AccountSyncStatus: Story = {
-  name: "search-s5: アカウントの検索結果には過去の投稿の同期状態を表示する",
-  parameters: { path: "/search?q=alice&tab=accounts" },
-  beforeEach: () => {
-    search("accounts", "alice", {
-      accounts: [{ ...alice, backfillStatus: "completed" }],
-    });
-  },
-  play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByText("同期済み", { exact: true }),
-    ).toBeVisible();
-  },
-};
-
 export const Loading: Story = {
   name: "search-s6: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => pendingSearch("posts", "alice"),

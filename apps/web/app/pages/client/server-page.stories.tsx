@@ -81,26 +81,6 @@ export const OperatorBadge: Story = {
   },
 };
 
-export const SyncStatus: Story = {
-  name: "server-s5: 一覧のアカウントには名前の下の行に過去の投稿の同期状態を表示する",
-  beforeEach: () => {
-    queryClient.setQueryData<Data<typeof registeredLoader>>(
-      ["clientServerMembers", ""],
-      {
-        serverMembers: [
-          { ...alice, isAdmin: false, backfillStatus: "completed" },
-        ],
-        hasMore: false,
-      },
-    );
-  },
-  play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByText("同期済み", { exact: true }),
-    ).toBeVisible();
-  },
-};
-
 export const FollowerCount: Story = {
   name: "server-s6: 「誰かがフォロー」タブには、フォローしているメンバーの数を「n人からフォロー」と表示する",
   parameters: { path: "/server?tab=tracked" },

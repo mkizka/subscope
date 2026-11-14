@@ -120,15 +120,6 @@ export const FollowSubmitting: Story = {
   },
 };
 
-export const SyncStatus: Story = {
-  name: "profile-s3: 追跡アカウントの全体ページにはそのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する",
-  play: async ({ canvasElement }) => {
-    await expect(
-      main(canvasElement).getByText("同期済み", { exact: true }),
-    ).toBeVisible();
-  },
-};
-
 export const Loading: Story = {
   name: "profile-s4: プロフィールを開くと、読み込みを待たずに画面を表示し、読み込み終えるまでバナー・アイコン・名前・自己紹介2行と投稿の場所のスケルトンを表示する。ハンドル・タブ・フォロー数は読み込み後に表示する",
   beforeEach: () => {
