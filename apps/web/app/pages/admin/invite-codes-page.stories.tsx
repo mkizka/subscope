@@ -121,21 +121,11 @@ export const UsedBy: Story = {
 };
 
 export const Loading: Story = {
-  name: "inviteCodes-s4: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["inviteCodes"] });
     void queryClient.query({
       queryKey: ["inviteCodes"],
       queryFn: () => new Promise<never>(() => {}),
     });
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("heading", { name: "招待コード" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
   },
 };

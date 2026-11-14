@@ -1064,7 +1064,7 @@ export const LoadingMore: Story = {
 };
 
 export const Loading: Story = {
-  name: "timeline-s5: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまで、アイコン・名前・本文・ツールバーを持つ投稿の形のスケルトンを表示する",
+  name: "skeleton-s1: 画面は読み込みを待たずに表示し、読み込み終えるまでデータの場所にスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["timeline"] });
     queryClient

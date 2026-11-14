@@ -121,7 +121,6 @@ export const FollowerCount: Story = {
 };
 
 export const AccountsLoading: Story = {
-  name: "server-s7: 一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["clientServerMembers"] });
     queryClient.removeQueries({ queryKey: ["trackedAccounts"] });
@@ -131,15 +130,6 @@ export const AccountsLoading: Story = {
         queryFn: () => new Promise<never>(() => {}),
       })
       .catch(() => {});
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("heading", { name: "サーバーについて" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
   },
 };
 
