@@ -42,7 +42,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("ジョブキュー", () => {
-  test("bull-board-e1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
+  test("bullBoard-e1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
     page,
   }) => {
     await page.goto("/");
@@ -57,7 +57,7 @@ test.describe("ジョブキュー", () => {
     await expect(popup).toHaveURL(/\/admin\/bull-board/);
   });
 
-  test("bull-board-e2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
+  test("bullBoard-e2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -81,7 +81,7 @@ test.describe("ジョブキュー", () => {
     });
   });
 
-  test("bull-board-e3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
+  test("bullBoard-e3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -101,7 +101,7 @@ test.describe("ジョブキュー", () => {
 });
 
 test.describe("メンバー", () => {
-  test("admin-accounts-e1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
+  test("adminAccounts-e1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -117,7 +117,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
   });
 
-  test("admin-accounts-e3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
+  test("adminAccounts-e3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -144,7 +144,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("admin-accounts-e2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("adminAccounts-e2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -188,7 +188,7 @@ test.describe("メンバー", () => {
     return did;
   };
 
-  test("admin-accounts-e4: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
+  test("adminAccounts-e4: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
     page,
   }) => {
     await page.goto("/");
@@ -208,7 +208,7 @@ test.describe("メンバー", () => {
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
 
-  test("admin-accounts-e6: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
+  test("adminAccounts-e6: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
@@ -221,7 +221,7 @@ test.describe("メンバー", () => {
     );
   });
 
-  test("admin-accounts-e5: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+  test("adminAccounts-e5: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -258,7 +258,7 @@ test.describe("招待コード", () => {
     return ((await response.json()) as { code: string }).code;
   };
 
-  test("invite-codes-e1: 招待コードを新しい順に1件1行で並べ、各行にコード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
+  test("inviteCodes-e1: 招待コードを新しい順に1件1行で並べ、各行にコード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -273,7 +273,7 @@ test.describe("招待コード", () => {
     await expect(rows.nth(1)).toContainText(older);
   });
 
-  test("invite-codes-e2: 一覧の下までスクロールすると続きを読み込む", async ({
+  test("inviteCodes-e2: 一覧の下までスクロールすると続きを読み込む", async ({
     page,
   }) => {
     await page.goto("/");
@@ -290,7 +290,7 @@ test.describe("招待コード", () => {
     await expect(page.getByText(oldest, { exact: true })).toBeVisible();
   });
 
-  test("invite-codes-e3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
+  test("inviteCodes-e3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -313,7 +313,7 @@ test.describe("招待コード", () => {
     );
   });
 
-  test("invite-codes-e4: 未使用で期限内の招待コードは確認のうえ削除できる", async ({
+  test("inviteCodes-e4: 未使用で期限内の招待コードは確認のうえ削除できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -330,7 +330,7 @@ test.describe("招待コード", () => {
     await expect(row).toHaveCount(0);
   });
 
-  test("invite-codes-e5: 期限切れの招待コードは確認せずに削除できる", async ({
+  test("inviteCodes-e5: 期限切れの招待コードは確認せずに削除できる", async ({
     page,
   }) => {
     await page.goto("/");
