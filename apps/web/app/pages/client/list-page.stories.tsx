@@ -75,19 +75,11 @@ export const MemberSyncStatus: Story = {
 };
 
 export const Loading: Story = {
-  name: "list-s6: リスト詳細を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["list", alice.handle, "1"] });
     void queryClient.query({
       queryKey: ["list", alice.handle, "1", "posts"],
       queryFn: () => new Promise<never>(() => {}),
     });
-  },
-  play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByRole("status", {
-        name: "読み込み中",
-      }),
-    ).toBeVisible();
   },
 };

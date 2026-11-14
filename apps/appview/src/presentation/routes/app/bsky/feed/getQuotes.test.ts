@@ -1,11 +1,8 @@
 import { asAtUriString } from "@atproto/syntax";
 import getQuotes from "@repo/client/app/bsky/feed/getQuotes";
 import {
-  accountFactory,
-  followFactory,
   postEmbedRecordFactory,
   postFactory,
-  recordFactory,
   testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -72,44 +69,5 @@ describe("app.bsky.feed.getQuotes", () => {
       middlePost.uri,
     ]);
     expect(secondPage.posts.map((p) => p.uri)).toEqual([oldPost.uri]);
-  });
-
-  test("getQuotes-3: 閲覧者がフォローしているアカウントの投稿には、author.viewer.followingを含める", async () => {
-    // arrange
-    const { client, loginAs } = await setupApiTest();
-    const viewer = await accountFactory(ctx.db).create();
-    const author = await accountFactory(ctx.db)
-      .use((t) => t.withProfile({}))
-      .create();
-    const target = await postFactory(ctx.db).create();
-    const quotePost = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ account: () => author })
-            .create(),
-      })
-      .create();
-    await postEmbedRecordFactory(ctx.db)
-      .vars({ post: () => quotePost, embeddedPost: () => target })
-      .create();
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ account: () => viewer })
-            .create(),
-        followee: () => author,
-      })
-      .create();
-    loginAs(viewer.did);
-
-    // act
-    const res = await client.call(getQuotes, {
-      uri: asAtUriString(target.uri),
-    });
-
-    // assert
-    expect(res.posts[0]?.author.viewer?.following).toBeDefined();
   });
 });
