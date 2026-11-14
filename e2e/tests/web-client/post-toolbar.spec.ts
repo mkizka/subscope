@@ -63,19 +63,31 @@ const toggleReaction = async (
   await expect.poll(hasRecord).toBe(false);
 };
 
-test("postToolbar-e1: いいねボタンで投稿にいいねし、もう一度押すと取り消す", (args) =>
-  toggleReaction(args, {
-    id: "postToolbar-e1",
-    name: "いいね",
-    collection: "app.bsky.feed.like",
-  }));
+test("postToolbar-e1: いいねボタンで投稿にいいねし、もう一度押すと取り消す", ({
+  page,
+  request,
+}) =>
+  toggleReaction(
+    { page, request },
+    {
+      id: "postToolbar-e1",
+      name: "いいね",
+      collection: "app.bsky.feed.like",
+    },
+  ));
 
-test("postToolbar-e2: リポストボタンで投稿をリポストし、もう一度押すと取り消す", (args) =>
-  toggleReaction(args, {
-    id: "postToolbar-e2",
-    name: "リポスト",
-    collection: "app.bsky.feed.repost",
-  }));
+test("postToolbar-e2: リポストボタンで投稿をリポストし、もう一度押すと取り消す", ({
+  page,
+  request,
+}) =>
+  toggleReaction(
+    { page, request },
+    {
+      id: "postToolbar-e2",
+      name: "リポスト",
+      collection: "app.bsky.feed.repost",
+    },
+  ));
 
 type PostRecord = {
   text: string;
@@ -130,21 +142,33 @@ const composeAndSubmit = async (
     .toContain(uri);
 };
 
-test("postToolbar-e3: 返信ボタンで投稿欄が開き、投稿するとその投稿への返信になる", (args) =>
-  composeAndSubmit(args, {
-    id: "postToolbar-e3",
-    name: "返信",
-    submit: "返信",
-    subjectOf: (record) => record.reply?.parent.uri,
-  }));
+test("postToolbar-e3: 返信ボタンで投稿欄が開き、投稿するとその投稿への返信になる", ({
+  page,
+  request,
+}) =>
+  composeAndSubmit(
+    { page, request },
+    {
+      id: "postToolbar-e3",
+      name: "返信",
+      submit: "返信",
+      subjectOf: (record) => record.reply?.parent.uri,
+    },
+  ));
 
-test("postToolbar-e4: 引用ボタンで投稿欄が開き、投稿するとその投稿を引用した投稿になる", (args) =>
-  composeAndSubmit(args, {
-    id: "postToolbar-e4",
-    name: "引用",
-    submit: "投稿",
-    subjectOf: (record) => record.embed?.record?.uri,
-  }));
+test("postToolbar-e4: 引用ボタンで投稿欄が開き、投稿するとその投稿を引用した投稿になる", ({
+  page,
+  request,
+}) =>
+  composeAndSubmit(
+    { page, request },
+    {
+      id: "postToolbar-e4",
+      name: "引用",
+      submit: "投稿",
+      subjectOf: (record) => record.embed?.record?.uri,
+    },
+  ));
 
 test("postToolbar-e5: いいね・リポストのボタンは押した結果を画面に反映し終えるまで押せない", async ({
   page,
