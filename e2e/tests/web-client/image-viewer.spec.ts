@@ -23,13 +23,13 @@ const openViewer = async (page: Page, text: string, alt: string) => {
 };
 
 test.describe("画像の拡大表示", () => {
-  test("image-viewer-e1: ブラウザの戻るで閉じ、元の画面にとどまる", async ({
+  test("imageViewer-e1: ブラウザの戻るで閉じ、元の画面にとどまる", async ({
     page,
   }) => {
     const viewer = await openViewer(
       page,
-      "image-viewer-e1: 投稿",
-      "image-viewer-e1: 画像",
+      "imageViewer-e1: 投稿",
+      "imageViewer-e1: 画像",
     );
 
     await page.goBack();

@@ -343,7 +343,7 @@ const svg = (color: string): `data:${string}` =>
   `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23${color}'/%3E%3C/svg%3E`;
 
 export const ImageViewerProfile: Story = {
-  name: "image-viewer-s7: プロフィール全体ページのアイコンかバナーを選ぶと、その画像を拡大して表示する",
+  name: "imageViewer-s7: プロフィール全体ページのアイコンかバナーを選ぶと、その画像を拡大して表示する",
   beforeEach: () => {
     queryClient.setQueryData(
       ["profile", alice.handle, ""],
