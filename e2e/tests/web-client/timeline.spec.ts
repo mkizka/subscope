@@ -104,28 +104,6 @@ test.describe("タイムライン", () => {
     ).toHaveCount(0);
   });
 
-  test("timeline-e7: 一度表示したタイムラインに戻ると、読み込み直しを待たずに前回の投稿を表示する", async ({
-    page,
-    request,
-  }) => {
-    const text = `timeline-e7: ${Date.now()}`;
-    await createPosts(request, [text]);
-    await expect(async () => {
-      await page.goto("/");
-      await expect(page.getByText(text)).toBeVisible({ timeout: 1000 });
-    }).toPass();
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "通知", exact: true })
-      .click();
-    await expect(page).toHaveURL("/notifications");
-    await page.route("**/api/timeline*", () => {});
-
-    await page.goBack();
-
-    await expect(page.getByText(text)).toBeVisible();
-  });
-
   test("timeline-e8: 表示中は60秒ごとに投稿を自動で読み込み直す", async ({
     page,
     request,

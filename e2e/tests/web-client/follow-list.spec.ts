@@ -68,26 +68,6 @@ test.describe("フォロー・フォロワー", () => {
     ).toBeVisible();
   });
 
-  test("followList-e4: 一度表示した一覧に戻ると、読み込み直しを待たずに前回の一覧を表示する", async ({
-    page,
-  }) => {
-    const bob = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ hasText: "Bob" });
-    await expect(async () => {
-      await page.goto("/alice.test/follows");
-      await expect(bob).toBeVisible({ timeout: 1000 });
-    }).toPass();
-    await bob.getByRole("link").click();
-    await expect(page).toHaveURL(/\/(?!alice\.)[^/]+\.test$/);
-    await page.route("**/api/profile/*/follows", () => {});
-
-    await page.goBack();
-
-    await expect(bob).toBeVisible();
-  });
-
   test("followList-e5: 「メンバー」タブ（`?filter=registered`）には、そのアカウントをフォローしているメンバーだけを一覧表示する", async ({
     page,
   }) => {

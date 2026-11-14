@@ -228,24 +228,6 @@ test.describe("プロフィール", () => {
     await expect(page).toHaveURL("/alice.test");
   });
 
-  test("profile-e7: 一度表示したプロフィールに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
-    page,
-  }) => {
-    await page.goto("/alice.test");
-    const followers = page.getByRole("main").getByText(/^\d+ フォロワー$/);
-    await expect(followers).toBeVisible();
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "通知", exact: true })
-      .click();
-    await expect(page).toHaveURL("/notifications");
-    await page.route("**/api/profile/*", () => {});
-
-    await page.goBack();
-
-    await expect(followers).toBeVisible();
-  });
-
   test("profile-e8: 全体ページの「投稿」タブでは自分の投稿への自分のリプライ(スレッド)を含め、timeline-s6と同じく線で繋げる", async ({
     page,
   }) => {

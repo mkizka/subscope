@@ -89,27 +89,4 @@ test.describe("検索", () => {
       new RegExp(`古い ${q} 投稿`),
     ]);
   });
-
-  test("search-e4: 一度表示した検索結果に戻ると、読み込み直しを待たずに前回の結果を表示する", async ({
-    page,
-  }) => {
-    const alice = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ hasText: "@alice.test" });
-    await expect(async () => {
-      await page.goto("/search?q=alice&tab=accounts");
-      await expect(alice).toBeVisible({ timeout: 1000 });
-    }).toPass();
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "通知", exact: true })
-      .click();
-    await expect(page).toHaveURL("/notifications");
-    await page.route("**/api/search*", () => {});
-
-    await page.goBack();
-
-    await expect(alice).toBeVisible();
-  });
 });

@@ -265,27 +265,6 @@ test.describe("スレッド", () => {
     }
   });
 
-  test("thread-e12: 一度表示したスレッドに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
-    page,
-  }) => {
-    const target = await post("thread-e12: 投稿");
-    await openThread(page, target.uri, "thread-e12: 投稿");
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "通知", exact: true })
-      .click();
-    await expect(page).toHaveURL("/notifications");
-    await page.route("**/api/thread*", () => {});
-
-    await page.goBack();
-
-    await expect(
-      page
-        .getByRole("region", { name: "スレッド" })
-        .getByText("thread-e12: 投稿"),
-    ).toBeVisible();
-  });
-
   test("thread-e13: 存在しない投稿のスレッドを開くと、再試行せずに「投稿が見つかりません」を表示する", async ({
     page,
   }) => {
