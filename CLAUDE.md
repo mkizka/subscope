@@ -94,6 +94,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/railway.md
 - プッシュ通知
   - docs/dev/push-notification.md
+- Workerの並列数・接続数・レート制限
+  - docs/dev/worker-tuning.md
 
 ## 開発の進め方(仕様駆動)
 
