@@ -225,11 +225,14 @@ authors以外の絞り込みパラメータ(sortなど)は今は無視する。
 
 ## app.bsky.unspecced.getPostThreadV2
 
-アンカー投稿を中心に、親投稿とリプライを深さ付きの平坦なリストで返す。認証は任意。branchingFactorとsortは無視し、hasOtherRepliesは常にfalseを返す。
+アンカー投稿を中心に、親投稿とリプライを深さ付きの平坦なリストで返す。認証は任意。リプライは古い順に並べる。sortは、PoCでは基本機能を優先するため無視し、hasOtherRepliesは常にfalseを返す。
 
 - getPostThreadV2-1: 親投稿を負のdepth、アンカー投稿をdepth 0、リプライを正のdepthとして、上から順にthreadに含める
 - getPostThreadV2-2: aboveがfalseのとき、親投稿を含めない
 - getPostThreadV2-3: 存在しない投稿はdepth 0のthreadItemNotFoundとして返す
+- getPostThreadV2-4: アンカー投稿への直接のリプライは、件数に関わらず全て含める
+- getPostThreadV2-5: depth 1より深いリプライは、投稿ごとにbranchingFactor件までを古い順に含める
+- getPostThreadV2-6: 各threadItemPostのmoreRepliesに、replyCountから含めたリプライ数を引いた数(0未満は0)を返す
 
 ## app.bsky.feed.getAuthorFeed
 

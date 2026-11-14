@@ -13,7 +13,7 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
 
-const MAX_REPLIES_PER_POST = 20;
+const DEFAULT_REPLY_LIMITS = { direct: 20, nested: 20 };
 
 export class PostNotFoundError extends Error {
   constructor(uri: AtUri) {
@@ -33,6 +33,7 @@ export class GetPostThreadUseCase {
     uri: ResolvedAtUri;
     depth: number;
     parentHeight: number;
+    replyLimits?: { direct?: number; nested: number };
     viewerDid?: Did;
   }): Promise<AppBskyFeedGetPostThread.$OutputBody> {
     // 1. ターゲット投稿を取得
@@ -48,6 +49,7 @@ export class GetPostThreadUseCase {
       targetPost,
       parentHeight: params.parentHeight,
       replyDepth: params.depth,
+      replyLimits: params.replyLimits ?? DEFAULT_REPLY_LIMITS,
     });
 
     // 3. すべての投稿のPostViewを一括取得
@@ -79,15 +81,20 @@ export class GetPostThreadUseCase {
     targetPost: PostDto;
     parentHeight: number;
     replyDepth: number;
+    replyLimits: { direct?: number; nested: number };
   }): Promise<{
     parentPosts: PostDto[];
     allPostUris: Set<string>;
     replyTree: Map<string, PostDto[]>;
   }> {
-    const { targetPost, parentHeight, replyDepth } = params;
+    const { targetPost, parentHeight, replyDepth, replyLimits } = params;
 
     const parentPosts = await this.collectParentChain(targetPost, parentHeight);
-    const replyTree = await this.collectReplyTree(targetPost, replyDepth);
+    const replyTree = await this.collectReplyTree(
+      targetPost,
+      replyDepth,
+      replyLimits,
+    );
 
     const allPostUris = this.aggregateAllUris({
       targetPost,
@@ -172,7 +179,9 @@ export class GetPostThreadUseCase {
   private async collectReplyTree(
     post: PostDto,
     remainingDepth: number,
+    limits: { direct?: number; nested: number },
     structure: Map<string, PostDto[]> = new Map(),
+    isAnchor = true,
   ): Promise<Map<string, PostDto[]>> {
     if (remainingDepth <= 0) {
       return structure;
@@ -180,13 +189,19 @@ export class GetPostThreadUseCase {
 
     const directReplies = await this.postQuery.findReplies(
       new AtUri(post.uri),
-      MAX_REPLIES_PER_POST,
+      isAnchor ? limits.direct : limits.nested,
     );
     structure.set(post.uri, directReplies);
 
     await Promise.all(
       directReplies.map((reply) =>
-        this.collectReplyTree(reply, remainingDepth - 1, structure),
+        this.collectReplyTree(
+          reply,
+          remainingDepth - 1,
+          limits,
+          structure,
+          false,
+        ),
       ),
     );
 
