@@ -2,6 +2,39 @@
 
 AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞いを定める。レスポンスは常にlexiconに適合する。
 
+## XRPC対応一覧
+
+v1での各XRPCの対応状況。対応は公式AppViewと同じ振る舞いをするもの、一部対応は一部のパラメーターや項目を見送るもの、見送りは実装しないと決めて501を返すもの、未対応は一覧にないXRPCで同じく501を返すもの。
+
+### 標準のXRPC
+
+| XRPC                                                                                                            | 状況     | 備考                                                                                    |
+| --------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| app.bsky.actor.getProfile / getProfiles / searchActors / searchActorsTypeahead                                  | 対応     |                                                                                         |
+| app.bsky.actor.getPreferences                                                                                   | 一部対応 | 設定の保存はせず固定の設定を返す                                                        |
+| app.bsky.feed.getTimeline / getAuthorFeed / getActorLikes / getListFeed                                         | 対応     |                                                                                         |
+| app.bsky.feed.getPosts / getPostThread / getQuotes / getLikes / getRepostedBy / getFeedGenerators / searchPosts | 対応     |                                                                                         |
+| app.bsky.feed.searchPostsV2                                                                                     | 一部対応 | sort=top、since、until、languages、`to:me`、hashtags、mentions、domains、urlsを無視する |
+| app.bsky.unspecced.getPostThreadV2                                                                              | 一部対応 | sortを無視し、threadgateのhiddenRepliesを反映しない。getPostThreadOtherV2は見送り       |
+| app.bsky.notification.listNotifications / getUnreadCount                                                        | 一部対応 | priorityを無視する                                                                      |
+| app.bsky.notification.getGroupedNotifications                                                                   | 一部対応 | `feed=people-i-follow`と`feed=activity`は見送り                                         |
+| app.bsky.notification.updateSeen                                                                                | 対応     |                                                                                         |
+| app.bsky.graph.getFollowers / getFollows / getKnownFollowers / getList / getLists / getListsWithMembership      | 対応     |                                                                                         |
+| app.bsky.bookmark.*                                                                                             | 見送り   | `viewer.bookmarked`と`bookmarkCount`も返さない                                          |
+| app.bsky.draft.*                                                                                                | 見送り   |                                                                                         |
+| app.bsky.notification.getPreferences / putPreferencesV2 / putActivitySubscription                               | 見送り   |                                                                                         |
+| app.bsky.labeler.getServices                                                                                    | 見送り   |                                                                                         |
+| app.bsky.graph.getBlocks、ブロックの反映                                                                        | 見送り   | 下記                                                                                    |
+| 上記以外のapp.bsky.*                                                                                            | 未対応   | 501を返す(例: app.bsky.feed.getFeed)                                                    |
+
+### 独自のXRPC
+
+me.subsco.*はすべて対応している。各XRPCの振る舞いは以降の節を参照する。
+
+### ブロック
+
+ブロックはv1に入れない。ブロックレコードのインデックス、`viewer.blocking`と`viewer.blockedBy`、ブロック相手の投稿の非表示、`app.bsky.graph.getBlocks`はいずれも対応しない。v1の範囲を絞るための判断で、ブロックしたアカウントも通常どおり表示される。
+
 ## 未実装のAPI
 
 v1で対応しないXRPCやパラメータには、空の応答で成功を装わずエラーを返す。空の応答だと、クライアントは「データが無い」と区別できないため。
