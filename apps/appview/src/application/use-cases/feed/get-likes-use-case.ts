@@ -38,7 +38,7 @@ export class GetLikesUseCase {
           return (
             account && {
               $type: "app.bsky.feed.getLikes#like",
-              indexedAt: toDatetimeString(like.sortAt), // TODO: indexedAtに修正
+              indexedAt: toDatetimeString(like.sortAt),
               createdAt: toDatetimeString(like.createdAt),
               actor: account,
             }
