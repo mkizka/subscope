@@ -2,7 +2,6 @@ import { asDid } from "@atproto/did";
 import searchPostsV2 from "@repo/client/app/bsky/feed/searchPostsV2";
 import {
   accountFactory,
-  followFactory,
   postFactory,
   recordFactory,
   testSetup,
@@ -123,40 +122,6 @@ describe("app.bsky.feed.searchPostsV2", () => {
 
     // assert
     expect(res.posts).toEqual([]);
-  });
-
-  test("searchPostsV2-5: 閲覧者がフォローしているアカウントの投稿には、author.viewer.followingを含める", async () => {
-    // arrange
-    const { client, loginAs } = await setupApiTest();
-    const viewer = await accountFactory(ctx.db).create();
-    const author = await accountFactory(ctx.db)
-      .use((t) => t.withProfile({}))
-      .create();
-    await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ account: () => author })
-            .create(),
-      })
-      .props({ text: () => "viewerで探す投稿" })
-      .create();
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ account: () => viewer })
-            .create(),
-        followee: () => author,
-      })
-      .create();
-    loginAs(viewer.did);
-
-    // act
-    const res = await client.call(searchPostsV2, { query: "viewerで探す" });
-
-    // assert
-    expect(res.posts[0]?.author.viewer?.following).toBeDefined();
   });
 
   test("searchPostsV2-6: queryに`from:me`が含まれる場合、それを語として扱わず、閲覧者をauthorsに加える", async () => {

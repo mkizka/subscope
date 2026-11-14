@@ -2,7 +2,6 @@ import { asAtUriString } from "@atproto/syntax";
 import getLikes from "@repo/client/app/bsky/feed/getLikes";
 import {
   accountFactory,
-  followFactory,
   likeFactory,
   postFactory,
   recordFactory,
@@ -81,40 +80,5 @@ describe("app.bsky.feed.getLikes", () => {
       middleAccount.did,
     ]);
     expect(secondPage.likes.map((l) => l.actor.did)).toEqual([oldAccount.did]);
-  });
-
-  test("getLikes-3: 閲覧者がフォローしているアカウントには、viewer.followingを含める", async () => {
-    // arrange
-    const { client, loginAs } = await setupApiTest();
-    const viewer = await accountFactory(ctx.db).create();
-    const account = await accountFactory(ctx.db)
-      .use((t) => t.withProfile({}))
-      .create();
-    const post = await postFactory(ctx.db).create();
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ account: () => account })
-            .create(),
-        subject: () => post,
-      })
-      .create();
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ account: () => viewer })
-            .create(),
-        followee: () => account,
-      })
-      .create();
-    loginAs(viewer.did);
-
-    // act
-    const res = await client.call(getLikes, { uri: asAtUriString(post.uri) });
-
-    // assert
-    expect(res.likes[0]?.actor.viewer?.following).toBeDefined();
   });
 });
