@@ -96,7 +96,9 @@ test.describe("サーバー", () => {
     ).toBeVisible();
   });
 
-  test("server-e6: 旧URLは`/server` の該当タブへ移動する", async ({ page }) => {
+  test("server-e6: 旧URLの `/server/accounts`、`/accounts`、`/registered-accounts`、`/tracked-accounts` は、`/server` の該当タブへ移動する", async ({
+    page,
+  }) => {
     await page.goto("/server/accounts?tab=tracked");
     await expect(page).toHaveURL("/server?tab=tracked");
 
