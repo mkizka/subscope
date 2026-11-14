@@ -125,12 +125,23 @@ const helpTexts = {
 };
 
 export const PushSettingDenied: Story = {
-  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチの代わりに行の右端へ「ブロック中」を表示する。押すと、ラベルの下に「ブラウザのサイト設定で、このサイトの通知を許可すると使えます。」を吹き出しで表示する",
+  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチの代わりに行の右端へ「ブロック中」を表示する",
+  beforeEach: pushSetting("denied"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByRole("switch")).toBeNull();
+    await expect(
+      await canvas.findByRole("button", { name: "ブロック中" }),
+    ).toBeVisible();
+  },
+};
+
+export const PushSettingHelpDenied: Story = {
+  name: "pushSetting-s10: 「ブロック中」を押すと、ラベルの下に「ブラウザのサイト設定で、このサイトの通知を許可すると使えます。」を吹き出しで表示する",
   beforeEach: pushSetting("denied"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const help = await canvas.findByText(helpTexts.denied);
-    await expect(canvas.queryByRole("switch")).toBeNull();
     await expect(help).not.toBeVisible();
 
     await userEvent.click(
@@ -141,12 +152,23 @@ export const PushSettingDenied: Story = {
 };
 
 export const PushSettingUnsupported: Story = {
-  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、スイッチの代わりに行の右端へ「非対応」を表示する。押すと、「iPhone・iPadでは、このサイトをホーム画面に追加して開くと使えます。」を吹き出しで表示する",
+  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、スイッチの代わりに行の右端へ「非対応」を表示する",
+  beforeEach: pushSetting("unsupported"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByRole("switch")).toBeNull();
+    await expect(
+      await canvas.findByRole("button", { name: "非対応" }),
+    ).toBeVisible();
+  },
+};
+
+export const PushSettingHelpUnsupported: Story = {
+  name: "pushSetting-s11: 「非対応」を押すと、ラベルの下に「iPhone・iPadでは、このサイトをホーム画面に追加して開くと使えます。」を吹き出しで表示する",
   beforeEach: pushSetting("unsupported"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const help = await canvas.findByText(helpTexts.unsupported);
-    await expect(canvas.queryByRole("switch")).toBeNull();
     await expect(help).not.toBeVisible();
 
     await userEvent.click(
