@@ -8,24 +8,24 @@ v1での各XRPCの対応状況。対応は公式AppViewと同じ振る舞いを�
 
 ### 標準のXRPC
 
-| XRPC                                                                                                            | 状況     | 備考                                                                                    |
-| --------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
-| app.bsky.actor.getProfile / getProfiles / searchActors / searchActorsTypeahead                                  | 対応     |                                                                                         |
-| app.bsky.actor.getPreferences                                                                                   | 一部対応 | 設定の保存はせず固定の設定を返す                                                        |
-| app.bsky.feed.getTimeline / getAuthorFeed / getActorLikes / getListFeed                                         | 対応     |                                                                                         |
-| app.bsky.feed.getPosts / getPostThread / getQuotes / getLikes / getRepostedBy / getFeedGenerators / searchPosts | 対応     |                                                                                         |
-| app.bsky.feed.searchPostsV2                                                                                     | 一部対応 | sort=top、since、until、languages、`to:me`、hashtags、mentions、domains、urlsを無視する |
-| app.bsky.unspecced.getPostThreadV2                                                                              | 一部対応 | sortを無視し、threadgateのhiddenRepliesを反映しない。getPostThreadOtherV2は見送り       |
-| app.bsky.notification.listNotifications / getUnreadCount                                                        | 一部対応 | priorityを無視する                                                                      |
-| app.bsky.notification.getGroupedNotifications                                                                   | 一部対応 | `feed=people-i-follow`と`feed=activity`は見送り                                         |
-| app.bsky.notification.updateSeen                                                                                | 対応     |                                                                                         |
-| app.bsky.graph.getFollowers / getFollows / getKnownFollowers / getList / getLists / getListsWithMembership      | 対応     |                                                                                         |
-| app.bsky.bookmark.*                                                                                             | 見送り   | `viewer.bookmarked`と`bookmarkCount`も返さない                                          |
-| app.bsky.draft.*                                                                                                | 見送り   |                                                                                         |
-| app.bsky.notification.getPreferences / putPreferencesV2 / putActivitySubscription                               | 見送り   |                                                                                         |
-| app.bsky.labeler.getServices                                                                                    | 見送り   |                                                                                         |
-| app.bsky.graph.getBlocks、ブロックの反映                                                                        | 見送り   | 下記                                                                                    |
-| 上記以外のapp.bsky.*                                                                                            | 未対応   | 501を返す(例: app.bsky.feed.getFeed)                                                    |
+| XRPC                                                                                                            | 状況     | 備考                                                  |
+| --------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------- |
+| app.bsky.actor.getProfile / getProfiles / searchActors / searchActorsTypeahead                                  | 対応     |                                                       |
+| app.bsky.actor.getPreferences                                                                                   | 一部対応 | 設定の保存はせず固定の設定を返す                      |
+| app.bsky.feed.getTimeline / getAuthorFeed / getActorLikes / getListFeed                                         | 対応     |                                                       |
+| app.bsky.feed.getPosts / getPostThread / getQuotes / getLikes / getRepostedBy / getFeedGenerators / searchPosts | 対応     |                                                       |
+| app.bsky.feed.searchPostsV2                                                                                     | 一部対応 | 一部のパラメーターを無視する(下記)                    |
+| app.bsky.unspecced.getPostThreadV2                                                                              | 一部対応 | sortとhiddenRepliesを無視する(下記)                   |
+| app.bsky.notification.listNotifications / getUnreadCount                                                        | 一部対応 | priorityを無視する(下記)                              |
+| app.bsky.notification.getGroupedNotifications                                                                   | 一部対応 | `feed=people-i-follow`と`feed=activity`は見送り(下記) |
+| app.bsky.notification.updateSeen                                                                                | 対応     |                                                       |
+| app.bsky.graph.getFollowers / getFollows / getKnownFollowers / getList / getLists / getListsWithMembership      | 対応     |                                                       |
+| app.bsky.bookmark.*                                                                                             | 見送り   | `viewer.bookmarked`と`bookmarkCount`も返さない        |
+| app.bsky.draft.*                                                                                                | 見送り   |                                                       |
+| app.bsky.notification.getPreferences / putPreferencesV2 / putActivitySubscription                               | 見送り   |                                                       |
+| app.bsky.labeler.getServices                                                                                    | 見送り   |                                                       |
+| app.bsky.graph.getBlocks、ブロックの反映                                                                        | 見送り   | 下記                                                  |
+| 上記以外のapp.bsky.*                                                                                            | 未対応   | 501を返す(例: app.bsky.feed.getFeed)                  |
 
 ### 独自のXRPC
 
@@ -41,14 +41,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 - notImplemented-1: 実装していないXRPCには501とMethodNotImplementedを返す
 
-次のXRPCは、実装する予定がない。
-
-- `app.bsky.bookmark.*`（`viewer.bookmarked`と`bookmarkCount`も返さない）
-- `app.bsky.draft.*`
-- `app.bsky.notification.getPreferences`、`app.bsky.notification.putPreferencesV2`
-- `app.bsky.notification.putActivitySubscription`（`getGroupedNotifications`の`feed=activity`を含む）
-
-理由は2つある。
+対応一覧で見送りとしたXRPCは、実装する予定がない。理由は2つある。
 
 - どれもSNSを便利にする機能で、基本機能の再現というPoCの目標に入らない。
 - PDSにない利用者の非公開データをAppViewのDBに保管する必要があり、保管するデータを増やしたくない。
@@ -68,7 +61,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## ラベル
 
-モデレーションサービスが付けたラベルと、作成者がレコードに付けたセルフラベルを、プロフィールと投稿のビューの labels に載せる。公式クライアントは labels を見て警告やぼかしを表示する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
+モデレーションサービスが付けたラベルと、作成者がレコードに付けたセルフラベルを、プロフィールと投稿のビューの labels に載せる。公式クライアントは labels を見て警告やぼかしを表示する。
 
 - labels-1: プロフィールのビューの labels に、そのアカウントのDIDに付いたラベルを含める
 - labels-2: 投稿のビューの labels に、その投稿に付いたラベルを含める
@@ -81,7 +74,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## ラベラーの指定
 
-クライアントが `atproto-accept-labelers` ヘッダーで指定したラベラー（モデレーションサービス）のラベルだけを labels に載せる。公式クライアントは、アカウントが登録したラベラーをこのヘッダーで送る。今はgetPostsだけが対応する。
+クライアントが `atproto-accept-labelers` ヘッダーで指定したラベラー（モデレーションサービス）のラベルだけを labels に載せる。公式クライアントは、アカウントが登録したラベラーをこのヘッダーで送る。getPostsだけが対応する。
 
 - labelers-1: labels には、`atproto-accept-labelers` ヘッダーで指定されたラベラーが付けたラベルだけを含める
 - labelers-2: `atproto-accept-labelers` ヘッダーがないか不正な場合は、すべてのラベラーのラベルを labels に含める
@@ -92,7 +85,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## 返信制限
 
-スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
+スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。
 
 - threadgate-1: スレッドの起点の投稿はそのthreadgateをthreadgateに含める
 - threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする
@@ -105,7 +98,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## 引用制限
 
-投稿者がpostgateで決めた引用の禁止と切り離しを、postViewに反映する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
+投稿者がpostgateで決めた引用の禁止と切り離しを、postViewに反映する。
 
 - postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする
 - postgate-2: 引用された投稿のpostgateのdetachedEmbeddingUrisに引用した投稿が含まれる場合、引用をviewDetachedにする
