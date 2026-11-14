@@ -21,6 +21,7 @@ import type {
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
+import type { IRepoStatusFetcher } from "../application/interfaces/external/repo-status-fetcher.js";
 import type { ITapClient } from "../application/interfaces/external/tap-client.js";
 import type { IWebPushSender } from "../application/interfaces/external/web-push-sender.js";
 import type { IAccountQuery } from "../application/interfaces/queries/account-query.js";
@@ -82,6 +83,7 @@ import { PostStatsQuery } from "../infrastructure/queries/post-stats-query/post-
 import { ProfileQuery } from "../infrastructure/queries/profile-query/profile-query.js";
 import { PushNotificationQuery } from "../infrastructure/queries/push-notification-query/push-notification-query.js";
 import { RegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.js";
+import { RepoStatusFetcher } from "../infrastructure/repo-status-fetcher/repo-status-fetcher.js";
 import { AccountRepository } from "../infrastructure/repositories/account-repository/account-repository.js";
 import { AccountStatsRepository } from "../infrastructure/repositories/account-stats-repository/account-stats-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
@@ -116,6 +118,7 @@ export const createWorkerRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["env"], asClassArgs(LoggerManager))
     .service("tapClient", ["env"], asClassArgs<ITapClient>()(TapClient))
+    .service("repoStatusFetcher", ["env"], asClassArgs<IRepoStatusFetcher>()(RepoStatusFetcher))
     .service("connectionPool", ["env"], connectionPoolFactory)
     .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
@@ -176,7 +179,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClassArgs(AggregateAccountStatsUseCase))
     .service("indexLabelUseCase", ["labelRepository", "accountQuery", "transactionManager"], asClassArgs(IndexLabelUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "registrationQuery", "labelFetcher", "indexLabelUseCase", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
-    .service("checkBackfillUseCase", ["tapClient", "registrationQuery", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
+    .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "registrationQuery", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClassArgs(SendPushNotificationUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClassArgs(SyncWorker))

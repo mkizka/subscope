@@ -11,6 +11,7 @@ import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/queries/profile-query/profile-query.in-memory.js";
 import { InMemoryRegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.in-memory.js";
+import { InMemoryRepoStatusFetcher } from "../infrastructure/repo-status-fetcher/repo-status-fetcher.in-memory.js";
 import { InMemoryAccountRepository } from "../infrastructure/repositories/account-repository/account-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
@@ -37,6 +38,7 @@ export const testEnv = {
   DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres",
   REDIS_URL: "redis://localhost:6379",
   TAP_URL: "http://localhost:2480",
+  RELAY_URL: "https://relay1.us-east.bsky.network",
   MODERATION_URL: "https://mod.bsky.app",
   TAP_CONCURRENCY: 64,
   DATABASE_POOL_MAX: 32,
@@ -67,6 +69,7 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("registrationQuery", asClassArgs(InMemoryRegistrationQuery))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
   .replaceService("tapClient", asClassArgs(InMemoryTapClient))
+  .replaceService("repoStatusFetcher", asClassArgs(InMemoryRepoStatusFetcher))
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
