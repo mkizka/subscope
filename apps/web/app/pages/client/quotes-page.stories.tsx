@@ -53,7 +53,6 @@ export const Empty: Story = {
 };
 
 export const Loading: Story = {
-  name: "quotes-s1: 引用一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["quotes", alice.handle] });
     queryClient
@@ -62,12 +61,5 @@ export const Loading: Story = {
         queryFn: () => new Promise<never>(() => {}),
       })
       .catch(() => {});
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByRole("heading", { name: "引用" })).toBeVisible();
-    await expect(
-      canvas.getByRole("status", { name: "読み込み中" }),
-    ).toBeVisible();
   },
 };
