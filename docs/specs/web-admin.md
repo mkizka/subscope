@@ -15,7 +15,7 @@
 
 ## メンバー
 
-`/admin/registered-accounts` でメンバーを管理する。管理者の付与には appview の API の追加が必要。
+`/admin/registered-accounts` でメンバーを管理する。
 
 - admin-accounts-e1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す
 - admin-accounts-e2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる

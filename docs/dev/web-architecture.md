@@ -51,7 +51,3 @@
 ## デザイン
 
 - 色・文字・余白・部品などのデザインルールは [apps/web/DESIGN.md](../../apps/web/DESIGN.md) に従う
-
-## 今後追加する画面
-
-- ローカルタイムライン: メンバー全員の投稿を流す（`me.subsco.feed.getLocalTimeline`）
