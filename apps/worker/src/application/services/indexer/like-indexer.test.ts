@@ -61,7 +61,7 @@ describe("LikeIndexer", () => {
 
     test.each([
       {
-        name: "notify-1: 通知はサブスクライバー宛てにだけ作る",
+        name: "notify-1: 通知はメンバー宛てにだけ作る",
         isRegistered: false,
         isSelf: false,
         expected: [],
@@ -116,7 +116,7 @@ describe("LikeIndexer", () => {
       { name: "バックフィルで受け取ったレコード", live: false, depth: 0 },
       { name: "取得しに行ったレコード", live: true, depth: 1 },
     ])(
-      "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルで受け取ったレコードや取得しに行ったレコードでは作らない ($name)",
+      "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルや取得しに行ったレコードでは作らない ($name)",
       async ({ live, depth }) => {
         // arrange
         const liker = accountFactory();

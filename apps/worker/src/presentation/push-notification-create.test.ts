@@ -69,7 +69,7 @@ describe("プッシュ通知の送信(通知作成時)", () => {
     return { member, post };
   };
 
-  test("push-5: 通知を新しく作ると、受け取るメンバーが登録したすべての端末にプッシュ通知を送る", async () => {
+  test("push-5: 通知を新しく作ると、受け取るメンバーが登録したすべての端末に送る", async () => {
     // arrange
     const { indexCommit, runSendPushNotificationJobs, webPushSender } =
       await setupJobTest();
