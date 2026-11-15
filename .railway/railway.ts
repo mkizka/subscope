@@ -67,7 +67,6 @@ export default defineRailway(() => {
 
   const appview = service("Appview", {
     ...app("appview", ["/packages/db/**/*"]),
-    preDeploy: "npm --prefix /db run db:migrate",
     deploy: deploy(2),
     domains: ["appview.subsco.me"],
     env: {
@@ -81,7 +80,6 @@ export default defineRailway(() => {
 
   const web = service("Web", {
     ...app("web", ["/packages/db/**/*"]),
-    preDeploy: "npm --prefix /db run db:migrate",
     deploy: deploy(1),
     domains: ["alpha.subsco.me"],
     env: {
@@ -99,7 +97,6 @@ export default defineRailway(() => {
 
   const worker = service("Worker", {
     ...app("worker", ["/packages/db/**/*"]),
-    preDeploy: "npm --prefix /db run db:migrate",
     deploy: { ...deploy(2), drainingSeconds: 60 },
     env: {
       BUILD_TARGET: "worker",

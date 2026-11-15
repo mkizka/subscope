@@ -1,4 +1,5 @@
 export * from "./lib/infrastructure/db/db.js";
+export * from "./lib/infrastructure/db/migrate.js";
 export * from "./lib/infrastructure/did-cache/redis-did-cache.js";
 export * from "./lib/infrastructure/did-resolver/did-resolver.in-memory.js";
 export * from "./lib/infrastructure/did-resolver/did-resolver.js";
