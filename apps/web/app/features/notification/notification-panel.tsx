@@ -126,7 +126,7 @@ export function NotificationPanel({
                 </div>
                 <div className="min-w-0 flex-1">
                   <Avatar src={notification.avatarUrl} />
-                  <p className="mt-2">
+                  <p className="mt-2 text-body">
                     <span className="font-bold">{notification.authorName}</span>
                     {reason?.label}
                   </p>
