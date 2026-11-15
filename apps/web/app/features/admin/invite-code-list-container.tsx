@@ -80,7 +80,7 @@ export function InviteCodeListContainer() {
         >
           <LoaderCircle className="size-6 animate-spin text-muted" />
           <InfiniteScrollTrigger
-            onIntersect={() => void fetchNextPage()}
+            onIntersect={() => void fetchNextPage({ cancelRefetch: false })}
             enabled={!isFetchingNextPage}
           />
         </li>

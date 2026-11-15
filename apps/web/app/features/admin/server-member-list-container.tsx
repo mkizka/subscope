@@ -119,7 +119,7 @@ export function ServerMemberListContainer() {
       total={serverMembersQuery.data?.total}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}
-      onLoadMore={fetchNextPage}
+      onLoadMore={() => void fetchNextPage({ cancelRefetch: false })}
       hasNextPage={hasNextPage}
       onGrantAdmin={grantAdminMutation.mutate}
       grantingDid={
