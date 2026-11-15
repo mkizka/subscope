@@ -19,7 +19,6 @@ coverage/
 
 # react-router
 .react-router/
-build/
 
 # storybook
 *storybook.log

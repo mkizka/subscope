@@ -7,7 +7,7 @@
     },
     "build": {
       "dependsOn": ["^build", "generate"],
-      "outputs": ["dist/**", "build/**", ".react-router/**"]
+      "outputs": ["dist/**", ".react-router/**"]
     },
     "typecheck": {
       "dependsOn": ["^build", "generate"]

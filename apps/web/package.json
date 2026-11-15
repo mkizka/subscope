@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "main": "server.js",
+  "main": "dist/server/index.js",
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
@@ -13,7 +13,7 @@
     "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
     "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
     "preview": "vite preview",
-    "start": "node server.js",
+    "start": "node .",
     "storybook": "storybook dev -p 6006",
     "typecheck": "react-router typegen && tsc"
   },
@@ -26,6 +26,7 @@
     "@atproto/oauth-client-node": "0.5.13",
     "@atproto/syntax": "0.7.7",
     "@bull-board/api": "7.2.1",
+    "@bull-board/ui": "7.2.1",
     "@conform-to/react": "1.21.2",
     "@conform-to/zod": "1.21.2",
     "@fontsource/noto-sans-jp": "^5.3.1",

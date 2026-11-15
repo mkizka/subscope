@@ -21,10 +21,10 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY --from=pruner /app/out/full/ .
 RUN turbo build --filter=${BUILD_PACKAGE}
 RUN pnpm deploy --prod --ignore-scripts --filter=@repo/db /out/db \
+  && mkdir /out/app && cp -r apps/${BUILD_TARGET}/package.json apps/${BUILD_TARGET}/dist /out/app \
   && if [ "${BUILD_TARGET}" = web ]; then \
-    pnpm deploy --prod --ignore-scripts --filter=@repo/web /out/app; \
-  else \
-    mkdir /out/app && cp -r apps/${BUILD_TARGET}/package.json apps/${BUILD_TARGET}/dist /out/app; \
+    mkdir -p /out/app/node_modules/@bull-board \
+    && cp -rL apps/web/node_modules/@bull-board/ui /out/app/node_modules/@bull-board/; \
   fi
 
 FROM node:24.22.1-slim AS runner

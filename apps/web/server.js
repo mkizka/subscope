@@ -7,13 +7,15 @@ app.set("trust proxy", true);
 app.disable("x-powered-by");
 app.use(
   "/assets",
-  express.static("build/client/assets", { immutable: true, maxAge: "1y" }),
+  express.static("dist/client/assets", { immutable: true, maxAge: "1y" }),
 );
-app.use(express.static("build/client", { maxAge: "1h" }));
+app.use(express.static("dist/client", { maxAge: "1h" }));
 app.use(morgan("tiny"));
 app.all(
   "/{*splat}",
-  createRequestHandler({ build: await import("./build/server/index.js") }),
+  createRequestHandler({
+    build: () => import("virtual:react-router/server-build"),
+  }),
 );
 
 app.listen(Number(process.env.PORT ?? 3000));
