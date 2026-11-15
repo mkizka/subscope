@@ -49,7 +49,7 @@ describe("テイクダウン", () => {
   };
 
   test.each(["!takedown", "!suspend"])(
-    "takedown-1: `!takedown` か `!suspend` のラベルが付いたアカウントと投稿は応答に含めない(%s)",
+    "takedown-1: !takedown か !suspend のラベルが付いたアカウントと投稿は応答に含めない(%s)",
     async (val) => {
       // arrange
       const account = await createAccount();
@@ -94,7 +94,7 @@ describe("テイクダウン", () => {
   });
 
   test.each(["takendown", "suspended", "deactivated"] as const)(
-    "takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない(%s)",
+    "takedown-4: PDSでテイクダウン・停止・無効化されたアカウントとその投稿は応答に含めない(%s)",
     async (status) => {
       // arrange
       const post = await createPost();

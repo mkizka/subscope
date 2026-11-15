@@ -222,7 +222,7 @@ describe("app.bsky.feed.getPosts", () => {
     expect(res.posts.map((post) => post.viewer?.pinned)).toEqual([true, false]);
   });
 
-  test("threadgate-1: スレッドの起点の投稿はそのthreadgateをthreadgateに含める", async () => {
+  test("threadgate-1: 起点の投稿のビューにthreadgateを含める", async () => {
     // arrange
     const { client } = await setupApiTest();
     const root = await createPost();
@@ -244,7 +244,7 @@ describe("app.bsky.feed.getPosts", () => {
     expect(res.posts[1]?.threadgate).toBeUndefined();
   });
 
-  test("threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする", async () => {
+  test("threadgate-2: 返信を許されていない閲覧者には、replyDisabledをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db).create();
@@ -271,7 +271,7 @@ describe("app.bsky.feed.getPosts", () => {
     ]);
   });
 
-  test("threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする", async () => {
+  test("threadgate-3: 起点の投稿者と、メンション・フォロー・フォロワーの規則に合う閲覧者には、replyDisabledをfalseにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const mentioned = await accountFactory(ctx.db).create();
@@ -308,7 +308,7 @@ describe("app.bsky.feed.getPosts", () => {
     expect(results).toEqual([false, false, false, false]);
   });
 
-  test("threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする", async () => {
+  test("threadgate-4: 規則が無いthreadgateでは、replyDisabledをfalseにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db).create();
@@ -325,7 +325,7 @@ describe("app.bsky.feed.getPosts", () => {
     expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
   });
 
-  test("threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする", async () => {
+  test("threadgate-5: リストの規則のリストに入っている閲覧者には、replyDisabledをfalseにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db).create();
@@ -352,7 +352,7 @@ describe("app.bsky.feed.getPosts", () => {
     expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
   });
 
-  test("threadgate-6: allowのlistRuleで指定したリストのうちインデックスしたものを、threadgate.listsにlistViewBasicとして含める", async () => {
+  test("threadgate-6: リストの規則のリストのうちインデックスしたものを、threadgateのlistsに含める", async () => {
     // arrange
     const { client } = await setupApiTest();
     const root = await createPost();
@@ -383,7 +383,7 @@ describe("app.bsky.feed.getPosts", () => {
     ]);
   });
 
-  test("postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする", async () => {
+  test("postgate-1: 引用を禁止した投稿は、投稿者以外の閲覧者のembeddingDisabledをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db).create();
@@ -406,7 +406,7 @@ describe("app.bsky.feed.getPosts", () => {
     expect(results).toEqual([true, false]);
   });
 
-  test("postgate-2: 引用された投稿のpostgateのdetachedEmbeddingUrisに引用した投稿が含まれる場合、引用をviewDetachedにする", async () => {
+  test("postgate-2: 引用された側が切り離した引用は、viewDetachedにする", async () => {
     // arrange
     const { client } = await setupApiTest();
     const quoted = await createPost();
@@ -442,7 +442,7 @@ describe("app.bsky.feed.getPosts", () => {
       },
     ]);
   });
-  test("embed-1: gallery埋め込みの画像は引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す", async () => {
+  test("embed-1: 画像のギャラリーは、引用に添えたものも含めてgalleryのビューで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const quoted = await createPost();
@@ -476,7 +476,7 @@ describe("app.bsky.feed.getPosts", () => {
     ]);
   });
 
-  test("embed-2: 動画の埋め込みは再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す", async () => {
+  test("embed-2: 動画は、再生用のプレイリストとサムネイルをvideo.bsky.appのURLにして返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const post = await createPost();

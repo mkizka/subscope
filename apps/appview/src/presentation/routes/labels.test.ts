@@ -54,7 +54,7 @@ describe("ラベル", () => {
     return res.posts[0];
   };
 
-  test("labels-1: プロフィールのビューの labels に、そのアカウントのDIDに付いたラベルを含める", async () => {
+  test("labels-1: プロフィールのlabelsに、アカウントのDIDに付いたラベルを含める", async () => {
     // arrange
     const { account, post } = await createPost();
     const label = await labelFactory(ctx.db)
@@ -76,7 +76,7 @@ describe("ラベル", () => {
     ]);
   });
 
-  test("labels-2: 投稿のビューの labels に、その投稿に付いたラベルを含める", async () => {
+  test("labels-2: 投稿のlabelsに、投稿に付いたラベルを含める", async () => {
     // arrange
     const { account, post } = await createPost();
     const label = await labelFactory(ctx.db)
@@ -98,7 +98,7 @@ describe("ラベル", () => {
     ]);
   });
 
-  test("labels-3: プロフィールのビューの labels に、プロフィールレコードに付いたラベルを含める", async () => {
+  test("labels-3: プロフィールのlabelsに、プロフィールレコードに付いたラベルを含める", async () => {
     // arrange
     const { account, profileRecord, post } = await createPost();
     const label = await labelFactory(ctx.db)
@@ -120,7 +120,7 @@ describe("ラベル", () => {
     ]);
   });
 
-  test("labels-4: プロフィールのビューの labels に、プロフィールレコードのセルフラベルを含める", async () => {
+  test("labels-4: プロフィールのlabelsに、プロフィールレコードのセルフラベルを含める", async () => {
     // arrange
     const { account, profileRecord, post } = await createPost({
       profileJson: {
@@ -145,7 +145,7 @@ describe("ラベル", () => {
     ]);
   });
 
-  test("labels-5: 投稿のビューの labels に、投稿レコードのセルフラベルを含める", async () => {
+  test("labels-5: 投稿のlabelsに、投稿レコードのセルフラベルを含める", async () => {
     // arrange
     const { account, post, postRecord } = await createPost({
       postJson: {
@@ -171,7 +171,7 @@ describe("ラベル", () => {
     ]);
   });
 
-  test("labels-6: 引用された投稿のビューの labels に、その投稿に付いたラベルを含める", async () => {
+  test("labels-6: 引用された投稿のlabelsにも、その投稿に付いたラベルを含める", async () => {
     // arrange
     const { account, post: quoted } = await createPost();
     const { post } = await createPost();

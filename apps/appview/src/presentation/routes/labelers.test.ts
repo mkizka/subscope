@@ -55,7 +55,7 @@ describe("ラベラーの指定", () => {
     });
   };
 
-  test("labelers-1: labels には、`atproto-accept-labelers` ヘッダーで指定されたラベラーが付けたラベルだけを含める", async () => {
+  test("labelers-1: labelsには、指定されたラベラーのラベルだけを含める", async () => {
     // arrange
     const post = await createPost();
     await createLabel(post, labelerA, "spam");
@@ -71,7 +71,7 @@ describe("ラベラーの指定", () => {
   });
 
   test.each([undefined, "invalid"])(
-    "labelers-2: `atproto-accept-labelers` ヘッダーがないか不正な場合は、すべてのラベラーのラベルを labels に含める(%s)",
+    "labelers-2: ヘッダーがないか不正なときは、すべてのラベラーのラベルを含める(%s)",
     async (header) => {
       // arrange
       const post = await createPost();
@@ -88,7 +88,7 @@ describe("ラベラーの指定", () => {
     },
   );
 
-  test("labelers-3: `atproto-accept-labelers` ヘッダーで指定されたラベラーを、応答の `atproto-content-labelers` ヘッダーで返す", async () => {
+  test("labelers-3: 指定されたラベラーを、応答の atproto-content-labelers ヘッダーで返す", async () => {
     // arrange
     const post = await createPost();
 
@@ -101,7 +101,7 @@ describe("ラベラーの指定", () => {
     );
   });
 
-  test("labelers-4: テイクダウンは`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する", async () => {
+  test("labelers-4: テイクダウンは、指定されていないラベラーのラベルでも適用する", async () => {
     // arrange
     const post = await createPost();
     await createLabel(post, labelerB, "!takedown");
