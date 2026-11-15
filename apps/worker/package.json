@@ -7,7 +7,7 @@
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
-    "build": "node build.mjs",
+    "build": "node build.ts",
     "dev": "NODE_ENV=development tsx watch ./src/worker.ts | pino-pretty",
     "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
     "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
