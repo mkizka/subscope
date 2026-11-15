@@ -29,7 +29,7 @@ const createList = async (name: string) => {
 };
 
 test.describe("リスト", () => {
-  test("list-e1: プロフィール全体ページの「リスト」から、そのアカウントが作成したリスト（名前、説明）を一覧表示する", async ({
+  test("list-e1: プロフィールの「リスト」タブに、そのアカウントが作ったリスト（名前、説明）を一覧表示する", async ({
     page,
   }) => {
     const name = `list-e1のリスト ${Date.now()}`;
@@ -51,7 +51,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e2: 一覧のリストを選ぶと、戻るボタンと作成者を含むヘッダー、リストの名前と説明、リストのメンバーの投稿を新しい順に表示する", async ({
+  test("list-e2: リストを選ぶと、ヘッダー（戻るボタン、作成者）、名前と説明、メンバーの投稿を新しい順に表示する", async ({
     page,
   }) => {
     const name = `list-e2のリスト ${Date.now()}`;
@@ -90,7 +90,7 @@ test.describe("リスト", () => {
     ]);
   });
 
-  test("list-e3: リスト詳細の「メンバー」タブで、リストに追加されたアカウントを一覧表示する", async ({
+  test("list-e3: 詳細の「メンバー」タブに、リストのメンバーを一覧表示する", async ({
     page,
   }) => {
     const rkey = await createList(`list-e3のリスト ${Date.now()}`);
@@ -112,7 +112,7 @@ test.describe("リスト", () => {
     await expect(main.getByText("@bob.test")).toBeVisible();
   });
 
-  test("list-e4: 「リスト」の管理画面（`/lists`）で、「新しいリスト」ボタンのダイアログに名前と説明を入力してリストを作成する", async ({
+  test("list-e4: 管理画面の「新しいリスト」から、名前と説明を入力してリストを作る", async ({
     page,
   }) => {
     const name = `list-e4のリスト ${Date.now()}`;
@@ -140,7 +140,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e5: 自分のリスト詳細のヘッダーにある「…」メニューから編集ダイアログを開き、リストの名前と説明を編集する", async ({
+  test("list-e5: 自分のリスト詳細の「…」メニューから、名前と説明を編集する", async ({
     page,
   }) => {
     const rkey = await createList(`list-e5のリスト ${Date.now()}`);
@@ -176,7 +176,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e6: 自分のリスト詳細のヘッダーにある「…」メニューから、確認のうえリストとリストのメンバーを削除し、リスト一覧に戻る", async ({
+  test("list-e6: 自分のリスト詳細の「…」メニューから、確認のうえリストとメンバーを削除し、リスト一覧に戻る", async ({
     page,
   }) => {
     const name = `list-e6のリスト ${Date.now()}`;
@@ -220,7 +220,7 @@ test.describe("リスト", () => {
     ).toEqual([]);
   });
 
-  test("list-e7: 自分のリストの「メンバー」タブで、ハンドルを入力したアカウントをリストに追加する", async ({
+  test("list-e7: 自分のリストの「メンバー」タブで、ハンドルを入力してアカウントを追加する", async ({
     page,
   }) => {
     const list = await createEmptyList(`list-e7のリスト ${Date.now()}`);
@@ -245,7 +245,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e8: 自分のリストの「メンバー」タブで、リストのメンバーをリストから削除する", async ({
+  test("list-e8: 自分のリストの「メンバー」タブで、メンバーを削除する", async ({
     page,
   }) => {
     const rkey = await createList(`list-e8のリスト ${Date.now()}`);
@@ -268,7 +268,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e9: リストのメンバーの投稿はタイムラインと同じ規則でリプライを絞り込む", async ({
+  test("list-e9: メンバーの投稿は、タイムラインと同じ規則でリプライを絞り込む", async ({
     page,
   }) => {
     const rkey = await createList(`list-e9のリスト ${Date.now()}`);
@@ -303,7 +303,7 @@ test.describe("リスト", () => {
     await expect(main.getByText("list-e9: aliceへの返信")).toHaveCount(0);
   });
 
-  test("list-e10: リスト一覧はプロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示し、自分のプロフィールでも作成フォームは表示しない", async ({
+  test("list-e10: リスト一覧はプロフィールのヘッダーとタブの下に、そのアカウントのリストだけを出す。自分のプロフィールでも作成フォームは出さない", async ({
     page,
   }) => {
     const name = `list-e10のリスト ${Date.now()}`;
@@ -355,7 +355,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e12: プロフィール全体ページのフォローボタンの右にある「…」メニューの「リストに追加」から、自分のリストにそのアカウントを追加・削除する", async ({
+  test("list-e12: プロフィールのフォローボタンの右の「…」メニューの「リストに追加」から、そのアカウントを自分のリストに追加・削除する", async ({
     page,
   }) => {
     const name = `list-e12のリスト ${Date.now()}`;
@@ -390,7 +390,7 @@ test.describe("リスト", () => {
     await reopen("追加");
   });
 
-  test("list-e13: 自分のプロフィール全体ページにも、フォローボタンの右の「…」メニューを表示する", async ({
+  test("list-e13: 自分のプロフィールにも「…」メニューを出す", async ({
     page,
   }) => {
     await page.goto("/alice.test");

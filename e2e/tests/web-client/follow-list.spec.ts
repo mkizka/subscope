@@ -15,7 +15,7 @@ test.describe("フォロー・フォロワー", () => {
     await page.goto("/");
   });
 
-  test("followList-e1: プロフィール全体ページのフォロー数から、中央カラムにそのアカウントのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("followList-e1: プロフィールのフォロー数から、フォローの一覧（名前、ハンドル、自己紹介）を開く", async ({
     page,
   }) => {
     await page.goto("/alice.test");
@@ -34,7 +34,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(bob.getByText("@bob.test")).toBeVisible();
   });
 
-  test("followList-e2: プロフィール全体ページのフォロワー数から、中央カラムにそのアカウントのフォロワー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("followList-e2: プロフィールのフォロワー数から、フォロワーの一覧（名前、ハンドル、自己紹介）を開く", async ({
     page,
   }) => {
     await page.goto("/bob.test");
@@ -55,7 +55,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(alice.getByText("@alice.test")).toBeVisible();
   });
 
-  test("followList-e3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
+  test("followList-e3: 一覧のアカウントを選ぶと、そのプロフィールに移動する", async ({
     page,
   }) => {
     await page.goto("/alice.test/follows");
@@ -68,7 +68,7 @@ test.describe("フォロー・フォロワー", () => {
     ).toBeVisible();
   });
 
-  test("followList-e5: 「メンバー」タブ（`?filter=registered`）には、そのアカウントをフォローしているメンバーだけを一覧表示する", async ({
+  test("followList-e5: 「メンバー」タブ（`?filter=registered`）は、フォロワーのうちメンバーだけを表示する", async ({
     page,
   }) => {
     await page.goto("/bob.test/followers");
@@ -86,7 +86,7 @@ test.describe("フォロー・フォロワー", () => {
     }).toPass();
   });
 
-  test("followList-e6: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「メンバー」タブに移動する", async ({
+  test("followList-e6: サーバーページの「誰かがフォロー」タブで「n人からフォロー」を押すと、フォロワー一覧の「メンバー」タブに移動する", async ({
     page,
   }) => {
     const link = page
@@ -104,7 +104,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(page).toHaveURL(/\/followers\?filter=registered$/);
   });
 
-  test("followList-e7: 見出しを「{名前}のフォロー」「{名前}のフォロワー」とし、戻るボタンでそのアカウントのプロフィール全体ページに移動する", async ({
+  test("followList-e7: 見出しは「{名前}のフォロー」「{名前}のフォロワー」とし、戻るボタンでプロフィールに移動する", async ({
     page,
   }) => {
     await page.goto("/alice.test/follows");
@@ -117,7 +117,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(page).toHaveURL("/alice.test");
   });
 
-  test("followList-e8: 「知り合い」タブ（`?filter=known`）には、自分がフォローしているアカウントのうちそのアカウントをフォローしている人だけを、自分がフォローした新しい順に一覧表示する", async ({
+  test("followList-e8: 「知り合い」タブ（`?filter=known`）は、フォロワーのうち自分がフォローしている人だけを、自分がフォローした新しい順に表示する", async ({
     page,
   }) => {
     await follow("bob.test", "carol.test");

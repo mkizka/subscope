@@ -11,7 +11,7 @@ import {
 } from "../../helpers/pds";
 
 test.describe("プロフィール", () => {
-  test("profile-e1: 左カラムの「プロフィール」から、中央カラムに自分のプロフィール（バナー、アイコン、名前、ハンドル、自己紹介、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
+  test("profile-e1: 左カラムの「プロフィール」から、自分のプロフィール（バナー、アイコン、名前、ハンドル、自己紹介、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
     page,
   }) => {
     const text = `profile-1の投稿 ${Date.now()}`;
@@ -46,7 +46,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-e2: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
+  test("profile-e2: フォローボタンでフォローし、もう一度押すと外す", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -82,7 +82,7 @@ test.describe("プロフィール", () => {
     await expect.poll(isFollowing).toBe(true);
   });
 
-  test("profile-e3: 全体ページの「投稿」タブではリプライを除いた投稿を、「リプライ」タブではリプライを含めた投稿を表示する", async ({
+  test("profile-e3: 「投稿」タブは他人へのリプライを除いた投稿を、「リプライ」タブはリプライを含めた投稿を表示する", async ({
     page,
   }) => {
     await createRecord("alice.test", "app.bsky.feed.post", {
@@ -112,7 +112,7 @@ test.describe("プロフィール", () => {
     await expect(main.getByText(reply)).toHaveCount(0);
   });
 
-  test("profile-e4: 全てのアカウントのプロフィールの「いいね」タブに、そのアカウントがいいねした投稿を表示する", async ({
+  test("profile-e4: 「いいね」タブは、どのアカウントでも、そのアカウントがいいねした投稿を表示する", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -137,7 +137,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-e5: 全体ページの「メディア」タブには画像付きの投稿だけを表示する", async ({
+  test("profile-e5: 「メディア」タブは画像付きの投稿だけを表示する", async ({
     page,
   }) => {
     const image = `profile-10の画像付き ${Date.now()}`;
@@ -164,7 +164,7 @@ test.describe("プロフィール", () => {
     await expect(main.getByText(text)).toHaveCount(0);
   });
 
-  test("profile-e11: 全体ページの「動画」タブには動画付きの投稿だけを表示する", async ({
+  test("profile-e11: 「動画」タブは動画付きの投稿だけを表示する", async ({
     page,
   }) => {
     const video = `profile-e11の動画付き ${Date.now()}`;
@@ -200,7 +200,7 @@ test.describe("プロフィール", () => {
     await expect(main.getByText(text)).toHaveCount(0);
   });
 
-  test("profile-e6: タイムラインとスレッドの投稿のアイコンか名前を選ぶと、投稿者のプロフィール全体ページに移動する", async ({
+  test("profile-e6: タイムラインとスレッドで投稿者のアイコンか名前を選ぶと、そのプロフィールに移動する", async ({
     page,
   }) => {
     const text = `profile-12の投稿 ${Date.now()}`;
@@ -228,7 +228,7 @@ test.describe("プロフィール", () => {
     await expect(page).toHaveURL("/alice.test");
   });
 
-  test("profile-e8: 全体ページの「投稿」タブでは自分の投稿への自分のリプライ(スレッド)を含め、timeline-s6と同じく線で繋げる", async ({
+  test("profile-e8: 「投稿」タブは自分の投稿への自分のリプライを含め、タイムラインと同じく線で繋げる", async ({
     page,
   }) => {
     const root = await createRecord("alice.test", "app.bsky.feed.post", {
@@ -258,7 +258,7 @@ test.describe("プロフィール", () => {
     ).toHaveCount(2);
   });
 
-  test("profile-e12: 全体ページの「投稿」タブの1ページ目では、プロフィールでピン留めした投稿を先頭に表示し、投稿の上にリポストと同じ位置で「ピン留め」を出す。元の位置には重ねて表示しない", async ({
+  test("profile-e12: 「投稿」タブの1ページ目は、ピン留めした投稿を「ピン留め」の表示付きで先頭に出し、元の位置には出さない", async ({
     page,
   }) => {
     const pinned = await createRecord("alice.test", "app.bsky.feed.post", {
@@ -291,7 +291,7 @@ test.describe("プロフィール", () => {
     ).toBeVisible();
   });
 
-  test("profile-e9: 「リプライ」タブでは、返信先の投稿が一覧にない場合、リプライの上に返信先を表示して線で繋げる", async ({
+  test("profile-e9: 「リプライ」タブは、返信先の投稿が一覧にないとき、リプライの上に返信先を表示して線で繋げる", async ({
     page,
   }) => {
     const parentText = `profile-17の親 ${Date.now()}`;
@@ -318,7 +318,7 @@ test.describe("プロフィール", () => {
     );
   });
 
-  test("profile-e10: 全体ページの各タブ（投稿・リプライ・メディア・いいね）は、一番下の2画面分手前までスクロールすると、続きの古い投稿を読み込む", async ({
+  test("profile-e10: 各タブは、一番下の2画面分手前までスクロールすると続きを読み込む", async ({
     page,
   }) => {
     for (let i = 1; i <= 25; i++) {

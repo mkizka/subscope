@@ -60,7 +60,7 @@ export const Loading: Story = {
 };
 
 export const FollowersTabs: Story = {
-  name: "followList-s3: フォロワー一覧に「すべて」「知り合い」「メンバー」のタブを表示し、「メンバー」には人数を添える",
+  name: "followList-s3: フォロワー一覧に「すべて」「知り合い」「メンバー」のタブを出し、「メンバー」には人数を添える",
   args: { kind: "followers" },
   parameters: { path: "/alice.bsky.social/followers" },
   beforeEach: () => {
@@ -82,7 +82,7 @@ export const FollowersTabs: Story = {
 };
 
 export const FollowsEmpty: Story = {
-  name: "followList-s4: 読み込みが終わって0件のときは、フォロー一覧には「フォローしているアカウントはありません」を表示する",
+  name: "followList-s4: フォローが0件のときは「フォローしているアカウントはありません」を出す",
   args: { handle: "dave.bsky.social" },
   beforeEach: () => emptyData("dave.bsky.social", "follows"),
   play: async ({ canvasElement }) => {
@@ -93,7 +93,7 @@ export const FollowsEmpty: Story = {
 };
 
 export const FollowersEmpty: Story = {
-  name: "followList-s5: 読み込みが終わって0件のときは、フォロワー一覧には「フォロワーはいません」を表示する",
+  name: "followList-s5: フォロワーが0件のときは「フォロワーはいません」を出す",
   args: { handle: "dave.bsky.social", kind: "followers" },
   beforeEach: () => emptyData("dave.bsky.social", "followers"),
   play: async ({ canvasElement }) => {
@@ -120,7 +120,7 @@ export const KnownFollowers: Story = {
 };
 
 export const KnownFollowersEmpty: Story = {
-  name: "followList-s6: 「知り合い」タブの読み込みが終わって0件のときは、「知り合いのフォロワーはいません」を表示する",
+  name: "followList-s6: 「知り合い」タブが0件のときは「知り合いのフォロワーはいません」を出す",
   args: { handle: "dave.bsky.social", kind: "followers" },
   parameters: {
     path: "/dave.bsky.social/followers?filter=known",
