@@ -10,7 +10,7 @@ export function Dialog({ title, actions, children, ...props }: Props) {
     <dialog
       className="
         mx-auto mt-4 mb-auto w-lg max-w-[calc(100%-2rem)] rounded-xl bg-surface
-        text-ink
+        text-left text-ink
         backdrop:bg-black/40
         md:my-auto
       "

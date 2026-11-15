@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 import { LoginPage } from "./login-page";
 
@@ -10,6 +10,7 @@ const meta = {
   },
   args: {
     step: "login",
+    operator: { handle: "alice.example.com", displayName: "Alice" },
   },
 } satisfies Meta<typeof LoginPage>;
 
@@ -142,5 +143,29 @@ export const PassportButton: Story = {
     });
     await expect(link).toHaveAttribute("href", "/login/atpassport");
     await expect(link.querySelector("svg")).toBeInTheDocument();
+  },
+};
+
+export const AboutDialog: Story = {
+  name: "login-s11: 説明の下の「詳しく見る」を押すと、「Subscopeとは」のモーダルを開く",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "詳しく見る" }));
+    await expect(
+      canvas.getByRole("dialog", { name: "Subscopeとは" }),
+    ).toBeVisible();
+  },
+};
+
+export const AboutDialogOperator: Story = {
+  name: "login-s12: 「Subscopeとは」のモーダルには、運営者の名前とハンドルを出す",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "詳しく見る" }));
+    await expect(
+      within(canvas.getByRole("dialog")).getByText(
+        "運営: Alice（@alice.example.com）",
+      ),
+    ).toBeVisible();
   },
 };
