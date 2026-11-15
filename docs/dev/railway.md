@@ -25,19 +25,6 @@ Grafanaのデータソースとダッシュボードもリポジトリのファ�
 | -------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Web      | `COOKIE_SECRET`                                          | `openssl rand -base64 33`                                                                                                                                                                                                                        |
 | Web      | `PRIVATE_KEY_ES256_B64`                                  | `openssl ecparam -name prime256v1 -genkey \| openssl pkcs8 -topk8 -nocrypt \| openssl base64 -A`                                                                                                                                                 |
-| Web      | `ADMIN_API_TOKEN`                                        | Claudeなどにジョブキューを読ませる場合だけ設定する                                                                                                                                                                                               |
+| Web      | `ADMIN_API_TOKEN`                                        | 外部からジョブキューを読み取り専用で読む場合だけ設定する                                                                                                                                                                                         |
 | Grafana  | `GF_SECURITY_ADMIN_PASSWORD`                             | 未設定だとGrafanaは起動しない                                                                                                                                                                                                                    |
 | Worker   | `VAPID_PUBLIC_KEY`、`VAPID_PRIVATE_KEY`、`VAPID_SUBJECT` | プッシュ通知を使う場合だけ設定する。鍵は `npx web-push generate-vapid-keys` で作り、`VAPID_SUBJECT` は `mailto:` かhttpsのURLにする。Webの `VAPID_PUBLIC_KEY` はWorkerの値を参照する。未設定でも起動し、プッシュ通知の切り替えが出ないだけになる |
-
-Claudeなどにメトリクスを読ませる場合は、GrafanaでViewerロールのサービスアカウントのトークンも作る。
-
-## 運用の調査
-
-Claude Codeのクラウド環境では、ネットワークシークレットに登録したトークンをプロキシが付けるので、次のURLをcurlでGETすれば読める。
-
-| 対象         | URL                                                                                          | トークン                |
-| ------------ | -------------------------------------------------------------------------------------------- | ----------------------- |
-| ジョブキュー | `https://alpha.subsco.me/admin/bull-board/api/queues`                                        | Webの `ADMIN_API_TOKEN` |
-| メトリクス   | `https://grafana.subsco.me/api/datasources/proxy/uid/prometheus/api/v1/query?query={PromQL}` | GrafanaのViewerトークン |
-
-メトリクスの推移は `query_range` で、メトリクス名の一覧は `label/__name__/values` で読める。
