@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "main": "server.js",
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
