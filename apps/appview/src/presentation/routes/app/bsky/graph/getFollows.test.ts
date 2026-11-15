@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.graph.getFollows", () => {
   const { ctx } = testSetup;
 
-  test("getFollows-1: 指定したアカウントをsubjectに、そのフォロー先をfollowsにprofileViewで返す", async () => {
+  test("getFollows-1: 指定したアカウントをsubjectに、フォロー先をfollowsにprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db)
@@ -44,7 +44,7 @@ describe("app.bsky.graph.getFollows", () => {
     });
   });
 
-  test("getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
+  test("getFollows-2: 新しい順に並べ、cursorより古いものを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();

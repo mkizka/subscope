@@ -33,7 +33,7 @@ describe("app.bsky.graph.getListsWithMembership", () => {
       .use((t) => t.withProfile({}))
       .create();
 
-  test("getListsWithMembership-1: 認証がないリクエストには401を返す", async () => {
+  test("getListsWithMembership-1: 認証がなければ401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const subject = await createViewer();
@@ -47,7 +47,7 @@ describe("app.bsky.graph.getListsWithMembership", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getListsWithMembership-2: 閲覧者が作成したリストだけをlistViewで返し、他のアカウントのリストは含めない", async () => {
+  test("getListsWithMembership-2: 閲覧者が作成したリストだけをlistViewで返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createViewer();
@@ -69,7 +69,7 @@ describe("app.bsky.graph.getListsWithMembership", () => {
     expect(res.listsWithMembership[0]?.listItem).toBeUndefined();
   });
 
-  test("getListsWithMembership-3: actorがリストに含まれている場合は、listItemにlist itemのuriとactorのprofileViewを入れる", async () => {
+  test("getListsWithMembership-3: actorがリストに含まれていれば、listItemにそのリスト項目のuriとactorのprofileViewを入れる", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createViewer();

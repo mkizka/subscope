@@ -70,7 +70,7 @@ describe("app.bsky.actor.getProfiles", () => {
     ]);
   });
 
-  test("getProfiles-2: 閲覧者がフォローしているフォロワーがいるアカウントには、viewer.knownFollowersを含める", async () => {
+  test("getProfiles-2: getProfileと同じくviewer.knownFollowersを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const { viewer, subject, known } = await setupKnownFollowers(1);
