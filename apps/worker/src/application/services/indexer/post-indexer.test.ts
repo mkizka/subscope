@@ -201,7 +201,7 @@ describe("PostIndexer", () => {
       ]);
     });
 
-    test("notify-8: 1つの投稿から同じ相手への通知は mention > quote > reply の優先順で1件にする", async () => {
+    test("notify-8: 1つの投稿から同じ相手への通知は mention、quote、reply の優先順で1件にする", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const mentioned = accountFactory();
@@ -240,7 +240,7 @@ describe("PostIndexer", () => {
       ]);
     });
 
-    test("notify-6: リプライの親投稿を含めて4つ上までの投稿の作者に reply の通知を作る", async () => {
+    test("notify-6: リプライの親投稿から4つ上までの投稿の作者に reply の通知を作る", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const ancestors = [];

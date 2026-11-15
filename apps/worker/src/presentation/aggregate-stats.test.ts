@@ -38,7 +38,7 @@ describe("統計の集計", () => {
     await queue.promoteJobs();
   };
 
-  test("aggregate-1: 同じ対象の集計ジョブが実行待ちの間に来たイベントは、そのジョブにまとめる", async () => {
+  test("aggregate-1: 同じ対象のジョブが実行待ちの間に来たイベントは、そのジョブにまとめる", async () => {
     // arrange
     const uri = AtUri.make("did:plc:aggregate1", "app.bsky.feed.post", "a");
 
@@ -51,7 +51,7 @@ describe("統計の集計", () => {
     await queue.obliterate({ force: true });
   });
 
-  test("aggregate-2: 集計ジョブの実行中や完了後に来たイベントは、もう一度集計する", async () => {
+  test("aggregate-2: ジョブの実行中や完了後に来たイベントは、もう一度集計する", async () => {
     // arrange
     const uri = AtUri.make("did:plc:aggregate2", "app.bsky.feed.post", "a");
     const { promise: firstJobBlocker, resolve: finishFirstJob } =
@@ -82,7 +82,7 @@ describe("統計の集計", () => {
     await worker.close();
   });
 
-  test("aggregate-3: 投稿の集計ジョブが実行待ちの間に来た別の投稿のイベントも、そのジョブにまとめる", async () => {
+  test("aggregate-3: 投稿のジョブが実行待ちの間に来た別の投稿のイベントも、そのジョブにまとめる", async () => {
     // arrange
     const uriA = AtUri.make("did:plc:aggregate3", "app.bsky.feed.post", "a");
     const uriB = AtUri.make("did:plc:aggregate3", "app.bsky.feed.post", "b");
@@ -99,7 +99,7 @@ describe("統計の集計", () => {
     await queue.obliterate({ force: true });
   });
 
-  test("aggregate-4: アカウントの集計ジョブはフォロー・フォロワー・投稿のどのイベントから積まれてもアカウントごとに1つにまとめる", async () => {
+  test("aggregate-4: アカウントのジョブは、フォロー・フォロワー・投稿のどのイベントから積まれても1つにまとめる", async () => {
     // arrange
     const did = "did:plc:aggregate4";
 

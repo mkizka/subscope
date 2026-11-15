@@ -66,7 +66,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(foundAccount?.handle).toBe(command.handle);
   });
 
-  test("resolveDid-4: Tapのidentityイベントのハンドルが handle.invalid のときは、DIDドキュメントからハンドルを解決し直す", async () => {
+  test("resolveDid-4: Tapのidentityイベントのハンドルが handle.invalid のときは、DIDドキュメントから解決し直す", async () => {
     // arrange
     const account = accountFactory();
     didResolver.setResolveResult(account.did, {

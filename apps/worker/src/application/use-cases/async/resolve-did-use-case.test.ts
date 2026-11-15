@@ -29,7 +29,7 @@ describe("ResolveDidUseCase", () => {
     });
   };
 
-  test("resolveDid-1: DIDドキュメントのハンドルは、そのハンドルが同じDIDに解決できるときだけ保存する", async () => {
+  test("resolveDid-1: DIDドキュメントのハンドルは、同じDIDに解決できるときだけ保存する", async () => {
     // arrange
     const did = asDid("did:plc:alice");
     setDidDocument(did, "alice.test");
@@ -57,7 +57,7 @@ describe("ResolveDidUseCase", () => {
     expect(account?.handle).toBe("handle.invalid");
   });
 
-  test("resolveDid-3: すでに handle.invalid 以外のハンドルを持つアカウントのハンドルは上書きしない", async () => {
+  test("resolveDid-3: handle.invalid 以外のハンドルを持つアカウントは上書きしない", async () => {
     // arrange
     const account = accountFactory({ handle: asHandle("old.test") });
     accountRepository.add(account);
