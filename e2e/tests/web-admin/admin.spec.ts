@@ -6,7 +6,7 @@ import { registerAccount, resolveHandle } from "../../helpers/pds";
 const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-e1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-e1: 管理者にだけ、左カラムの「サーバー管理」に「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -19,7 +19,7 @@ test.describe("管理画面へのアクセス", () => {
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
   });
 
-  test("admin-e2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
+  test("admin-e2: 管理者でないアカウントが管理画面を開くと403エラーを出す", async ({
     page,
     browser,
   }) => {
@@ -42,7 +42,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("ジョブキュー", () => {
-  test("bullBoard-e1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
+  test("bullBoard-e1: 左カラムの「ジョブキュー」は、新しいタブで開くことが分かるアイコンを付け、新しいタブで開く", async ({
     page,
   }) => {
     await page.goto("/");
@@ -57,7 +57,7 @@ test.describe("ジョブキュー", () => {
     await expect(popup).toHaveURL(/\/admin\/bull-board/);
   });
 
-  test("bullBoard-e2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
+  test("bullBoard-e2: `ADMIN_API_TOKEN` を付けると、ログインせずにジョブキューのAPIをGETで読める", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -81,7 +81,7 @@ test.describe("ジョブキュー", () => {
     });
   });
 
-  test("bullBoard-e3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
+  test("bullBoard-e3: `ADMIN_API_TOKEN` では、ジョブキューのAPIをGET以外で呼べない", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -101,7 +101,7 @@ test.describe("ジョブキュー", () => {
 });
 
 test.describe("メンバー", () => {
-  test("adminAccounts-e1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
+  test("adminAccounts-e1: メンバーを新しい順に並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -117,7 +117,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
   });
 
-  test("adminAccounts-e3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
+  test("adminAccounts-e3: 管理者でないメンバーは、確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -144,7 +144,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("adminAccounts-e2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("adminAccounts-e2: 管理者でないメンバーは、確認のうえ「サーバー登録を停止する」で登録を解除でき、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -221,7 +221,7 @@ test.describe("メンバー", () => {
     );
   });
 
-  test("adminAccounts-e5: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+  test("adminAccounts-e5: 停止中のアカウントは、確認のうえ「登録を再開する」で一覧から消え、招待コードで再登録できるようになる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -258,7 +258,7 @@ test.describe("招待コード", () => {
     return ((await response.json()) as { code: string }).code;
   };
 
-  test("inviteCodes-e1: 招待コードを新しい順に1件1行で並べ、各行にコード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
+  test("inviteCodes-e1: 招待コードを新しい順に並べ、コード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
     page,
   }) => {
     await page.goto("/");

@@ -84,7 +84,7 @@ export const MemberCount: Story = {
 };
 
 export const BannedAccounts: Story = {
-  name: "adminAccounts-s2: 「停止中」タブにはサーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す",
+  name: "adminAccounts-s2: 「停止中」タブには登録を停止したアカウントを並べ、名前・ハンドルを出す",
   parameters: { path: "/admin/registered-accounts?tab=banned" },
   beforeEach: () => {
     queryClient.setQueryData(["bannedAccounts"], {
