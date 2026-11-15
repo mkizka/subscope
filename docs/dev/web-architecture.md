@@ -2,52 +2,53 @@
 
 ## 概要
 
-- apps/web は Bluesky クライアント相当の SNS 体験と管理画面を提供する
-- ログインできるのはメンバーと管理者のみ
+webはBlueskyクライアント相当のSNS画面と管理画面を提供する。ログインできるのはメンバーと管理者だけ。
 
 ## 構成
 
-```
-ブラウザ ──(/api/xxx, loader/action)──> apps/web(BFF) ──(XRPC)──> PDS ──(atproto-proxy)──> apps/appview
-```
+webのサーバーはBFFとして、ブラウザとPDSの間に立つ。
 
-- OAuth はサーバー側の confidential client で行う
-  - ブラウザ OAuth（public client）はセッション期限が短いため採用しない
-  - セッションは Cookie で識別し、トークンはサーバーで保持する
-- BFF のエンドポイントは XRPC の形に縛られず、画面が使いやすい形で返す
-  - 内部で `@repo/client` を使って PDS に XRPC リクエストを送る
-- 書き込み（投稿、いいね等）も BFF の action から PDS に XRPC で送る
+| 区間           | やり取り                                                     |
+| -------------- | ------------------------------------------------------------ |
+| ブラウザ → web | 読み込みはwebのAPI、書き込み(投稿・いいねなど)は画面のaction |
+| web → PDS      | XRPCで送る                                                   |
+| PDS → appview  | atproto-proxyヘッダで転送する                                |
+
+- OAuthはサーバー側のconfidential clientで行う。ブラウザのpublic clientはセッション期限が短いため使わない
+- セッションはCookieで識別し、トークンはサーバーで持つ
+- webのAPIはXRPCの形に縛られず、画面が使いやすい形で返す
 
 ## サーバー側の構成
 
-- loader/action の処理は `apps/web/app/server` 以下にオニオンアーキテクチャで置き、routes は入力の検証・ユースケースの呼び出し・応答だけにする
-- DI は `@gyaku/di` を使い、ファクトリ関数を `app/server/di.ts` で組み立てる
-- 層の詳細は `.claude/skills/web-server/SKILL.md` を参照
+loaderとactionの処理はオニオンアーキテクチャで置き、routesは入力の検証、ユースケースの呼び出し、応答だけにする。DIには@gyaku/diを使う。層の詳細はweb-serverスキルを参照する。
 
 ## 技術選定
 
-| 項目           | 採用                                                                |
-| -------------- | ------------------------------------------------------------------- |
-| フレームワーク | React Router (framework mode)                                       |
-| データ取得     | 読み込みは `/api/*` + TanStack Query、書き込みは action・useFetcher |
-| UI             | Tailwind CSS                                                        |
-| アイコン       | lucide-react                                                        |
+| 項目           | 採用                                       |
+| -------------- | ------------------------------------------ |
+| フレームワーク | React Router(framework mode)               |
+| データ取得     | 読み込みはTanStack Query、書き込みはaction |
+| UI             | Tailwind CSS                               |
+| アイコン       | lucide-react                               |
 
-- 読み込みは画面の loader で待たず、Container が TanStack Query で `/api/*` から取る。遷移を待たせず、戻ったときにキャッシュを出すため
-  - action の後は root で全クエリを invalidate し、React Router の loader 再実行と同じく最新を取り直す
-- tRPC は使わない
-- API の型は React Router の型生成（`Route.ComponentProps` 等）を使う
+- 読み込みは画面のloaderで待たず、ContainerがTanStack QueryでwebのAPIから取る。遷移を待たせず、戻ったときにキャッシュを出すため
+- actionの後は全クエリを取り直す
+- tRPCは使わず、APIの型はReact Routerの型生成を使う
 
 ## UIの方針
 
-- 画面の構成はBluesky公式クライアントに寄せ、Blueskyが使えなくなったときに覚え直しをなくす
-  - タイムラインは新しい投稿を上にする
-  - 投稿欄は常に出さず、投稿ボタンから開く
-  - スレッドは中央に広く表示する
-  - スマホは下のタブ（ホーム・検索・通知・プロフィール）にする
-- クローンを目指したものではないことが伝わるよう、色・ロゴ・フォントは公式と全く違うものにする
+画面の構成はBluesky公式クライアントに寄せ、Blueskyが使えなくなったときに覚え直さなくて済むようにする。
+
+| 画面         | 方針                                             |
+| ------------ | ------------------------------------------------ |
+| タイムライン | 新しい投稿を上にする                             |
+| 投稿欄       | 常に出さず、投稿ボタンから開く                   |
+| スレッド     | 中央に広く表示する                               |
+| スマホ       | 下のタブ(ホーム・検索・通知・プロフィール)にする |
+
+- クローンではないと伝わるよう、色・ロゴ・フォントは公式と全く違うものにする
 - カスタムフィードは扱わない
 
 ## デザイン
 
-- 色・文字・余白・部品などのデザインルールは [apps/web/DESIGN.md](../../apps/web/DESIGN.md) に従う
+色・文字・余白・部品などのデザインルールは[Webクライアントのデザインルール](../../apps/web/DESIGN.md)に従う。
