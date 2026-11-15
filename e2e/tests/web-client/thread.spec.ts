@@ -89,9 +89,7 @@ test.describe("スレッド", () => {
     await expect(page).toHaveURL(search);
   });
 
-  test("thread-e5: 直下の返信の下には返信への返信を1件ずつたどって並べる", async ({
-    page,
-  }) => {
+  test("thread-e5: 返信への返信は1件ずつたどって並べる", async ({ page }) => {
     const target = await post("thread-e5: 投稿");
     const reply = await post("thread-e5: 返信", target);
     const nested = await post("thread-e5: 返信の返信", reply);
@@ -148,7 +146,7 @@ test.describe("スレッド", () => {
     });
   });
 
-  test("thread-e7: スレッドで返信ボタンを押すと投稿欄が開き、投稿すると再読み込みなしでスレッドに返信を表示する", async ({
+  test("thread-e7: 返信ボタンから返信すると、再読み込みなしでスレッドに返信を表示する", async ({
     page,
   }) => {
     const target = await post("thread-e7: 投稿");
@@ -172,7 +170,7 @@ test.describe("スレッド", () => {
     ).toBeVisible();
   });
 
-  test("thread-e8: スレッドから戻ると、スレッドを開く前のスクロール位置に戻る", async ({
+  test("thread-e8: スレッドから戻ると、開く前のスクロール位置に戻る", async ({
     page,
   }) => {
     for (let i = 1; i <= 10; i++) {
@@ -203,7 +201,7 @@ test.describe("スレッド", () => {
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollY);
   });
 
-  test("thread-e9: 選んだ投稿の直下に自分のアイコン付きの「返信を書く」欄を置き、押すとその投稿への返信の投稿欄を開く", async ({
+  test("thread-e9: 選んだ投稿の下に自分のアイコン付きの「返信を書く」欄を置き、押すと返信の投稿欄を開く", async ({
     page,
   }) => {
     const target = await post("thread-e9: 投稿");

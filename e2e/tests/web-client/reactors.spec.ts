@@ -33,7 +33,7 @@ const openList = async (
   );
 };
 
-test("reactors-e1: スレッドの選んだ投稿にリポストがあるときは「N件のリポスト」を押すと、リポストしたアカウントの一覧を開く", async ({
+test("reactors-e1: 「N件のリポスト」を押すと、リポストしたアカウントの一覧を開く", async ({
   page,
 }) => {
   await openList(
@@ -45,7 +45,7 @@ test("reactors-e1: スレッドの選んだ投稿にリポストがあるとき�
   );
 });
 
-test("reactors-e2: スレッドの選んだ投稿にいいねがあるときは「N件のいいね」を押すと、いいねしたアカウントの一覧を開く", async ({
+test("reactors-e2: 「N件のいいね」を押すと、いいねしたアカウントの一覧を開く", async ({
   page,
 }) => {
   await openList(

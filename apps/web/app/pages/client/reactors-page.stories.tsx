@@ -53,7 +53,7 @@ export const Loading: Story = {
 };
 
 export const Empty: Story = {
-  name: "reactors-s2: だれもいないときは「まだいいねされていません」「まだリポストされていません」を表示する",
+  name: "reactors-s2: だれもいないときは「まだリポストされていません」「まだいいねされていません」を表示する",
   beforeEach: () => setAccounts("liked-by", []),
   play: async ({ canvasElement }) => {
     await expect(
