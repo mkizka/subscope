@@ -74,7 +74,7 @@ export const NoReplies: Story = {
 };
 
 export const FocusedPost: Story = {
-  name: "thread-s1: 選んだ投稿は本文を大きくし、投稿日時と返信・リポスト・いいねの件数を表示する",
+  name: "thread-s1: 選んだ投稿は本文を大きくし、投稿日時と返信・リポスト・引用・いいねの件数を表示する",
   play: async ({ canvasElement }) => {
     const focused = within(canvasElement).getByRole("article", {
       name: "選んだ投稿",

@@ -37,7 +37,7 @@ test.describe("引用投稿", () => {
 });
 
 test.describe("引用一覧", () => {
-  test("quotes-e1: スレッドの選んだ投稿に引用があるときは件数の「N件の引用」を表示し、押すと引用一覧を開く", async ({
+  test("quotes-e1: 選んだ投稿に引用があるときは「N件の引用」を表示し、押すと引用一覧を開く", async ({
     page,
   }) => {
     const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
