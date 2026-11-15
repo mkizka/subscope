@@ -57,7 +57,7 @@ services:
       REDIS_URL: redis://redis:6379
   migrate:
     build: { context: .., args: { BUILD_TARGET: web } }
-    command: pnpm db:migrate
+    command: npm --prefix /db run db:migrate
     environment: *env
     depends_on:
       db:

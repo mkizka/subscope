@@ -20,20 +20,21 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY --from=pruner /app/out/full/ .
 RUN turbo build --filter=${BUILD_PACKAGE}
-# pnpm pruneはmonorepoでは完全には動作しないためinstall --prodを使用する
-# https://pnpm.io/ja/next/cli/prune
-RUN find . -name node_modules -prune -exec rm -rf {} + \
-  && pnpm install --prod --ignore-scripts --config.confirmModulesPurge=false --config.node-linker=hoisted
+RUN pnpm deploy --prod --ignore-scripts --filter=@repo/db /out/db \
+  && if [ "${BUILD_TARGET}" = web ]; then \
+    pnpm deploy --prod --ignore-scripts --filter=@repo/web /out/app; \
+  else \
+    mkdir /out/app && cp -r apps/${BUILD_TARGET}/package.json apps/${BUILD_TARGET}/dist /out/app; \
+  fi
 
-FROM base AS runner
-WORKDIR /app
+FROM node:24.22.1-slim AS runner
 USER node
-COPY --from=builder --chown=node:node /app .
-RUN corepack prepare
+COPY --from=builder --chown=node:node /out/db /db
+COPY --from=builder --chown=node:node /out/app /app
+WORKDIR /app
 
 ENV PORT=8080
 ENV NODE_ENV=production
-ENV pnpm_config_node_linker=hoisted
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "cd apps/${BUILD_TARGET} && exec node ."]
+CMD ["node", "."]

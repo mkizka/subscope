@@ -5,10 +5,8 @@ await build({
   bundle: true,
   platform: "node",
   format: "esm",
-  packages: "external",
-  alias: {
-    "@repo/common": "../../packages/common/src",
-    "@repo/db": "../../packages/db/src",
+  banner: {
+    js: 'import { createRequire } from "node:module"; const require = createRequire(import.meta.url); const __dirname = import.meta.dirname;',
   },
   outdir: "dist",
   logLevel: "info",
