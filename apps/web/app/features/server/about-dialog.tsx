@@ -1,7 +1,6 @@
 import { type ReactNode, useRef } from "react";
 
 import { Button } from "@/app/components/ui/button";
-import { Dialog } from "@/app/components/ui/dialog";
 
 type Props = {
   operator?: { handle: string; displayName?: string };
@@ -13,10 +12,22 @@ export function AboutDialog({ operator, children }: Props) {
   return (
     <>
       {children(() => ref.current?.showModal())}
-      <Dialog
+      <dialog
         ref={ref}
-        title="Subscopeとは"
-        actions={
+        className="
+          mx-auto mt-4 mb-auto w-lg max-w-[calc(100%-2rem)] rounded-xl
+          bg-surface text-left text-ink
+          backdrop:bg-black/40
+          open:flex open:max-h-[85dvh] open:flex-col
+          md:my-auto
+        "
+        aria-label="Subscopeとは"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) e.currentTarget.close();
+        }}
+      >
+        <div className="flex items-center justify-between border-b border-line p-4">
+          <h2 className="text-heading">Subscopeとは</h2>
           <Button
             type="button"
             variant="secondary"
@@ -24,9 +35,8 @@ export function AboutDialog({ operator, children }: Props) {
           >
             閉じる
           </Button>
-        }
-      >
-        <div className="space-y-4 text-label">
+        </div>
+        <div className="space-y-4 overflow-y-auto p-4 text-label">
           <p>
             SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
           </p>
@@ -49,7 +59,7 @@ export function AboutDialog({ operator, children }: Props) {
             </p>
           )}
         </div>
-      </Dialog>
+      </dialog>
     </>
   );
 }
