@@ -16,7 +16,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.sync.unregisterAccount", () => {
   const { ctx } = testSetup;
 
-  test("unregisterAccount-1: 本人とそのフォロー先のsyncTapRepoジョブを積む", async () => {
+  test("unregisterAccount-1: 本人とそのフォロー先のうち、追跡アカウントでなくなったものをTapから外す", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     const serverMember = await accountFactory(ctx.db)

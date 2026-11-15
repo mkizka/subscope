@@ -11,7 +11,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.server.getOperator", () => {
   const { ctx } = testSetup;
 
-  test("getOperator-1: 管理者のうち最初に登録したメンバー1人だけをoperatorにprofileViewで返す", async () => {
+  test("getOperator-1: 管理者のうち最初に登録したメンバー1人を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const first = await accountFactory(ctx.db)
