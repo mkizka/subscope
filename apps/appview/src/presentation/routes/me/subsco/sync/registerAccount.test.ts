@@ -42,7 +42,7 @@ describe("me.subsco.sync.registerAccount", () => {
     ]);
   });
 
-  test("registerAccount-2: BANされたアカウントは登録せず、400とBannedを返す", async () => {
+  test("registerAccount-2: 登録停止中のアカウントは登録せず、400とBannedを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const account = await accountFactory(ctx.db)
@@ -85,7 +85,7 @@ describe("me.subsco.sync.registerAccount", () => {
         ).code,
     },
   ])(
-    "registerAccount-3: 管理者以外は、有効期限内の未使用の招待コードがなければ登録せず、400とInvalidInviteCodeを返す($name)",
+    "registerAccount-3: 管理者以外は、有効な招待コードがなければ登録せず、400とInvalidInviteCodeを返す($name)",
     async ({ code }) => {
       // arrange
       const { client, loginAs } = await setupApiTest();
@@ -160,7 +160,7 @@ describe("me.subsco.sync.registerAccount", () => {
     expect(updated?.usedAt).toBeInstanceOf(Date);
   });
 
-  test("registerAccount-7: 登録したアカウントのsyncTapRepoジョブを積む", async () => {
+  test("registerAccount-7: 登録したアカウントをTapに追加する", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
@@ -174,7 +174,7 @@ describe("me.subsco.sync.registerAccount", () => {
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: account.did }]);
   });
 
-  test("registerAccount-8: DBにないアカウントも登録する", async () => {
+  test("registerAccount-8: まだ保存していないアカウントも登録する", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const did = "did:plc:notindexedyet";

@@ -36,7 +36,7 @@ describe("me.subsco.server.getFollowedAccounts", () => {
       })
       .create();
 
-  test("getFollowedAccounts-1: メンバーの1人以上にフォローされているアカウントを返し、それ以外のアカウントは含めない", async () => {
+  test("getFollowedAccounts-1: メンバーの1人以上にフォローされているアカウントだけを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const member = await createServerMember();
@@ -87,7 +87,7 @@ describe("me.subsco.server.getFollowedAccounts", () => {
     ]);
   });
 
-  test("getFollowedAccounts-3: totalにはページングに関係なくフォローされているアカウントの総数を入れる", async () => {
+  test("getFollowedAccounts-3: totalにはページに関係なくフォローされているアカウントの総数を入れる", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const serverMember = await createServerMember();
@@ -103,7 +103,7 @@ describe("me.subsco.server.getFollowedAccounts", () => {
     expect(res.total).toBe(2);
   });
 
-  test("getFollowedAccounts-4: qを指定すると、表示名またはハンドルにqを含むフォローされているアカウントだけを返す。totalはqに関係なく総数のままにする", async () => {
+  test("getFollowedAccounts-4: qを指定すると、表示名かハンドルにqを含むアカウントだけを返す。totalはqに関係なく総数のままにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const serverMember = await createServerMember();

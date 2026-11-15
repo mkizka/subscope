@@ -34,7 +34,7 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
       .props(date ? { createdAt: () => date, indexedAt: () => date } : {})
       .create();
 
-  test("getServerMemberFollowers-1: 指定したアカウントをフォローしているメンバーだけをfollowersにprofileViewで返す", async () => {
+  test("getServerMemberFollowers-1: 指定したアカウントをフォローしているメンバーだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
@@ -52,7 +52,7 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     expect(res.followers.map((a) => a.did)).toEqual([registeredFollower.did]);
   });
 
-  test("getServerMemberFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
+  test("getServerMemberFollowers-2: 新しくフォローした順に並べ、ページ送りする", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
@@ -82,7 +82,7 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     expect(secondPage.followers.map((a) => a.did)).toEqual([oldFollower.did]);
   });
 
-  test("getServerMemberFollowers-3: totalにはページングに関係なくメンバーのフォロワーの総数を入れる", async () => {
+  test("getServerMemberFollowers-3: totalにはページに関係なくメンバーのフォロワーの総数を入れる", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();

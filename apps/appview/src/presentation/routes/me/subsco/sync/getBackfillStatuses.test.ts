@@ -36,7 +36,7 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
       })
       .create();
 
-  test("getBackfillStatuses-1: メンバーとそのフォロー先のbackfillStatusを返し、それ以外のアカウントは含めない", async () => {
+  test("getBackfillStatuses-1: 追跡アカウントの状態だけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
@@ -62,7 +62,7 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
     );
   });
 
-  test("getBackfillStatuses-2: backfillStatusが未設定のアカウントはinProgressとして返す", async () => {
+  test("getBackfillStatuses-2: 状態をまだ確認していないアカウントは同期中として返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
@@ -78,7 +78,7 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
     ]);
   });
 
-  test("getBackfillStatuses-3: 認証なしで呼び出せる", async () => {
+  test("getBackfillStatuses-3: 認証がなくても状態を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
