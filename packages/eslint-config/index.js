@@ -135,6 +135,7 @@ export const config = [
       "**/shared/registry.ts",
       "**/src/worker.ts",
       "**/src/appview.ts",
+      "**/server.js",
     ],
     rules: { "local/no-env-import": "off" },
   },
