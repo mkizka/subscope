@@ -10,7 +10,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.revokeAdmin", () => {
   const { ctx } = testSetup;
 
-  test("revokeAdmin-1: 指定した管理者の管理者権限を外す", async () => {
+  test("revokeAdmin-1: 指定した管理者を管理者から外す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -32,7 +32,7 @@ describe("me.subsco.admin.revokeAdmin", () => {
     expect(account?.isAdmin).toBe(false);
   });
 
-  test("revokeAdmin-2: 自分自身には400とCannotRevokeSelfを返す", async () => {
+  test("revokeAdmin-2: 自分自身なら400とCannotRevokeSelfを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -50,7 +50,7 @@ describe("me.subsco.admin.revokeAdmin", () => {
     });
   });
 
-  test("revokeAdmin-3: メンバーでないアカウントには400とNotRegisteredを返す", async () => {
+  test("revokeAdmin-3: メンバーでなければ400とNotRegisteredを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

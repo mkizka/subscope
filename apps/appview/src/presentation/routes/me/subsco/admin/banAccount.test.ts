@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.banAccount", () => {
   const { ctx } = testSetup;
 
-  test("banAccount-1: 管理者はBANせず、400とCannotBanAdminを返す", async () => {
+  test("banAccount-1: 管理者は登録停止せず、400とCannotBanAdminを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -32,7 +32,7 @@ describe("me.subsco.admin.banAccount", () => {
     });
   });
 
-  test("banAccount-2: 本人とそのフォロー先のsyncTapRepoジョブを積む", async () => {
+  test("banAccount-2: 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

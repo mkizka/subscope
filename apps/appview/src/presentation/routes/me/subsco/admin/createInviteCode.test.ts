@@ -11,7 +11,7 @@ describe("me.subsco.admin.createInviteCode", () => {
     vi.useRealTimers();
   });
 
-  test("createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする", async () => {
+  test("createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に変え、「-」とランダムな英小文字・数字5文字を続けたものにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

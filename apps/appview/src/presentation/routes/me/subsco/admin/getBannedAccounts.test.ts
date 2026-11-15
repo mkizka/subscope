@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.getBannedAccounts", () => {
   const { ctx } = testSetup;
 
-  test("getBannedAccounts-1: BANされたアカウントのprofileViewを返す", async () => {
+  test("getBannedAccounts-1: 登録停止中のアカウントをprofileViewで返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -25,7 +25,7 @@ describe("me.subsco.admin.getBannedAccounts", () => {
     expect(res.actors).toMatchObject([{ did: banned.did }]);
   });
 
-  test("getBannedAccounts-2: BANされていないアカウントは含めない", async () => {
+  test("getBannedAccounts-2: 登録停止中でないアカウントは含めない", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
