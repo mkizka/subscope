@@ -49,7 +49,7 @@ const likeAlicePost = async (text: string) => {
 };
 
 test.describe("プッシュ通知", () => {
-  test("pushSetting-e1: 設定ページのスイッチをオンにすると、通知が追加されたときにその端末へプッシュ通知を送る", async ({
+  test("pushSetting-e1: スイッチをオンにすると、通知が届いたときにこの端末へプッシュ通知を送る", async ({
     newDevice,
   }) => {
     const device = await newDevice();
@@ -65,7 +65,7 @@ test.describe("プッシュ通知", () => {
       .toMatchObject([{ title: "Bobさんがいいねしました", body: text }]);
   });
 
-  test("pushSetting-e2: 設定ページのスイッチをオフにすると、その端末へプッシュ通知を送らない", async ({
+  test("pushSetting-e2: スイッチをオフにすると、この端末へプッシュ通知を送らない", async ({
     newDevice,
   }) => {
     const turnedOff = await newDevice();
@@ -85,7 +85,7 @@ test.describe("プッシュ通知", () => {
     expect(turnedOff.receiver.requests).toEqual([]);
   });
 
-  test("pushSetting-e3: ログアウトすると、その端末へプッシュ通知を送らない", async ({
+  test("pushSetting-e3: ログアウトすると、この端末へプッシュ通知を送らない", async ({
     newDevice,
   }) => {
     const loggedOut = await newDevice();
@@ -104,7 +104,7 @@ test.describe("プッシュ通知", () => {
     expect(loggedOut.receiver.requests).toEqual([]);
   });
 
-  test("pushSetting-e4: サーバーへの購読の削除に失敗しても、その端末のブラウザの購読は解除する", async ({
+  test("pushSetting-e4: サーバーから購読を消せなくても、ブラウザの購読は解除する", async ({
     newDevice,
   }) => {
     const device = await newDevice();
@@ -120,7 +120,7 @@ test.describe("プッシュ通知", () => {
     ).not.toBeChecked();
   });
 
-  test("pushSetting-e5: 通知ページの案内の「オンにする」を押すと、その端末へプッシュ通知を送るようにして、案内を「プッシュ通知をオンにしました」に変える", async ({
+  test("pushSetting-e5: 通知ページの案内の「オンにする」を押すと、プッシュ通知を受け取るようにして、案内を「プッシュ通知をオンにしました」に変える", async ({
     newDevice,
   }) => {
     const { page } = await newDevice();
