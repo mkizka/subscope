@@ -135,10 +135,12 @@ export const SetupWithoutTabs: Story = {
 };
 
 export const PassportButton: Story = {
-  name: "login-s10: ログインタブには「@passportでログイン」ボタンを出す",
+  name: "login-s10: ログインタブには@passportのアイコン付きの「@passportでログイン」ボタンを出す",
   play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByRole("link", { name: "@passportでログイン" }),
-    ).toHaveAttribute("href", "/login/atpassport");
+    const link = within(canvasElement).getByRole("link", {
+      name: "@passportでログイン",
+    });
+    await expect(link).toHaveAttribute("href", "/login/atpassport");
+    await expect(link.querySelector("svg")).toBeInTheDocument();
   },
 };
