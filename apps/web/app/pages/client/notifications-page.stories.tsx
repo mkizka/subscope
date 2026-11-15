@@ -88,7 +88,7 @@ export const Empty: Story = {
 };
 
 export const UnreadBadge: Story = {
-  name: "notification-s1: モバイルでは、未読があるとき下のタブの通知に未読数を表示する",
+  name: "notification-s1: モバイルでは、下のタブの通知に未読数を表示する",
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
     const tab = within(canvasElement).getByRole("navigation", {
@@ -104,7 +104,7 @@ const avatarUrl =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 
 export const IconAndAvatar: Story = {
-  name: "notification-s2: 通知には種類を表す色付きのアイコンと相手のアバターを表示する",
+  name: "notification-s2: 通知に、種類を表す色付きのアイコンと相手のアバターを表示する",
   beforeEach: () => {
     queryClient.setQueryData(
       ["notifications"],
@@ -137,7 +137,7 @@ export const IconAndAvatar: Story = {
 };
 
 export const PushPromptOff: Story = {
-  name: "pushSetting-s8: 受け取らない設定のときは、通知一覧の上に「プッシュ通知を受け取る」の案内と「オンにする」ボタンを表示する",
+  name: "pushSetting-s8: 受け取らない設定のときは、通知一覧の上に「オンにする」ボタン付きの案内を表示する",
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -176,7 +176,7 @@ export const PushPromptHidden: Story = {
 };
 
 export const SettingsLink: Story = {
-  name: "pushSetting-s9: 通知ページの見出しの右端に、設定ページへ移動する「通知の設定」ボタンを表示する",
+  name: "pushSetting-s9: 通知ページの見出しの右端に、設定ページを開く「通知の設定」ボタンを表示する",
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByRole("link", { name: "通知の設定" }),
@@ -187,7 +187,7 @@ export const SettingsLink: Story = {
 let release: () => void = () => {};
 
 export const Loading: Story = {
-  name: "notification-s3: 通知の読み込み中は「通知はまだありません」を表示せず、読み込みが終わって0件のときだけ表示する",
+  name: "notification-s3: 「通知はまだありません」は、読み込みが終わって0件のときだけ表示する",
   beforeEach: () => {
     queryClient.clear();
     const gate = new Promise<void>((resolve) => (release = resolve));
@@ -214,7 +214,7 @@ export const Loading: Story = {
 };
 
 export const LoadingSkeleton: Story = {
-  name: "notification-s4: 通知の読み込み中は左にアイコン列、右にアバター・文・ハンドル・本文を持つ通知の形のスケルトンを6行表示する",
+  name: "notification-s4: 読み込み中は、通知の形のスケルトンを6行表示する",
   beforeEach: () => {
     queryClient.clear();
     void queryClient.infiniteQuery({

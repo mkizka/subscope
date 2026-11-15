@@ -97,7 +97,7 @@ const pushSwitch = (canvasElement: HTMLElement) =>
   within(canvasElement).findByRole("switch", { name: "プッシュ通知" });
 
 export const PushSettingOff: Story = {
-  name: "pushSetting-s1: 受け取らない設定のときは、スイッチをオフにする。説明文は表示しない",
+  name: "pushSetting-s1: 受け取らない設定のときは、スイッチをオフにする",
   beforeEach: pushSetting("off"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).not.toBeChecked();
@@ -108,7 +108,7 @@ export const PushSettingOff: Story = {
 };
 
 export const PushSettingOn: Story = {
-  name: "pushSetting-s2: 受け取る設定のときは、スイッチをオンにする。説明文は表示しない",
+  name: "pushSetting-s2: 受け取る設定のときは、スイッチをオンにする",
   beforeEach: pushSetting("on"),
   play: async ({ canvasElement }) => {
     await expect(await pushSwitch(canvasElement)).toBeChecked();
@@ -125,7 +125,7 @@ const helpTexts = {
 };
 
 export const PushSettingDenied: Story = {
-  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチの代わりに行の右端へ「ブロック中」を表示する",
+  name: "pushSetting-s3: ブラウザで通知をブロックしているときは、スイッチの代わりに「ブロック中」を表示する",
   beforeEach: pushSetting("denied"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -137,7 +137,7 @@ export const PushSettingDenied: Story = {
 };
 
 export const PushSettingHelpDenied: Story = {
-  name: "pushSetting-s10: 「ブロック中」を押すと、ラベルの下に「ブラウザのサイト設定で、このサイトの通知を許可すると使えます。」を吹き出しで表示する",
+  name: "pushSetting-s10: 「ブロック中」を押すと、ブラウザのサイト設定で通知を許可するよう吹き出しで案内する",
   beforeEach: pushSetting("denied"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -152,7 +152,7 @@ export const PushSettingHelpDenied: Story = {
 };
 
 export const PushSettingUnsupported: Story = {
-  name: "pushSetting-s4: プッシュ通知に対応していないブラウザでは、スイッチの代わりに行の右端へ「非対応」を表示する",
+  name: "pushSetting-s4: ブラウザがプッシュ通知に対応していないときは、スイッチの代わりに「非対応」を表示する",
   beforeEach: pushSetting("unsupported"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -164,7 +164,7 @@ export const PushSettingUnsupported: Story = {
 };
 
 export const PushSettingHelpUnsupported: Story = {
-  name: "pushSetting-s11: 「非対応」を押すと、ラベルの下に「iPhone・iPadでは、このサイトをホーム画面に追加して開くと使えます。」を吹き出しで表示する",
+  name: "pushSetting-s11: 「非対応」を押すと、iPhone・iPadではホーム画面に追加して開くと使えることを吹き出しで案内する",
   beforeEach: pushSetting("unsupported"),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -192,7 +192,7 @@ const pendingPermission = () => {
 };
 
 export const PushSettingDismissed: Story = {
-  name: "pushSetting-s6: スイッチをオンにして通知の許可ダイアログが選択されずに閉じたときは、何も表示せずスイッチをオフのままにする",
+  name: "pushSetting-s6: 通知の許可ダイアログが選ばれずに閉じたときは、スイッチをオフのままにする",
   beforeEach: () => {
     pushSetting("off")();
     const permission = pendingPermission();
@@ -211,7 +211,7 @@ export const PushSettingDismissed: Story = {
 };
 
 export const PushSettingUnavailable: Story = {
-  name: "pushSetting-s7: サーバーにVAPID鍵が設定されていないときは、「通知」のセクションを表示しない",
+  name: "pushSetting-s7: サーバーにVAPID鍵がないときは、「通知」の欄を表示しない",
   play: async ({ canvasElement }) => {
     await within(canvasElement).findByRole("heading", { name: "アカウント" });
 
