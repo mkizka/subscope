@@ -13,7 +13,7 @@ import { setupApiTest } from "../../shared/api-test-utils.js";
 describe("フォロー状態", () => {
   const { ctx } = testSetup;
 
-  test("viewerFollowing-1: 閲覧者がフォローしているアカウントのビューには、viewer.followingを含める", async () => {
+  test("viewerFollowing-1: 閲覧者がフォローしているアカウントのビューには、viewer.followingにフォローのURIを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const create = () =>

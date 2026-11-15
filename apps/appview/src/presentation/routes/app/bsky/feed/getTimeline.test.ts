@@ -184,7 +184,7 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
   });
 
-  test("feedViewPost-1: リプライにはスレッドの起点と親の投稿をreplyに含める", async () => {
+  test("feedViewPost-1: リプライには、スレッドの起点と親の投稿をreplyに含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
@@ -207,7 +207,7 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
   });
 
-  test("feedViewPost-2: 起点や親の投稿が見つからない場合、replyのその投稿をnotFoundPostにする", async () => {
+  test("feedViewPost-2: 起点や親が見つからないときは、その投稿をnotFoundPostにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
@@ -232,7 +232,7 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
   });
 
-  test("feedViewPost-3: リポストにはリポストしたアカウントとリポストの日時をreasonに含める", async () => {
+  test("feedViewPost-3: リポストには、リポストしたアカウントと日時をreasonに含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
