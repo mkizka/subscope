@@ -42,16 +42,18 @@ export function AboutDialog({ children }: Props) {
           <section className="space-y-1">
             <h3 className="font-bold">Blueskyとの違い</h3>
             <p>
-              登録も登録者からのフォローもされていないアカウントを表示しないため、Blueskyと比べて以下の違いがあります。
+              Subscopeではサーバーに登録しているアカウントか、登録アカウントからフォローされているアカウントのみが表示されます。
             </p>
+            <p>そのためBlueskyと比べて以下の違いがあります。</p>
             <ul className="list-disc pl-5">
               <li>
-                いいね、リポスト、フォロワーなどの数はBlueskyより小さく表示されます
+                いいね、リポスト、フォロワーなどの数は多くの場合Blueskyより少なく表示されます
               </li>
-              <li>検索結果に表示される投稿やアカウントが少なくなります</li>
-              <li>いくつかの機能が未実装です</li>
+              <li>検索結果に表示される投稿やアカウントも少なく表示されます</li>
             </ul>
-            <p>機能面では「限られた部分だけ動作するBluesky」といえます。</p>
+            <p>
+              機能面では「限られた部分だけ表示するBluesky」となっています。なお一部機能は未実装です。
+            </p>
           </section>
           <section className="space-y-1">
             <h3 className="font-bold">Subscopeの目的</h3>
