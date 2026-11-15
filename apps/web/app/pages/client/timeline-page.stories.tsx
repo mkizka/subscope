@@ -921,6 +921,7 @@ export const QuoteFeed: Story = {
       displayName: "フィード名",
       creatorHandle: "alice.bsky.social",
       description: "フィードの説明",
+      url: "https://bsky.app/profile/did:plc:alice/feed/example",
     },
   }),
   name: "quote-s7: フィードジェネレーターの引用は、フィード名・作成者・説明を枠で表示する",
@@ -929,6 +930,21 @@ export const QuoteFeed: Story = {
     await expect(q).toHaveTextContent("フィード名");
     await expect(q).toHaveTextContent("@alice.bsky.social");
     await expect(q).toHaveTextContent("フィードの説明");
+  },
+};
+
+export const QuoteFeedLink: Story = {
+  ...QuoteFeed,
+  name: "quote-s10: フィードジェネレーターの引用をタップすると、Blueskyのフィードページを新しいタブで開く",
+  play: async ({ canvasElement }) => {
+    const link = within(quote(canvasElement)).getByRole("link", {
+      name: "フィードをBlueskyで開く",
+    });
+    await expect(link).toHaveAttribute(
+      "href",
+      "https://bsky.app/profile/did:plc:alice/feed/example",
+    );
+    await expect(link).toHaveAttribute("target", "_blank");
   },
 };
 

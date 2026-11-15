@@ -54,6 +54,7 @@ export type PostCardProps = {
     displayName: string;
     creatorHandle: string;
     description?: string;
+    url: string;
   };
   reasonRepost?: {
     byDisplayName?: string;
@@ -152,7 +153,14 @@ export function QuotedFeed({
   feed: NonNullable<PostCardProps["quotedFeed"]>;
 }) {
   return (
-    <blockquote className="mt-2 rounded-xl border border-line px-3 py-2">
+    <blockquote className="relative mt-2 rounded-xl border border-line px-3 py-2">
+      <a
+        href={feed.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="フィードをBlueskyで開く"
+        className="absolute inset-0 rounded-xl"
+      />
       <div className="flex items-center gap-2 text-label">
         <Avatar src={feed.avatar} size="sm" />
         <span className="truncate font-bold">{feed.displayName}</span>
