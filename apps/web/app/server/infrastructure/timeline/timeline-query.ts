@@ -191,6 +191,7 @@ export function toTimelinePost({
           displayName: quoted.displayName,
           creatorHandle: quoted.creator.handle,
           description: quoted.description,
+          url: `https://bsky.app/profile/${quoted.creator.did}/feed/${quoted.uri.split("/").pop()}`,
         }
       : undefined,
     createdAt: maybeString(post.record.createdAt),

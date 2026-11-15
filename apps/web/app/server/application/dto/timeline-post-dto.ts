@@ -74,6 +74,7 @@ export type TimelinePostDto = {
     displayName: string;
     creatorHandle: string;
     description?: string;
+    url: string;
   };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
   reasonPin?: boolean;

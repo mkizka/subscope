@@ -145,6 +145,7 @@ export const QuotedFeed: Story = {
             displayName: "フィード名",
             creatorHandle: alice.handle,
             description: "フィードの説明",
+            url: "https://bsky.app/profile/did:plc:alice/feed/example",
           },
         },
         replies: [],
