@@ -84,7 +84,7 @@ describe("app.bsky.actor.getProfile", () => {
     await expect(promise).rejects.toMatchObject({ status: 400 });
   });
 
-  test("getProfile-3: プロフィールレコードがないアカウントには、DIDとハンドルだけのprofileViewDetailedを返す", async () => {
+  test("getProfile-3: プロフィールレコードがなければ、DIDとハンドルだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
@@ -102,7 +102,7 @@ describe("app.bsky.actor.getProfile", () => {
     expect(res.displayName).toBeUndefined();
   });
 
-  test("getProfile-4: テイクダウンされたアカウントと、状態が takendown か suspended のアカウントには400とAccountTakedownを返す", async () => {
+  test("getProfile-4: テイクダウンされたアカウントと、状態が takendown か suspended のアカウントには、400とAccountTakedownを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const label = await labelFactory(ctx.db).create();
@@ -129,7 +129,7 @@ describe("app.bsky.actor.getProfile", () => {
     );
   });
 
-  test("getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す", async () => {
+  test("getProfile-5: 状態が deactivated のアカウントには、400とAccountDeactivatedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db)
@@ -179,7 +179,7 @@ describe("app.bsky.actor.getProfile", () => {
       .create();
   };
 
-  test("getProfile-6: プロフィールレコードのlinksが指す app.bsky.actor.link レコードを、linksの順にprofileLinkViewで返す", async () => {
+  test("getProfile-6: プロフィールのlinksが指すリンクを、その順にlinksで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
@@ -226,7 +226,7 @@ describe("app.bsky.actor.getProfile", () => {
     ]);
   });
 
-  test("getProfile-8: 閲覧者がフォローしているフォロワーを、フォローした新しい順に最大5件、総数とともにviewer.knownFollowersに入れる", async () => {
+  test("getProfile-8: 閲覧者がフォローしているフォロワーを、閲覧者がフォローした新しい順に最大5件、総数とともにviewer.knownFollowersで返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const { viewer, subject, known } = await setupKnownFollowers(6);
@@ -272,7 +272,7 @@ describe("app.bsky.actor.getProfile", () => {
     expect(self.viewer?.knownFollowers).toBeUndefined();
   });
 
-  test("getProfile-10: プロフィールレコードのpinnedPostを、pinnedPostに含める", async () => {
+  test("getProfile-10: プロフィールのpinnedPostを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();

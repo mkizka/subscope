@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.actor.searchActorsTypeahead", () => {
   const { ctx } = testSetup;
 
-  test("searchActorsTypeahead-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアカウントをprofileViewBasicで返す", async () => {
+  test("searchActorsTypeahead-1: 表示名が大文字・小文字を区別せず一致するアカウントをprofileViewBasicで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db)
@@ -29,7 +29,7 @@ describe("app.bsky.actor.searchActorsTypeahead", () => {
     ]);
   });
 
-  test("searchActorsTypeahead-2: ハンドルが検索語に部分一致するアカウントは、プロフィールレコードがなくても返す", async () => {
+  test("searchActorsTypeahead-2: ハンドルが一致するアカウントは、プロフィールレコードがなくても返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db)

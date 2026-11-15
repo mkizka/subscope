@@ -36,7 +36,7 @@ describe("app.bsky.graph.getKnownFollowers", () => {
       .props({ createdAt: () => date, indexedAt: () => date })
       .create();
 
-  test("getKnownFollowers-1: 認証がないリクエストには401を返す", async () => {
+  test("getKnownFollowers-1: 認証がなければ401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const subject = await createAccount();
@@ -50,7 +50,7 @@ describe("app.bsky.graph.getKnownFollowers", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getKnownFollowers-2: 指定したアカウントをsubjectに、閲覧者がフォローしているそのフォロワーだけをfollowersにprofileViewで返す", async () => {
+  test("getKnownFollowers-2: 指定したアカウントをsubjectに、閲覧者がフォローしているフォロワーだけをfollowersにprofileViewで返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
@@ -76,7 +76,7 @@ describe("app.bsky.graph.getKnownFollowers", () => {
     });
   });
 
-  test("getKnownFollowers-3: 閲覧者がフォローした新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
+  test("getKnownFollowers-3: 閲覧者がフォローした新しい順に並べ、cursorより古いものを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
