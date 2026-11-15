@@ -38,7 +38,7 @@ test.describe("投稿欄", () => {
     }).toPass();
   });
 
-  test("postForm-e1: 新規投稿ボタンで投稿欄を開き、投稿すると投稿欄を閉じて、投稿した内容を再読み込みなしでタイムラインの一番上に表示する", async ({
+  test("postForm-e1: 投稿すると投稿欄を閉じ、再読み込みなしでタイムラインの一番上に表示する", async ({
     page,
     request,
   }) => {
@@ -66,7 +66,7 @@ test.describe("投稿欄", () => {
     await expect(page.getByText(/^postForm-e1: /).first()).toHaveText(text);
   });
 
-  test("postForm-e2: 画像にALTを付けて添付でき、タイムラインの投稿にALT付きで表示する", async ({
+  test("postForm-e2: 画像にALTを付けて添付でき、タイムラインにALT付きで表示する", async ({
     page,
   }) => {
     const alt = `postForm-e2: ${Date.now()}`;
@@ -77,7 +77,7 @@ test.describe("投稿欄", () => {
     await expect(page.getByRole("img", { name: alt })).toBeAttached();
   });
 
-  test("postForm-e3: 返信できる人の設定は投稿と同じrkeyのthreadgateに保存する", async ({
+  test("postForm-e3: 返信できる人の設定は、投稿と同じrkeyのthreadgateに保存する", async ({
     page,
     request,
   }) => {
@@ -124,7 +124,7 @@ test.describe("投稿欄", () => {
     expect(value.text).toBe(text);
   });
 
-  test("postForm-e5: 添付した画像には公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
+  test("postForm-e5: 添付した画像の縦横比をaspectRatioに保存する", async ({
     page,
     request,
   }) => {
@@ -162,7 +162,7 @@ test.describe("投稿欄", () => {
     });
   });
 
-  test("postForm-e4: 本文のURLとハッシュタグには、その範囲にfacetsを付ける", async ({
+  test("postForm-e4: 本文のURLとハッシュタグにfacetsを付ける", async ({
     page,
     request,
   }) => {
