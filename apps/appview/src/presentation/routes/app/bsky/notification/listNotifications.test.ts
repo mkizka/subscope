@@ -60,7 +60,7 @@ describe("app.bsky.notification.listNotifications", () => {
     ]);
   });
 
-  test("listNotifications-3: 既読時刻以前の通知は既読にし、それより後の通知は未読にする", async () => {
+  test("listNotifications-3: 既読時刻以前の通知を既読、それより後を未読にする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db)

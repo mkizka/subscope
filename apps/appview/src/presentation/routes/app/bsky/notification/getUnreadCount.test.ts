@@ -52,7 +52,7 @@ describe("app.bsky.notification.getUnreadCount", () => {
     expect(res).toEqual({ count: 2 });
   });
 
-  test("getUnreadCount-3: seenAtを指定すると、保存した既読時刻の代わりにseenAtより新しい通知の数を返す", async () => {
+  test("getUnreadCount-3: seenAtを指定すると、保存した既読時刻の代わりにseenAtで数える", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db)

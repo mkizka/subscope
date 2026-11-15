@@ -75,7 +75,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getGroupedNotifications-2: 同じ投稿へのいいねとリポストは種類ごとに1つのグループにまとめる", async () => {
+  test("getGroupedNotifications-2: 同じ投稿へのいいねとリポストは、種類ごとに1つのグループにまとめる", async () => {
     // arrange
     const { client, notify, viewerPost } = await setup();
     const post = await viewerPost();
@@ -113,7 +113,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     );
   });
 
-  test("getGroupedNotifications-3: フィードジェネレーターへのいいねは、フィードジェネレーターごとに1つのグループにまとめる", async () => {
+  test("getGroupedNotifications-3: フィードジェネレーターへのいいねは、フィードジェネレーターごとにまとめる", async () => {
     // arrange
     const { client, notify, viewer } = await setup();
     const generator = await generatorFactory(ctx.db)
@@ -198,7 +198,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     ]);
   });
 
-  test("getGroupedNotifications-6: relatedViewsに、グループが参照するアカウントと投稿とフィードジェネレーターのビューを返す", async () => {
+  test("getGroupedNotifications-6: relatedViewsに、グループが参照するアカウント・投稿・フィードジェネレーターを返す", async () => {
     // arrange
     const { client, notify, viewerPost } = await setup();
     const post = await viewerPost();
@@ -222,7 +222,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     );
   });
 
-  test("getGroupedNotifications-7: グループの中で最新の通知が既読時刻以前なら、グループを既読にする", async () => {
+  test("getGroupedNotifications-7: グループの最新の通知が既読時刻以前なら、グループを既読にする", async () => {
     // arrange
     const { client, notify, viewer } = await setup();
     await notify({ reason: "follow", sortAt: "2024-01-01T00:00:00.000Z" });
@@ -246,7 +246,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     });
   });
 
-  test("getGroupedNotifications-8: feedにconversationsを指定すると返信・引用・メンションだけを、followersを指定するとフォローだけを返す", async () => {
+  test("getGroupedNotifications-8: feedがconversationsなら返信・引用・メンションだけを、followersならフォローだけを返す", async () => {
     // arrange
     const { client, notify } = await setup();
     await notify({ reason: "follow" });
@@ -269,7 +269,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     ]);
   });
 
-  test("getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、501とMethodNotImplementedを返す", async () => {
+  test("getGroupedNotifications-9: feedがpeople-i-followかactivityなら、501とMethodNotImplementedを返す", async () => {
     // arrange
     const { client } = await setup();
 
