@@ -7,7 +7,7 @@
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
-    "build": "esbuild src/appview.ts --bundle --platform=node --format=esm --packages=external --alias:@repo/common=../../packages/common/src --alias:@repo/db=../../packages/db/src --outdir=dist",
+    "build": "node build.mjs",
     "dev": "NODE_ENV=development tsx watch ./src/appview.ts | pino-pretty",
     "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
     "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
