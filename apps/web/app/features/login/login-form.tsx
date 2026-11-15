@@ -1,3 +1,4 @@
+import { AtPassportIcon } from "@atpassport/client";
 import type { ComponentProps } from "react";
 import { Form } from "react-router";
 
@@ -51,6 +52,7 @@ export function LoginForm({
           href="/login/atpassport"
           className={buttonClass({ variant: "secondary" })}
         >
+          <AtPassportIcon size={20} />
           @passportでログイン
         </a>
       )}
