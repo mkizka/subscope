@@ -7,21 +7,6 @@ on:
   pull_request:
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      code: ${{ steps.filter.outputs.code }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-      - id: filter
-        run: |
-          if git diff --name-only ${{ github.event.pull_request.base.sha || github.event.before }} ${{ github.sha }} | grep -qvE '^(docs/|\.claude/)|\.md$'; then
-            echo "code=true" >> $GITHUB_OUTPUT
-          else
-            echo "code=false" >> $GITHUB_OUTPUT
-          fi
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -38,8 +23,6 @@ jobs:
       - run: pnpm lint
       - run: pnpm check:specs
   test:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -54,8 +37,6 @@ jobs:
       - run: pnpm build
       - run: pnpm test --coverage --project '*:unit' --project '*:integration'
   e2e-shard:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -79,8 +60,8 @@ jobs:
           name: blob-report-${{ matrix.shard }}
           path: e2e/blob-report
   e2e:
-    needs: [changes, e2e-shard]
-    if: always() && needs.changes.outputs.code != 'false'
+    needs: e2e-shard
+    if: always()
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -130,8 +111,6 @@ jobs:
       - if: needs.e2e-shard.result != 'success'
         run: exit 1
   vrt:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -188,8 +167,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   storybook:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
