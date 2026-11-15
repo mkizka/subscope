@@ -1,50 +1,26 @@
 # Lexiconレコードのインデックス実装ガイド
 
-新しいレコードタイプ（例：`app.bsky.graph.list`）をインデックスする際の手順です。既存の`app.bsky.graph.follow`の実装を参考にしてください。
+新しいレコードタイプ（例: app.bsky.graph.list）をworkerでインデックスするときの流れです。迷ったら、app.bsky.graph.followの実装をなぞってください。
 
-## データフロー
+## データの流れ
 
-```
-Tap → Worker(TapSubscriber → IndexCommitUseCase) → IndexRecordService → {RecordType}Indexer → {RecordType}Repository → Database
-```
+workerはTapから受け取ったコミットを、レコードタイプごとのIndexerに振り分けます。IndexerはRepositoryを通してデータベースに保存します。
 
 ## 手順
 
-### 1. Lexicon定義の取得
+| 順  | やること                                                                         |
+| --- | -------------------------------------------------------------------------------- |
+| 1   | Lexicon定義を取得し、クライアントのコードを生成する。定義ファイルは手で書かない  |
+| 2   | データベースにテーブルを追加し、マイグレーションを作る                           |
+| 3   | レコードをDBに依存しない型に変換する処理を作り、対応するコレクションの一覧に足す |
+| 4   | Repositoryのインターフェースと実装、テスト用のインメモリ実装を作る               |
+| 5   | Indexerを作り、振り分け先に登録する                                              |
+| 6   | RepositoryとIndexerをDIに登録し、テストではインメモリ実装に差し替える            |
+| 7   | IndexerとRepositoryのテストを書き、pnpm allを通す                                |
 
-1. `pnpm --filter @repo/client exec lex install <NSID>` を実行すると、定義を取得して`packages/client/lexicons`と`lexicons.json`に追加する
-2. `pnpm build`や`pnpm typecheck`を実行すると、`@repo/client`のコードを生成する
+Indexerには次の2つの処理を書きます。
 
-Lexicon定義ファイルは手動で作成しないでください。
-
-### 2. データベース
-
-- `packages/db/src/schema.ts` にテーブルを追加し、マイグレーションを作成
-
-### 3. DTO
-
-- `apps/worker/src/application/dto/{record-type}.ts` に、DBに依存しないプレーンな型と、Tapのレコードから変換する `parse{RecordType}(record)` を作成
-- `packages/common/src/lib/utils/collection.ts` の`SupportedCollectionMap`と`SUPPORTED_COLLECTIONS`に追加
-
-### 4. Repository
-
-- インターフェース: `apps/worker/src/application/interfaces/repositories/{record-type}-repository.ts`
-- 実装: `apps/worker/src/infrastructure/repositories/{record-type}-repository/{record-type}-repository.ts`
-- テスト用インメモリ実装: 同ディレクトリの `{record-type}-repository.in-memory.ts`
-
-### 5. Indexer
-
-- `apps/worker/src/application/services/indexer/{record-type}-indexer.ts` に`ICollectionIndexer`を実装
-  - `upsert`: レコードを保存する。保存するかどうかの判定もここで行う
-  - `afterAction`: 集計ジョブのスケジュールなど、保存・削除後の処理
-- `apps/worker/src/application/services/index-record-service.ts` のマップに追加
-
-### 6. DI
-
-- `apps/worker/src/shared/registry.ts` にRepositoryとIndexerを登録
-- `apps/worker/src/shared/test-utils.ts` でインメモリ実装に差し替え
-
-### 7. テスト
-
-- Indexerのテスト（`{record-type}-indexer.test.ts`）とRepositoryのテストを追加
-- `pnpm all` を実行
+| 処理           | 内容                                                   |
+| -------------- | ------------------------------------------------------ |
+| 保存           | レコードを保存する。保存するかどうかの判定もここで行う |
+| 保存・削除の後 | 集計ジョブの登録など、保存や削除のあとに行う処理       |
