@@ -352,7 +352,7 @@ export function PostCard({
             <ProfileLink
               handle={authorHandle}
               className="
-                relative truncate font-bold
+                relative truncate text-body font-bold
                 hover:underline
               "
             >
@@ -367,7 +367,7 @@ export function PostCard({
                 : "日時不明"}
             </span>
           </div>
-          <p className="mt-1 wrap-break-word whitespace-pre-wrap">
+          <p className="mt-1 text-body wrap-break-word whitespace-pre-wrap">
             {text && <RichText text={text} links={links} />}
           </p>
           {images && <PostImages images={images} />}
