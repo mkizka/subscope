@@ -1008,7 +1008,7 @@ export const Counts: Story = {
 };
 
 export const ExternalLink: Story = {
-  name: "timeline-s2: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする",
+  name: "timeline-s2: 本文のfacetsのリンクは、そのURLを新しいタブで開くリンクにする",
   beforeEach: () => {
     const label = "example.com/timeline...";
     setPosts([
@@ -1032,7 +1032,7 @@ export const ExternalLink: Story = {
 };
 
 export const Mention: Story = {
-  name: "timeline-s3: 本文のうちfacetsでメンションが付いた範囲は、そのアカウントのプロフィール全体ページへのリンクにする",
+  name: "timeline-s3: 本文のfacetsのメンションは、そのアカウントのプロフィール全体ページへのリンクにする",
   beforeEach: () => {
     setPosts([
       post("mention", {
@@ -1084,7 +1084,7 @@ export const Loading: Story = {
 };
 
 export const ThreadOrder: Story = {
-  name: "timeline-s6: 一覧の中に返信先の投稿があれば、間に別の投稿があっても返信先を上にして古い順に並べ、アイコンの間を線で繋げる",
+  name: "timeline-s6: 一覧に返信先の投稿があれば、間に別の投稿があっても返信先から古い順に続けて並べ、アイコンを線で繋げる",
   beforeEach: () => {
     const root = post("起点");
     setPosts([
@@ -1154,7 +1154,7 @@ export const RepostLink: Story = {
 };
 
 export const Hashtag: Story = {
-  name: "timeline-s10: 本文のうちfacetsでハッシュタグが付いた範囲は、そのハッシュタグを投稿タブで検索する検索ページ（`/search?q=%23タグ`）へのリンクにする",
+  name: "timeline-s10: 本文のfacetsのハッシュタグは、そのタグを投稿タブで検索する検索ページ（`/search?q=%23タグ`）へのリンクにする",
   beforeEach: () => {
     setPosts([
       post("tag", {
@@ -1193,7 +1193,7 @@ export const OmittedPosts: Story = {
 };
 
 export const OmittedPostsCount: Story = {
-  name: "timeline-s12: 線で繋げた投稿を省略した場合は、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する",
+  name: "timeline-s12: 線で繋げた投稿を省略したら、起点と返信先の間に省略した件数を点線つきのリンクで表示する",
   beforeEach: omittedBeforeEach,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -1204,7 +1204,7 @@ export const OmittedPostsCount: Story = {
 };
 
 export const OmittedPostsLink: Story = {
-  name: "timeline-s13: 省略した投稿の件数の表示は、最後の投稿のスレッドページへのリンクにする",
+  name: "timeline-s13: 省略した件数の表示は、最後の投稿のスレッドページへのリンクにする",
   beforeEach: omittedBeforeEach,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
