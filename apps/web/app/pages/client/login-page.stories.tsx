@@ -10,7 +10,6 @@ const meta = {
   },
   args: {
     step: "login",
-    operator: { handle: "alice.example.com", displayName: "Alice" },
   },
 } satisfies Meta<typeof LoginPage>;
 
@@ -153,19 +152,6 @@ export const AboutDialog: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "詳しく見る" }));
     await expect(
       canvas.getByRole("dialog", { name: "Subscopeとは" }),
-    ).toBeVisible();
-  },
-};
-
-export const AboutDialogOperator: Story = {
-  name: "login-s12: 「Subscopeとは」のモーダルには、運営者の名前とハンドルを出す",
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: "詳しく見る" }));
-    await expect(
-      within(canvas.getByRole("dialog")).getByText(
-        "運営: Alice（@alice.example.com）",
-      ),
     ).toBeVisible();
   },
 };

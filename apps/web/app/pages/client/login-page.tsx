@@ -9,15 +9,9 @@ type Props = {
   step: "setup" | "login" | "inviteCode";
   tab?: "login" | "register";
   inviteCodeError?: string;
-  operator?: { handle: string; displayName?: string };
 };
 
-export function LoginPage({
-  step,
-  tab = "login",
-  inviteCodeError,
-  operator,
-}: Props) {
+export function LoginPage({ step, tab = "login", inviteCodeError }: Props) {
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
       <div
@@ -40,11 +34,13 @@ export function LoginPage({
             />
             <h1 className="text-title">Subscope</h1>
           </div>
-          <h2 className="text-heading">見出しが入ります（仮）</h2>
+          <h2 className="text-heading">
+            SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
+          </h2>
           <p className="text-label">
             招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。
           </p>
-          <AboutDialog operator={operator}>
+          <AboutDialog>
             {(open) => (
               <button
                 type="button"

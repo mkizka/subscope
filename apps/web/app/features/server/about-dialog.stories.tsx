@@ -12,7 +12,6 @@ function OpenOnMount({ open }: { open: () => void }) {
 const meta = {
   component: AboutDialog,
   args: {
-    operator: { handle: "alice.example.com", displayName: "Alice" },
     children: (open) => <OpenOnMount open={open} />,
   },
 } satisfies Meta<typeof AboutDialog>;

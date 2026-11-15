@@ -3,11 +3,10 @@ import { type ReactNode, useRef } from "react";
 import { Button } from "@/app/components/ui/button";
 
 type Props = {
-  operator?: { handle: string; displayName?: string };
   children: (open: () => void) => ReactNode;
 };
 
-export function AboutDialog({ operator, children }: Props) {
+export function AboutDialog({ children }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   return (
     <>
@@ -41,23 +40,28 @@ export function AboutDialog({ operator, children }: Props) {
             SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
           </p>
           <section className="space-y-1">
-            <h3 className="font-bold">仕組み</h3>
+            <h3 className="font-bold">Blueskyとの違い</h3>
             <p>
-              Subscopeにログインするとあなたのアカウントが登録され、アカウントの情報を読み込みます。このとき、あなたがフォローしている全てのアカウントの情報も読み込みます。これにより、サーバーに登録した人と、その誰かがフォローした人の投稿が表示されます。
+              登録も登録者からのフォローもされていないアカウントを表示しないため、Blueskyと比べて以下の違いがあります。
             </p>
+            <ul className="list-disc pl-5">
+              <li>
+                いいね、リポスト、フォロワーなどの数はBlueskyより小さく表示されます
+              </li>
+              <li>検索結果に表示される投稿やアカウントが少なくなります</li>
+              <li>いくつかの機能が未実装です</li>
+            </ul>
+            <p>機能面では「限られた部分だけ動作するBluesky」といえます。</p>
           </section>
           <section className="space-y-1">
-            <h3 className="font-bold">Subscopeが目指すもの</h3>
+            <h3 className="font-bold">Subscopeの目的</h3>
             <p>
-              これまでBlueskyと連携する分散SNSを作るには、Blueskyと同等に強力なサーバーが必要でした。Subscopeは上記の仕組みでサーバーに保存するデータを大幅に減らし、誰でも個人でBlueskyの仕組みを使った分散SNSを運営できることを目指しています。
+              通常、Blueskyと連携する分散SNSを作るにはBlueskyと同等に強力なサーバーが必要です。
+            </p>
+            <p>
+              Subscopeは一部のデータのみ保存する方針によってサーバーに保存するデータを大幅に減らし、誰でも個人でBlueskyと連携する分散SNSを運営できることを目指しています。
             </p>
           </section>
-          {operator && (
-            <p className="text-caption text-muted">
-              運営: {operator.displayName || operator.handle}（@
-              {operator.handle}）
-            </p>
-          )}
         </div>
       </dialog>
     </>
