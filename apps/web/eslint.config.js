@@ -20,7 +20,6 @@ export default defineConfig(
     files: ["app/**/*.{ts,tsx}"],
     ignores: [
       "app/server/application/**/*.ts",
-      "app/server/infrastructure/db/db.ts",
       "app/server/infrastructure/auth/oauth-storage.ts",
       "app/server/infrastructure/push/push-subscription-command.ts",
     ],
@@ -47,7 +46,7 @@ export default defineConfig(
         {
           patterns: [
             {
-              regex: "^(?!@gyaku/di$|\\.)",
+              regex: "^(?!@gyaku/di$|@repo/|\\.)",
               message:
                 "DIの配線でライブラリを直接使わないでください。自前のinterfaceを返すファクトリ関数でラップしてください。",
             },
