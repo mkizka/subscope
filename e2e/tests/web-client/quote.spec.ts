@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { createRecord } from "../../helpers/pds";
 
 test.describe("引用投稿", () => {
-  test("quote-e1: 引用されている投稿をタップすると、その投稿のスレッドを開く", async ({
+  test("quote-e1: 引用されている投稿をタップすると、そのスレッドを開く", async ({
     page,
   }) => {
     const quoted = await createRecord("alice.test", "app.bsky.feed.post", {

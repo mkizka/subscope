@@ -63,7 +63,7 @@ const toggleReaction = async (
   await expect.poll(hasRecord).toBe(false);
 };
 
-test("postToolbar-e1: いいねボタンで投稿にいいねし、もう一度押すと取り消す", ({
+test("postToolbar-e1: いいねボタンでいいねし、もう一度押すと取り消す", ({
   page,
   request,
 }) =>
@@ -76,7 +76,7 @@ test("postToolbar-e1: いいねボタンで投稿にいいねし、もう一度�
     },
   ));
 
-test("postToolbar-e2: リポストボタンで投稿をリポストし、もう一度押すと取り消す", ({
+test("postToolbar-e2: リポストボタンでリポストし、もう一度押すと取り消す", ({
   page,
   request,
 }) =>
@@ -142,7 +142,7 @@ const composeAndSubmit = async (
     .toContain(uri);
 };
 
-test("postToolbar-e3: 返信ボタンで投稿欄が開き、投稿するとその投稿への返信になる", ({
+test("postToolbar-e3: 返信ボタンで投稿欄を開き、その投稿への返信を投稿する", ({
   page,
   request,
 }) =>
@@ -156,7 +156,7 @@ test("postToolbar-e3: 返信ボタンで投稿欄が開き、投稿するとそ�
     },
   ));
 
-test("postToolbar-e4: 引用ボタンで投稿欄が開き、投稿するとその投稿を引用した投稿になる", ({
+test("postToolbar-e4: 引用ボタンで投稿欄を開き、その投稿を引用した投稿をする", ({
   page,
   request,
 }) =>
@@ -170,7 +170,7 @@ test("postToolbar-e4: 引用ボタンで投稿欄が開き、投稿するとそ�
     },
   ));
 
-test("postToolbar-e5: いいね・リポストのボタンは押した結果を画面に反映し終えるまで押せない", async ({
+test("postToolbar-e5: いいね・リポストのボタンは、結果を画面に反映し終えるまで押せない", async ({
   page,
   request,
 }) => {
@@ -220,7 +220,7 @@ test("postToolbar-e5: いいね・リポストのボタンは押した結果を�
   }
 });
 
-test("postToolbar-e6: 削除ボタンで確認ダイアログを開き、削除すると再読み込みなしでタイムラインから投稿を消す", async ({
+test("postToolbar-e6: 削除は確認ダイアログを経て、再読み込みなしでタイムラインから投稿を消す", async ({
   page,
   request,
 }) => {
@@ -250,7 +250,7 @@ test("postToolbar-e6: 削除ボタンで確認ダイアログを開き、削除�
   expect(await res.text()).not.toContain(uri);
 });
 
-test("postToolbar-e7: 返信を投稿すると、再読み込みなしで返信先の投稿の返信の件数を増やす", async ({
+test("postToolbar-e7: 返信すると、再読み込みなしで返信先の返信の件数を増やす", async ({
   page,
 }) => {
   const text = "postToolbar-e7: 投稿";
@@ -277,7 +277,7 @@ test("postToolbar-e7: 返信を投稿すると、再読み込みなしで返信�
   await expect(post.getByTitle("1件の返信")).toHaveText("1");
 });
 
-test("postToolbar-e8: 投稿のメニューの「リンクをコピー」で、投稿のスレッドのURLをクリップボードにコピーする", async ({
+test("postToolbar-e8: 「リンクをコピー」で、投稿のスレッドのURLをコピーする", async ({
   page,
   context,
 }) => {
@@ -320,7 +320,7 @@ const openPostMenu = async (page: Page, text: string) => {
   return post;
 };
 
-test("postToolbar-e9: 自分の投稿の「…」メニューの「プロフィールにピン留め」で、確認なしにプロフィールのピン留めをその投稿にし、ピン留め中の投稿では「ピン留めを外す」でピン留めを外す", async ({
+test("postToolbar-e9: 自分の投稿を「プロフィールにピン留め」で確認なしにピン留めし、「ピン留めを外す」で外す", async ({
   page,
   request,
 }) => {
@@ -343,7 +343,7 @@ test("postToolbar-e9: 自分の投稿の「…」メニューの「プロフィ�
     .not.toContain("pinnedPost");
 });
 
-test("postToolbar-e10: 別の投稿がピン留め中のときに「プロフィールにピン留め」を押すと、確認なしにピン留めをその投稿へ入れ替える", async ({
+test("postToolbar-e10: 別の投稿がピン留め中でも、確認なしにピン留めを入れ替える", async ({
   page,
   request,
 }) => {

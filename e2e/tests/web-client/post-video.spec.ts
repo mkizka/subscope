@@ -37,7 +37,7 @@ async function open(page: Page, text: string) {
 }
 
 test.describe("投稿動画", () => {
-  test("postVideo-e1: 再生ボタンを押すとplaylistを取得して再生を始める", async ({
+  test("postVideo-e1: 再生ボタンを押すと、playlistを取得して再生を始める", async ({
     page,
   }) => {
     const text = `postVideo-e1: ${Date.now()}`;

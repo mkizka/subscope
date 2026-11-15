@@ -128,7 +128,7 @@ export const Loading: Story = {
 };
 
 export const QuotedFeed: Story = {
-  name: "quote-s9: スレッドで選んだ投稿がフィードジェネレーターを引用している場合も、quote-s7と同じ枠を表示する",
+  name: "quote-s9: スレッドで選んだ投稿のフィードジェネレーターの引用も同じ枠で表示する",
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof threadLoader>>(
       ["thread", alice.handle, "selected"],

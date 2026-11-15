@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { createRecord, uploadBlob } from "../../helpers/pds";
 
 test.describe("投稿画像", () => {
-  test("postImages-e1: gallery埋め込み(app.bsky.embed.gallery)の画像も、すべて並べて表示する", async ({
+  test("postImages-e1: gallery埋め込みの画像も、すべて並べて表示する", async ({
     page,
   }) => {
     const text = `postImages-e1: ${Date.now()}`;
