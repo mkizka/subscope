@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 import { alice, bob, type Data, queryClient } from "@/.storybook/query-client";
 import type { loader as registeredLoader } from "@/app/routes/api.registered-accounts";
@@ -20,25 +20,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
-
-export const About: Story = {
-  name: "server-s1: 「サーバーについて」の下に、Subscopeの概要と「仕組み」「Subscopeが目指すもの」を表示する",
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("heading", { name: "サーバーについて" }),
-    ).toBeVisible();
-    await expect(
-      canvas.getByText(
-        "SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。",
-      ),
-    ).toBeVisible();
-    await expect(canvas.getByRole("heading", { name: "仕組み" })).toBeVisible();
-    await expect(
-      canvas.getByRole("heading", { name: "Subscopeが目指すもの" }),
-    ).toBeVisible();
-  },
-};
 
 export const TabCounts: Story = {
   name: "server-s2: タブの見出しに、それぞれの人数を出す",
@@ -149,5 +130,23 @@ export const ServerInfoLoading: Story = {
     await expect(
       canvas.getByRole("status", { name: "サーバーDIDを読み込み中" }),
     ).toBeVisible();
+  },
+};
+
+export const Hostname: Story = {
+  name: "server-s10: 見出しに、サーバーDIDから取り出したホスト名を表示する",
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole("heading", { name: "subsco.me" }),
+    ).toBeVisible();
+  },
+};
+
+export const AboutDialogOpen: Story = {
+  name: "server-s11: 「Subscopeとは」を押すと、Subscopeの説明をダイアログで開く",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Subscopeとは" }));
+    await expect(canvas.getByRole("dialog")).toBeVisible();
   },
 };
