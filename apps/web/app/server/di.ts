@@ -1,4 +1,8 @@
-import { createRegistry } from "@gyaku/di";
+import { asFunctionArgs, createRegistry } from "@gyaku/di";
+import {
+  connectionPoolFactory,
+  databaseFactory,
+} from "@repo/common/infrastructure";
 
 import { getFollowListUseCaseFactory } from "./application/accounts/get-follow-list-use-case";
 import { getFollowedAccountsUseCaseFactory } from "./application/accounts/get-followed-accounts-use-case";
@@ -57,7 +61,6 @@ import {
   stateStoreFactory,
 } from "./infrastructure/auth/oauth-storage";
 import { backfillQueryFactory } from "./infrastructure/backfill/backfill-query";
-import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { followQueryFactory } from "./infrastructure/follow/follow-query";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
@@ -78,7 +81,12 @@ import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 export const di = await createRegistry()
   .value("env", env)
   .service("loggerManager", ["env"], loggerManagerFactory)
-  .service("db", ["env", "loggerManager"], dbFactory)
+  .service("connectionPool", ["env"], connectionPoolFactory)
+  .service(
+    "db",
+    ["connectionPool", "loggerManager"],
+    asFunctionArgs(databaseFactory),
+  )
   .service("jobQueue", ["env"], jobQueueFactory)
   .service("oauthStateStore", ["db"], stateStoreFactory)
   .service("oauthSessionStore", ["db"], sessionStoreFactory)

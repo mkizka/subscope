@@ -50,7 +50,7 @@ export const timelineQueryFactory = ({
 ## DI
 
 - `app/server/di.ts` で `createRegistry()` に `.service("名前", ["依存"], 〇〇Factory)` と並べ、`resolve()` した結果を `di` として export する
-- `di.ts` は `@gyaku/di` と相対パスだけを import できる(ESLintで強制)
+- `di.ts` は `@gyaku/di`、`@repo/`、相対パスだけを import できる(ESLintで強制)
 - routes・middlewares からは `di.〇〇` で使う
 
 ## routes(presentation)
