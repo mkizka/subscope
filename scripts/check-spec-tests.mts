@@ -2,6 +2,7 @@ import { globSync, readFileSync } from "node:fs";
 
 const ID = String.raw`["'\`]([A-Za-z][A-Za-z0-9-]*-[es]?\d+):`;
 const SPEC_ID = /^- ([A-Za-z][A-Za-z0-9-]*-[es]?\d+):/gm;
+const TABLE_SPEC_ID = /^\| *([A-Za-z][A-Za-z0-9-]*-[es]?\d+) *\|/gm;
 const TEST_ID = new RegExp(
   String.raw`(?:\b(?:test|it)(?:\.\w+)?|\))\(\s*${ID}`,
   "g",
@@ -21,7 +22,7 @@ const collect = (files: string[], res: RegExp[]) => {
   return ids;
 };
 
-const specs = collect(globSync("docs/specs/**/*.md"), [SPEC_ID]);
+const specs = collect(globSync("docs/specs/**/*.md"), [SPEC_ID, TABLE_SPEC_ID]);
 const tests = collect(
   globSync("{apps,packages,e2e}/**/*.{test,spec,stories}.{ts,tsx}", {
     exclude: (name) => name.includes("node_modules"),
