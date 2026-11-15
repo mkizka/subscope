@@ -8,8 +8,8 @@ x-app: &app
   depends_on:
     redis:
       condition: service_started
-    migrate:
-      condition: service_completed_successfully
+    db:
+      condition: service_healthy
 
 services:
   caddy:
@@ -55,13 +55,6 @@ services:
       PORT: 8080
       DID_CACHE: redis
       REDIS_URL: redis://redis:6379
-  migrate:
-    build: { context: .., args: { BUILD_TARGET: web } }
-    command: npm --prefix /db run db:migrate
-    environment: *env
-    depends_on:
-      db:
-        condition: service_healthy
   web:
     <<: *app
     build: { context: .., args: { BUILD_TARGET: web } }
