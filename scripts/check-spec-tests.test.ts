@@ -24,7 +24,7 @@ const table = (...ids: string[]) =>
 
 test("表の行の仕様IDとテストが1対1なら成功する", () => {
   const result = run(
-    `- foo-1: 文\n\n${table("foo-2")}\n`,
+    `${table("foo-1", "foo-2")}\n`,
     `test("foo-1: 文", () => {});\ntest("foo-2: 文", () => {});\n`,
   );
   expect(result.stdout).toContain("OK: 2 spec ids");
@@ -37,9 +37,15 @@ test("表の行の仕様IDにテストがなければ失敗する", () => {
   expect(result.status).toBe(1);
 });
 
-test("表とリストで仕様IDが重複していれば失敗する", () => {
+test("リスト形式の行は仕様項目として読まない", () => {
+  const result = run(`- foo-1: 文\n`, "");
+  expect(result.stdout).toContain("OK: 0 spec ids");
+  expect(result.status).toBe(0);
+});
+
+test("表で仕様IDが重複していれば失敗する", () => {
   const result = run(
-    `- foo-1: 文\n\n${table("foo-1")}\n`,
+    `${table("foo-1", "foo-1")}\n`,
     `test("foo-1: 文", () => {});\n`,
   );
   expect(result.stderr).toContain("foo-1: 仕様書内でIDが重複しています");
