@@ -46,7 +46,7 @@ function ProfileCell({
     <>
       <Avatar src={account.avatar} />
       <div className="min-w-0 flex-1">
-        <div className="truncate font-bold">
+        <div className="truncate text-body font-bold">
           {account.displayName ?? account.handle}
         </div>
         <div className="truncate text-label text-muted" title={account.did}>

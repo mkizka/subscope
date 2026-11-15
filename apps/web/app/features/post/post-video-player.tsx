@@ -53,7 +53,7 @@ export default function PostVideoPlayer({ video }: { video: PostVideoData }) {
         "
       >
         <MediaPlayButton />
-        <MediaTimeDisplay showDuration className="text-xs" />
+        <MediaTimeDisplay showDuration className="text-caption" />
         <MediaTimeRange className="min-w-0 flex-1" />
         <MediaMuteButton />
         <MediaFullscreenButton />
