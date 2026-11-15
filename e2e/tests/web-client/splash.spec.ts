@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("起動時のスプラッシュ", () => {
-  test("splash-e1: 自分の情報の取得が終わるまで、ロゴと読み込み中のプログレスバーを全画面で表示する", async ({
+  test("splash-e1: 自分の情報が届くまで、ロゴとプログレスバーを全画面で表示する", async ({
     page,
   }) => {
     let release = () => {};
@@ -25,7 +25,7 @@ test.describe("起動時のスプラッシュ", () => {
     release();
   });
 
-  test("splash-e2: 自分の情報の取得が終わると、スプラッシュを消してメニューとアバターが揃った画面を表示する", async ({
+  test("splash-e2: 自分の情報が届くと、スプラッシュを消してメニューとアバターが揃った画面を表示する", async ({
     page,
   }) => {
     let release = () => {};
@@ -61,7 +61,7 @@ test.describe("起動時のスプラッシュ", () => {
     await expect(page.getByTestId("splash")).toBeHidden();
   });
 
-  test("splash-e5: 自分の情報の取得が終わると、スプラッシュを約300msかけてフェードして消す", async ({
+  test("splash-e5: 自分の情報が届くと、スプラッシュを約300msかけてフェードして消す", async ({
     page,
   }) => {
     let release = () => {};
@@ -94,7 +94,7 @@ test.describe("起動時のスプラッシュ", () => {
     ).toBe(true);
   });
 
-  test("splash-e6: prefers-reduced-motionが有効なときは、フェードせずにスプラッシュを消す", async ({
+  test("splash-e6: 動きを減らす設定のブラウザでは、フェードせずにスプラッシュを消す", async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -142,7 +142,7 @@ test.describe("起動時のスプラッシュ", () => {
 test.describe("起動時のスプラッシュ（JS無効）", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("splash-e4: JSが読み込まれる前から、サーバーが返すHTMLにスプラッシュを含める", async ({
+  test("splash-e4: JSの読み込み前から、サーバーが返すHTMLにスプラッシュを含める", async ({
     page,
   }) => {
     await page.goto("/");

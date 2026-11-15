@@ -6,7 +6,7 @@ const rightColumn = (page: Page) =>
   });
 
 test.describe("レイアウト", () => {
-  test("layout-e4: `/server` では、同じ内容の重複を避けるため右カラムのカードを表示せず、中央カラムの位置は他のページと変えない", async ({
+  test("layout-e4: `/server` では右カラムのカードを表示せず、中央カラムの位置は他のページと変えない", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -23,7 +23,7 @@ test.describe("レイアウト", () => {
     expect((await page.getByRole("main").boundingBox())?.x).toBe(home?.x);
   });
 
-  test("layout-e5: 右カラムの検索ボックスで検索語を入力してEnterを押すと、`/search?q=検索語` に移動する", async ({
+  test("layout-e5: 右カラムの検索ボックスでEnterを押すと、`/search?q=検索語` に移動する", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -38,7 +38,7 @@ test.describe("レイアウト", () => {
     await expect(page).toHaveURL("/search?q=alice");
   });
 
-  test("layout-e7: 右カラムの検索ボックスに入力すると、入力に合うアカウントの候補（アイコン、表示名、ハンドル）を下に表示し、候補を選ぶとそのアカウントのプロフィールに移動する", async ({
+  test("layout-e7: 右カラムの検索ボックスに入力すると合うアカウントの候補を出し、候補を選ぶとそのプロフィールに移動する", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -56,7 +56,7 @@ test.describe("レイアウト", () => {
     await expect(page).toHaveURL("/alice.test");
   });
 
-  test("layout-e2: ページの読み込み中は画面上部に読み込み中のプログレスバーを表示する", async ({
+  test("layout-e2: ページの読み込み中は、画面上部にプログレスバーを表示する", async ({
     page,
   }) => {
     await page.goto("/");
@@ -83,7 +83,7 @@ test.describe("レイアウト", () => {
 test.describe("レイアウト（モバイル）", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
-  test("layout-e6: モバイルでは下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
+  test("layout-e6: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると再び表示する", async ({
     page,
   }) => {
     await page.goto("/server");

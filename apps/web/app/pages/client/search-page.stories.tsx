@@ -129,7 +129,7 @@ const openHistory = async (canvasElement: HTMLElement) => {
 };
 
 export const HistoryList: Story = {
-  name: "searchHistory-s1: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する",
+  name: "searchHistory-s1: 検索欄にフォーカスして何も入力していないとき、検索した語を新しい順に最大10件表示する",
   parameters: { path: "/search?q=word5" },
   beforeEach: seedHistory(
     Array.from({ length: 11 }, (_, i) => `word${11 - i}`),
@@ -148,7 +148,7 @@ export const HistoryList: Story = {
 };
 
 export const HistorySelect: Story = {
-  name: "searchHistory-s2: 履歴の語を選ぶと、検索欄にその語を入れて検索する",
+  name: "searchHistory-s2: 履歴の語を選ぶと、その語で検索する",
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -163,7 +163,7 @@ export const HistorySelect: Story = {
 };
 
 export const HistoryRemove: Story = {
-  name: "searchHistory-s3: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる",
+  name: "searchHistory-s3: 履歴の語は1件ずつ、または「履歴を全て削除」でまとめて削除できる",
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo"]),
   play: async ({ canvasElement }) => {
@@ -201,7 +201,7 @@ export const HistoryClosesOnSearch: Story = {
 };
 
 export const NoSidebarSearch: Story = {
-  name: "layout-s11: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない",
+  name: "layout-s11: `/search` では、右カラムの検索ボックスを表示しない",
   globals: { viewport: { value: "desktop" } },
   play: async ({ canvasElement }) => {
     const sidebar = within(canvasElement).getAllByRole("complementary").at(-1);
