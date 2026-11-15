@@ -102,14 +102,15 @@ export const FollowerCount: Story = {
 
 export const AccountsLoading: Story = {
   beforeEach: () => {
-    queryClient.removeQueries({ queryKey: ["clientServerMembers"] });
-    queryClient.removeQueries({ queryKey: ["trackedAccounts"] });
-    void queryClient
-      .query({
-        queryKey: ["clientServerMembers", ""],
-        queryFn: () => new Promise<never>(() => {}),
-      })
-      .catch(() => {});
+    for (const key of ["clientServerMembers", "trackedAccounts"]) {
+      queryClient.removeQueries({ queryKey: [key] });
+      void queryClient
+        .query({
+          queryKey: [key, ""],
+          queryFn: () => new Promise<never>(() => {}),
+        })
+        .catch(() => {});
+    }
   },
 };
 
