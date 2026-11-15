@@ -1,3 +1,6 @@
+import { createRequire } from "node:module";
+import path from "node:path";
+
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ReactRouterAdapter } from "bull-board-react-router";
@@ -16,6 +19,11 @@ const getServerAdapter = () => {
     createBullBoard({
       queues: di.jobQueue.getQueues().map((queue) => new BullMQAdapter(queue)),
       serverAdapter,
+      options: {
+        uiBasePath: path.dirname(
+          createRequire(import.meta.url).resolve("@bull-board/ui/package.json"),
+        ),
+      },
     });
   }
   return serverAdapter;
