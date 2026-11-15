@@ -26,7 +26,7 @@ test.describe("検索", () => {
     });
   });
 
-  test("search-e1: 左カラムの「検索」から開いた検索欄でユーザータブに切り替えて検索すると、表示名またはハンドルが検索語に部分一致するアカウント（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("search-e1: ユーザータブでは、表示名かハンドルが検索語に部分一致するアカウントを一覧表示する", async ({
     page,
   }) => {
     await page.goto("/");
@@ -51,7 +51,7 @@ test.describe("検索", () => {
     await expect(alice.getByText("Blueskyを使っています")).toBeVisible();
   });
 
-  test("search-e2: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
+  test("search-e2: 一覧のアカウントを選ぶと、そのアカウントのプロフィールに移動する", async ({
     page,
   }) => {
     const link = page.getByRole("main").getByRole("link", { name: /^Alice/ });
@@ -70,7 +70,7 @@ test.describe("検索", () => {
     ).toBeVisible();
   });
 
-  test("search-e3: 投稿タブ（最初に表示されるタブ）で検索すると、本文が検索語に部分一致する投稿を、リプライを除いて新しい順に一覧表示する", async ({
+  test("search-e3: 投稿タブでは、本文が検索語に部分一致する投稿をリプライを除いて新しい順に表示する", async ({
     page,
   }) => {
     const q = `search3-${Date.now()}`;

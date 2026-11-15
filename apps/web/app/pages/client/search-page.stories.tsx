@@ -76,7 +76,7 @@ export const AccountsNotFound: Story = {
 };
 
 export const Empty: Story = {
-  name: "search-s7: 検索語がないときは、検索欄の下に探せる対象（追跡アカウントと投稿）の説明を出す",
+  name: "search-s7: 検索語がないときは、探せる対象（追跡アカウントと投稿）の説明を出す",
   parameters: { path: "/search" },
   play: async ({ canvasElement }) => {
     await expect(
@@ -89,7 +89,7 @@ export const Empty: Story = {
 };
 
 export const FromUrl: Story = {
-  name: "search-s2: URLに `?q=検索語` があると、検索欄にその語を入れて、投稿タブで検索結果を表示する",
+  name: "search-s2: URLに検索語があると、それを検索欄に入れて投稿タブの結果を表示する",
   parameters: { path: "/search?q=alice" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -184,7 +184,7 @@ export const HistoryRemove: Story = {
 };
 
 export const HistoryClosesOnSearch: Story = {
-  name: "search-s11: 検索を実行すると、履歴を閉じる",
+  name: "search-s11: 検索を実行すると、検索履歴を閉じる",
   parameters: { path: "/search" },
   beforeEach: seedHistory(["bar", "foo", "baz"]),
   play: async ({ canvasElement }) => {

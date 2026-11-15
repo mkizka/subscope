@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const About: Story = {
-  name: "server-s1: 見出し「サーバーについて」の下に、Subscopeの概要と、見出し「仕組み」「Subscopeが目指すもの」の説明を表示する",
+  name: "server-s1: 「サーバーについて」の下に、Subscopeの概要と「仕組み」「Subscopeが目指すもの」を表示する",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -41,7 +41,7 @@ export const About: Story = {
 };
 
 export const TabCounts: Story = {
-  name: "server-s2: 「メンバー」「誰かがフォロー」のタブを表示し、タブ見出しに各タブの人数を出す",
+  name: "server-s2: タブの見出しに、それぞれの人数を出す",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole("tab", { name: "メンバー 2" })).toBeVisible();
@@ -52,7 +52,7 @@ export const TabCounts: Story = {
 };
 
 export const MemberDetails: Story = {
-  name: "server-s3: 「メンバー」タブではメンバーの一覧（名前、ハンドル、自己紹介）を表示する",
+  name: "server-s3: 「メンバー」タブでは、メンバーを自己紹介つきで一覧表示する",
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
       ["clientServerMembers", ""],
@@ -82,7 +82,7 @@ export const OperatorBadge: Story = {
 };
 
 export const FollowerCount: Story = {
-  name: "server-s6: 「誰かがフォロー」タブには、フォローしているメンバーの数を「n人からフォロー」と表示する",
+  name: "server-s6: 「誰かがフォロー」タブでは、フォローしているメンバーの数を「n人からフォロー」と表示する",
   parameters: { path: "/server?tab=tracked" },
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof trackedLoader>>(
@@ -114,7 +114,7 @@ export const AccountsLoading: Story = {
 };
 
 export const NoSearchResult: Story = {
-  name: "server-s8: 検索に一致するアカウントがないときは「アカウントが見つかりません」を表示する",
+  name: "server-s8: 絞り込みに一致するアカウントがないときは「アカウントが見つかりません」と表示する",
   parameters: { path: "/server?q=zzzzzz" },
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
@@ -130,7 +130,7 @@ export const NoSearchResult: Story = {
 };
 
 export const ServerInfoLoading: Story = {
-  name: "server-s9: 運営者とサーバーDIDは、読み込み終えるまで値の場所にスケルトンを表示する",
+  name: "server-s9: 運営者とサーバーDIDは、読み込み中にスケルトンを表示する",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["server"] });
     void queryClient
