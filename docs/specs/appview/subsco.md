@@ -145,7 +145,7 @@ qは大文字と小文字を区別しない。
 | listServerMembers-7 | メンバー本人のバックフィルの状態を返し、フォロー先の状態は見ない |
 | listServerMembers-8 | バックフィルの状態をまだ確認していなければinProgressにする       |
 
-バックフィルの状態は、workerがアカウントに保存したもの（[バックフィルの状態の確認](../worker.md#バックフィルの状態の確認)）を読む。
+バックフィルの状態は、workerがアカウントに保存したもの（[バックフィルの状態の確認](../worker/backfill.md#バックフィルの状態の確認)）を読む。
 
 ## me.subsco.admin.grantAdmin
 
