@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("PWA", () => {
-  test("pwa-e1: Web App Manifestで、名前・アイコン・`display: standalone`・`start_url`・DESIGN.mdのsurfaceに合わせたテーマ色を宣言する", async ({
+  test("pwa-e1: マニフェストで、名前・アイコン・独立したウィンドウでの表示・開始ページ・背景色に合わせたテーマ色を宣言する", async ({
     request,
   }) => {
     const response = await request.get("/manifest.webmanifest");
@@ -23,7 +23,7 @@ test.describe("PWA", () => {
     }
   });
 
-  test("pwa-e2: すべてのページのheadでManifestとapple-touch-iconを参照する", async ({
+  test("pwa-e2: すべてのページで、マニフェストとホーム画面用のアイコンを参照する", async ({
     page,
   }) => {
     await page.goto("/login");

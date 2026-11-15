@@ -391,7 +391,7 @@ export const ListsLoading: Story = {
 };
 
 export const TabsStayInPlaceOnSlowScroll: Story = {
-  name: "layout-s16: モバイルでタブがまだ画面上端に届いていないうちにヘッダーが隠れても、タブはその場から動かさず、下の投稿との間に隙間を作らない",
+  name: "layout-s16: モバイルでタブが画面上端に届く前にヘッダーが隠れても、タブはその場から動かさない",
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
     canvasElement
