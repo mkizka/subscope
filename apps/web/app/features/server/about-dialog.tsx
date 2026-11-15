@@ -42,26 +42,26 @@ export function AboutDialog({ children }: Props) {
           <section className="space-y-1">
             <h3 className="font-bold">Blueskyとの違い</h3>
             <p>
-              Subscopeではサーバーに登録しているアカウントか、登録アカウントからフォローされているアカウントのみが表示されます。
+              Subscopeでは、サーバーに登録しているアカウント、または登録アカウントからフォローされているアカウントのみが表示されます。
             </p>
-            <p>そのためBlueskyと比べて以下の違いがあります。</p>
+            <p>そのためBlueskyと比べて、以下の違いがあります。</p>
             <ul className="list-disc pl-5">
               <li>
-                いいね、リポスト、フォロワーなどの数は多くの場合Blueskyより少なく表示されます
+                いいね、リポスト、フォロワーなどの数は、多くの場合Blueskyより少なく表示されます
               </li>
-              <li>検索結果に表示される投稿やアカウントも少なく表示されます</li>
+              <li>検索結果に出てくる投稿やアカウントも少なくなります</li>
             </ul>
             <p>
-              機能面では「限られた部分だけ表示するBluesky」となっています。なお一部機能は未実装です。
+              機能面では「限られた部分だけ表示するBluesky」です。なお、一部の機能は未実装です。
             </p>
           </section>
           <section className="space-y-1">
             <h3 className="font-bold">Subscopeの目的</h3>
             <p>
-              通常、Blueskyと連携する分散SNSを作るにはBlueskyと同等に強力なサーバーが必要です。
+              通常、Blueskyと連携する分散SNSを作るには、Blueskyと同等の性能を持つサーバーが必要です。
             </p>
             <p>
-              Subscopeは一部のデータのみ保存する方針によってサーバーに保存するデータを大幅に減らし、誰でも個人でBlueskyと連携する分散SNSを運営できることを目指しています。
+              Subscopeは保存するデータを一部に絞ることで、サーバーの保存量を大幅に減らし、誰でも個人で運営できるBluesky連携の分散SNSを目指しています。
             </p>
           </section>
         </div>
