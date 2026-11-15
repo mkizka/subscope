@@ -148,7 +148,7 @@ test.describe("タイムライン", () => {
     return { spinner, release: () => release(undefined) };
   };
 
-  test("timeline-e10: 自動更新の読み込み中は、一覧の上部に、スピナー付きの「更新中」の表示を投稿の上、上部のタブの下に重ねて浮かせる", async ({
+  test("timeline-e10: 自動更新の読み込み中は、スピナー付きの「更新中」の表示を、上部のタブのすぐ下に投稿へ重ねて浮かせる", async ({
     page,
     request,
   }) => {
@@ -171,7 +171,7 @@ test.describe("タイムライン", () => {
     await expect(spinner).toBeHidden();
   });
 
-  test("timeline-e11: 「更新中」の表示は、スクロールしても上部のタブとの位置関係を変えず、タブと一緒に動く", async ({
+  test("timeline-e11: 「更新中」の表示は、スクロールしても上部のタブと一緒に動く", async ({
     page,
     request,
   }) => {
@@ -195,7 +195,7 @@ test.describe("タイムライン", () => {
     await expect(spinner).toBeHidden();
   });
 
-  test("timeline-e9: 表示中のタイムラインと同じものを指すメニューのホーム、またはフォロー中・ローカルのタブをタップすると、先頭へスクロールして投稿を読み込み直し、読み込み中は timeline-e10 と同じ「更新中」の表示を出す", async ({
+  test("timeline-e9: 選択中のタブか、同じタイムラインを指すメニューのホームをタップすると、先頭へスクロールして読み込み直し、その間「更新中」を出す", async ({
     page,
     request,
   }) => {
@@ -332,7 +332,7 @@ test.describe("ローカルタイムライン", () => {
     }).toPass();
   });
 
-  test("localTimeline-e2: 「ローカル」タブには、メンバーのフォロー先であってもメンバーではないアカウントの投稿は表示しない", async ({
+  test("localTimeline-e2: 「ローカル」タブには、メンバーではないアカウントの投稿は、メンバーのフォロー先でも出さない", async ({
     page,
     request,
   }) => {
