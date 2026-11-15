@@ -12,7 +12,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.getInviteCodes", () => {
   const { ctx } = testSetup;
 
-  test("getInviteCodes-1: 使用済みの招待コードには使用したアカウントのprofileViewを含める", async () => {
+  test("getInviteCodes-1: 使用済みの招待コードには、使ったアカウントのprofileViewを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -33,7 +33,7 @@ describe("me.subsco.admin.getInviteCodes", () => {
     ]);
   });
 
-  test("getInviteCodes-2: 使用したアカウントがテイクダウンされていてもprofileViewを含める", async () => {
+  test("getInviteCodes-2: 使ったアカウントがテイクダウンされていてもprofileViewを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

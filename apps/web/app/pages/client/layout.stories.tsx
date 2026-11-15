@@ -69,7 +69,7 @@ export const SideNavHandle: Story = {
 };
 
 export const ServerCard: Story = {
-  name: "layout-s3: 右カラムに、見出し「サーバーについて」と「SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。」を出したカードを表示し、カード全体を `/server` へのリンクにする",
+  name: "layout-s3: 右カラムに、Subscopeを紹介する「サーバーについて」カードを表示し、カード全体を `/server` へのリンクにする",
   globals: desktop,
   play: async ({ canvasElement }) => {
     const card = rightColumn(canvasElement).getByRole("link", {
@@ -84,7 +84,7 @@ export const ServerCard: Story = {
 };
 
 export const TabBarCurrent: Story = {
-  name: "layout-s4: モバイルでは下のタブで今いるページの項目を強調する",
+  name: "layout-s4: モバイルでは、下のタブで今いるページの項目を強調する",
   globals: mobile,
   play: async ({ canvasElement }) => {
     const tabs = tabBar(canvasElement);
@@ -109,7 +109,7 @@ const openDrawer = async (canvasElement: HTMLElement) => {
 };
 
 export const DrawerItems: Story = {
-  name: "layout-s5: モバイルのドロワーにはPCの左カラムと同じメニュー項目を並べる",
+  name: "layout-s5: モバイルのドロワーには、PCの左カラムと同じメニューを並べる",
   globals: mobile,
   play: async ({ canvasElement }) => {
     const pcItems = [...canvasElement.querySelectorAll("aside nav a")].map(
@@ -125,7 +125,7 @@ export const DrawerItems: Story = {
 };
 
 export const ServerMenu: Story = {
-  name: "layout-s6: 左カラムとモバイルのドロワーのメニューの「サーバー」から `/server` に移動できる",
+  name: "layout-s6: メニューの「サーバー」から `/server` に移動できる",
   globals: mobile,
   play: async ({ canvasElement }) => {
     const drawer = await openDrawer(canvasElement);
@@ -140,7 +140,7 @@ export const ServerMenu: Story = {
 };
 
 export const SettingsMenu: Story = {
-  name: "layout-s15: 左カラムとモバイルのドロワーのメニューの「設定」から `/settings` に移動できる",
+  name: "layout-s15: メニューの「設定」から `/settings` に移動できる",
   globals: mobile,
   play: async ({ canvasElement }) => {
     const drawer = await openDrawer(canvasElement);
@@ -156,7 +156,7 @@ export const SettingsMenu: Story = {
 };
 
 export const Skeleton: Story = {
-  name: "layout-s12: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す",
+  name: "layout-s12: スケルトンは、左から右へ光が流れるアニメーションにする",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["timeline"] });
     queryClient
@@ -179,7 +179,7 @@ export const Skeleton: Story = {
 };
 
 export const TabBarIconOnly: Story = {
-  name: "layout-s13: モバイルでは下のタブにラベル文字を出さず、アイコンだけを表示する",
+  name: "layout-s13: モバイルの下のタブは、ラベルを出さずアイコンだけにする",
   globals: mobile,
   play: async ({ canvasElement }) => {
     const tabs = tabBar(canvasElement);
@@ -207,7 +207,7 @@ export const StackingOrder: Story = {
 };
 
 export const TabsPinnedOnScroll: Story = {
-  name: "layout-s10: モバイルでは、タブのあるページ（タイムライン・プロフィール・サーバーなど）は、ヘッダーを隠すとタブだけを画面上端に残し、ヘッダーの再表示と同時にタブをその下へ戻す",
+  name: "layout-s10: モバイルのタブのあるページでは、ヘッダーを隠すとタブだけを画面上端に残し、ヘッダーを再び出すとタブもその下に戻す",
   globals: mobile,
   play: async ({ canvasElement }) => {
     const main = canvasElement.querySelector("main");

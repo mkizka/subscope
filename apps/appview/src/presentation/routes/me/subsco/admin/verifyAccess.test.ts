@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.verifyAccess", () => {
   const { ctx } = testSetup;
 
-  test("verifyAccess-1: 閲覧者が管理者ならstatusをauthorizedにする", async () => {
+  test("verifyAccess-1: 管理者ならstatusをauthorizedにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -22,7 +22,7 @@ describe("me.subsco.admin.verifyAccess", () => {
     expect(result).toEqual({ status: "authorized" });
   });
 
-  test("verifyAccess-2: 閲覧者が管理者でなければstatusをunauthorizedにする", async () => {
+  test("verifyAccess-2: 管理者でなければstatusをunauthorizedにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     await accountFactory(ctx.db)

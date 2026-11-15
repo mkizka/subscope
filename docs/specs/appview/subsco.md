@@ -85,91 +85,113 @@
 
 ## me.subsco.admin.verifyAccess
 
-閲覧者の管理画面へのアクセス権を返す。認証が必要。
+閲覧者が管理画面を使えるかを返す。認証が必要。
 
-- verifyAccess-1: 閲覧者が管理者ならstatusをauthorizedにする
-- verifyAccess-2: 閲覧者が管理者でなければstatusをunauthorizedにする
+| ID             | 仕様                                       |
+| -------------- | ------------------------------------------ |
+| verifyAccess-1 | 管理者ならstatusをauthorizedにする         |
+| verifyAccess-2 | 管理者でなければstatusをunauthorizedにする |
 
 ## me.subsco.admin.registerAdmin
 
-管理者が未登録のとき、閲覧者を最初の管理者として登録する。認証が必要。
+管理者がまだいないとき、閲覧者を最初の管理者として登録する。認証が必要。
 
-- registerAdmin-1: 閲覧者を管理者にし、メンバーにする
-- registerAdmin-2: 既に管理者がいれば、400とAdminAlreadyExistsを返す
-- registerAdmin-3: 閲覧者のsyncTapRepoジョブを積む
-- registerAdmin-4: 閲覧者のプロフィールのfetchRecordジョブを積む
-- registerAdmin-5: 閲覧者のハンドルが未取得ならresolveDidジョブを積む
+| ID              | 仕様                                                         |
+| --------------- | ------------------------------------------------------------ |
+| registerAdmin-1 | 閲覧者を管理者にし、メンバーにする                           |
+| registerAdmin-2 | 既に管理者がいれば、400とAdminAlreadyExistsを返す            |
+| registerAdmin-3 | 閲覧者をTapに追加するジョブを積む                            |
+| registerAdmin-4 | 閲覧者のプロフィールを取得するジョブを積む                   |
+| registerAdmin-5 | 閲覧者のハンドルが未取得なら、ハンドルを解決するジョブを積む |
 
 ## me.subsco.admin.listServerMembers
 
-メンバーのプロフィール、管理者かどうか、登録日時、同期状態と、メンバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
+メンバーの一覧と総数を返す。管理者の認証が必要。limitとcursorでページングする。
 
-- listServerMembers-1: 認証がないリクエストには401を返す
-- listServerMembers-2: 管理者でないアカウントからのリクエストには403を返す
-- listServerMembers-3: メンバーごとにprofileViewと管理者かどうかを返す
-- listServerMembers-4: テイクダウンされたメンバーも含める
-- listServerMembers-5: メンバーごとに登録日時をregisteredAtとして返す
-- listServerMembers-6: ページングに関係なくメンバーの総数をtotalとして返す
-- listServerMembers-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す
-- listServerMembers-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
+| ID                  | 仕様                                                             |
+| ------------------- | ---------------------------------------------------------------- |
+| listServerMembers-1 | 認証がなければ401を返す                                          |
+| listServerMembers-2 | 管理者でなければ403を返す                                        |
+| listServerMembers-3 | メンバーごとにprofileViewと管理者かどうかを返す                  |
+| listServerMembers-4 | テイクダウンされたメンバーも含める                               |
+| listServerMembers-5 | メンバーごとに登録日時を返す                                     |
+| listServerMembers-6 | totalにはページングに関係なくメンバーの総数を入れる              |
+| listServerMembers-7 | メンバー本人のバックフィルの状態を返し、フォロー先の状態は見ない |
+| listServerMembers-8 | バックフィルの状態をまだ確認していなければinProgressにする       |
 
-バックフィルの状態はworkerがaccountsに保存したもの（[backfill-1](../worker.md#バックフィルの状態の確認)）を読む。
+バックフィルの状態は、workerがアカウントに保存したもの（[バックフィルの状態の確認](../worker.md#バックフィルの状態の確認)）を読む。
 
 ## me.subsco.admin.grantAdmin
 
-指定したメンバーを管理者にする。管理者の認証が必要。
+メンバーを管理者にする。管理者の認証が必要。
 
-- grantAdmin-1: 指定したメンバーを管理者にする
-- grantAdmin-2: メンバーでないアカウントには400とNotRegisteredを返す
+| ID           | 仕様                                       |
+| ------------ | ------------------------------------------ |
+| grantAdmin-1 | 指定したメンバーを管理者にする             |
+| grantAdmin-2 | メンバーでなければ400とNotRegisteredを返す |
 
 ## me.subsco.admin.revokeAdmin
 
-指定した管理者の管理者権限を外す。管理者の認証が必要。
+管理者を外す。管理者の認証が必要。
 
-- revokeAdmin-1: 指定した管理者の管理者権限を外す
-- revokeAdmin-2: 自分自身には400とCannotRevokeSelfを返す
-- revokeAdmin-3: メンバーでないアカウントには400とNotRegisteredを返す
+| ID            | 仕様                                       |
+| ------------- | ------------------------------------------ |
+| revokeAdmin-1 | 指定した管理者を管理者から外す             |
+| revokeAdmin-2 | 自分自身なら400とCannotRevokeSelfを返す    |
+| revokeAdmin-3 | メンバーでなければ400とNotRegisteredを返す |
 
 ## me.subsco.admin.banAccount
 
-メンバーの登録を解除し、サーバー登録を停止する。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
+メンバーを登録停止する。管理者の認証が必要。メンバーでなければ400とNotRegisteredを返す。
 
-- banAccount-1: 管理者は登録停止せず、400とCannotBanAdminを返す
-- banAccount-2: 本人とそのフォロー先のsyncTapRepoジョブを積む
+| ID           | 仕様                                                                    |
+| ------------ | ----------------------------------------------------------------------- |
+| banAccount-1 | 管理者は登録停止せず、400とCannotBanAdminを返す                         |
+| banAccount-2 | 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む |
 
 ## me.subsco.admin.getBannedAccounts
 
-サーバー登録を停止中のアカウントのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
+登録停止中のアカウントを返す。管理者の認証が必要。limitとcursorでページングする。
 
-- getBannedAccounts-1: 停止中のアカウントのprofileViewを返す
-- getBannedAccounts-2: 停止中でないアカウントは含めない
+| ID                  | 仕様                                      |
+| ------------------- | ----------------------------------------- |
+| getBannedAccounts-1 | 登録停止中のアカウントをprofileViewで返す |
+| getBannedAccounts-2 | 登録停止中でないアカウントは含めない      |
 
 ## me.subsco.admin.unbanAccount
 
-アカウントのサーバー登録の停止を取り消す(登録を再開する)。管理者の認証が必要。メンバーには戻さず、本人が改めて登録する。
+登録停止を取り消す。管理者の認証が必要。メンバーには戻さず、本人が改めて登録する。
 
-- unbanAccount-1: 登録を再開したアカウントは招待コードで再登録できる
-- unbanAccount-2: 停止中でないアカウントには400とNotBannedを返す
+| ID             | 仕様                                           |
+| -------------- | ---------------------------------------------- |
+| unbanAccount-1 | 取り消したアカウントは招待コードで再登録できる |
+| unbanAccount-2 | 登録停止中でなければ400とNotBannedを返す       |
 
 ## me.subsco.admin.createInviteCode
 
 招待コードを作る。管理者の認証が必要。
 
-- createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする
-- createInviteCode-2: 有効期限はdaysToExpire日後にする
+| ID                 | 仕様                                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| createInviteCode-1 | コードは公開URLのホスト名の「.」を「-」に変え、「-」とランダムな英小文字・数字5文字を続けたものにする |
+| createInviteCode-2 | 有効期限はdaysToExpire日後にする                                                                      |
 
-ランダムな5文字は推測されないよう暗号論的乱数で作る。
+ランダムな5文字は、推測されないよう暗号論的乱数で作る。
 
 ## me.subsco.admin.getInviteCodes
 
-招待コードを、使用日時と使用したアカウントとともに返す。管理者の認証が必要。limitとcursorでページングする。
+招待コードを、使った日時とアカウントとともに返す。管理者の認証が必要。limitとcursorでページングする。
 
-- getInviteCodes-1: 使用済みの招待コードには使用したアカウントのprofileViewを含める
-- getInviteCodes-2: 使用したアカウントがテイクダウンされていてもprofileViewを含める
+| ID               | 仕様                                                            |
+| ---------------- | --------------------------------------------------------------- |
+| getInviteCodes-1 | 使用済みの招待コードには、使ったアカウントのprofileViewを含める |
+| getInviteCodes-2 | 使ったアカウントがテイクダウンされていてもprofileViewを含める   |
 
 ## me.subsco.admin.deleteInviteCode
 
-未使用の招待コードを削除する。管理者の認証が必要。
+未使用の招待コードを消す。管理者の認証が必要。
 
-- deleteInviteCode-1: 存在しない招待コードには400とInviteCodeNotFoundを返す
-- deleteInviteCode-2: 使用済みの招待コードには400とInviteCodeAlreadyUsedを返す
+| ID                 | 仕様                                                     |
+| ------------------ | -------------------------------------------------------- |
+| deleteInviteCode-1 | 存在しない招待コードなら400とInviteCodeNotFoundを返す    |
+| deleteInviteCode-2 | 使用済みの招待コードなら400とInviteCodeAlreadyUsedを返す |
