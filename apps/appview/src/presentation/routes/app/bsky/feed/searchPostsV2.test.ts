@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.searchPostsV2", () => {
   const { ctx } = testSetup;
 
-  test("searchPostsV2-1: 本文がqueryに一致する投稿をpostViewで返す", async () => {
+  test("searchPostsV2-1: queryを空白で区切った語をすべて本文に含む投稿をpostViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await accountFactory(ctx.db)
@@ -69,7 +69,7 @@ describe("app.bsky.feed.searchPostsV2", () => {
     expect(res.posts.map((p) => p.uri)).toEqual([post.uri]);
   });
 
-  test("searchPostsV2-3: repliesOnlyがtrueなら返信だけ、excludeRepliesがtrueなら返信以外だけを返す。どちらも無ければ返信も含める", async () => {
+  test("searchPostsV2-3: repliesOnlyがtrueなら返信だけ、excludeRepliesがtrueなら返信以外だけを返し、どちらもなければ両方を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await accountFactory(ctx.db).create();
@@ -124,7 +124,7 @@ describe("app.bsky.feed.searchPostsV2", () => {
     expect(res.posts).toEqual([]);
   });
 
-  test("searchPostsV2-6: queryに`from:me`が含まれる場合、それを語として扱わず、閲覧者をauthorsに加える", async () => {
+  test("searchPostsV2-6: queryにfrom:meが含まれる場合、それを語として扱わず、閲覧者をauthorsに加える", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db).create();
@@ -150,7 +150,7 @@ describe("app.bsky.feed.searchPostsV2", () => {
     expect(res.posts.map((p) => p.uri)).toEqual([post.uri]);
   });
 
-  test("searchPostsV2-7: 未ログインで`from:me`を含むqueryの場合、空の配列を返す", async () => {
+  test("searchPostsV2-7: 未ログインでfrom:meを含むqueryの場合、空の配列を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     await postFactory(ctx.db)
