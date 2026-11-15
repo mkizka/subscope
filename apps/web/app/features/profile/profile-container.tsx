@@ -112,7 +112,9 @@ export function ProfileContainer({ handle }: Props) {
             {hasNextPage && (
               <LoadingSpinner label="続きを読み込み中">
                 <InfiniteScrollTrigger
-                  onIntersect={() => void fetchNextPage()}
+                  onIntersect={() =>
+                    void fetchNextPage({ cancelRefetch: false })
+                  }
                   enabled={!isFetchingNextPage}
                 />
               </LoadingSpinner>

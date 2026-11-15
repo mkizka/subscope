@@ -71,7 +71,7 @@ export function NotificationPanelContainer() {
       <NotificationPanel
         pushPrompt={<PushPromptContainer />}
         notifications={notifications}
-        onLoadMore={fetchNextPage}
+        onLoadMore={() => void fetchNextPage({ cancelRefetch: false })}
         hasNextPage={hasNextPage && !isFetchingNextPage}
         isLoading={isLoading}
       />
