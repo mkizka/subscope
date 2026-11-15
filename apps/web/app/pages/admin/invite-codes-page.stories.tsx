@@ -72,7 +72,7 @@ export const Used: Story = {
 };
 
 export const Copy: Story = {
-  name: "inviteCodes-s2: 未使用で期限内の招待コードはコードの横のボタンでコードをクリップボードにコピーできる",
+  name: "inviteCodes-s2: 未使用で期限内の招待コードは、横のボタンでクリップボードにコピーできる",
   beforeEach: () => {
     setCodes([
       {
