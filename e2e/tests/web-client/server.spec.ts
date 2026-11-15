@@ -17,7 +17,7 @@ test.describe("サーバー", () => {
 
   const items = (page: Page) => page.getByRole("main").getByRole("listitem");
 
-  test("server-e1: 項目「運営者」に、最初に管理者になった1人のアイコンと名前を表示し、選ぶとそのアカウントのプロフィール全体ページに移動する", async ({
+  test("server-e1: 「運営者」に最初の管理者を表示し、選ぶとそのプロフィールに移動する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -33,7 +33,7 @@ test.describe("サーバー", () => {
     await expect(page).toHaveURL(/\/alice\.test$/);
   });
 
-  test("server-e2: 項目「サーバーDID」に、サーバーDID `did:web:{ホスト}#bsky_appview` を表示する", async ({
+  test("server-e2: 「サーバーDID」に、did:web:ホスト名#bsky_appview の形のサーバーDIDを表示する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -42,7 +42,7 @@ test.describe("サーバー", () => {
     await expect(page.getByText(/^did:web:.+#bsky_appview$/)).toBeVisible();
   });
 
-  test("server-e3: サーバーDIDの文字列とコピーアイコンをひとつのボタンにし、押すとサーバーDIDをクリップボードにコピーできる", async ({
+  test("server-e3: サーバーDIDを押すと、クリップボードにコピーする", async ({
     page,
     context,
   }) => {
@@ -57,7 +57,7 @@ test.describe("サーバー", () => {
       .toBe(did);
   });
 
-  test("server-e4: 「誰かがフォロー」タブでは、フォローされているアカウント（名前、ハンドル）を、フォローしているメンバーが多い順に一覧表示する", async ({
+  test("server-e4: 「誰かがフォロー」タブでは、フォローしているメンバーが多い順にアカウントを一覧表示する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -79,7 +79,7 @@ test.describe("サーバー", () => {
     expect(counts).toEqual([...counts].sort((a, b) => b - a));
   });
 
-  test("server-e5: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
+  test("server-e5: 一覧のアカウントを選ぶと、そのアカウントのプロフィールに移動する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -96,7 +96,7 @@ test.describe("サーバー", () => {
     ).toBeVisible();
   });
 
-  test("server-e6: 旧URLの `/server/accounts`、`/accounts`、`/registered-accounts`、`/tracked-accounts` は、`/server` の該当タブへ移動する", async ({
+  test("server-e6: 旧URLの `/server/accounts`、`/accounts`、`/registered-accounts`、`/tracked-accounts` は `/server` の該当タブに移動する", async ({
     page,
   }) => {
     await page.goto("/server/accounts?tab=tracked");
@@ -112,7 +112,7 @@ test.describe("サーバー", () => {
     await expect(page).toHaveURL("/server?tab=tracked");
   });
 
-  test("server-e7: タブの下の検索欄に入力すると、選んでいるタブの全件から表示名・ハンドルの部分一致で絞り込み、検索語を `?q=` に入れる", async ({
+  test("server-e7: 検索欄に入力すると、選んでいるタブの全件を表示名かハンドルの部分一致で絞り込み、検索語をURLに入れる", async ({
     page,
   }) => {
     await page.goto("/server?tab=tracked");
