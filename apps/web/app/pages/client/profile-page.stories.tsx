@@ -97,7 +97,7 @@ export const Self: Story = {
 };
 
 export const FollowSubmitting: Story = {
-  name: "profile-s2: フォローボタンは押した結果を画面に反映し終えるまで押せない",
+  name: "profile-s2: フォローボタンは、押した結果が画面に反映されるまで押せない",
   parameters: { pending: true },
   beforeEach: () => {
     seed({
@@ -121,7 +121,7 @@ export const FollowSubmitting: Story = {
 };
 
 export const Loading: Story = {
-  name: "profile-s4: プロフィールを開くと、読み込みを待たずに画面を表示し、読み込み終えるまでバナー・アイコン・名前・自己紹介2行と投稿の場所のスケルトンを表示する。ハンドル・タブ・フォロー数は読み込み後に表示する",
+  name: "profile-s4: 開くとすぐ画面を出し、読み込み終えるまでバナー・アイコン・名前・自己紹介・投稿の場所をスケルトンにする",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["profile", alice.handle] });
     void pending(["profile", alice.handle, ""]);
@@ -138,7 +138,7 @@ export const Loading: Story = {
 };
 
 export const TabLoading: Story = {
-  name: "profile-s5: タブを切り替えると、ヘッダーとタブはそのままにして、投稿の場所だけ読み込み終えるまでスケルトンを表示する",
+  name: "profile-s5: タブを切り替えると、ヘッダーとタブはそのままで、投稿の場所だけを読み込み終えるまでスケルトンにする",
   beforeEach: () => {
     void pending(["profile", alice.handle, "media"]);
   },
@@ -165,7 +165,7 @@ const listsRoute = {
 };
 
 export const TabLoadingFromLists: Story = {
-  name: "profile-s6: 「リスト」タブから他のタブに切り替えても、ヘッダーとタブはそのままにして、投稿の場所だけ読み込み終えるまでスケルトンを表示する",
+  name: "profile-s6: 「リスト」タブから他のタブに切り替えたときも、投稿の場所だけをスケルトンにする",
   parameters: { path: "/alice.bsky.social/lists", route: listsRoute },
   beforeEach: () => {
     void pending(["lists", alice.handle]);
@@ -184,7 +184,7 @@ export const TabLoadingFromLists: Story = {
 };
 
 export const Links: Story = {
-  name: "profile-s7: プロフィールの自己紹介の下に、プロフィールに設定されたリンクを、枠付きの丸いボタンとして折り返しながら並べて表示する。表示名（なければドメイン）を選ぶと、リンク先を新しいタブで開く",
+  name: "profile-s7: 自己紹介の下にプロフィールのリンクを丸いボタンで並べ、選ぶと新しいタブで開く",
   beforeEach: () => {
     seed({
       profile: {
@@ -220,7 +220,7 @@ export const Links: Story = {
 };
 
 export const AvatarFallback: Story = {
-  name: "profile-s8: アイコン画像を設定していないアカウントには、人型のシルエットをアイコンの代わりに表示する",
+  name: "profile-s8: アイコンが未設定のアカウントには、人型のシルエットを出す（アイコンを出すすべての場所で共通）",
   play: async ({ canvasElement }) => {
     await expect(
       main(canvasElement)
@@ -231,7 +231,7 @@ export const AvatarFallback: Story = {
 };
 
 export const FollowedBy: Story = {
-  name: "profile-s9: 自分をフォローしているアカウントのプロフィール全体ページには、ハンドルの横に「フォローされています」を表示する",
+  name: "profile-s9: 自分をフォローしているアカウントには、ハンドルの横に「フォローされています」を出す",
   beforeEach: () => {
     seed({
       profile: {
@@ -263,7 +263,7 @@ const knownFollowers = {
 };
 
 export const KnownFollowers: Story = {
-  name: "profile-s12: 自分がフォローしているアカウントのうちそのアカウントをフォローしている人（知り合い）がいる全体ページには、フォロー数の下に知り合いのアイコン（最大3人）と名前（最大2人）、残りの人数を「Bob、Carolほか12人がフォローしています」の形で表示する",
+  name: "profile-s12: 知り合い（自分のフォローのうち、そのアカウントをフォローしている人）がいるときは、フォロー数の下にアイコンと「Bob、Carolほか12人がフォローしています」を出す",
   beforeEach: () => {
     seed({
       profile: {
@@ -296,7 +296,7 @@ export const KnownFollowersLink: Story = {
 };
 
 export const NoKnownFollowers: Story = {
-  name: "profile-s13: 知り合いがいない全体ページと自分の全体ページには、知り合いの行を表示しない",
+  name: "profile-s13: 知り合いがいないときと自分のプロフィールでは、知り合いの行を出さない",
   play: async ({ canvasElement }) => {
     await expect(main(canvasElement).getByText("345")).toBeVisible();
     await expect(
@@ -310,7 +310,7 @@ export const KnownFollowersView: Story = {
 };
 
 export const UntrackedBadge: Story = {
-  name: "profile-s10: 追跡アカウントでない全体ページには、ハンドルの横に「同期対象外」を表示する",
+  name: "profile-s10: 追跡アカウントでないときは、ハンドルの横に「同期対象外」を出す",
   beforeEach: () => {
     seed({ backfillStatus: undefined });
   },
@@ -322,7 +322,7 @@ export const UntrackedBadge: Story = {
 };
 
 export const UntrackedNotice: Story = {
-  name: "profile-s11: 追跡アカウントでない全体ページには、タブの下に「このアカウントのデータはサーバーに同期されていません。フォローすると同期を開始します。」を全てのタブで表示する",
+  name: "profile-s11: 追跡アカウントでないときは、全てのタブの下に、同期されていないことと、フォローすると同期を始めることを出す",
   beforeEach: () => {
     seed({ backfillStatus: undefined });
     seed({ backfillStatus: undefined, tab: "likes" }, "likes");
@@ -442,7 +442,7 @@ const membershipLists: Data<typeof membershipLoader>["lists"] = [
 ];
 
 export const AddToListDialog: Story = {
-  name: "list-s8: 「リストに追加」ダイアログは、自分のキュレーションリストを新しい順に並べ、そのアカウントが入っているリストに「削除」、入っていないリストに「追加」を出す",
+  name: "list-s8: 「リストに追加」ダイアログは自分のキュレーションリストを新しい順に並べ、入っているリストに「削除」、入っていないリストに「追加」を出す",
   beforeEach: () => {
     seedMembership(membershipLists);
   },
@@ -458,7 +458,7 @@ export const AddToListDialog: Story = {
 };
 
 export const AddToListLoading: Story = {
-  name: "list-s10: 「リストに追加」ダイアログは、開いてから読み込み終えるまでスケルトンを表示し、自分のリストが無いときは「リストがありません。」とリスト管理画面（`/lists`）へのリンクを表示する",
+  name: "list-s10: 「リストに追加」ダイアログは読み込み中にスケルトンを出し、リストが無いときは「リストがありません。」と管理画面へのリンクを出す",
   beforeEach: () => {
     void pending(["listMembership", alice.did]);
   },
