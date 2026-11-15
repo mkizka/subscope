@@ -54,7 +54,7 @@ describe("FetchRecordUseCase", () => {
   const execute = () =>
     fetchRecordUseCase.execute({ uri, depth: 0, live: false, jobLogger });
 
-  test("fetchRecord-1: PDSにレコードがないときは、再試行せずに終える", async () => {
+  test("fetchRecord-1: PDSにレコードがなければ、再試行せずに終える", async () => {
     // arrange
     pdsResponse = {
       status: 400,
@@ -65,7 +65,7 @@ describe("FetchRecordUseCase", () => {
     await expect(execute()).resolves.toBeUndefined();
   });
 
-  test("fetchRecord-2: PDSにリポジトリがない、または停止・凍結されているときは、再試行せずに終える", async () => {
+  test("fetchRecord-2: PDSにリポジトリがないか、停止・凍結されていれば、再試行せずに終える", async () => {
     const errors = [
       { error: "InvalidRequest", message: `Could not find repo: ${did}` },
       { error: "RepoNotFound", message: `Repo ${did} not found` },
@@ -84,7 +84,7 @@ describe("FetchRecordUseCase", () => {
     }
   });
 
-  test("fetchRecord-3: DIDが登録されていないときは、再試行せずに終える", async () => {
+  test("fetchRecord-3: DIDが登録されていなければ、再試行せずに終える", async () => {
     // arrange
     didResolver.clear();
 
@@ -92,7 +92,7 @@ describe("FetchRecordUseCase", () => {
     await expect(execute()).resolves.toBeUndefined();
   });
 
-  test("fetchRecord-4: それ以外の理由で取得に失敗したときは再試行する", async () => {
+  test("fetchRecord-4: それ以外の失敗では再試行する", async () => {
     // arrange
     pdsResponse = {
       status: 502,

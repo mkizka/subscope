@@ -10,7 +10,7 @@ const src = "did:plc:ar7c4by46qjdydhdevvrndac";
 describe("ラベルの保存", () => {
   const { ctx } = testSetup;
 
-  test("label-1: 保存済みのアカウントと、そのアカウントのレコードに付いたラベルを保存する", async () => {
+  test("label-1: 保存済みのアカウントと、そのレコードに付いたラベルを保存する", async () => {
     // arrange
     const { indexLabel } = await setupJobTest();
     const account = await accountFactory(ctx.db).create();
@@ -38,7 +38,7 @@ describe("ラベルの保存", () => {
     ]);
   });
 
-  test("label-2: 保存していないアカウントへのラベルは保存しない", async () => {
+  test("label-2: 保存していないアカウントのラベルは保存しない", async () => {
     // arrange
     const { indexLabel } = await setupJobTest();
 
@@ -74,7 +74,7 @@ describe("ラベルの保存", () => {
     expect(labels).toHaveLength(0);
   });
 
-  test("label-4: Tapに追加したアカウントに付いているラベルをモデレーションサービスの queryLabels で取り寄せて保存する", async () => {
+  test("label-4: Tapに追加したアカウントに前から付いているラベルを取り寄せて保存する", async () => {
     // arrange
     const { syncTapRepo, labelFetcher } = await setupJobTest();
     const serverMember = await accountFactory(ctx.db)

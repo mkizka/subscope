@@ -104,7 +104,7 @@ describe("Tapからのイベント受信", () => {
     await new Promise((resolve) => server.close(resolve));
   });
 
-  test("channel-1: recordイベントはインデックスを、identityイベントはアカウントの状態の保存を終えてからTapにackする", async () => {
+  test("channel-1: イベントは処理を終えてからTapにackする", async () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)
@@ -133,7 +133,7 @@ describe("Tapからのイベント受信", () => {
     expect(found?.status).toBe("takendown");
   });
 
-  test("channel-2: サポートしないコレクションのrecordイベントは保存せずにackする", async () => {
+  test("channel-2: サポートしないコレクションのrecordイベントは、保存せずにackする", async () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)

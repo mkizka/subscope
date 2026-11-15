@@ -88,7 +88,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(foundAccount?.handle).toBe("alice.test");
   });
 
-  test("account-1: アカウントの状態をアカウントに保存する", async () => {
+  test("account-1: アカウントの状態を保存する", async () => {
     // arrange
     const account = accountFactory();
     accountRepo.add(account);

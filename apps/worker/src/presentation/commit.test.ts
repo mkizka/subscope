@@ -83,7 +83,7 @@ describe("commit", () => {
     return post ?? null;
   };
 
-  test("index-5: 削除したレコードは削除より古いrevのコミットで復活させない", async () => {
+  test("index-5: 削除したレコードを、それより古いコミットで復活させない", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
@@ -99,7 +99,7 @@ describe("commit", () => {
     expect(await findPost(account.did)).toBeNull();
   });
 
-  test("index-6: 更新したレコードは更新より古いrevのコミットで古い内容に戻さない", async () => {
+  test("index-6: 更新したレコードを、それより古いコミットで古い内容に戻さない", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
@@ -117,7 +117,7 @@ describe("commit", () => {
     expect((await findPost(account.did))?.text).toBe("new");
   });
 
-  test("index-8: 処理済みのrevと同じrevのコミットは、もう一度処理する", async () => {
+  test("index-8: 処理済みと同じrevのコミットは、もう一度処理する", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
@@ -169,7 +169,7 @@ describe("commit", () => {
     expect(revs).toEqual([]);
   });
 
-  test("index-15: 投稿のgallery埋め込み(引用のmediaにあるものを含む)の画像を、images埋め込みと区別して保存する", async () => {
+  test("index-15: 投稿のgallery埋め込みの画像を、images埋め込みと区別して保存する", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
@@ -243,7 +243,7 @@ describe("commit", () => {
     ]);
   });
 
-  test("index-16: 投稿のvideo埋め込み(引用のmediaにあるものを含む)のメタデータ(動画のCID、alt、アスペクト比、presentation)を保存する", async () => {
+  test("index-16: 投稿のvideo埋め込みのメタデータを保存する", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())

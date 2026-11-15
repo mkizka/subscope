@@ -87,7 +87,7 @@ describe("モデレーションサービスからのラベル受信", () => {
     });
   });
 
-  test("subscribeLabels-2: 最後に受け取ったラベルのseqをRedisに保存し、再接続時はその続きから受け取る", async () => {
+  test("subscribeLabels-2: 最後に受け取ったラベルのseqを保存し、再接続時はその続きから受け取る", async () => {
     const [firstSocket, firstUrl] = await connect();
     expect(firstUrl.searchParams.has("cursor")).toBe(false);
 

@@ -193,7 +193,7 @@ describe("バックフィルの状態の確認", () => {
     expect(await findBackfillStatus(followee.did)).toBe("completed");
   });
 
-  test("backfill-2: Tapの状態が error のときはエラー、pending・desynchronized・resyncing のときは同期中、それ以外は完了として保存する", async () => {
+  test("backfill-2: Tapの状態を、エラー・同期中・完了のどれかに分けて保存する", async () => {
     // arrange
     const { checkBackfill, tapClient } = await setupJobTest();
     const expected = {
@@ -256,7 +256,7 @@ describe("バックフィルの状態の確認", () => {
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
   });
 
-  test("backfill-6: Tapの状態が error でリレーが削除済みと答えるアカウントは、Tapから外して完了として保存し、確認を止める", async () => {
+  test("backfill-6: リレーが削除済みと答えるエラーのアカウントは、Tapから外して完了とし、確認を止める", async () => {
     // arrange
     const { checkBackfill, tapClient, repoStatusFetcher, jobScheduler } =
       await setupJobTest();

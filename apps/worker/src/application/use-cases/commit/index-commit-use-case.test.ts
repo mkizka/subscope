@@ -66,7 +66,7 @@ describe("IndexCommitUseCase", () => {
       expect(savedPost?.text).toBe("Hello world");
     });
 
-    test("index-10: レコードの作成者やフォロー先などのアカウントは、すでに保存済みでハンドルと状態が変わらなければ更新しない", async () => {
+    test("index-10: 保存済みのアカウントは、ハンドルと状態が変わらなければ更新しない", async () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);
@@ -96,7 +96,7 @@ describe("IndexCommitUseCase", () => {
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
-    test("index-9: threadgate と postgate は、同じアカウントで同じrkeyの投稿を対象とするものだけ保存する", async () => {
+    test("index-9: threadgateとpostgateは、同じアカウントの同じrkeyの投稿に付くものだけ保存する", async () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);
@@ -237,7 +237,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("RecordValidationError", () => {
-    test("index-3: Lexiconのスキーマに合わないレコードはスキップする", async () => {
+    test("index-3: スキーマに合わないレコードは保存しない", async () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);
