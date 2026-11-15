@@ -9,7 +9,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.unbanAccount", () => {
   const { ctx } = testSetup;
 
-  test("unbanAccount-1: BANを解除したアカウントは招待コードで再登録できる", async () => {
+  test("unbanAccount-1: 取り消したアカウントは招待コードで再登録できる", async () => {
     // arrange
     const { client, createClient, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -32,7 +32,7 @@ describe("me.subsco.admin.unbanAccount", () => {
     ).resolves.toBeDefined();
   });
 
-  test("unbanAccount-2: BANされていないアカウントには400とNotBannedを返す", async () => {
+  test("unbanAccount-2: 登録停止中でなければ400とNotBannedを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

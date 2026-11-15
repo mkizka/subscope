@@ -51,7 +51,7 @@ describe("me.subsco.admin.registerAdmin", () => {
     });
   });
 
-  test("registerAdmin-3: 閲覧者のsyncTapRepoジョブを積む", async () => {
+  test("registerAdmin-3: 閲覧者をTapに追加するジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     loginAs(requesterDid);
@@ -63,7 +63,7 @@ describe("me.subsco.admin.registerAdmin", () => {
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: requesterDid }]);
   });
 
-  test("registerAdmin-4: 閲覧者のプロフィールのfetchRecordジョブを積む", async () => {
+  test("registerAdmin-4: 閲覧者のプロフィールを取得するジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     loginAs(requesterDid);
@@ -81,7 +81,7 @@ describe("me.subsco.admin.registerAdmin", () => {
     ]);
   });
 
-  test("registerAdmin-5: 閲覧者のハンドルが未取得ならresolveDidジョブを積む", async () => {
+  test("registerAdmin-5: 閲覧者のハンドルが未取得なら、ハンドルを解決するジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     loginAs(requesterDid);
