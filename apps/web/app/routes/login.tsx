@@ -21,6 +21,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   return data({
     step,
+    operator: await di.subscopeQuery.findOperator(),
     tab: url.searchParams.get("tab") === "register" ? "register" : "login",
     inviteCodeError:
       url.searchParams.get("error") === "invalid_invite_code"
@@ -71,6 +72,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
       step={loaderData.step}
       tab={loaderData.tab}
       inviteCodeError={loaderData.inviteCodeError}
+      operator={loaderData.operator}
     />
   );
 }
