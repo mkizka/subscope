@@ -1,25 +1,23 @@
-# appviewのビュー生成(ViewContext、*Views)
+# appviewのビュー生成
 
-appviewはXRPCの応答に含めるビュー(profileView、postViewなど)を、lexiconの入れ子と同じ形の非同期関数で組み立てる。必要なデータは形にしながらその場で要求し、リクエストごとの読み取り器がまとめて取る。
+appviewはXRPCの応答に含めるビュー(profileViewやpostViewなど)を、lexiconの入れ子と同じ形の非同期関数で組み立てる。必要なデータは組み立てながらその場で要求し、リクエストごとの読み取り器がまとめて取る。
 
-## ViewContext
+## 読み取り器
 
-`apps/appview/src/application/views/view-context.ts` に置く。`ViewContextFactory.create(viewer)` でリクエストごとに作る。
+リクエストごとに1つ作り、ビューを組み立てる間で使い回す。
 
-- リポジトリごとに `Batch` を持ち、同じティックに届いた要求を1回のクエリにまとめ、結果をリクエスト内でキャッシュする。1対1は `Batch.one`、1対多は `Batch.many` で作り、取得した配列からキー関数で引き当てる
-- `profile(did)` と `post(uri)` はテイクダウンされたものを返さない。著者が隠されていれば投稿も返さない。管理画面などの例外は `includeTakedowns` で切り替える
-- 閲覧者ごとの状態(フォロー、いいね、リポスト)も閲覧者がいるときだけ取る
-- 形にはしない
+- 同じタイミングに届いた要求を1回のクエリにまとめ、結果をリクエストの中でキャッシュする
+- テイクダウンされたアカウントや投稿は返さない。著者が隠されていれば投稿も返さない。管理画面などでは含めるように切り替えられる
+- フォロー・いいね・リポストなど閲覧者ごとの状態は、閲覧者がいるときだけ取る
+- データを取るだけで、ビューの形にはしない
 
-## *Views
+## ビューの組み立て
 
-`apps/appview/src/application/views/` に lexicon の defs と同じ単位で置く(ProfileViews、PostViews、EmbedViews、FeedViews、GeneratorViews、NotificationViews など)。
+lexiconの定義と同じ単位(プロフィール、投稿、埋め込み、フィード、通知など)に分けて置く。
 
-- `(対象, ctx)` を受け取り、ViewContext から取ったデータを lexicon の形にする。無ければ `undefined` を返し、置き換え(viewNotFound など)は呼び出し側の Views が決める
-- lexicon の入れ子と同じ向きに互いを呼ぶ(FeedViews → PostViews → ProfileViews / EmbedViews)
-- 兄弟は `Promise.all` で並べてから await する。順に await すると Batch がまとまらず、クエリが増える
-- 状態を持たず、DI で組む。テイクダウンは知らない
+- 対象と読み取り器を受け取り、取ったデータをlexiconの形にする。データが無ければ何も返さず、viewNotFoundなどへの置き換えは呼び出し側が決める
+- lexiconの入れ子と同じ向きに呼び合う(フィード → 投稿 → プロフィール・埋め込み)
+- 兄弟はまとめて並列に待つ。1つずつ待つと要求がまとまらず、クエリが増える
+- 状態を持たず、テイクダウンのことは知らない
 
-## use case
-
-`viewContextFactory.create(...)` で ctx を作り、欲しい Views を呼ぶだけにする。
+ユースケースは読み取り器を作り、欲しいビューの組み立てを呼ぶだけにする。
