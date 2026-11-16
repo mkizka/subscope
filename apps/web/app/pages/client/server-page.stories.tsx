@@ -143,10 +143,12 @@ export const Hostname: Story = {
 };
 
 export const AboutDialogOpen: Story = {
-  name: "server-s11: 「Subscopeとは」を押すと、Subscopeの説明をダイアログで開く",
+  name: "server-s11: 「Subscopeについて」を押すと、Subscopeの説明をダイアログで開く",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: "Subscopeとは" }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Subscopeについて" }),
+    );
     await expect(canvas.getByRole("dialog")).toBeVisible();
   },
 };

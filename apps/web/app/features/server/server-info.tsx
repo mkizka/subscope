@@ -38,7 +38,7 @@ export function ServerInfo({ operator, serviceDid }: Props) {
           <AboutDialog>
             {(open) => (
               <Button variant="secondary" size="sm" onClick={open}>
-                Subscopeとは
+                Subscopeについて
               </Button>
             )}
           </AboutDialog>
