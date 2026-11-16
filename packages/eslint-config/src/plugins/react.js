@@ -1,3 +1,5 @@
+import { syntaxRule } from "../syntax-rule.js";
+
 const effectPadding = {
   meta: { type: "layout", fixable: "whitespace", schema: [] },
   create(context) {
@@ -36,14 +38,22 @@ const effectPadding = {
   },
 };
 
-export const rules = { "effect-padding": effectPadding };
-
-export const restrictedSyntax = [
+export const react = [
   {
-    selector: "JSXOpeningElement[name.name='form']",
-    message:
-      "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",
+    plugins: {
+      react: {
+        rules: {
+          "effect-padding": effectPadding,
+          "no-form": syntaxRule(
+            "JSXOpeningElement[name.name='form']",
+            "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",
+          ),
+        },
+      },
+    },
+    rules: {
+      "react/effect-padding": "error",
+      "react/no-form": "error",
+    },
   },
 ];
-
-export const configs = [{ rules: { "local/effect-padding": "error" } }];

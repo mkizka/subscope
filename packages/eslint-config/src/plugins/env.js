@@ -33,18 +33,19 @@ const noEnvValue = {
   },
 };
 
-export const rules = {
-  "no-env-import": noEnvImport,
-  "no-env-value": noEnvValue,
-};
-
-export const restrictedSyntax = [];
-
-export const configs = [
+export const env = [
   {
+    plugins: {
+      env: {
+        rules: {
+          "no-env-import": noEnvImport,
+          "no-env-value": noEnvValue,
+        },
+      },
+    },
     rules: {
-      "local/no-env-import": "error",
-      "local/no-env-value": "error",
+      "env/no-env-import": "error",
+      "env/no-env-value": "error",
       "no-restricted-properties": [
         "error",
         {
@@ -74,6 +75,6 @@ export const configs = [
       "**/src/appview.ts",
       "**/server.js",
     ],
-    rules: { "local/no-env-import": "off" },
+    rules: { "env/no-env-import": "off" },
   },
 ];

@@ -1,3 +1,5 @@
+import { syntaxRule } from "../syntax-rule.js";
+
 const noUseCaseImport = {
   meta: { type: "problem", schema: [] },
   create(context) {
@@ -15,21 +17,24 @@ const noUseCaseImport = {
   },
 };
 
-export const rules = { "no-use-case-import": noUseCaseImport };
-
-export const restrictedSyntax = [
+export const architecture = [
   {
-    selector:
-      "TSInterfaceDeclaration[id.name=/^I\\w*Repository$/] > TSInterfaceBody > [key.name!=/^(find|save|delete)$/]",
-    message:
-      "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
+    plugins: {
+      architecture: {
+        rules: {
+          "no-use-case-import": noUseCaseImport,
+          "repository-methods": syntaxRule(
+            "TSInterfaceDeclaration[id.name=/^I\\w*Repository$/] > TSInterfaceBody > [key.name!=/^(find|save|delete)$/]",
+            "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
+          ),
+        },
+      },
+    },
+    rules: { "architecture/repository-methods": "error" },
   },
-];
-
-export const configs = [
   {
     files: ["**/*-use-case.ts"],
-    rules: { "local/no-use-case-import": "error" },
+    rules: { "architecture/no-use-case-import": "error" },
   },
   {
     files: ["**/*.in-memory.ts"],
