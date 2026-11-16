@@ -37,7 +37,7 @@ export function AboutDialog({ children }: Props) {
         </div>
         <div className="space-y-4 overflow-y-auto p-4 text-label">
           <p>
-            SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
+            SubscopeはBlueskyでフォローしている人だけを表示する分散SNS実装です。
           </p>
           <section className="space-y-1">
             <h3 className="font-bold">Blueskyとの違い</h3>
