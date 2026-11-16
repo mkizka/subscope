@@ -2,8 +2,10 @@ import type { Did } from "@atproto/did";
 import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
-import type { UnregisterAccountUseCase } from "../sync/unregister-account-use-case.js";
-import { NotRegisteredError } from "../sync/unregister-account-use-case.js";
+import {
+  NotRegisteredError,
+  type UnregisterAccountService,
+} from "../../service/sync/unregister-account-service.js";
 
 export class CannotBanAdminError extends Error {
   constructor(message: string) {
@@ -16,12 +18,12 @@ export class BanAccountUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly accountRepository: IAccountRepository,
-    private readonly unregisterAccountUseCase: UnregisterAccountUseCase,
+    private readonly unregisterAccountService: UnregisterAccountService,
   ) {}
   static inject = [
     "transactionManager",
     "accountRepository",
-    "unregisterAccountUseCase",
+    "unregisterAccountService",
   ] as const;
 
   async execute(params: { did: Did }): Promise<void> {
@@ -33,7 +35,7 @@ export class BanAccountUseCase {
       throw new CannotBanAdminError("Cannot ban an admin");
     }
 
-    await this.unregisterAccountUseCase.execute({ accountDid: params.did });
+    await this.unregisterAccountService.execute(params.did);
     account.ban();
     await this.transactionManager.transaction((ctx) =>
       this.accountRepository.save({ ctx, account }),
