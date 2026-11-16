@@ -172,7 +172,6 @@ export const config = [
       "**/src/application/use-cases/admin/ban-account-use-case.ts",
       "**/src/application/use-cases/admin/grant-admin-use-case.ts",
       "**/src/application/use-cases/admin/revoke-admin-use-case.ts",
-      "**/src/application/use-cases/feed/get-post-thread-v2-use-case.ts",
       "**/src/application/use-cases/async/sync-tap-repo-use-case.ts",
       "**/src/application/use-cases/identity/upsert-identity-use-case.ts",
     ],
