@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.addMember",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Register an account as a member without an invite code",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "actor": {
+              "type": "string",
+              "format": "at-identifier",
+              "description": "Handle or DID of the account to add"
+            }
+          },
+          "required": ["actor"]
+        }
+      },
+      "errors": [
+        {
+          "name": "AdminRequired"
+        },
+        {
+          "name": "AccountNotFound"
+        },
+        {
+          "name": "AlreadyRegistered"
+        },
+        {
+          "name": "Banned"
+        }
+      ]
+    }
+  }
+}
