@@ -43,6 +43,7 @@ import type { ITimelineQuery } from "../application/interfaces/queries/timeline-
 import type { IRegistrationRepository } from "../application/interfaces/registration-repository.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
+import { PostThreadService } from "../application/service/feed/post-thread-service.js";
 import { RegisterAccountService } from "../application/service/sync/register-account-service.js";
 import { UnregisterAccountService } from "../application/service/sync/unregister-account-service.js";
 import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
@@ -244,8 +245,9 @@ export const createAppRegistry = (env: Env) =>
     .service("searchActorsUseCase", ["profileQuery", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
     .service("searchActorsTypeaheadUseCase", ["profileQuery", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
-    .service("getPostThreadUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
-    .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
+    .service("postThreadService", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(PostThreadService))
+    .service("getPostThreadUseCase", ["postThreadService"], asClassArgs(GetPostThreadUseCase))
+    .service("getPostThreadV2UseCase", ["postThreadService"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationQuery", "registrationRepository", "viewContextFactory", "profileViews"], asClassArgs(ListNotificationsUseCase))
     .service("searchPostsUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(SearchPostsUseCase))
