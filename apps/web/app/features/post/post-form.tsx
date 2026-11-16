@@ -117,6 +117,7 @@ export function PostForm({
         </>
       }
     >
+      {/* eslint-disable-next-line no-restricted-syntax */}
       <form
         id={formId}
         className="flex flex-col gap-2"

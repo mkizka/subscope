@@ -103,6 +103,11 @@ export const config = [
           message:
             "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
         },
+        {
+          selector: "JSXOpeningElement[name.name='form']",
+          message:
+            "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",
+        },
       ],
     },
   },
