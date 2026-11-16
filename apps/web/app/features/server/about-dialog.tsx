@@ -42,19 +42,19 @@ export function AboutDialog({ children }: Props) {
           <section className="space-y-1">
             <h3 className="font-bold">Blueskyとの違い</h3>
             <p>
-              表示されるのは、登録しているアカウントとそのフォロー先だけです。その分いいねやフォロワーなどの数は少なめになり、検索で見つかる投稿やアカウントも少なくなります。また、一部の機能はまだありません。
+              表示されるのは登録しているアカウントとそのフォロー先だけです。その分いいねやフォロワーなどの数は少なめになります。検索で見つかる投稿やアカウントも少なくなります。また一部の機能はまだありません。
             </p>
           </section>
           <section className="space-y-1">
             <h3 className="font-bold">Subscopeの目的</h3>
             <p>
-              Blueskyと連携するSNSをそのまま作ると、Bluesky並みの性能のサーバーが必要になります。Subscopeは保存するデータを絞ることで、サーバー代をできるだけ抑えています。
+              Blueskyと連携するSNSを普通に作るとBluesky並みに大きなサーバーが必要です。Subscopeは保存するデータを絞ってサーバー代をできるだけ抑えています。
             </p>
             <p>
-              また、Blueskyのシステムにはなるべく頼らない作りにしています※。Blueskyから離れたくなったときに、誰でも自分でサーバーを始められることを目指しています。
+              またBlueskyのシステムにはなるべく頼らない作りにしています※。Blueskyを離れたくなったときに誰でも自分でサーバーを持てることを目指しています。
             </p>
             <p className="text-caption text-muted">
-              ※今はリレー、plc.directory、モデレーションにBlueskyのものを使っています。ただし、詳しい人なら自前のものに簡単に置き換えられるはずです。
+              ※今はリレーとplc.directoryとモデレーションにBlueskyのものを使っています。詳しい人なら自前のものに置き換えられます。
             </p>
           </section>
         </div>
