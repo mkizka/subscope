@@ -1,3 +1,4 @@
+import { XrpcResponseError } from "@atproto/lex";
 import addMember from "@repo/client/me/subsco/admin/addMember";
 import banAccount from "@repo/client/me/subsco/admin/banAccount";
 import createInviteCode from "@repo/client/me/subsco/admin/createInviteCode";
@@ -24,7 +25,22 @@ export const adminCommandFactory = ({
   return {
     async addMember(did, actor) {
       const agent = await restore(did);
-      await agent.call(addMember, { actor });
+      try {
+        await agent.call(addMember, { actor });
+        return "added";
+      } catch (e) {
+        if (e instanceof XrpcResponseError) {
+          switch (e.error) {
+            case "AccountNotFound":
+              return "accountNotFound";
+            case "AlreadyRegistered":
+              return "alreadyRegistered";
+            case "Banned":
+              return "banned";
+          }
+        }
+        throw e;
+      }
     },
     async banAccount(did, target) {
       const agent = await restore(did);

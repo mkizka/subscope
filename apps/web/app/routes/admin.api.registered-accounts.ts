@@ -1,13 +1,11 @@
 import { XrpcResponseError } from "@atproto/lex";
-import {
-  type DidString,
-  isAtIdentifierString,
-  isValidDid,
-} from "@atproto/syntax";
+import { type DidString, isValidDid } from "@atproto/syntax";
+import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 import { z } from "zodV4";
 
 import { didContext } from "@/app/context/did";
+import { addMemberSchema } from "@/app/features/admin/add-member-dialog-container";
 import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/admin.api.registered-accounts";
@@ -30,19 +28,32 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   }
 };
 
+const ADD_MEMBER_ERRORS = {
+  accountNotFound: "アカウントが見つかりません",
+  alreadyRegistered: "すでにメンバーです",
+  banned:
+    "登録停止中のアカウントです。「停止中」タブで登録を再開してから追加してください",
+};
+
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const did = context.get(didContext);
 
   try {
     if (request.method === "PUT") {
-      const { actor } = z
-        .object({ actor: z.string() })
-        .parse(await request.json());
-      if (!isAtIdentifierString(actor)) {
-        return data({ error: "AccountNotFound" }, { status: 400 });
+      const submission = parseWithZod(await request.formData(), {
+        schema: addMemberSchema,
+      });
+      if (submission.status !== "success") {
+        return data(submission.reply(), { status: 400 });
       }
-      await di.addMemberUseCase(did, actor);
-      return data({ success: true });
+      const result = await di.addMemberUseCase(did, submission.value.actor);
+      if (result === "added") {
+        return data(submission.reply({ resetForm: true }));
+      }
+      return data(
+        submission.reply({ formErrors: [ADD_MEMBER_ERRORS[result]] }),
+        { status: 400 },
+      );
     }
     const { did: target } = z
       .object({ did: z.custom<DidString>(isValidDid) })
@@ -57,9 +68,6 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       (e.status === 401 || e.status === 403)
     ) {
       throw data({ error: "Unauthorized" }, { status: 403 });
-    }
-    if (e instanceof XrpcResponseError && e.status === 400) {
-      return data({ error: e.error }, { status: 400 });
     }
     throw e;
   }

@@ -1,21 +1,27 @@
 import { UserPlusIcon } from "lucide-react";
-import { useId, useRef } from "react";
+import type { ComponentProps, RefObject } from "react";
 
 import { Button } from "@/app/components/ui/button";
 import { Dialog } from "@/app/components/ui/dialog";
 import { Input } from "@/app/components/ui/input";
 
 type Props = {
-  onAdd: (actor: string) => Promise<unknown>;
-  isAdding?: boolean;
+  ref: RefObject<HTMLDialogElement | null>;
+  formProps: ComponentProps<"form">;
+  inputProps: ComponentProps<"input">;
   error?: string;
-  onClose?: () => void;
+  loading: boolean;
+  onClose: () => void;
 };
 
-export function AddMemberDialog({ onAdd, isAdding, error, onClose }: Props) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const formId = useId();
+export function AddMemberDialog({
+  ref,
+  formProps,
+  inputProps,
+  error,
+  loading,
+  onClose,
+}: Props) {
   return (
     <>
       <Button type="button" onClick={() => ref.current?.showModal()}>
@@ -31,45 +37,27 @@ export function AddMemberDialog({ onAdd, isAdding, error, onClose }: Props) {
             <Button
               type="button"
               variant="secondary"
-              disabled={isAdding}
+              disabled={loading}
               onClick={() => ref.current?.close()}
             >
               キャンセル
             </Button>
-            <Button type="submit" form={formId} loading={isAdding}>
+            <Button type="submit" form={formProps.id} loading={loading}>
               追加する
             </Button>
           </>
         }
       >
-        <form
-          id={formId}
-          className="flex flex-col gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = e.currentTarget;
-            const actor = (inputRef.current?.value ?? "")
-              .trim()
-              .replace(/^@/, "");
-            void onAdd(actor).then(
-              () => {
-                form.reset();
-                ref.current?.close();
-              },
-              () => {},
-            );
-          }}
-        >
+        <form className="flex flex-col gap-3" {...formProps}>
           <p className="text-label text-muted">
             本人のログインなしでメンバーにします。追加したアカウントは、サーバーのページのメンバー一覧にも表示されます。
           </p>
           <Input
-            ref={inputRef}
             label="ハンドルまたはDID"
             placeholder="example.bsky.social"
-            required
-            disabled={isAdding}
+            disabled={loading}
             error={error}
+            {...inputProps}
           />
         </form>
       </Dialog>

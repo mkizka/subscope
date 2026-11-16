@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
+import { AddMemberDialogContainer } from "./add-member-dialog-container";
 import { ServerMemberList, type ServerMemberTab } from "./server-member-list";
 
 async function fetchBannedAccounts(
@@ -63,30 +64,6 @@ async function updateServerMember(method: "POST" | "DELETE", did: string) {
   }
 }
 
-const ADD_MEMBER_ERRORS: Record<string, string> = {
-  AccountNotFound: "アカウントが見つかりません",
-  AlreadyRegistered: "すでにメンバーです",
-  Banned:
-    "登録停止中のアカウントです。「停止中」タブで登録を再開してから追加してください",
-};
-
-async function addMember(actor: string) {
-  const response = await fetch("/admin/api/registered-accounts", {
-    method: "PUT",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ actor }),
-  });
-  if (!response.ok) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const body = (await response.json().catch(() => ({}))) as {
-      error?: string;
-    };
-    throw new Error(
-      ADD_MEMBER_ERRORS[body.error ?? ""] ?? "メンバーの追加に失敗しました",
-    );
-  }
-}
-
 export function ServerMemberListContainer() {
   const [searchParams] = useSearchParams();
   const tab: ServerMemberTab =
@@ -106,7 +83,6 @@ export function ServerMemberListContainer() {
     onSuccess,
   });
   const unbanMutation = useMutation({ mutationFn: unbanAccount, onSuccess });
-  const addMemberMutation = useMutation({ mutationFn: addMember, onSuccess });
   const bannedQuery = useInfiniteQuery({
     queryKey: ["bannedAccounts"],
     queryFn: ({ pageParam }) => fetchBannedAccounts(pageParam),
@@ -154,10 +130,7 @@ export function ServerMemberListContainer() {
       banningDid={banMutation.isPending ? banMutation.variables : null}
       onUnban={unbanMutation.mutate}
       unbanningDid={unbanMutation.isPending ? unbanMutation.variables : null}
-      onAddMember={addMemberMutation.mutateAsync}
-      isAddingMember={addMemberMutation.isPending}
-      addMemberError={addMemberMutation.error?.message}
-      onAddMemberClose={addMemberMutation.reset}
+      addMemberButton={<AddMemberDialogContainer />}
     />
   );
 }

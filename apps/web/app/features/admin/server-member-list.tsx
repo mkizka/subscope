@@ -12,8 +12,6 @@ import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { Tabs } from "@/app/components/ui/tabs";
 import { formatDate } from "@/app/lib/format-date";
 
-import { AddMemberDialog } from "./add-member-dialog";
-
 export type BannedAccount = {
   did: string;
   handle: string;
@@ -75,10 +73,7 @@ type Props = {
   banningDid?: string | null;
   onUnban?: (did: string) => void;
   unbanningDid?: string | null;
-  onAddMember?: (actor: string) => Promise<unknown>;
-  isAddingMember?: boolean;
-  addMemberError?: string;
-  onAddMemberClose?: () => void;
+  addMemberButton?: ReactNode;
 };
 
 export function ServerMemberList({
@@ -96,10 +91,7 @@ export function ServerMemberList({
   banningDid,
   onUnban,
   unbanningDid,
-  onAddMember,
-  isAddingMember,
-  addMemberError,
-  onAddMemberClose,
+  addMemberButton,
 }: Props) {
   const isEmpty =
     tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
@@ -112,14 +104,7 @@ export function ServerMemberList({
             <span className="text-label text-muted">{total}人</span>
           )}
         </div>
-        {tab === "serverMembers" && onAddMember && (
-          <AddMemberDialog
-            onAdd={onAddMember}
-            isAdding={isAddingMember}
-            error={addMemberError}
-            onClose={onAddMemberClose}
-          />
-        )}
+        {tab === "serverMembers" && addMemberButton}
       </div>
       <Tabs
         tabs={[
