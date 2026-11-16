@@ -1,6 +1,8 @@
 import { clsx } from "clsx";
 import { Link } from "react-router";
 
+import { useHydrated } from "@/app/lib/use-hydrated";
+
 type Props = {
   tabs: {
     to?: string;
@@ -12,6 +14,7 @@ type Props = {
 };
 
 export function Tabs({ tabs, onSelect }: Props) {
+  const hydrated = useHydrated();
   return (
     <div
       role="tablist"
@@ -36,6 +39,7 @@ export function Tabs({ tabs, onSelect }: Props) {
           <button
             key={label}
             type="button"
+            disabled={!hydrated}
             onClick={onClick}
             role="tab"
             aria-selected={selected}
