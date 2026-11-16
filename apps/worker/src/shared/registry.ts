@@ -3,6 +3,7 @@ import {
   connectionPoolFactory,
   databaseFactory,
   DidResolver,
+  HandleResolver,
   JobQueue,
   JobScheduler,
   LoggerManager,
@@ -13,12 +14,12 @@ import {
 import type {
   IDidCache,
   IDidResolver,
+  IHandleResolver,
   IJobQueue,
   IJobScheduler,
   ITransactionManager,
 } from "@repo/common/interface";
 
-import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IRepoStatusFetcher } from "../application/interfaces/external/repo-status-fetcher.js";
@@ -49,6 +50,7 @@ import type { IRecordRepository } from "../application/interfaces/repositories/r
 import type { IRecordRevRepository } from "../application/interfaces/repositories/record-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
+import { IndexLabelService } from "../application/services/index-label-service.js";
 import { IndexRecordService } from "../application/services/index-record-service.js";
 import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
 import { GateIndexer } from "../application/services/indexer/gate-indexer.js";
@@ -74,7 +76,6 @@ import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
-import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { AccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.js";
@@ -160,6 +161,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("notificationService", ["notificationRepository", "jobScheduler"], asClassArgs(NotificationService))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))
     .service("postIndexer", ["postRepository", "postQuery", "feedItemRepository", "registrationQuery", "notificationService", "jobScheduler"], asClassArgs(PostIndexer))
+    .service("indexLabelService", ["labelRepository", "accountQuery"], asClassArgs(IndexLabelService))
     .service("indexAccountService", ["accountRepository", "profileQuery", "jobScheduler"], asClassArgs(IndexAccountService))
     .service("followIndexer", ["followRepository", "jobScheduler", "indexAccountService", "registrationQuery", "notificationService"], asClassArgs(FollowIndexer))
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
@@ -177,8 +179,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClassArgs(AggregateAccountStatsUseCase))
-    .service("indexLabelUseCase", ["labelRepository", "accountQuery", "transactionManager"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["tapClient", "registrationQuery", "labelFetcher", "indexLabelUseCase", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
+    .service("indexLabelUseCase", ["indexLabelService", "transactionManager"], asClassArgs(IndexLabelUseCase))
+    .service("syncTapRepoUseCase", ["tapClient", "registrationQuery", "labelFetcher", "indexLabelService", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
     .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "registrationQuery", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClassArgs(SendPushNotificationUseCase))

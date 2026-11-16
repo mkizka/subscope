@@ -1,9 +1,12 @@
 import type { Did } from "@atproto/did";
-import { DidNotFoundError, type IDidResolver } from "@repo/common/interface";
+import {
+  DidNotFoundError,
+  type IDidResolver,
+  type IHandleResolver,
+} from "@repo/common/interface";
 import { type ITransactionManager } from "@repo/common/interface";
 
 import { Account } from "../../../domain/account.js";
-import type { IHandleResolver } from "../../interfaces/external/handle-resolver.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
 
 export class ResolveDidUseCase {

@@ -1,11 +1,11 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import revokeAdmin from "@repo/client/me/subsco/admin/revokeAdmin";
 
+import { NotRegisteredError } from "../../../../../application/service/sync/unregister-account-service.js";
 import {
   CannotRevokeSelfError,
   type RevokeAdminUseCase,
 } from "../../../../../application/use-cases/admin/revoke-admin-use-case.js";
-import { NotRegisteredError } from "../../../../../application/use-cases/sync/unregister-account-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";
 
 export class RevokeAdmin {

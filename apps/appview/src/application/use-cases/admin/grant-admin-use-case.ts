@@ -3,7 +3,7 @@ import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
-import { NotRegisteredError } from "../../../application/use-cases/sync/unregister-account-use-case.js";
+import { NotRegisteredError } from "../../service/sync/unregister-account-service.js";
 
 export class GrantAdminUseCase {
   constructor(
