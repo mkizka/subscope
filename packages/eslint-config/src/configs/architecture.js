@@ -68,21 +68,4 @@ export const architecture = [
       ],
     },
   },
-  {
-    // TODO: AccountStatus / BackfillStatus の@repo/db依存の切り離しと、IHandleResolverのdomain移動で削除する
-    files: [
-      "**/src/application/use-cases/identity/upsert-identity-command.ts",
-      "**/src/application/use-cases/async/check-backfill-use-case.ts",
-      "**/src/application/services/index-account-service.ts",
-      "**/src/application/record-parsers.ts",
-      "**/src/domain/account.ts",
-      "**/src/domain/service/at-uri-service.ts",
-      "**/src/application/use-cases/sync/get-backfill-statuses-use-case.ts",
-      "**/src/application/interfaces/queries/registration-query.ts",
-      "**/src/domain/models/account.ts",
-    ],
-    rules: {
-      "no-restricted-imports": "off",
-    },
-  },
 ];

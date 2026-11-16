@@ -2,8 +2,8 @@ import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
 import getList from "@repo/client/app/bsky/graph/getList";
 
+import type { AtUriService } from "../../../../../application/service/at-uri-service.js";
 import type { GetListUseCase } from "../../../../../application/use-cases/graph/get-list-use-case.js";
-import type { AtUriService } from "../../../../../domain/service/at-uri-service.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
 export class GetList {

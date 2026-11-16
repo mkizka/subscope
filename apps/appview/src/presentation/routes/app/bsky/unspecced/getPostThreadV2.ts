@@ -2,8 +2,8 @@ import type { LexRouter } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
 import getPostThreadV2 from "@repo/client/app/bsky/unspecced/getPostThreadV2";
 
+import type { AtUriService } from "../../../../../application/service/at-uri-service.js";
 import type { GetPostThreadV2UseCase } from "../../../../../application/use-cases/feed/get-post-thread-v2-use-case.js";
-import type { AtUriService } from "../../../../../domain/service/at-uri-service.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
 export class GetPostThreadV2 {

@@ -1,8 +1,8 @@
 import { AtUri } from "@atproto/syntax";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
+import { HandleResolutionError } from "../interfaces/handle-resolver.js";
 
 describe("AtUriService", () => {
   let atUriService: TestServices["atUriService"];
