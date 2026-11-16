@@ -170,7 +170,6 @@ export const config = [
     // TODO: usecase間の依存をserviceに切り出して削除する
     files: [
       "**/src/application/use-cases/feed/get-post-thread-v2-use-case.ts",
-      "**/src/application/use-cases/identity/upsert-identity-use-case.ts",
     ],
     rules: { "local/no-use-case-import": "off" },
   },
