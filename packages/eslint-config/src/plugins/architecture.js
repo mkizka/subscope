@@ -27,10 +27,22 @@ export const architecture = [
             "TSInterfaceDeclaration[id.name=/^I\\w*Repository$/] > TSInterfaceBody > [key.name!=/^(find|save|delete)$/]",
             "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
           ),
+          "use-case-execute-only": syntaxRule(
+            "ClassDeclaration[id.name=/UseCase$/] > ClassBody > MethodDefinition[kind!='constructor'][key.type!='PrivateIdentifier'][accessibility!='private'][accessibility!='protected'][key.name!='execute'], TSInterfaceDeclaration[id.name=/^I\\w*UseCase$/] > TSInterfaceBody > [key.name!='execute']",
+            "usecaseの公開メソッドはexecuteのみにしてください。",
+          ),
+          "execute-only-in-use-case": syntaxRule(
+            "ClassDeclaration[id.name!=/UseCase$/] > ClassBody > MethodDefinition[key.name='execute']",
+            "executeはusecaseだけのメソッド名です。別の名前にしてください。",
+          ),
         },
       },
     },
-    rules: { "architecture/repository-methods": "error" },
+    rules: {
+      "architecture/repository-methods": "error",
+      "architecture/use-case-execute-only": "error",
+      "architecture/execute-only-in-use-case": "error",
+    },
   },
   {
     files: ["**/*-use-case.ts"],

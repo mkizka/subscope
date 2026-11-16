@@ -36,7 +36,7 @@ export class RegisterAdminUseCase {
     }
 
     await this.transactionManager.transaction(async (ctx) => {
-      await this.createAdminService.execute({
+      await this.createAdminService.create({
         ctx,
         did: params.requesterDid,
       });

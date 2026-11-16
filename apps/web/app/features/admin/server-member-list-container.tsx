@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
+import { AddMemberDialogContainer } from "./add-member-dialog-container";
 import { ServerMemberList, type ServerMemberTab } from "./server-member-list";
 
 async function fetchBannedAccounts(
@@ -129,6 +130,7 @@ export function ServerMemberListContainer() {
       banningDid={banMutation.isPending ? banMutation.variables : null}
       onUnban={unbanMutation.mutate}
       unbanningDid={unbanMutation.isPending ? unbanMutation.variables : null}
+      addMemberButton={<AddMemberDialogContainer />}
     />
   );
 }

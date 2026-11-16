@@ -8,7 +8,7 @@ export class RegisterAccountUseCase {
   ) {}
 
   async execute(params: { accountDid: Did; code?: string }): Promise<void> {
-    await this.registerAccountService.execute({
+    await this.registerAccountService.register({
       ...params,
       inviteCodeRequired: true,
     });

@@ -30,6 +30,7 @@ import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetPostThreadV2 } from "./app/bsky/unspecced/getPostThreadV2.js";
+import type { AddMember } from "./me/subsco/admin/addMember.js";
 import type { BanAccount } from "./me/subsco/admin/banAccount.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
@@ -79,6 +80,7 @@ export const lexRouterFactory = (
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
   grantAdmin: GrantAdmin,
+  addMember: AddMember,
   revokeAdmin: RevokeAdmin,
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
@@ -130,6 +132,7 @@ export const lexRouterFactory = (
     deleteInviteCode,
     getInviteCodes,
     grantAdmin,
+    addMember,
     revokeAdmin,
     registerAdmin,
     verifyAccess,
