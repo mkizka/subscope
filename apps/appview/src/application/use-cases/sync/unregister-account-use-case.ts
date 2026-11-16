@@ -12,6 +12,6 @@ export class UnregisterAccountUseCase {
   ) {}
 
   async execute(params: UnregisterAccountParams): Promise<void> {
-    await this.unregisterAccountService.execute(params.accountDid);
+    await this.unregisterAccountService.unregister(params.accountDid);
   }
 }

@@ -35,7 +35,7 @@ export class BanAccountUseCase {
       throw new CannotBanAdminError("Cannot ban an admin");
     }
 
-    await this.unregisterAccountService.execute(params.did);
+    await this.unregisterAccountService.unregister(params.did);
     account.ban();
     await this.transactionManager.transaction((ctx) =>
       this.accountRepository.save({ ctx, account }),

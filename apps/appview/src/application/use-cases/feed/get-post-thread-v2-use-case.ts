@@ -27,7 +27,7 @@ export class GetPostThreadV2UseCase {
   }): Promise<AppBskyUnspeccedGetPostThreadV2.$OutputBody> {
     const anchorUri = params.uri.getValue().toString();
     try {
-      const { thread } = await this.postThreadService.execute({
+      const { thread } = await this.postThreadService.build({
         uri: params.uri,
         depth: params.below,
         parentHeight: params.above ? MAX_PARENT_HEIGHT : 0,

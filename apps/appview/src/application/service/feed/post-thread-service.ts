@@ -29,7 +29,7 @@ export class PostThreadService {
     private readonly postViews: PostViews,
   ) {}
 
-  async execute(params: {
+  async build(params: {
     uri: ResolvedAtUri;
     depth: number;
     parentHeight: number;
