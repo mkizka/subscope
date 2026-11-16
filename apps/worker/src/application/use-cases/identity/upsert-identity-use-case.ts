@@ -1,14 +1,14 @@
 import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IndexAccountService } from "../../services/index-account-service.js";
-import type { ResolveDidUseCase } from "../async/resolve-did-use-case.js";
+import type { ResolveDidService } from "../../services/resolve-did-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 export class UpsertIdentityUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly indexAccountService: IndexAccountService,
-    private readonly resolveDidUseCase: ResolveDidUseCase,
+    private readonly resolveDidService: ResolveDidService,
   ) {}
 
   async execute(command: UpsertIdentityCommand) {
@@ -32,7 +32,7 @@ export class UpsertIdentityUseCase {
       }),
     );
     if (handle === "handle.invalid") {
-      await this.resolveDidUseCase.execute(command.did);
+      await this.resolveDidService.resolve(command.did);
     }
   }
 }
