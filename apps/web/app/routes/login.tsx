@@ -21,7 +21,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   return data({
     step,
-    tab: url.searchParams.get("tab") === "register" ? "register" : "login",
     inviteCodeError:
       url.searchParams.get("error") === "invalid_invite_code"
         ? "招待コードが無効または期限切れです"
@@ -69,7 +68,6 @@ export default function Login({ loaderData }: Route.ComponentProps) {
   return (
     <LoginPage
       step={loaderData.step}
-      tab={loaderData.tab}
       inviteCodeError={loaderData.inviteCodeError}
     />
   );

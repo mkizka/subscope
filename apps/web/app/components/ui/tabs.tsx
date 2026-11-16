@@ -2,7 +2,12 @@ import { clsx } from "clsx";
 import { Link } from "react-router";
 
 type Props = {
-  tabs: { to: string; label: string; selected: boolean }[];
+  tabs: {
+    to?: string;
+    label: string;
+    selected: boolean;
+    onClick?: () => void;
+  }[];
   onSelect?: (to: string) => void;
 };
 
@@ -17,26 +22,40 @@ export function Tabs({ tabs, onSelect }: Props) {
         max-lg:[main:has(>header[data-visible=false])_&]:top-0
       "
     >
-      {tabs.map(({ to, label, selected }) => (
-        <Link
-          key={to}
-          to={to}
-          onClick={() => onSelect?.(to)}
-          role="tab"
-          aria-selected={selected}
-          className={clsx(
-            `
-              flex h-11 flex-1 items-center justify-center border-b-3 text-label
-              hover:bg-surface-2
-            `,
-            selected
-              ? "border-brand font-bold text-ink"
-              : "border-transparent text-muted",
-          )}
-        >
-          {label}
-        </Link>
-      ))}
+      {tabs.map(({ to, label, selected, onClick }) => {
+        const className = clsx(
+          `
+            flex h-11 flex-1 items-center justify-center border-b-3 text-label
+            hover:bg-surface-2
+          `,
+          selected
+            ? "border-brand font-bold text-ink"
+            : "border-transparent text-muted",
+        );
+        return to === undefined ? (
+          <button
+            key={label}
+            type="button"
+            onClick={onClick}
+            role="tab"
+            aria-selected={selected}
+            className={className}
+          >
+            {label}
+          </button>
+        ) : (
+          <Link
+            key={to}
+            to={to}
+            onClick={() => onSelect?.(to)}
+            role="tab"
+            aria-selected={selected}
+            className={className}
+          >
+            {label}
+          </Link>
+        );
+      })}
     </div>
   );
 }
