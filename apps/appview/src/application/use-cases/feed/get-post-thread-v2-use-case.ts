@@ -7,16 +7,16 @@ import type * as AppBskyUnspeccedGetPostThreadV2 from "@repo/client/app/bsky/uns
 
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import {
-  type GetPostThreadUseCase,
   PostNotFoundError,
-} from "./get-post-thread-use-case.js";
+  type PostThreadService,
+} from "../../service/feed/post-thread-service.js";
 
 type ThreadItem = AppBskyUnspeccedGetPostThreadV2.ThreadItem;
 
 const MAX_PARENT_HEIGHT = 1000;
 
 export class GetPostThreadV2UseCase {
-  constructor(private readonly getPostThreadUseCase: GetPostThreadUseCase) {}
+  constructor(private readonly postThreadService: PostThreadService) {}
 
   async execute(params: {
     uri: ResolvedAtUri;
@@ -27,7 +27,7 @@ export class GetPostThreadV2UseCase {
   }): Promise<AppBskyUnspeccedGetPostThreadV2.$OutputBody> {
     const anchorUri = params.uri.getValue().toString();
     try {
-      const { thread } = await this.getPostThreadUseCase.execute({
+      const { thread } = await this.postThreadService.execute({
         uri: params.uri,
         depth: params.below,
         parentHeight: params.above ? MAX_PARENT_HEIGHT : 0,

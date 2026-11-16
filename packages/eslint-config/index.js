@@ -56,6 +56,23 @@ const noEnvImport = {
   },
 };
 
+const noUseCaseImport = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    return {
+      ImportDeclaration(node) {
+        if (/-use-case(\.js)?$/.test(node.source.value)) {
+          context.report({
+            node,
+            message:
+              "usecaseから別のusecaseを呼ばないでください。共通の処理はserviceに切り出してください。",
+          });
+        }
+      },
+    };
+  },
+};
+
 const noEnvValue = {
   meta: { type: "problem", schema: [] },
   create(context) {
@@ -82,6 +99,7 @@ export const config = [
           "effect-padding": effectPadding,
           "no-env-import": noEnvImport,
           "no-env-value": noEnvValue,
+          "no-use-case-import": noUseCaseImport,
         },
       },
     },
@@ -102,6 +120,11 @@ export const config = [
             "TSInterfaceDeclaration[id.name=/^I\\w*Repository$/] > TSInterfaceBody > [key.name!=/^(find|save|delete)$/]",
           message:
             "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
+        },
+        {
+          selector: "JSXOpeningElement[name.name='form']",
+          message:
+            "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",
         },
       ],
     },
@@ -138,6 +161,10 @@ export const config = [
       "**/server.js",
     ],
     rules: { "local/no-env-import": "off" },
+  },
+  {
+    files: ["**/*-use-case.ts"],
+    rules: { "local/no-use-case-import": "error" },
   },
   {
     files: ["**/*.in-memory.ts"],
