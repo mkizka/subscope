@@ -1,7 +1,8 @@
 import { asDid, type Did } from "@atproto/did";
 import type { Handle } from "@repo/common/utils";
 import { asHandle } from "@repo/common/utils";
-import type { BackfillStatus } from "@repo/db";
+
+export type BackfillStatus = "inProgress" | "completed" | "error";
 
 export type AccountParams = {
   did: string;

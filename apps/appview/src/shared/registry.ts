@@ -45,6 +45,7 @@ import type { ITimelineQuery } from "../application/interfaces/queries/timeline-
 import type { IRegistrationRepository } from "../application/interfaces/registration-repository.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
+import { AtUriService } from "../application/service/at-uri-service.js";
 import { PostThreadService } from "../application/service/feed/post-thread-service.js";
 import { RegisterAccountService } from "../application/service/sync/register-account-service.js";
 import { UnregisterAccountService } from "../application/service/sync/unregister-account-service.js";
@@ -104,7 +105,6 @@ import { NotificationViews } from "../application/views/notification-views.js";
 import { PostViews } from "../application/views/post-views.js";
 import { ProfileViews } from "../application/views/profile-views.js";
 import { ViewContextFactory } from "../application/views/view-context.js";
-import { AtUriService } from "../domain/service/at-uri-service.js";
 import { AccountRepository } from "../infrastructure/account-repository/account-repository.js";
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
