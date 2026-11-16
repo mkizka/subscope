@@ -3,6 +3,7 @@ import {
   connectionPoolFactory,
   databaseFactory,
   DidResolver,
+  HandleResolver,
   JobQueue,
   JobScheduler,
   LoggerManager,
@@ -13,12 +14,12 @@ import {
 import type {
   IDidCache,
   IDidResolver,
+  IHandleResolver,
   IJobQueue,
   IJobScheduler,
   ITransactionManager,
 } from "@repo/common/interface";
 
-import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IRepoStatusFetcher } from "../application/interfaces/external/repo-status-fetcher.js";
@@ -75,7 +76,6 @@ import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
-import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { AccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.js";
