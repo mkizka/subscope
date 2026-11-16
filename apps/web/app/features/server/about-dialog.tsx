@@ -52,7 +52,7 @@ export function AboutDialog({ children }: Props) {
               <li>検索結果に出てくる投稿やアカウントも少なくなります</li>
             </ul>
             <p>
-              機能面では「限られた部分だけ表示するBluesky」です。なお、一部の機能は未実装です。
+              機能面では「限られた部分だけ表示するBluesky」です。さらに一部の機能が未実装です。
             </p>
           </section>
           <section className="space-y-1">
