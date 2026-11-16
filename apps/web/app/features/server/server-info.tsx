@@ -20,41 +20,26 @@ type Props = {
   serviceDid?: string;
 };
 
-const hostname = (serviceDid: string) =>
-  serviceDid.replace(/^did:web:/, "").replace(/#.*$/, "");
-
 export function ServerInfo({ operator, serviceDid }: Props) {
   const [copied, setCopied] = useState(false);
 
   return (
     <>
-      <div className="space-y-3 p-4">
-        <div className="flex items-start justify-between">
-          <img
-            src={`${import.meta.env.BASE_URL}favicon.svg`}
-            alt=""
-            className="size-16 rounded-2xl border border-line"
-          />
-          <AboutDialog>
-            {(open) => (
-              <Button variant="secondary" size="sm" onClick={open}>
-                Subscopeとは
-              </Button>
-            )}
-          </AboutDialog>
-        </div>
-        <div>
-          <h1 className="text-title">
-            {serviceDid ? (
-              hostname(serviceDid)
-            ) : (
-              <Skeleton className="h-6 w-40" />
-            )}
-          </h1>
-          <p className="text-label text-muted">Subscopeのサーバー</p>
-        </div>
+      <div
+        className="
+          flex items-center justify-between border-b border-line px-4 py-3
+        "
+      >
+        <h1 className="text-title">サーバー情報</h1>
+        <AboutDialog>
+          {(open) => (
+            <Button variant="secondary" size="sm" onClick={open}>
+              Subscopeとは
+            </Button>
+          )}
+        </AboutDialog>
       </div>
-      <dl className="border-t border-line text-label">
+      <dl className="text-label">
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">運営者</dt>
           <dd className="flex min-w-0 flex-wrap gap-x-3">

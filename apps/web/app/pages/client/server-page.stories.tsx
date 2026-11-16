@@ -133,11 +133,11 @@ export const ServerInfoLoading: Story = {
   },
 };
 
-export const Hostname: Story = {
-  name: "server-s10: 見出しに、サーバーDIDから取り出したホスト名を表示する",
+export const Heading: Story = {
+  name: "server-s12: 見出しに「サーバー情報」を表示する",
   play: async ({ canvasElement }) => {
     await expect(
-      within(canvasElement).getByRole("heading", { name: "subsco.me" }),
+      within(canvasElement).getByRole("heading", { name: "サーバー情報" }),
     ).toBeVisible();
   },
 };
