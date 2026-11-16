@@ -10,6 +10,7 @@ import { getMeUseCaseFactory } from "./application/accounts/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/accounts/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/accounts/get-profile-use-case";
 import { getServerMembersUseCaseFactory } from "./application/accounts/get-server-members-use-case";
+import { addMemberUseCaseFactory } from "./application/admin/add-member-use-case";
 import { banAccountUseCaseFactory } from "./application/admin/ban-account-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
@@ -184,6 +185,7 @@ export const di = await createRegistry()
     ["adminQuery"],
     listServerMembersUseCaseFactory,
   )
+  .service("addMemberUseCase", ["adminCommand"], addMemberUseCaseFactory)
   .service("banAccountUseCase", ["adminCommand"], banAccountUseCaseFactory)
   .service("grantAdminUseCase", ["adminCommand"], grantAdminUseCaseFactory)
   .service(
