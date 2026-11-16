@@ -58,10 +58,15 @@ export function AboutDialog({ children }: Props) {
           <section className="space-y-1">
             <h3 className="font-bold">Subscopeの目的</h3>
             <p>
-              通常、Blueskyと連携する分散SNSを作るには、Blueskyと同等の性能を持つサーバーが必要です。
+              Blueskyと連携する分散SNSを作ろうとすると、そのままではBlueskyと同等の性能を持つサーバーが必要になってしまいます。
+              <br />
+              そこでSubscopeではサーバーに保存するデータを一部に絞ることで保存する量を大幅に減らし、出来るだけサーバー維持費を節約するようにしています。
             </p>
             <p>
-              Subscopeは保存するデータを一部に絞ることで、サーバーの保存量を大幅に減らし、誰でも個人で運営できるBluesky連携の分散SNSを目指しています。
+              またBlueskyのシステムに出来るだけ依存しないようにしています※。Blueskyをやめたくなった時に、誰でも個人で運用を始められるような分散SNS実装を目指しています。
+            </p>
+            <p className="text-caption text-muted">
+              ※技術的にはリレー、plc.directory、モデレーションはBlueskyのものを使用しています。ただし詳しい人なら簡単に独自のものに置き換えられるはずです。
             </p>
           </section>
         </div>
