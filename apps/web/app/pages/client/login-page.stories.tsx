@@ -87,7 +87,7 @@ export const MemberNotice: Story = {
 
 export const Register: Story = {
   args: {
-    tab: "register",
+    defaultTab: "register",
   },
 };
 
@@ -111,12 +111,10 @@ export const Tabs: Story = {
 };
 
 export const RegisterFields: Story = {
-  name: "login-s8: 「新規登録」タブにはハンドルと招待コードの入力欄を出す",
-  args: {
-    tab: "register",
-  },
+  name: "login-s8: 「新規登録」タブを押すと、ハンドルと招待コードの入力欄を出す",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("tab", { name: "新規登録" }));
     await expect(canvas.getByLabelText("ハンドル")).toBeVisible();
     await expect(canvas.getByLabelText("招待コード")).toBeVisible();
   },

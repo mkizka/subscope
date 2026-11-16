@@ -25,6 +25,17 @@ test.describe("ログイン", () => {
     ).toBeVisible();
   });
 
+  test("login-e11: 「ログイン」「新規登録」のタブを切り替えても、URLは変えない", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+
+    await page.getByRole("tab", { name: "新規登録" }).click();
+
+    await expect(page.getByLabel("招待コード")).toBeVisible();
+    await expect(page).toHaveURL("/login");
+  });
+
   test("login-e3: メンバーでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
     page,
   }) => {

@@ -1,4 +1,5 @@
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
+import { useState } from "react";
 
 import { Tabs } from "@/app/components/ui/tabs";
 import { InviteCodeFormContainer } from "@/app/features/login/invite-code-form-container";
@@ -7,11 +8,16 @@ import { AboutDialog } from "@/app/features/server/about-dialog";
 
 type Props = {
   step: "setup" | "login" | "inviteCode";
-  tab?: "login" | "register";
+  defaultTab?: "login" | "register";
   inviteCodeError?: string;
 };
 
-export function LoginPage({ step, tab = "login", inviteCodeError }: Props) {
+export function LoginPage({
+  step,
+  defaultTab = "login",
+  inviteCodeError,
+}: Props) {
+  const [tab, setTab] = useState(defaultTab);
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
       <div
@@ -71,11 +77,15 @@ export function LoginPage({ step, tab = "login", inviteCodeError }: Props) {
           {step === "login" && (
             <Tabs
               tabs={[
-                { to: "/login", label: "ログイン", selected: tab === "login" },
                 {
-                  to: "/login?tab=register",
+                  label: "ログイン",
+                  selected: tab === "login",
+                  onClick: () => setTab("login"),
+                },
+                {
                   label: "新規登録",
                   selected: tab === "register",
+                  onClick: () => setTab("register"),
                 },
               ]}
             />

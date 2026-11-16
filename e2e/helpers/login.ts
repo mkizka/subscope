@@ -16,7 +16,8 @@ export const login = async (page: Page, handle = "alice.test", url = "/") => {
 };
 
 export const register = async (page: Page, handle: string, code: string) => {
-  await page.goto("/login?tab=register");
+  await page.goto("/login");
+  await page.getByRole("tab", { name: "新規登録" }).click();
   await page.getByLabel("ハンドル").fill(handle);
   await page.getByLabel("招待コード").fill(code);
   await page.getByRole("button", { name: "新規登録" }).click();
