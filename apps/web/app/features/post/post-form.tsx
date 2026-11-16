@@ -1,6 +1,8 @@
+import { getFormProps, useForm } from "@conform-to/react";
 import { clsx } from "clsx";
 import { Globe, X } from "lucide-react";
-import { type Ref, useId, useState } from "react";
+import { type Ref, useState } from "react";
+import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button, buttonClass } from "@/app/components/ui/button";
@@ -81,7 +83,6 @@ export function PostForm({
   onClose,
   onSubmit,
 }: Props) {
-  const formId = useId();
   const [text, setText] = useState("");
   const [allow, setAllow] = useState<ReplyRule[]>();
   const [showRules, setShowRules] = useState(false);
@@ -91,6 +92,20 @@ export function PostForm({
   >([]);
   const [editingAlt, setEditingAlt] = useState<number>();
   const length = countGraphemes(text);
+  const [form] = useForm({
+    onSubmit(e, { formData }) {
+      e.preventDefault();
+      images.forEach(({ file, alt }) => {
+        formData.append("image", file);
+        formData.append("alt", alt);
+      });
+      if (canSetReplyRules && allow) {
+        formData.set("threadgate", "on");
+        allow.forEach((rule) => formData.append("allow", rule));
+      }
+      onSubmit(formData);
+    },
+  });
 
   return (
     <Dialog
@@ -105,7 +120,7 @@ export function PostForm({
           </Button>
           <Button
             type="submit"
-            form={formId}
+            form={form.id}
             loading={isSubmitting}
             disabled={
               (text.trim() === "" && images.length === 0) ||
@@ -117,24 +132,7 @@ export function PostForm({
         </>
       }
     >
-      {/* eslint-disable-next-line no-restricted-syntax */}
-      <form
-        id={formId}
-        className="flex flex-col gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          images.forEach(({ file, alt }) => {
-            formData.append("image", file);
-            formData.append("alt", alt);
-          });
-          if (canSetReplyRules && allow) {
-            formData.set("threadgate", "on");
-            allow.forEach((rule) => formData.append("allow", rule));
-          }
-          onSubmit(formData);
-        }}
-      >
+      <Form {...getFormProps(form)} className="flex flex-col gap-2">
         {target?.type === "reply" && (
           <article aria-label="返信先" className="flex gap-3">
             <div className="flex flex-col items-center gap-1">
@@ -311,7 +309,7 @@ export function PostForm({
             ))}
           </fieldset>
         )}
-      </form>
+      </Form>
       {editingAlt !== undefined && images[editingAlt] && (
         <AltDialog
           imageUrl={images[editingAlt].url}
