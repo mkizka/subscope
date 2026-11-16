@@ -93,6 +93,21 @@ export const AccountNote: Story = {
   },
 };
 
+export const LogoutDialog: Story = {
+  name: "settings-s3: 「ログアウト」を押すと、ログアウトしてよいかを確認するダイアログを開く",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "ログアウト" }),
+    );
+
+    await expect(
+      canvas.getByRole("dialog", { name: "ログアウトしますか？" }),
+    ).toBeVisible();
+  },
+};
+
 const pushSwitch = (canvasElement: HTMLElement) =>
   within(canvasElement).findByRole("switch", { name: "プッシュ通知" });
 

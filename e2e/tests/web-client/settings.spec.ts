@@ -13,12 +13,16 @@ test.describe("設定", () => {
     await expect(link).toHaveAttribute("target", "_blank");
   });
 
-  test("settings-e3: 「ログアウト」を押すと、ログイン画面に移動する", async ({
+  test("settings-e3: 確認ダイアログで「ログアウト」を押すと、ログイン画面に移動する", async ({
     page,
   }) => {
     await page.goto("/settings");
 
     await page.getByRole("button", { name: "ログアウト" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "ログアウト" })
+      .click();
 
     await expect(page).toHaveURL("/login");
   });

@@ -2,6 +2,7 @@ import { ExternalLinkIcon, LogOutIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Form } from "react-router";
 
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
 
@@ -62,19 +63,28 @@ export function Settings({
       </section>
       {pushSetting}
       <section className="p-4">
-        <Form
-          method="post"
-          action="/oauth/logout"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onLogout();
-          }}
+        <ConfirmDialog
+          title="ログアウトしますか？"
+          description="この端末からログアウトします。"
+          confirmLabel="ログアウト"
+          onConfirm={onLogout}
         >
-          <Button type="submit" variant="secondary">
-            <LogOutIcon className="size-4" />
-            ログアウト
-          </Button>
-        </Form>
+          {(open) => (
+            <Form
+              method="post"
+              action="/oauth/logout"
+              onSubmit={(event) => {
+                event.preventDefault();
+                open();
+              }}
+            >
+              <Button type="submit" variant="secondary">
+                <LogOutIcon className="size-4" />
+                ログアウト
+              </Button>
+            </Form>
+          )}
+        </ConfirmDialog>
       </section>
     </>
   );
