@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { Handle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../../application/interfaces/external/handle-resolver.js";
+import type { IHandleResolver } from "../../interface/handle-resolver.js";
+import type { Handle } from "../../utils/handle.js";
 
 export class InMemoryHandleResolver implements IHandleResolver {
   private handleToDid: Map<Handle, Did> = new Map();

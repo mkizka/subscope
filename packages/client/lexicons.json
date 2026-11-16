@@ -83,6 +83,7 @@
     "com.atproto.repo.strongRef",
     "com.atproto.sync.getBlob",
     "com.atproto.sync.getRepo",
+    "me.subsco.admin.addMember",
     "me.subsco.admin.banAccount",
     "me.subsco.admin.createInviteCode",
     "me.subsco.admin.deleteInviteCode",
@@ -375,6 +376,10 @@
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.sync.getRepo",
       "cid": "bafyreieyt5x6wf4pgcn56tb2724uplmwcqjivkubmi25km3xrvroz6dw5q"
     },
+    "me.subsco.admin.addMember": {
+      "uri": "file://./lexicons/me/subsco/admin/addMember.json",
+      "cid": "bafyreieftuf4xi6fsamesq3yvm5hpj6tcgmecqb4rwmedtjqm4b3l46leq"
+    },
     "me.subsco.admin.banAccount": {
       "uri": "file://./lexicons/me/subsco/admin/banAccount.json",
       "cid": "bafyreih4fbox62m5h3pjzsr4b2wcccwp2u6xzn33a6327b7trnom2o4mza"
@@ -421,7 +426,7 @@
     },
     "me.subsco.authFull": {
       "uri": "file://./lexicons/me/subsco/authFull.json",
-      "cid": "bafyreibfkme55tefccydu7w5sapyncshvfrj6buhrigj66iubcqqaw5mva"
+      "cid": "bafyreial7zfatzuvnio4h7rjhfxk2pk4yd2ghrr6rh3ab2ek2jchefjur4"
     },
     "me.subsco.graph.getServerMemberFollowers": {
       "uri": "file://./lexicons/me/subsco/graph/getServerMemberFollowers.json",

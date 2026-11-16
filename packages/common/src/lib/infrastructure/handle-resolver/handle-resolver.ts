@@ -1,13 +1,12 @@
 import { HandleResolver as AtprotoHandleResolver } from "@atproto/identity";
-import type { Handle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../../application/interfaces/external/handle-resolver.js";
-import type { Env } from "../../shared/env.js";
+import type { IHandleResolver } from "../../interface/handle-resolver.js";
+import type { Handle } from "../../utils/handle.js";
 
 export class HandleResolver implements IHandleResolver {
   private readonly resolver = new AtprotoHandleResolver();
 
-  constructor(private readonly env: Pick<Env, "ATPROTO_HANDLE_RESOLVER_URL">) {}
+  constructor(private readonly env: { ATPROTO_HANDLE_RESOLVER_URL?: string }) {}
 
   async resolve(handle: Handle) {
     if (!this.env.ATPROTO_HANDLE_RESOLVER_URL) {

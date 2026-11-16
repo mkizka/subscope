@@ -35,6 +35,7 @@ export class BannedError extends Error {
 type RegisterAccountParams = {
   accountDid: Did;
   code?: string;
+  byAdmin?: boolean;
 };
 
 export class RegisterAccountUseCase {
@@ -69,7 +70,11 @@ export class RegisterAccountUseCase {
     await this.inviteCodeRepository.save({ inviteCode, ctx });
   }
 
-  async execute({ accountDid, code }: RegisterAccountParams): Promise<void> {
+  async execute({
+    accountDid,
+    code,
+    byAdmin,
+  }: RegisterAccountParams): Promise<void> {
     const existingRegistration =
       await this.registrationRepository.find(accountDid);
     if (existingRegistration) {
@@ -82,7 +87,7 @@ export class RegisterAccountUseCase {
     }
 
     await this.transactionManager.transaction(async (ctx) => {
-      if (!existingAccount?.isAdmin) {
+      if (!byAdmin && !existingAccount?.isAdmin) {
         await this.useInviteCode(code, ctx);
       }
 

@@ -12,6 +12,7 @@
           "resource": "rpc",
           "inheritAud": true,
           "lxm": [
+            "me.subsco.admin.addMember",
             "me.subsco.admin.banAccount",
             "me.subsco.admin.createInviteCode",
             "me.subsco.admin.deleteInviteCode",
