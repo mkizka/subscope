@@ -14,6 +14,7 @@ const schema = z
       .default(match({ prod: "info", dev: "debug" })),
     PORT: z.coerce.number().default(3001),
     PLC_URL: z.url().default("https://plc.directory"),
+    ATPROTO_HANDLE_RESOLVER_URL: z.url().optional(),
     PUBLIC_URL: match({
       prod: z.url(),
       dev: z.url().default("http://localhost:3001"),
