@@ -118,7 +118,9 @@ export function InviteCodeItems({
           )}
         </ConfirmDialog>
       ) : (
-        <span className="size-10" />
+        <Button type="button" variant="ghost" aria-label="削除" disabled>
+          <Trash2Icon className="size-4 text-danger" />
+        </Button>
       )}
     </li>
   ));

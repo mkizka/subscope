@@ -50,7 +50,7 @@ const setCodes = (
   );
 
 export const Used: Story = {
-  name: "inviteCodes-s1: 使用済みの招待コードは削除できない",
+  name: "inviteCodes-s1: 使用済みの招待コードの削除ボタンは押せない",
   beforeEach: () => {
     setCodes([
       {
@@ -67,7 +67,9 @@ export const Used: Story = {
       within(canvasElement).getByRole("list", { name: "招待コード" }),
     ).getByRole("listitem");
     await expect(row).toHaveTextContent("使用済み");
-    await expect(within(row).queryByRole("button")).toBeNull();
+    await expect(
+      within(row).getByRole("button", { name: "削除" }),
+    ).toBeDisabled();
   },
 };
 
