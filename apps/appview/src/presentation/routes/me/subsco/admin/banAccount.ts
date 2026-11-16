@@ -2,11 +2,11 @@ import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import banAccount from "@repo/client/me/subsco/admin/banAccount";
 
+import { NotRegisteredError } from "../../../../../application/service/sync/unregister-account-service.js";
 import {
   type BanAccountUseCase,
   CannotBanAdminError,
 } from "../../../../../application/use-cases/admin/ban-account-use-case.js";
-import { NotRegisteredError } from "../../../../../application/use-cases/sync/unregister-account-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";
 
 export class BanAccount {
