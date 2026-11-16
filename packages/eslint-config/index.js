@@ -56,6 +56,23 @@ const noEnvImport = {
   },
 };
 
+const noUseCaseImport = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    return {
+      ImportDeclaration(node) {
+        if (/-use-case(\.js)?$/.test(node.source.value)) {
+          context.report({
+            node,
+            message:
+              "usecaseから別のusecaseを呼ばないでください。共通の処理はserviceに切り出してください。",
+          });
+        }
+      },
+    };
+  },
+};
+
 const noEnvValue = {
   meta: { type: "problem", schema: [] },
   create(context) {
@@ -82,6 +99,7 @@ export const config = [
           "effect-padding": effectPadding,
           "no-env-import": noEnvImport,
           "no-env-value": noEnvValue,
+          "no-use-case-import": noUseCaseImport,
         },
       },
     },
@@ -138,6 +156,22 @@ export const config = [
       "**/server.js",
     ],
     rules: { "local/no-env-import": "off" },
+  },
+  {
+    files: ["**/*-use-case.ts"],
+    rules: { "local/no-use-case-import": "error" },
+  },
+  {
+    // TODO: usecase間の依存をserviceに切り出して削除する
+    files: [
+      "**/src/application/use-cases/admin/ban-account-use-case.ts",
+      "**/src/application/use-cases/admin/grant-admin-use-case.ts",
+      "**/src/application/use-cases/admin/revoke-admin-use-case.ts",
+      "**/src/application/use-cases/feed/get-post-thread-v2-use-case.ts",
+      "**/src/application/use-cases/async/sync-tap-repo-use-case.ts",
+      "**/src/application/use-cases/identity/upsert-identity-use-case.ts",
+    ],
+    rules: { "local/no-use-case-import": "off" },
   },
   {
     files: ["**/*.in-memory.ts"],
