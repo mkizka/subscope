@@ -42,31 +42,19 @@ export function AboutDialog({ children }: Props) {
           <section className="space-y-1">
             <h3 className="font-bold">Blueskyとの違い</h3>
             <p>
-              Subscopeでは、サーバーに登録しているアカウント、または登録アカウントからフォローされているアカウントのみが表示されます。
-            </p>
-            <p>そのためBlueskyと比べて、以下の違いがあります。</p>
-            <ul className="list-disc pl-5">
-              <li>
-                いいね、リポスト、フォロワーなどの数は、多くの場合Blueskyより少なく表示されます
-              </li>
-              <li>検索結果に出てくる投稿やアカウントも少なくなります</li>
-            </ul>
-            <p>
-              機能面では「限られた部分だけ表示するBluesky」です。さらに一部の機能が未実装です。
+              表示されるのは、登録しているアカウントとそのフォロー先だけです。その分いいねやフォロワーなどの数は少なめになり、検索で見つかる投稿やアカウントも少なくなります。また、一部の機能はまだありません。
             </p>
           </section>
           <section className="space-y-1">
             <h3 className="font-bold">Subscopeの目的</h3>
             <p>
-              Blueskyと連携する分散SNSを作ろうとすると、そのままではBlueskyと同等の性能を持つサーバーが必要になってしまいます。
-              <br />
-              そこでSubscopeではサーバーに保存するデータを一部に絞ることで保存する量を大幅に減らし、出来るだけサーバー維持費を節約するようにしています。
+              Blueskyと連携するSNSをそのまま作ると、Bluesky並みの性能のサーバーが必要になります。Subscopeは保存するデータを絞ることで、サーバー代をできるだけ抑えています。
             </p>
             <p>
-              またBlueskyのシステムに出来るだけ依存しないようにしています※。Blueskyをやめたくなった時に、誰でも個人で運用を始められるような分散SNS実装を目指しています。
+              また、Blueskyのシステムにはなるべく頼らない作りにしています※。Blueskyから離れたくなったときに、誰でも自分でサーバーを始められることを目指しています。
             </p>
             <p className="text-caption text-muted">
-              ※技術的にはリレー、plc.directory、モデレーションはBlueskyのものを使用しています。ただし詳しい人なら簡単に独自のものに置き換えられるはずです。
+              ※今はリレー、plc.directory、モデレーションにBlueskyのものを使っています。ただし、詳しい人なら自前のものに簡単に置き換えられるはずです。
             </p>
           </section>
         </div>
