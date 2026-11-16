@@ -48,7 +48,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       }
       const result = await di.addMemberUseCase(did, submission.value.actor);
       if (result === "added") {
-        return data(submission.reply({ resetForm: true }));
+        return data(submission.reply());
       }
       return data(
         submission.reply({ formErrors: [ADD_MEMBER_ERRORS[result]] }),
