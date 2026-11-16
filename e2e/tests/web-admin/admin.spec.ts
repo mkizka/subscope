@@ -221,6 +221,37 @@ test.describe("メンバー", () => {
     );
   });
 
+  test("adminAccounts-e7: 追加ダイアログで入力したアカウントを、本人のログインなしでメンバーにして一覧の先頭に出す", async ({
+    page,
+  }) => {
+    const graceDid = await resolveHandle("grace.test");
+
+    await page.goto("/admin/registered-accounts");
+    await page.getByRole("button", { name: "メンバーを追加" }).click();
+    const dialog = page.getByRole("dialog", { name: "メンバーを追加" });
+    await dialog.getByLabel("ハンドルまたはDID").fill("grace.test");
+    await dialog.getByRole("button", { name: "追加する" }).click();
+
+    await expect(dialog).toBeHidden();
+    await expect(
+      page.getByRole("main").getByRole("listitem").first(),
+    ).toContainText("@grace.test");
+    await expect(page.getByTitle(graceDid)).toBeVisible();
+  });
+
+  test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー・登録停止中）を出す", async ({
+    page,
+  }) => {
+    await page.goto("/admin/registered-accounts");
+    await page.getByRole("button", { name: "メンバーを追加" }).click();
+    const dialog = page.getByRole("dialog", { name: "メンバーを追加" });
+    await dialog.getByLabel("ハンドルまたはDID").fill("alice.test");
+    await dialog.getByRole("button", { name: "追加する" }).click();
+
+    await expect(dialog.getByRole("alert")).toHaveText("すでにメンバーです");
+    await expect(dialog).toBeVisible();
+  });
+
   test("adminAccounts-e5: 停止中のアカウントは、確認のうえ「登録を再開する」で一覧から消え、招待コードで再登録できるようになる", async ({
     page,
   }) => {

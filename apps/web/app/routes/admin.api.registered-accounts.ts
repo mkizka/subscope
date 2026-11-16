@@ -1,5 +1,9 @@
 import { XrpcResponseError } from "@atproto/lex";
-import { type DidString, isValidDid } from "@atproto/syntax";
+import {
+  type DidString,
+  isAtIdentifierString,
+  isValidDid,
+} from "@atproto/syntax";
 import { data } from "react-router";
 import { z } from "zodV4";
 
@@ -30,6 +34,16 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const did = context.get(didContext);
 
   try {
+    if (request.method === "PUT") {
+      const { actor } = z
+        .object({ actor: z.string() })
+        .parse(await request.json());
+      if (!isAtIdentifierString(actor)) {
+        return data({ error: "AccountNotFound" }, { status: 400 });
+      }
+      await di.addMemberUseCase(did, actor);
+      return data({ success: true });
+    }
     const { did: target } = z
       .object({ did: z.custom<DidString>(isValidDid) })
       .parse(await request.json());
@@ -43,6 +57,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       (e.status === 401 || e.status === 403)
     ) {
       throw data({ error: "Unauthorized" }, { status: 403 });
+    }
+    if (e instanceof XrpcResponseError && e.status === 400) {
+      return data({ error: e.error }, { status: 400 });
     }
     throw e;
   }

@@ -12,6 +12,8 @@ import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { Tabs } from "@/app/components/ui/tabs";
 import { formatDate } from "@/app/lib/format-date";
 
+import { AddMemberDialog } from "./add-member-dialog";
+
 export type BannedAccount = {
   did: string;
   handle: string;
@@ -73,6 +75,10 @@ type Props = {
   banningDid?: string | null;
   onUnban?: (did: string) => void;
   unbanningDid?: string | null;
+  onAddMember?: (actor: string) => Promise<unknown>;
+  isAddingMember?: boolean;
+  addMemberError?: string;
+  onAddMemberClose?: () => void;
 };
 
 export function ServerMemberList({
@@ -90,15 +96,29 @@ export function ServerMemberList({
   banningDid,
   onUnban,
   unbanningDid,
+  onAddMember,
+  isAddingMember,
+  addMemberError,
+  onAddMemberClose,
 }: Props) {
   const isEmpty =
     tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
   return (
     <>
-      <div className="flex items-baseline gap-2 px-4 py-3">
-        <h1 className="text-title">アカウント管理</h1>
-        {total !== undefined && (
-          <span className="text-label text-muted">{total}人</span>
+      <div className="flex items-center justify-between gap-2 px-4 py-3">
+        <div className="flex items-baseline gap-2">
+          <h1 className="text-title">アカウント管理</h1>
+          {total !== undefined && (
+            <span className="text-label text-muted">{total}人</span>
+          )}
+        </div>
+        {tab === "serverMembers" && onAddMember && (
+          <AddMemberDialog
+            onAdd={onAddMember}
+            isAdding={isAddingMember}
+            error={addMemberError}
+            onClose={onAddMemberClose}
+          />
         )}
       </div>
       <Tabs

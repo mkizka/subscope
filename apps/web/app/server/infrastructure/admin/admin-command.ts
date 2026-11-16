@@ -1,3 +1,4 @@
+import addMember from "@repo/client/me/subsco/admin/addMember";
 import banAccount from "@repo/client/me/subsco/admin/banAccount";
 import createInviteCode from "@repo/client/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/me/subsco/admin/deleteInviteCode";
@@ -21,6 +22,10 @@ export const adminCommandFactory = ({
   };
 
   return {
+    async addMember(did, actor) {
+      const agent = await restore(did);
+      await agent.call(addMember, { actor });
+    },
     async banAccount(did, target) {
       const agent = await restore(did);
       await agent.call(banAccount, { did: target });

@@ -1,8 +1,9 @@
-import type { DidString } from "@atproto/syntax";
+import type { AtIdentifierString, DidString } from "@atproto/syntax";
 
 import type { CreateInviteCodeOutput } from "@/app/server/application/dto/admin";
 
 export interface IAdminCommand {
+  addMember: (did: string, actor: AtIdentifierString) => Promise<void>;
   banAccount: (did: string, target: DidString) => Promise<void>;
   grantAdmin: (did: string, target: DidString) => Promise<void>;
   unbanAccount: (did: string, target: DidString) => Promise<void>;
