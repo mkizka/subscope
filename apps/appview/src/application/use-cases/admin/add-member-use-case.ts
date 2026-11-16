@@ -6,7 +6,7 @@ import {
 } from "@repo/common/interface";
 import { isHandle } from "@repo/common/utils";
 
-import type { RegisterAccountUseCase } from "../sync/register-account-use-case.js";
+import type { RegisterAccountService } from "../../service/sync/register-account-service.js";
 
 export class AccountNotFoundError extends Error {
   constructor(message: string) {
@@ -19,7 +19,7 @@ export class AddMemberUseCase {
   constructor(
     private readonly atprotoHandleResolver: IHandleResolver,
     private readonly didResolver: IDidResolver,
-    private readonly registerAccountUseCase: RegisterAccountUseCase,
+    private readonly registerAccountService: RegisterAccountService,
   ) {}
 
   private async resolveDid(actor: string): Promise<Did> {
@@ -43,6 +43,9 @@ export class AddMemberUseCase {
 
   async execute({ actor }: { actor: string }): Promise<void> {
     const accountDid = await this.resolveDid(actor);
-    await this.registerAccountUseCase.execute({ accountDid, byAdmin: true });
+    await this.registerAccountService.execute({
+      accountDid,
+      inviteCodeRequired: false,
+    });
   }
 }

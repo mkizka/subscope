@@ -2,13 +2,13 @@ import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import addMember from "@repo/client/me/subsco/admin/addMember";
 
 import {
+  AlreadyRegisteredError,
+  BannedError,
+} from "../../../../../application/service/sync/register-account-service.js";
+import {
   AccountNotFoundError,
   type AddMemberUseCase,
 } from "../../../../../application/use-cases/admin/add-member-use-case.js";
-import {
-  AlreadyRegisteredError,
-  BannedError,
-} from "../../../../../application/use-cases/sync/register-account-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";
 
 export class AddMember {
