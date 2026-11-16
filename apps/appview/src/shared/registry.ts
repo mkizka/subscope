@@ -46,6 +46,7 @@ import type { IRegistrationRepository } from "../application/interfaces/registra
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { RegisterAccountService } from "../application/service/sync/register-account-service.js";
+import { UnregisterAccountService } from "../application/service/sync/unregister-account-service.js";
 import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
 import { GetProfilesUseCase } from "../application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "../application/use-cases/actor/search-actors-typeahead-use-case.js";
@@ -229,6 +230,7 @@ export const createAppRegistry = (env: Env) =>
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["accountRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("registerAccountService", ["transactionManager", "accountRepository", "inviteCodeRepository", "registrationRepository", "jobScheduler"], asClassArgs(RegisterAccountService))
+    .service("unregisterAccountService", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(UnregisterAccountService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "accountRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
@@ -284,9 +286,9 @@ export const createAppRegistry = (env: Env) =>
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
     .service("registerAccountUseCase", ["registerAccountService"], asClassArgs(RegisterAccountUseCase))
     .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "registerAccountService"], asClassArgs(AddMemberUseCase))
-    .service("unregisterAccountUseCase", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(UnregisterAccountUseCase))
+    .service("unregisterAccountUseCase", ["unregisterAccountService"], asClassArgs(UnregisterAccountUseCase))
     .service("unbanAccountUseCase", ["transactionManager", "accountRepository"], asClassArgs(UnbanAccountUseCase))
-    .service("banAccountUseCase", ["transactionManager", "accountRepository", "unregisterAccountUseCase"], asClassArgs(BanAccountUseCase))
+    .service("banAccountUseCase", ["transactionManager", "accountRepository", "unregisterAccountService"], asClassArgs(BanAccountUseCase))
     .service("updateSeenUseCase", ["transactionManager", "registrationRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))
