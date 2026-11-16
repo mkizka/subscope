@@ -7,14 +7,14 @@ import type {
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
-import type { IndexLabelUseCase } from "../label/index-label-use-case.js";
+import type { IndexLabelService } from "../../services/index-label-service.js";
 
 export class SyncTapRepoUseCase {
   constructor(
     private readonly tapClient: ITapClient,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly labelFetcher: ILabelFetcher,
-    private readonly indexLabelUseCase: IndexLabelUseCase,
+    private readonly indexLabelService: IndexLabelService,
     private readonly jobScheduler: IJobScheduler,
     private readonly transactionManager: ITransactionManager,
   ) {}
@@ -29,7 +29,9 @@ export class SyncTapRepoUseCase {
       await this.tapClient.addRepo(did);
       await this.jobScheduler.scheduleCheckBackfill(did, 0);
       for (const label of await this.labelFetcher.fetchByAccount(did)) {
-        await this.indexLabelUseCase.execute(label);
+        await this.transactionManager.transaction((ctx) =>
+          this.indexLabelService.index({ ctx, label }),
+        );
       }
     } else {
       await this.tapClient.removeRepo(did);

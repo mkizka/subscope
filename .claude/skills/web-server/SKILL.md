@@ -44,13 +44,12 @@ export const timelineQueryFactory = ({
 ```
 
 - 名前は `{名前}Factory`、戻り値の interface は `I{名前}` とし、同じファイルから export する
-- 環境変数は `di.ts` で `.value("env", env)` の1つのvalueとして載せ、factoryは `{ env }: { env: Pick<Env, "XXX"> }` で必要なキーだけ受け取る。`env.ts` は `di.ts` と型の import 以外で使わない
+- 環境変数は `di.ts` で `.value("env", env)` の1つのvalueとして載せ、factoryは `{ env }: { env: Pick<Env, "XXX"> }` で必要なキーだけ受け取る
 - ライブラリのクラスは関数内に閉じ込め、interface に出さない(例: `oauthClientFactory` は `NodeOAuthClient` を内部に持つ)
 
 ## DI
 
 - `app/server/di.ts` で `createRegistry()` に `.service("名前", ["依存"], 〇〇Factory)` と並べ、`resolve()` した結果を `di` として export する
-- `di.ts` は `@gyaku/di`、`@repo/`、相対パスだけを import できる(ESLintで強制)
 - routes・middlewares からは `di.〇〇` で使う
 
 ## routes(presentation)

@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
 import { WebSocketServer } from "ws";
 
+import { IndexLabelService } from "../application/services/index-label-service.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.in-memory.js";
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
@@ -40,8 +41,7 @@ describe("モデレーションサービスからのラベル受信", () => {
     const subscriber = new LabelSubscriber(
       new MetricReporter(),
       new IndexLabelUseCase(
-        new LabelRepository(),
-        new AccountQuery(),
+        new IndexLabelService(new LabelRepository(), new AccountQuery()),
         new TransactionManager(ctx.db),
       ),
       labelCursorStore,

@@ -50,6 +50,7 @@ import type { IRecordRepository } from "../application/interfaces/repositories/r
 import type { IRecordRevRepository } from "../application/interfaces/repositories/record-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
+import { IndexLabelService } from "../application/services/index-label-service.js";
 import { IndexRecordService } from "../application/services/index-record-service.js";
 import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
 import { GateIndexer } from "../application/services/indexer/gate-indexer.js";
@@ -161,6 +162,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("notificationService", ["notificationRepository", "jobScheduler"], asClassArgs(NotificationService))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))
     .service("postIndexer", ["postRepository", "postQuery", "feedItemRepository", "registrationQuery", "notificationService", "jobScheduler"], asClassArgs(PostIndexer))
+    .service("indexLabelService", ["labelRepository", "accountQuery"], asClassArgs(IndexLabelService))
     .service("indexAccountService", ["accountRepository", "profileQuery", "jobScheduler"], asClassArgs(IndexAccountService))
     .service("resolveDidService", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidService))
     .service("followIndexer", ["followRepository", "jobScheduler", "indexAccountService", "registrationQuery", "notificationService"], asClassArgs(FollowIndexer))
@@ -179,8 +181,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClassArgs(AggregateAccountStatsUseCase))
-    .service("indexLabelUseCase", ["labelRepository", "accountQuery", "transactionManager"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["tapClient", "registrationQuery", "labelFetcher", "indexLabelUseCase", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
+    .service("indexLabelUseCase", ["indexLabelService", "transactionManager"], asClassArgs(IndexLabelUseCase))
+    .service("syncTapRepoUseCase", ["tapClient", "registrationQuery", "labelFetcher", "indexLabelService", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
     .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "registrationQuery", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClassArgs(SendPushNotificationUseCase))
