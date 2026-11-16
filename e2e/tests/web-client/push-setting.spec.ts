@@ -94,6 +94,10 @@ test.describe("プッシュ通知", () => {
     await turnOn(other);
     await loggedOut.page.goto("/settings");
     await loggedOut.page.getByRole("button", { name: "ログアウト" }).click();
+    await loggedOut.page
+      .getByRole("dialog")
+      .getByRole("button", { name: "ログアウト" })
+      .click();
     await expect(loggedOut.page).toHaveURL("/login");
 
     await likeAlicePost(`pushSetting-e3: ${new Date().toISOString()}`);
