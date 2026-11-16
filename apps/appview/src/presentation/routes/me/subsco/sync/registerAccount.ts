@@ -6,8 +6,8 @@ import {
   AlreadyRegisteredError,
   BannedError,
   InvalidInviteCodeError,
-  type RegisterAccountUseCase,
-} from "../../../../../application/use-cases/sync/register-account-use-case.js";
+} from "../../../../../application/service/sync/register-account-service.js";
+import type { RegisterAccountUseCase } from "../../../../../application/use-cases/sync/register-account-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
 export class RegisterAccount {
