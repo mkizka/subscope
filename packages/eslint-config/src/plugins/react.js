@@ -38,22 +38,12 @@ const effectPadding = {
   },
 };
 
-export const react = [
-  {
-    plugins: {
-      react: {
-        rules: {
-          "effect-padding": effectPadding,
-          "no-form": syntaxRule(
-            "JSXOpeningElement[name.name='form']",
-            "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",
-          ),
-        },
-      },
-    },
-    rules: {
-      "react/effect-padding": "error",
-      "react/no-form": "error",
-    },
+export default {
+  rules: {
+    "effect-padding": effectPadding,
+    "no-form": syntaxRule(
+      "JSXOpeningElement[name.name='form']",
+      "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",
+    ),
   },
-];
+};
