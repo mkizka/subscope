@@ -234,9 +234,8 @@ test.describe("メンバー", () => {
 
     await expect(dialog).toBeHidden();
     await expect(
-      page.getByRole("main").getByRole("listitem").first(),
-    ).toContainText("@grace.test");
-    await expect(page.getByTitle(graceDid)).toBeVisible();
+      page.getByRole("main").getByRole("listitem").first().getByTitle(graceDid),
+    ).toBeVisible();
   });
 
   test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー・登録停止中）を出す", async ({
