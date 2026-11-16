@@ -122,6 +122,24 @@ export const config = [
             "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
         },
         {
+          selector:
+            "ClassDeclaration[id.name=/UseCase$/] > ClassBody > MethodDefinition[kind!='constructor'][key.type!='PrivateIdentifier'][accessibility!='private'][accessibility!='protected'][key.name!='execute']",
+          message:
+            "usecaseの公開メソッドはexecuteのみにしてください。",
+        },
+        {
+          selector:
+            "TSInterfaceDeclaration[id.name=/^I\\w*UseCase$/] > TSInterfaceBody > [key.name!='execute']",
+          message:
+            "usecaseの公開メソッドはexecuteのみにしてください。",
+        },
+        {
+          selector:
+            "ClassDeclaration[id.name!=/UseCase$/] > ClassBody > MethodDefinition[key.name='execute']",
+          message:
+            "executeはusecaseだけのメソッド名です。別の名前にしてください。",
+        },
+        {
           selector: "JSXOpeningElement[name.name='form']",
           message:
             "素の<form>は使わず、conformのuseFormとgetFormPropsを使ってください。",

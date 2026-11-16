@@ -43,7 +43,7 @@ export class AddMemberUseCase {
 
   async execute({ actor }: { actor: string }): Promise<void> {
     const accountDid = await this.resolveDid(actor);
-    await this.registerAccountService.execute({
+    await this.registerAccountService.register({
       accountDid,
       inviteCodeRequired: false,
     });

@@ -14,7 +14,7 @@ export class CreateAdminService {
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
-  async execute({
+  async create({
     ctx,
     did,
   }: {

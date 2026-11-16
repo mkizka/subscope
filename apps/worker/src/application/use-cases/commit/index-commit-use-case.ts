@@ -32,7 +32,7 @@ export class IndexCommitUseCase {
     }
   }
 
-  async doIndexCommit({ commit, live }: IndexCommitCommand) {
+  private async doIndexCommit({ commit, live }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
       if (
         commit.operation !== "delete" &&
