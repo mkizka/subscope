@@ -35,13 +35,10 @@ test.describe("リスト", () => {
     const name = `list-e1のリスト ${Date.now()}`;
     await createList(name);
     await page.goto("/alice.test");
-
-    await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
-
-    await expect(page).toHaveURL("/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "リスト" }).click();
       await expect(main.getByText(name, { exact: true })).toBeVisible({
         timeout: 1000,
       });
@@ -64,10 +61,11 @@ test.describe("リスト", () => {
         createdAt: new Date().toISOString(),
       });
     }
-    await page.goto("/alice.test/lists");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "リスト" }).click();
       await expect(main.getByText(name, { exact: true })).toBeVisible({
         timeout: 1000,
       });
@@ -176,7 +174,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-e6: 自分のリスト詳細の「…」メニューから、確認のうえリストとメンバーを削除し、リスト一覧に戻る", async ({
+  test("list-e6: 自分のリスト詳細の「…」メニューから、確認のうえリストとメンバーを削除し、プロフィールに戻る", async ({
     page,
   }) => {
     const name = `list-e6のリスト ${Date.now()}`;
@@ -198,9 +196,10 @@ test.describe("リスト", () => {
       .getByRole("button", { name: "削除する" })
       .click();
 
-    await expect(page).toHaveURL("/alice.test/lists");
+    await expect(page).toHaveURL("/alice.test");
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "リスト" }).click();
       await expect(main.getByText(name, { exact: true })).toBeHidden({
         timeout: 1000,
       });
@@ -320,10 +319,11 @@ test.describe("リスト", () => {
   }) => {
     const name = `list-e10のリスト ${Date.now()}`;
     await createList(name);
-    await page.goto("/alice.test/lists");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "リスト" }).click();
       await expect(main.getByText(name, { exact: true })).toBeVisible({
         timeout: 1000,
       });
@@ -336,7 +336,8 @@ test.describe("リスト", () => {
       main.getByRole("button", { name: "新しいリスト" }),
     ).toBeHidden();
 
-    await page.goto("/bob.test/lists");
+    await page.goto("/bob.test");
+    await main.getByRole("tab", { name: "リスト" }).click();
 
     await expect(main.getByText("@bob.test")).toBeVisible();
     await expect(

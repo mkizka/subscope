@@ -8,7 +8,6 @@ import {
   infinite,
   queryClient,
 } from "@/.storybook/query-client";
-import { ListsContainer } from "@/app/features/list/lists-container";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
 import type { loader as membershipLoader } from "@/app/routes/api.list-membership.$did";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
@@ -17,7 +16,7 @@ import { ProfilePage } from "./profile-page";
 
 type ProfileData = Data<typeof profileLoader>;
 
-const seed = (patch: Partial<ProfileData> = {}, tab = "") =>
+const seed = (patch: Partial<ProfileData> = {}, tab = "posts") =>
   queryClient.setQueryData(
     ["profile", alice.handle, tab],
     infinite<typeof profileLoader>({
@@ -30,7 +29,6 @@ const seed = (patch: Partial<ProfileData> = {}, tab = "") =>
       isSelf: false,
       backfillStatus: "completed",
       posts: TimelineFeedStories.args.posts,
-      tab: "posts",
       ...patch,
     }),
   );
@@ -124,7 +122,7 @@ export const Loading: Story = {
   name: "profile-s4: 開くとすぐ画面を出し、読み込み終えるまでバナー・アイコン・名前・自己紹介・投稿の場所をスケルトンにする",
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["profile", alice.handle] });
-    void pending(["profile", alice.handle, ""]);
+    void pending(["profile", alice.handle, "posts"]);
   },
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
@@ -158,15 +156,8 @@ export const TabLoading: Story = {
   },
 };
 
-const ListsTab = () => <ListsContainer handle={alice.handle} />;
-const listsRoute = {
-  path: "/:handle",
-  children: [{ path: "lists", Component: ListsTab }],
-};
-
 export const TabLoadingFromLists: Story = {
   name: "profile-s6: 「リスト」タブから他のタブに切り替えたときも、投稿の場所だけをスケルトンにする",
-  parameters: { path: "/alice.bsky.social/lists", route: listsRoute },
   beforeEach: () => {
     void pending(["lists", alice.handle]);
     void pending(["profile", alice.handle, "media"]);
@@ -174,6 +165,7 @@ export const TabLoadingFromLists: Story = {
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
 
+    await userEvent.click(page.getByRole("tab", { name: "リスト" }));
     await userEvent.click(page.getByRole("tab", { name: "メディア" }));
 
     await expect(
@@ -325,7 +317,7 @@ export const UntrackedNotice: Story = {
   name: "profile-s11: 追跡アカウントでないときは、全てのタブの下に、同期されていないことと、フォローすると同期を始めることを出す",
   beforeEach: () => {
     seed({ backfillStatus: undefined });
-    seed({ backfillStatus: undefined, tab: "likes" }, "likes");
+    seed({ backfillStatus: undefined }, "likes");
   },
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
@@ -347,7 +339,7 @@ export const ImageViewerProfile: Story = {
   name: "imageViewer-s7: プロフィールのアイコンかバナーを選ぶと、拡大して表示する",
   beforeEach: () => {
     queryClient.setQueryData(
-      ["profile", alice.handle, ""],
+      ["profile", alice.handle, "posts"],
       infinite<typeof profileLoader>({
         profile: {
           ...alice,
@@ -359,7 +351,6 @@ export const ImageViewerProfile: Story = {
         isSelf: false,
         backfillStatus: "completed",
         posts: [],
-        tab: "posts",
       }),
     );
   },
@@ -377,16 +368,6 @@ export const ImageViewerProfile: Story = {
     await waitFor(() => expect(dialog()).toBeNull());
     await userEvent.click(canvas.getByRole("button", { name: "バナーを拡大" }));
     await waitFor(() => expect(viewerSrc()).toBe(svg("d97751")));
-  },
-};
-
-export const ListsLoading: Story = {
-  parameters: {
-    path: "/alice.bsky.social/lists",
-    route: listsRoute,
-  },
-  beforeEach: () => {
-    void pending(["lists", alice.handle]);
   },
 };
 
