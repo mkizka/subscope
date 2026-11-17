@@ -99,7 +99,6 @@ export function ServerMemberListContainer() {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
     select: (data) => ({
-      total: data.pages[0]?.total,
       serverMembers: data.pages.flatMap((page) =>
         page.serverMembers.map(({ profile, ...serverMember }) => ({
           ...profile,
@@ -117,7 +116,6 @@ export function ServerMemberListContainer() {
       tab={tab}
       serverMembers={serverMembersQuery.data?.serverMembers ?? []}
       bannedAccounts={bannedQuery.data ?? []}
-      total={serverMembersQuery.data?.total}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={() => void fetchNextPage({ cancelRefetch: false })}

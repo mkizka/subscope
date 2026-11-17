@@ -62,7 +62,6 @@ type Props = {
   tab?: ServerMemberTab;
   serverMembers: ServerMember[];
   bannedAccounts?: BannedAccount[];
-  total?: number;
   isLoading?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
@@ -80,7 +79,6 @@ export function ServerMemberList({
   tab = "serverMembers",
   serverMembers,
   bannedAccounts = [],
-  total,
   isLoading,
   isFetchingNextPage,
   onLoadMore,
@@ -98,12 +96,7 @@ export function ServerMemberList({
   return (
     <>
       <div className="flex items-center justify-between gap-2 px-4 py-3">
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-title">アカウント管理</h1>
-          {total !== undefined && (
-            <span className="text-label text-muted">{total}人</span>
-          )}
-        </div>
+        <h1 className="text-title">アカウント管理</h1>
         {tab === "serverMembers" && addMemberButton}
       </div>
       <Tabs
