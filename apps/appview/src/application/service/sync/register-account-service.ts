@@ -9,6 +9,7 @@ import { Account } from "../../../domain/models/account.js";
 import { Registration } from "../../../domain/models/registration.js";
 import type { IAccountRepository } from "../../interfaces/account-repository.js";
 import type { IInviteCodeRepository } from "../../interfaces/invite-code-repository.js";
+import type { IFollowQuery } from "../../interfaces/queries/follow-query.js";
 import type { IRegistrationRepository } from "../../interfaces/registration-repository.js";
 
 export class InvalidInviteCodeError extends Error {
@@ -44,6 +45,7 @@ export class RegisterAccountService {
     private readonly accountRepository: IAccountRepository,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly registrationRepository: IRegistrationRepository,
+    private readonly followQuery: IFollowQuery,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
@@ -106,6 +108,9 @@ export class RegisterAccountService {
       await this.registrationRepository.save({ ctx, registration });
     });
 
-    await this.jobScheduler.scheduleSyncTapRepo(accountDid);
+    const followeeDids = await this.followQuery.findFolloweeDids(accountDid);
+    for (const did of [accountDid, ...followeeDids]) {
+      await this.jobScheduler.scheduleSyncTapRepo(did);
+    }
   }
 }

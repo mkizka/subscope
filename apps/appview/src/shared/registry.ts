@@ -230,7 +230,7 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["accountRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("registerAccountService", ["transactionManager", "accountRepository", "inviteCodeRepository", "registrationRepository", "jobScheduler"], asClassArgs(RegisterAccountService))
+    .service("registerAccountService", ["transactionManager", "accountRepository", "inviteCodeRepository", "registrationRepository", "followQuery", "jobScheduler"], asClassArgs(RegisterAccountService))
     .service("unregisterAccountService", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(UnregisterAccountService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "accountRepository"], asClassArgs(AdminMiddleware))

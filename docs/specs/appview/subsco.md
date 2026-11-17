@@ -77,6 +77,7 @@ qは大文字と小文字を区別しない。
 | registerAccount-6 | 登録に使った招待コードを使用済みにする                                         |
 | registerAccount-7 | 登録したアカウントをTapに追加する                                              |
 | registerAccount-8 | まだ保存していないアカウントも登録する                                         |
+| registerAccount-9 | 登録したアカウントの保存済みのフォロー先もTapに追加する                        |
 
 有効な招待コードは、有効期限内で未使用のもの。
 

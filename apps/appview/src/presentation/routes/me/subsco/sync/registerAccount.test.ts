@@ -1,6 +1,12 @@
 import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 import { schema } from "@repo/db";
-import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
+import {
+  accountFactory,
+  followFactory,
+  inviteCodeFactory,
+  recordFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -188,5 +194,32 @@ describe("me.subsco.sync.registerAccount", () => {
     expect(await findRegistration(did)).toMatchObject({
       inviteCode: inviteCode.code,
     });
+  });
+
+  test("registerAccount-9: 登録したアカウントの保存済みのフォロー先もTapに追加する", async () => {
+    // arrange
+    const { client, loginAs, jobScheduler } = await setupApiTest();
+    const account = await accountFactory(ctx.db).create();
+    const followee = await accountFactory(ctx.db).create();
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ account: () => account })
+            .create(),
+        followee: () => followee,
+      })
+      .create();
+    const inviteCode = await inviteCodeFactory(ctx.db).create();
+    loginAs(account.did);
+
+    // act
+    await client.call(registerAccount, { inviteCode: inviteCode.code });
+
+    // assert
+    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
+      { did: account.did },
+      { did: followee.did },
+    ]);
   });
 });
