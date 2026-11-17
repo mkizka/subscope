@@ -25,6 +25,7 @@ type Props = {
   name: string;
   description?: string;
   tab: "posts" | "members";
+  onTabChange: (tab: "posts" | "members") => void;
   posts: TimelinePost[];
   members: (Account & { listItemUri: string })[];
   isSelf: boolean;
@@ -38,6 +39,7 @@ export function ListDetail({
   name,
   description,
   tab,
+  onTabChange,
   posts,
   members,
   isSelf,
@@ -117,11 +119,15 @@ export function ListDetail({
       )}
       <Tabs
         tabs={[
-          { to: ".", label: "投稿", selected: tab === "posts" },
           {
-            to: "?tab=members",
+            label: "投稿",
+            selected: tab === "posts",
+            onClick: () => onTabChange("posts"),
+          },
+          {
             label: "メンバー",
             selected: tab === "members",
+            onClick: () => onTabChange("members"),
           },
         ]}
       />

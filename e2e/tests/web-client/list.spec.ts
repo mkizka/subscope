@@ -224,10 +224,13 @@ test.describe("リスト", () => {
   }) => {
     const list = await createEmptyList(`list-e7のリスト ${Date.now()}`);
     const rkey = list.uri.split("/").at(-1);
-    await page.goto(`/alice.test/lists/${rkey}?tab=members`);
+    await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
+      await main
+        .getByRole("tab", { name: "メンバー" })
+        .click({ timeout: 1000 });
       await expect(main.getByLabel("ハンドル")).toBeVisible({ timeout: 1000 });
     }).toPass();
 
@@ -240,6 +243,9 @@ test.describe("リスト", () => {
 
     await expect(async () => {
       await page.reload();
+      await main
+        .getByRole("tab", { name: "メンバー" })
+        .click({ timeout: 1000 });
       await expect(main.getByText("@bob.test")).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
@@ -248,10 +254,13 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-e8のリスト ${Date.now()}`);
-    await page.goto(`/alice.test/lists/${rkey}?tab=members`);
+    await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
+      await main
+        .getByRole("tab", { name: "メンバー" })
+        .click({ timeout: 1000 });
       await expect(main.getByText("@bob.test")).toBeVisible({ timeout: 1000 });
     }).toPass();
 
@@ -263,6 +272,9 @@ test.describe("リスト", () => {
 
     await expect(async () => {
       await page.reload();
+      await main
+        .getByRole("tab", { name: "メンバー" })
+        .click({ timeout: 1000 });
       await expect(main.getByText("@bob.test")).toBeHidden({ timeout: 1000 });
     }).toPass();
   });

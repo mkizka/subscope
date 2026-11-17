@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigation, useSearchParams, useSubmit } from "react-router";
+import { useState } from "react";
+import { useNavigation, useSubmit } from "react-router";
 
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { AccountsSkeleton } from "@/app/components/rows-skeleton";
@@ -16,8 +17,7 @@ type Props = {
 };
 
 export function ListDetailContainer({ handle, rkey }: Props) {
-  const [searchParams] = useSearchParams();
-  const tab = searchParams.get("tab") === "members" ? "members" : "posts";
+  const [tab, setTab] = useState<"posts" | "members">("posts");
   const submit = useSubmit();
   const navigation = useNavigation();
   const { data } = useQuery({
@@ -40,6 +40,7 @@ export function ListDetailContainer({ handle, rkey }: Props) {
       name={list.name}
       description={list.description}
       tab={tab}
+      onTabChange={setTab}
       {...rest}
       deleting={navigation.formData?.get("intent") === "delete"}
       onDelete={() => submit({ intent: "delete" }, { method: "post" })}

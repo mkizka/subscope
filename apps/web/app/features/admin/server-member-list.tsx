@@ -60,6 +60,7 @@ function ProfileCell({
 
 type Props = {
   tab?: ServerMemberTab;
+  onTabChange?: (tab: ServerMemberTab) => void;
   serverMembers: ServerMember[];
   bannedAccounts?: BannedAccount[];
   isLoading?: boolean;
@@ -77,6 +78,7 @@ type Props = {
 
 export function ServerMemberList({
   tab = "serverMembers",
+  onTabChange,
   serverMembers,
   bannedAccounts = [],
   isLoading,
@@ -102,14 +104,14 @@ export function ServerMemberList({
       <Tabs
         tabs={[
           {
-            to: "/admin/registered-accounts",
             label: "メンバー",
             selected: tab === "serverMembers",
+            onClick: () => onTabChange?.("serverMembers"),
           },
           {
-            to: "/admin/registered-accounts?tab=banned",
             label: "停止中",
             selected: tab === "banned",
+            onClick: () => onTabChange?.("banned"),
           },
         ]}
       />
