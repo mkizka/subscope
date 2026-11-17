@@ -13,10 +13,9 @@ export const searchSchema = z.object({
 
 type Props = {
   q?: string;
-  tab: "accounts" | "posts";
 };
 
-export const SearchFormContainer = ({ q, tab }: Props) => {
+export const SearchFormContainer = ({ q }: Props) => {
   const { history, remove, clear } = useSearchHistory(q);
   const fetching = useIsFetching({ queryKey: ["search"] }) > 0;
   const [form, fields] = useForm({
@@ -32,7 +31,6 @@ export const SearchFormContainer = ({ q, tab }: Props) => {
     <SearchForm
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.q, { type: "search" })}
-      tab={tab}
       loading={fetching}
       history={history}
       onRemoveHistory={remove}

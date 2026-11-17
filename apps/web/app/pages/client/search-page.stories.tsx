@@ -62,12 +62,13 @@ export const NotFound: Story = {
 };
 
 export const Accounts: Story = {
-  parameters: { path: "/search?q=alice&tab=accounts" },
+  args: { defaultTab: "accounts" },
 };
 
 export const AccountsNotFound: Story = {
   name: "search-s1: 一致するアカウントがないときは「ユーザーが見つかりません」と表示する",
-  parameters: { path: "/search?q=nobody&tab=accounts" },
+  args: { defaultTab: "accounts" },
+  parameters: { path: "/search?q=nobody" },
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText("ユーザーが見つかりません"),

@@ -1,4 +1,5 @@
 import { parseWithZod } from "@conform-to/zod/v4";
+import { useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
@@ -9,25 +10,29 @@ import {
 } from "@/app/features/search/search-form-container";
 import { SearchResultsContainer } from "@/app/features/search/search-results-container";
 
-export function SearchPage() {
+type Props = {
+  defaultTab?: "posts" | "accounts";
+};
+
+export function SearchPage({ defaultTab = "posts" }: Props) {
   const [searchParams] = useSearchParams();
   const submission = parseWithZod(searchParams, { schema: searchSchema });
-  const { q, tab = "posts" as const } =
-    submission.status === "success" ? submission.value : {};
+  const q = submission.status === "success" ? submission.value.q : undefined;
+  const [tab, setTab] = useState(defaultTab);
   return (
     <ThreeColumnLayout hideSearch>
       <h1 className="border-b border-line p-4 text-title">検索</h1>
-      <SearchFormContainer key={q} q={q} tab={tab} />
+      <SearchFormContainer key={q} q={q} />
       <Tabs
         tabs={(
           [
-            ["posts", "投稿", {}],
-            ["accounts", "ユーザー", { tab: "accounts" }],
+            ["posts", "投稿"],
+            ["accounts", "ユーザー"],
           ] as const
-        ).map(([value, label, params]) => ({
-          to: `?${new URLSearchParams({ ...(q && { q }), ...params })}`,
+        ).map(([value, label]) => ({
           label,
           selected: tab === value,
+          onClick: () => setTab(value),
         }))}
       />
       {q ? (
