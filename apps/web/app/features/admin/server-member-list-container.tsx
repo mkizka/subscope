@@ -5,7 +5,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useSearchParams } from "react-router";
+import { useState } from "react";
 
 import { AddMemberDialogContainer } from "./add-member-dialog-container";
 import { ServerMemberList, type ServerMemberTab } from "./server-member-list";
@@ -65,9 +65,7 @@ async function updateServerMember(method: "POST" | "DELETE", did: string) {
 }
 
 export function ServerMemberListContainer() {
-  const [searchParams] = useSearchParams();
-  const tab: ServerMemberTab =
-    searchParams.get("tab") === "banned" ? "banned" : "serverMembers";
+  const [tab, setTab] = useState<ServerMemberTab>("serverMembers");
   const queryClient = useQueryClient();
   const onSuccess = () =>
     Promise.all([
@@ -114,6 +112,7 @@ export function ServerMemberListContainer() {
   return (
     <ServerMemberList
       tab={tab}
+      onTabChange={setTab}
       serverMembers={serverMembersQuery.data?.serverMembers ?? []}
       bannedAccounts={bannedQuery.data ?? []}
       isLoading={isLoading}

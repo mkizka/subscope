@@ -9,7 +9,6 @@ import { SearchHistory } from "./search-history";
 type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
-  tab: "accounts" | "posts";
   loading: boolean;
   history: string[];
   onRemoveHistory: (word: string) => void;
@@ -19,7 +18,6 @@ type Props = {
 export function SearchForm({
   formProps,
   inputProps,
-  tab,
   loading,
   history,
   onRemoveHistory,
@@ -47,18 +45,13 @@ export function SearchForm({
         {focused && history.length > 0 && (
           <SearchHistory
             history={history}
-            hrefFor={(word) =>
-              `?${new URLSearchParams({ q: word, ...(tab === "accounts" && { tab }) })}`
-            }
+            hrefFor={(word) => `?${new URLSearchParams({ q: word })}`}
             onSelect={() => setFocused(false)}
             onRemove={onRemoveHistory}
             onClear={onClearHistory}
           />
         )}
       </div>
-      {tab === "accounts" && (
-        <input type="hidden" name="tab" value="accounts" />
-      )}
       <Button type="submit" loading={loading}>
         検索
       </Button>

@@ -18,7 +18,6 @@ const meta = {
     );
   },
   component: TimelinePage,
-  args: { local: false },
   parameters: {
     layout: "fullscreen",
   },

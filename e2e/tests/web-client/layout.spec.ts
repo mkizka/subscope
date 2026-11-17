@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { createRecord } from "../../helpers/pds";
+
 const rightColumn = (page: Page) =>
   page.getByRole("complementary").filter({
     hasNot: page.getByRole("navigation"),
@@ -105,13 +107,18 @@ test.describe("レイアウト（モバイル）", () => {
   test("cache-e1: 一度表示した画面に戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
     page,
   }) => {
-    const alice = page
+    const q = `cache1-${Date.now()}`;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: q,
+      createdAt: new Date().toISOString(),
+    });
+    const post = page
       .getByRole("main")
-      .getByRole("listitem")
-      .filter({ hasText: "@alice.test" });
+      .getByRole("article")
+      .filter({ hasText: q });
     await expect(async () => {
-      await page.goto("/search?q=alice&tab=accounts");
-      await expect(alice).toBeVisible({ timeout: 1000 });
+      await page.goto(`/search?q=${q}`);
+      await expect(post).toBeVisible({ timeout: 1000 });
     }).toPass();
     await page
       .getByRole("navigation")
@@ -122,6 +129,6 @@ test.describe("レイアウト（モバイル）", () => {
 
     await page.goBack();
 
-    await expect(alice).toBeVisible();
+    await expect(post).toBeVisible();
   });
 });

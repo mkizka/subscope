@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { AccountsSkeleton } from "@/app/components/rows-skeleton";
@@ -15,7 +16,7 @@ type TrackedResponse = Awaited<ReturnType<typeof trackedLoader>>["data"];
 export function AccountsContainer() {
   const [params, setParams] = useSearchParams();
   const q = params.get("q") ?? "";
-  const tracked = params.get("tab") === "tracked";
+  const [tracked, setTracked] = useState(false);
 
   const registeredQuery = useQuery({
     queryKey: ["clientServerMembers", q],
@@ -47,14 +48,14 @@ export function AccountsContainer() {
       <Tabs
         tabs={[
           {
-            to: "/server",
             label: "メンバー",
             selected: !tracked,
+            onClick: () => setTracked(false),
           },
           {
-            to: "/server?tab=tracked",
             label: "誰かがフォロー",
             selected: tracked,
+            onClick: () => setTracked(true),
           },
         ]}
       />

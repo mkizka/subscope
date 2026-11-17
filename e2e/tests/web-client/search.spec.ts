@@ -38,13 +38,11 @@ test.describe("検索", () => {
     await main.getByRole("searchbox", { name: "検索語" }).fill("lic");
     await main.getByRole("button", { name: "検索" }).click();
 
-    await expect(page).toHaveURL("/search?q=lic&tab=accounts");
-    const alice = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ hasText: "Alice" });
+    await expect(page).toHaveURL("/search?q=lic");
+    const alice = main.getByRole("listitem").filter({ hasText: "Alice" });
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "ユーザー" }).click();
       await expect(alice).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(alice.getByText("@alice.test")).toBeVisible();
@@ -54,9 +52,11 @@ test.describe("検索", () => {
   test("search-e2: 一覧のアカウントを選ぶと、そのアカウントのプロフィールに移動する", async ({
     page,
   }) => {
-    const link = page.getByRole("main").getByRole("link", { name: /^Alice/ });
+    const main = page.getByRole("main");
+    const link = main.getByRole("link", { name: /^Alice/ });
     await expect(async () => {
-      await page.goto("/search?q=alice&tab=accounts");
+      await page.goto("/search?q=alice");
+      await main.getByRole("tab", { name: "ユーザー" }).click();
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
 
