@@ -95,7 +95,6 @@ export const AddMemberDialog: Story = {
 
 export const BannedAccounts: Story = {
   name: "adminAccounts-s2: 「停止中」タブには登録を停止したアカウントを並べ、名前・ハンドルを出す",
-  parameters: { path: "/admin/registered-accounts?tab=banned" },
   beforeEach: () => {
     queryClient.setQueryData(["bannedAccounts"], {
       pages: [{ actors: [alice, bob] } satisfies BannedAccountsResponse],
@@ -107,6 +106,7 @@ export const BannedAccounts: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("tab", { name: "停止中" }));
     const [first, second, ...rest] = within(
       canvas.getByRole("main"),
     ).getAllByRole("listitem");

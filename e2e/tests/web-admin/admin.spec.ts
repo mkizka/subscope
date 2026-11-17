@@ -208,17 +208,17 @@ test.describe("メンバー", () => {
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
 
-  test("adminAccounts-e6: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
+  test("adminAccounts-e6: 「メンバー」「停止中」のタブを切り替えても、URLは変えない", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
     await page.getByRole("tab", { name: "停止中" }).click();
-    await page.reload();
 
     await expect(page.getByRole("tab", { name: "停止中" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
+    await expect(page).toHaveURL("/admin/registered-accounts");
   });
 
   test("adminAccounts-e7: 追加ダイアログで入力したアカウントを、本人のログインなしでメンバーにして一覧の先頭に出す", async ({
