@@ -52,7 +52,6 @@ export const OperatorBadge: Story = {
 
 export const FollowerCount: Story = {
   name: "server-s6: 「誰かがフォロー」タブでは、フォローしているメンバーの数を「n人からフォロー」と表示する",
-  parameters: { path: "/server?tab=tracked" },
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof trackedLoader>>(
       ["trackedAccounts", ""],
@@ -62,9 +61,9 @@ export const FollowerCount: Story = {
     );
   },
   play: async ({ canvasElement }) => {
-    await expect(
-      within(canvasElement).getByText("3人からフォロー"),
-    ).toBeVisible();
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("tab", { name: "誰かがフォロー" }));
+    await expect(canvas.getByText("3人からフォロー")).toBeVisible();
   },
 };
 
