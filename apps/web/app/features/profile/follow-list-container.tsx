@@ -77,7 +77,7 @@ export function FollowListContainer({ handle, kind }: Props) {
             },
             {
               to: "?filter=registered",
-              label: `メンバー${data?.registeredCount === undefined ? "" : ` ${data.registeredCount}`}`,
+              label: "メンバー",
               selected: filter === "registered",
             },
           ]}

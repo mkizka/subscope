@@ -21,17 +21,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const TabCounts: Story = {
-  name: "server-s2: タブの見出しに、それぞれの人数を出す",
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByRole("tab", { name: "メンバー 2" })).toBeVisible();
-    await expect(
-      canvas.getByRole("tab", { name: "誰かがフォロー 3" }),
-    ).toBeVisible();
-  },
-};
-
 export const MemberDetails: Story = {
   name: "server-s3: 「メンバー」タブでは、メンバーを自己紹介つきで一覧表示する",
   beforeEach: () => {
@@ -41,7 +30,6 @@ export const MemberDetails: Story = {
         serverMembers: [
           { ...alice, isAdmin: false, description: "Blueskyを使っています" },
         ],
-        hasMore: false,
       },
     );
   },
@@ -69,7 +57,6 @@ export const FollowerCount: Story = {
     queryClient.setQueryData<Data<typeof trackedLoader>>(
       ["trackedAccounts", ""],
       {
-        total: 1,
         accounts: [{ ...bob, registeredFollowersCount: 3 }],
       },
     );
@@ -101,7 +88,7 @@ export const NoSearchResult: Story = {
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
       ["clientServerMembers", "zzzzzz"],
-      { serverMembers: [], hasMore: false },
+      { serverMembers: [] },
     );
   },
   play: async ({ canvasElement }) => {

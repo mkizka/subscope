@@ -33,13 +33,11 @@ const preview: Preview = {
           { ...alice, isAdmin: true },
           { did: "did:plc:carol", handle: "handle.invalid", isAdmin: false },
         ],
-        hasMore: false,
       },
     );
     queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
       ["trackedAccounts", ""],
       {
-        total: 3,
         accounts: [
           { ...bob, registeredFollowersCount: 3 },
           { ...alice, registeredFollowersCount: 1 },
