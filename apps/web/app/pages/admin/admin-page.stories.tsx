@@ -117,6 +117,39 @@ export const BannedAccounts: Story = {
   },
 };
 
+export const ProfileLinks: Story = {
+  name: "adminAccounts-s4: メンバーと停止中のアカウントは、アバターや名前を押すとそのアカウントのプロフィールを開く",
+  beforeEach: () => {
+    queryClient.setQueryData(
+      ["serverMembers"],
+      serverMembersData("completed", alice),
+    );
+    queryClient.setQueryData(["bannedAccounts"], {
+      pages: [{ actors: [bob] } satisfies BannedAccountsResponse],
+      pageParams: [undefined],
+    });
+  },
+  args: {
+    children: <ServerMemberListContainer />,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const main = within(canvas.getByRole("main"));
+
+    await expect(main.getByRole("link", { name: /Alice/ })).toHaveAttribute(
+      "href",
+      "/alice.bsky.social",
+    );
+
+    await userEvent.click(canvas.getByRole("tab", { name: "停止中" }));
+
+    await expect(main.getByRole("link", { name: /Bob/ })).toHaveAttribute(
+      "href",
+      "/bob.bsky.social",
+    );
+  },
+};
+
 export const BackfillBadges: Story = {
   name: "syncStatus-s1: 追跡アカウントには、過去の投稿の同期状態を「同期中」「同期済み」「同期エラー」のバッジで表示する",
   beforeEach: () => {
