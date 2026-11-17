@@ -36,6 +36,7 @@ const deploy = (cpu: number) => ({
 
 export default defineRailway(() => {
   const db = postgres("Postgres", { region });
+  const dbData = volume("postgres-volume", { region, sizeMB: 100_000 });
   const cache = redis("Redis", { region });
 
   const tapData = volume("tap-data", { region, sizeMB: 5000 });
@@ -138,6 +139,7 @@ export default defineRailway(() => {
   return project("Subscope", {
     resources: [
       db,
+      dbData,
       cache,
       tapData,
       tap,
