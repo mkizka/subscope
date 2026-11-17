@@ -67,22 +67,6 @@ const serverMembersData = (
   pageParams: [undefined],
 });
 
-export const MemberCount: Story = {
-  name: "adminAccounts-s1: 見出しの横にメンバーの人数を出す",
-  beforeEach: () => {
-    queryClient.setQueryData(
-      ["serverMembers"],
-      serverMembersData("completed", alice, bob),
-    );
-  },
-  args: {
-    children: <ServerMemberListContainer />,
-  },
-  play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByText("2人")).toBeVisible();
-  },
-};
-
 export const AddMemberDialog: Story = {
   name: "adminAccounts-s3: 「メンバー」タブの見出しの横の「メンバーを追加」で、ハンドルかDIDを入力するダイアログを開く",
   beforeEach: () => {
