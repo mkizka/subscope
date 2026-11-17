@@ -41,7 +41,6 @@ const meta = {
       </ComposeProvider>
     ),
   ],
-  args: { local: false },
   parameters: {
     layout: "fullscreen",
   },
@@ -328,7 +327,7 @@ export const ImageViewerZoom: Story = {
 };
 
 export const Local: Story = {
-  args: { local: true },
+  args: { defaultLocal: true },
   beforeEach: () => {
     queryClient.setQueryData(
       ["local-timeline"],

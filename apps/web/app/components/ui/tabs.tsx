@@ -10,10 +10,9 @@ type Props = {
     selected: boolean;
     onClick?: () => void;
   }[];
-  onSelect?: (to: string) => void;
 };
 
-export function Tabs({ tabs, onSelect }: Props) {
+export function Tabs({ tabs }: Props) {
   const hydrated = useHydrated();
   return (
     <div
@@ -51,7 +50,6 @@ export function Tabs({ tabs, onSelect }: Props) {
           <Link
             key={to}
             to={to}
-            onClick={() => onSelect?.(to)}
             role="tab"
             aria-selected={selected}
             className={className}

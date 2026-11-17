@@ -66,7 +66,7 @@ export function NavMenu({
         {...p}
         onNavigate={() => {
           onNavigate?.();
-          reloadTimeline("/");
+          reloadTimeline();
         }}
       >
         ホーム
