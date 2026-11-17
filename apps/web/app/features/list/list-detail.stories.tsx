@@ -11,6 +11,7 @@ const meta = {
     name: "友達",
     description: "よく話す人たち",
     tab: "posts",
+    onTabChange: fn(),
     isSelf: true,
     onDelete: fn(),
     posts: [
