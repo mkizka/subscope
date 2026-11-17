@@ -277,7 +277,7 @@ export const createAppRegistry = (env: Env) =>
     .service("listServerMembersUseCase", ["viewContextFactory", "profileViews", "accountRepository", "registrationQuery"], asClassArgs(ListServerMembersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "accountRepository", "registrationRepository"], asClassArgs(GrantAdminUseCase))
     .service("revokeAdminUseCase", ["transactionManager", "accountRepository"], asClassArgs(RevokeAdminUseCase))
-    .service("registerAdminUseCase", ["transactionManager", "accountQuery", "registrationRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
+    .service("registerAdminUseCase", ["transactionManager", "accountQuery", "createAdminService", "registerAccountService"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["accountRepository"], asClassArgs(VerifyAccessUseCase))
     .service("getServerMembersUseCase", ["registrationQuery", "accountRepository", "viewContextFactory", "profileViews"], asClassArgs(GetServerMembersUseCase))
     .service("getOperatorUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetOperatorUseCase))
