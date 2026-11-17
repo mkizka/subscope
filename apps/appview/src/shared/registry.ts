@@ -288,7 +288,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
     .service("registerAccountUseCase", ["registerAccountService"], asClassArgs(RegisterAccountUseCase))
     .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "registerAccountService"], asClassArgs(AddMemberUseCase))
-    .service("unregisterAccountUseCase", ["unregisterAccountService"], asClassArgs(UnregisterAccountUseCase))
+    .service("unregisterAccountUseCase", ["transactionManager", "unregisterAccountService"], asClassArgs(UnregisterAccountUseCase))
     .service("unbanAccountUseCase", ["transactionManager", "accountRepository"], asClassArgs(UnbanAccountUseCase))
     .service("banAccountUseCase", ["transactionManager", "accountRepository", "unregisterAccountService"], asClassArgs(BanAccountUseCase))
     .service("updateSeenUseCase", ["transactionManager", "registrationRepository"], asClassArgs(UpdateSeenUseCase))

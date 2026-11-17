@@ -56,8 +56,14 @@ export class RegistrationRepository implements IRegistrationRepository {
       });
   }
 
-  async delete(accountDid: Did): Promise<void> {
-    await this.db
+  async delete({
+    ctx,
+    accountDid,
+  }: {
+    ctx: TransactionContext;
+    accountDid: Did;
+  }): Promise<void> {
+    await ctx.db
       .delete(schema.registrations)
       .where(eq(schema.registrations.accountDid, accountDid));
   }

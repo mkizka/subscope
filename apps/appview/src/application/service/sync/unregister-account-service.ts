@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { IJobScheduler } from "@repo/common/interface";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { IFollowQuery } from "../../interfaces/queries/follow-query.js";
@@ -18,18 +18,26 @@ export class UnregisterAccountService {
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
-  async unregister(accountDid: Did): Promise<void> {
+  async unregister({
+    ctx,
+    accountDid,
+  }: {
+    ctx: AfterCommitContext;
+    accountDid: Did;
+  }): Promise<void> {
     const existingRegistration =
       await this.registrationRepository.find(accountDid);
     if (!existingRegistration) {
       throw new NotRegisteredError("Not registered with this server");
     }
 
-    await this.registrationRepository.delete(accountDid);
+    await this.registrationRepository.delete({ ctx, accountDid });
 
     const followeeDids = await this.followQuery.findFolloweeDids(accountDid);
-    for (const did of [accountDid, ...followeeDids]) {
-      await this.jobScheduler.scheduleSyncTapRepo(did);
-    }
+    ctx.afterCommit(async () => {
+      for (const did of [accountDid, ...followeeDids]) {
+        await this.jobScheduler.scheduleSyncTapRepo(did);
+      }
+    });
   }
 }
