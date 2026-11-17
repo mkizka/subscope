@@ -3,7 +3,7 @@ import { type ITransactionManager } from "@repo/common/interface";
 
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
 import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
-import type { RegisterAccountService } from "../../service/sync/register-account-service.js";
+import type { CreateRegistrationService } from "../../service/sync/create-registration-service.js";
 
 export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {
@@ -21,7 +21,7 @@ export class RegisterAdminUseCase {
     private readonly transactionManager: ITransactionManager,
     private readonly accountQuery: IAccountQuery,
     private readonly createAdminService: CreateAdminService,
-    private readonly registerAccountService: RegisterAccountService,
+    private readonly createRegistrationService: CreateRegistrationService,
   ) {}
 
   async execute(params: RegisterAdminParams): Promise<void> {
@@ -35,7 +35,7 @@ export class RegisterAdminUseCase {
         ctx,
         did: params.requesterDid,
       });
-      await this.registerAccountService.createRegistration({
+      await this.createRegistrationService.create({
         ctx,
         accountDid: params.requesterDid,
       });
