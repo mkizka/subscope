@@ -1,11 +1,13 @@
 import { asDid } from "@atproto/did";
 import banAccount from "@repo/client/me/subsco/admin/banAccount";
+import { schema } from "@repo/db";
 import {
   accountFactory,
   followFactory,
   recordFactory,
   testSetup,
 } from "@repo/test-utils";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -61,5 +63,32 @@ describe("me.subsco.admin.banAccount", () => {
       { did: asDid(serverMember.did) },
       { did: followee.did },
     ]);
+  });
+
+  test("banAccount-3: 登録を消し、登録停止中にする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const admin = await accountFactory(ctx.db)
+      .props({ isAdmin: () => true })
+      .create();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    loginAs(admin.did);
+
+    // act
+    await client.call(banAccount, { did: asDid(serverMember.did) });
+
+    // assert
+    const registrations = await ctx.db
+      .select()
+      .from(schema.registrations)
+      .where(eq(schema.registrations.accountDid, serverMember.did));
+    expect(registrations).toEqual([]);
+    const [account] = await ctx.db
+      .select()
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, serverMember.did));
+    expect(account?.isBanned).toBe(true);
   });
 });

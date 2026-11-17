@@ -35,10 +35,13 @@ export class BanAccountUseCase {
       throw new CannotBanAdminError("Cannot ban an admin");
     }
 
-    await this.unregisterAccountService.unregister(params.did);
     account.ban();
-    await this.transactionManager.transaction((ctx) =>
-      this.accountRepository.save({ ctx, account }),
-    );
+    await this.transactionManager.transaction(async (ctx) => {
+      await this.unregisterAccountService.unregister({
+        ctx,
+        accountDid: params.did,
+      });
+      await this.accountRepository.save({ ctx, account });
+    });
   }
 }
