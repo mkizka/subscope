@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import { BanIcon, EllipsisIcon, ShieldIcon, UndoIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
@@ -31,7 +32,8 @@ function BackfillBadge({ status }: { status: string }) {
   return <Badge>同期中</Badge>;
 }
 
-const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";
+const rowClass =
+  "flex items-center gap-3 border-b border-line px-4 py-3 hover:bg-surface-2";
 
 export type ServerMemberTab = "serverMembers" | "banned";
 
@@ -42,8 +44,13 @@ function ProfileCell({
   account: BannedAccount;
   children?: ReactNode;
 }) {
+  const profileId =
+    account.handle === "handle.invalid" ? account.did : account.handle;
   return (
-    <>
+    <Link
+      to={`/${profileId}`}
+      className="flex min-w-0 flex-1 items-center gap-3"
+    >
       <Avatar src={account.avatar} />
       <div className="min-w-0 flex-1">
         <div className="truncate text-body font-bold">
@@ -54,7 +61,7 @@ function ProfileCell({
         </div>
         {children}
       </div>
-    </>
+    </Link>
   );
 }
 
