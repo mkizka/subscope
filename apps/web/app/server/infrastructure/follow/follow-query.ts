@@ -11,12 +11,12 @@ export const followQueryFactory = ({
 }): IFollowQuery => {
   const publicClient = new Client(env.APPVIEW_URL);
   return {
-    async findRegisteredFollowers(subject, limit) {
-      const { total, followers } = await publicClient.call(
-        getServerMemberFollowers,
-        { actor: subject, limit },
-      );
-      return { total, dids: followers.map((follower) => follower.did) };
+    async findRegisteredFollowers(subject) {
+      const { followers } = await publicClient.call(getServerMemberFollowers, {
+        actor: subject,
+        limit: 100,
+      });
+      return followers.map((follower) => follower.did);
     },
   };
 };

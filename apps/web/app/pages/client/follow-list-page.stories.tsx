@@ -60,7 +60,7 @@ export const Loading: Story = {
 };
 
 export const FollowersTabs: Story = {
-  name: "followList-s3: フォロワー一覧に「すべて」「知り合い」「メンバー」のタブを出し、「メンバー」には人数を添える",
+  name: "followList-s3: フォロワー一覧に「すべて」「知り合い」「メンバー」のタブを出し",
   args: { kind: "followers" },
   parameters: { path: "/alice.bsky.social/followers" },
   beforeEach: () => {
@@ -69,7 +69,6 @@ export const FollowersTabs: Story = {
       infinite<typeof followListLoader>({
         subject: alice,
         accounts: [bob],
-        registeredCount: 3,
       }),
     );
   },
@@ -77,7 +76,7 @@ export const FollowersTabs: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole("tab", { name: "すべて" })).toBeVisible();
     await expect(canvas.getByRole("tab", { name: "知り合い" })).toBeVisible();
-    await expect(canvas.getByRole("tab", { name: "メンバー 3" })).toBeVisible();
+    await expect(canvas.getByRole("tab", { name: "メンバー" })).toBeVisible();
   },
 };
 

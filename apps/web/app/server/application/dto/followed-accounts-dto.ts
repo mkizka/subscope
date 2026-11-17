@@ -1,7 +1,6 @@
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 export type FollowedAccountsDto = {
-  total: number;
   accounts: {
     did: string;
     handle: string;
