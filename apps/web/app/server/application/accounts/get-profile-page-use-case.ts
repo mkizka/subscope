@@ -19,7 +19,6 @@ export interface IGetProfilePageUseCase {
     backfillStatus?: BackfillStatus;
     posts: TimelinePostDto[];
     cursor?: string;
-    tab: ProfileTab;
   }>;
 }
 
@@ -42,7 +41,6 @@ export const getProfilePageUseCaseFactory = ({
       backfillStatus: statuses[profile.did],
       posts,
       cursor: next,
-      tab,
     };
   },
 });

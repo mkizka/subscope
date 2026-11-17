@@ -99,10 +99,11 @@ test.describe("プロフィール", () => {
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/alice.test?tab=replies");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "リプライ" }).click();
       await expect(main.getByText(reply)).toBeVisible({ timeout: 1000 });
     }).toPass();
 
@@ -128,13 +129,12 @@ test.describe("プロフィール", () => {
     await page.goto("/bob.test");
     const main = page.getByRole("main");
 
-    await main.getByRole("tab", { name: "いいね" }).click();
-
-    await expect(page).toHaveURL("/bob.test?tab=likes");
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "いいね" }).click();
       await expect(main.getByText(text)).toBeVisible({ timeout: 1000 });
     }).toPass();
+    await expect(page).toHaveURL("/bob.test");
   });
 
   test("profile-e5: 「メディア」タブは画像付きの投稿だけを表示する", async ({
@@ -154,11 +154,12 @@ test.describe("プロフィール", () => {
       text,
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/alice.test?tab=media");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
 
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "メディア" }).click();
       await expect(main.getByText(image)).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(main.getByText(text)).toHaveCount(0);
@@ -190,11 +191,12 @@ test.describe("プロフィール", () => {
     await page.route("https://video.bsky.app/watch/**/thumbnail.jpg", (route) =>
       route.fulfill({ status: 404 }),
     );
-    await page.goto("/alice.test?tab=video");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
 
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "動画" }).click();
       await expect(main.getByText(video)).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(main.getByText(text)).toHaveCount(0);
@@ -305,11 +307,12 @@ test.describe("プロフィール", () => {
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/alice.test?tab=replies");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
 
     await expect(async () => {
       await page.reload();
+      await main.getByRole("tab", { name: "リプライ" }).click();
       await expect(main.getByText(reply)).toBeVisible({ timeout: 1000 });
     }).toPass();
 

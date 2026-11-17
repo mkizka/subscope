@@ -49,7 +49,7 @@ export function ListDetail({
     <>
       <header className="flex items-center gap-2 border-b border-line p-4">
         <Link
-          to={`/${handle}/lists`}
+          to={`/${handle}`}
           aria-label="戻る"
           className="shrink-0 text-muted"
         >

@@ -1,5 +1,5 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useOutlet, useSearchParams } from "react-router";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { LoadingSpinner } from "@/app/components/loading-spinner";
@@ -7,6 +7,7 @@ import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
 import { FollowButtonContainer } from "@/app/features/account/follow-button-container";
 import { AddToListContainer } from "@/app/features/list/add-to-list-container";
+import { ListsContainer } from "@/app/features/list/lists-container";
 import { TimelineFeed } from "@/app/features/timeline/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
@@ -16,21 +17,22 @@ import { UntrackedNotice } from "./untracked-notice";
 
 type ProfileResponse = Awaited<ReturnType<typeof loader>>["data"];
 
-const tabLabels = {
-  posts: "投稿",
-  replies: "リプライ",
-  media: "メディア",
-  video: "動画",
-  likes: "いいね",
-};
+const tabs = [
+  ["posts", "投稿"],
+  ["replies", "リプライ"],
+  ["media", "メディア"],
+  ["video", "動画"],
+  ["likes", "いいね"],
+  ["lists", "リスト"],
+] as const;
 
 type Props = {
   handle: string;
 };
 
 export function ProfileContainer({ handle }: Props) {
-  const listsTab = useOutlet();
-  const tabParam = useSearchParams()[0].get("tab") ?? "";
+  const [tab, setTab] = useState<(typeof tabs)[number][0]>("posts");
+  const postsTab = tab === "lists" ? "posts" : tab;
   const {
     data: pages,
     isPlaceholderData,
@@ -38,21 +40,19 @@ export function ProfileContainer({ handle }: Props) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["profile", handle, tabParam],
+    queryKey: ["profile", handle, postsTab],
     queryFn: ({ pageParam }) =>
       fetchJson<ProfileResponse>(
-        `/api/profile/${handle}?${new URLSearchParams({ tab: tabParam, ...(pageParam && { cursor: pageParam }) })}`,
+        `/api/profile/${handle}?${new URLSearchParams({ tab: postsTab, ...(pageParam && { cursor: pageParam }) })}`,
       ),
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
-    placeholderData: (previous, previousQuery) =>
-      previousQuery?.queryKey[1] === handle ? previous : undefined,
+    placeholderData: keepPreviousData,
     throwOnError: true,
   });
 
   const data = pages?.pages[0];
-  const tabs = ["posts", "replies", "media", "video", "likes"] as const;
   const { profile } = data ?? {};
   return (
     <>
@@ -86,43 +86,32 @@ export function ProfileContainer({ handle }: Props) {
       />
       {data && (
         <Tabs
-          tabs={[
-            ...tabs.map((value) => ({
-              to: value === "posts" ? `/${handle}` : `/${handle}?tab=${value}`,
-              label: tabLabels[value],
-              selected:
-                !listsTab &&
-                ((isPlaceholderData ? undefined : data.tab) ??
-                  (tabParam || "posts")) === value,
-            })),
-            {
-              to: `/${handle}/lists`,
-              label: "リスト",
-              selected: !!listsTab,
-            },
-          ]}
+          tabs={tabs.map(([value, label]) => ({
+            label,
+            selected: tab === value,
+            onClick: () => setTab(value),
+          }))}
         />
       )}
       {data && !data.backfillStatus && <UntrackedNotice />}
-      {listsTab ??
-        (pages && data && !isPlaceholderData ? (
-          // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
-          <>
-            <TimelineFeed posts={pages.pages.flatMap((page) => page.posts)} />
-            {hasNextPage && (
-              <LoadingSpinner label="続きを読み込み中">
-                <InfiniteScrollTrigger
-                  onIntersect={() =>
-                    void fetchNextPage({ cancelRefetch: false })
-                  }
-                  enabled={!isFetchingNextPage}
-                />
-              </LoadingSpinner>
-            )}
-          </>
-        ) : (
-          <PostsSkeleton />
-        ))}
+      {tab === "lists" ? (
+        <ListsContainer handle={handle} />
+      ) : pages && data && !isPlaceholderData ? (
+        // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
+        <>
+          <TimelineFeed posts={pages.pages.flatMap((page) => page.posts)} />
+          {hasNextPage && (
+            <LoadingSpinner label="続きを読み込み中">
+              <InfiniteScrollTrigger
+                onIntersect={() => void fetchNextPage({ cancelRefetch: false })}
+                enabled={!isFetchingNextPage}
+              />
+            </LoadingSpinner>
+          )}
+        </>
+      ) : (
+        <PostsSkeleton />
+      )}
     </>
   );
 }
