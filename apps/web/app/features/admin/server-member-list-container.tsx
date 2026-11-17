@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
+import { AddMemberDialogContainer } from "./add-member-dialog-container";
 import { ServerMemberList, type ServerMemberTab } from "./server-member-list";
 
 async function fetchBannedAccounts(
@@ -98,7 +99,6 @@ export function ServerMemberListContainer() {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
     select: (data) => ({
-      total: data.pages[0]?.total,
       serverMembers: data.pages.flatMap((page) =>
         page.serverMembers.map(({ profile, ...serverMember }) => ({
           ...profile,
@@ -116,7 +116,6 @@ export function ServerMemberListContainer() {
       tab={tab}
       serverMembers={serverMembersQuery.data?.serverMembers ?? []}
       bannedAccounts={bannedQuery.data ?? []}
-      total={serverMembersQuery.data?.total}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={() => void fetchNextPage({ cancelRefetch: false })}
@@ -129,6 +128,7 @@ export function ServerMemberListContainer() {
       banningDid={banMutation.isPending ? banMutation.variables : null}
       onUnban={unbanMutation.mutate}
       unbanningDid={unbanMutation.isPending ? unbanMutation.variables : null}
+      addMemberButton={<AddMemberDialogContainer />}
     />
   );
 }

@@ -70,7 +70,7 @@ export class RegisterAccountService {
     await this.inviteCodeRepository.save({ inviteCode, ctx });
   }
 
-  async execute({
+  async register({
     accountDid,
     code,
     inviteCodeRequired,

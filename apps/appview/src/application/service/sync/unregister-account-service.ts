@@ -18,7 +18,7 @@ export class UnregisterAccountService {
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
-  async execute(accountDid: Did): Promise<void> {
+  async unregister(accountDid: Did): Promise<void> {
     const existingRegistration =
       await this.registrationRepository.find(accountDid);
     if (!existingRegistration) {

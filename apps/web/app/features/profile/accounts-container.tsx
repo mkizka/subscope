@@ -48,12 +48,12 @@ export function AccountsContainer() {
         tabs={[
           {
             to: "/server",
-            label: `メンバー${registered && !q ? ` ${registered.serverMembers.length}${registered.hasMore ? "+" : ""}` : ""}`,
+            label: "メンバー",
             selected: !tracked,
           },
           {
             to: "/server?tab=tracked",
-            label: `誰かがフォロー${trackedData ? ` ${trackedData.total}` : ""}`,
+            label: "誰かがフォロー",
             selected: tracked,
           },
         ]}

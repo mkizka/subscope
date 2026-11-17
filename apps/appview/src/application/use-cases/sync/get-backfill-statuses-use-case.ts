@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { BackfillStatus } from "@repo/db";
 
+import type { BackfillStatus } from "../../../domain/models/account.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 
 export class GetBackfillStatusesUseCase {

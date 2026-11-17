@@ -62,7 +62,6 @@ type Props = {
   tab?: ServerMemberTab;
   serverMembers: ServerMember[];
   bannedAccounts?: BannedAccount[];
-  total?: number;
   isLoading?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
@@ -73,13 +72,13 @@ type Props = {
   banningDid?: string | null;
   onUnban?: (did: string) => void;
   unbanningDid?: string | null;
+  addMemberButton?: ReactNode;
 };
 
 export function ServerMemberList({
   tab = "serverMembers",
   serverMembers,
   bannedAccounts = [],
-  total,
   isLoading,
   isFetchingNextPage,
   onLoadMore,
@@ -90,16 +89,15 @@ export function ServerMemberList({
   banningDid,
   onUnban,
   unbanningDid,
+  addMemberButton,
 }: Props) {
   const isEmpty =
     tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
   return (
     <>
-      <div className="flex items-baseline gap-2 px-4 py-3">
+      <div className="flex items-center justify-between gap-2 px-4 py-3">
         <h1 className="text-title">アカウント管理</h1>
-        {total !== undefined && (
-          <span className="text-label text-muted">{total}人</span>
-        )}
+        {tab === "serverMembers" && addMemberButton}
       </div>
       <Tabs
         tabs={[

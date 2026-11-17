@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { BackfillStatus } from "@repo/db";
 
+import type { BackfillStatus } from "../../../domain/models/account.js";
 import type { Registration } from "../../../domain/models/registration.js";
 
 export interface IRegistrationQuery {

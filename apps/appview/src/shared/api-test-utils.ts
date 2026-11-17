@@ -8,6 +8,7 @@ import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
   InMemoryDidResolver,
+  InMemoryHandleResolver,
   InMemoryJobQueue,
 } from "@repo/common/test";
 import { testSetup } from "@repo/test-utils";
@@ -24,6 +25,7 @@ const apiTestRegistry = createAppRegistry(testEnv)
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
+  .replaceService("atprotoHandleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceValue("tokenVerifier", { verify: ({ token }: { token: string }) => Promise.resolve({ did: asDid(token) }) });
 
 export const setupApiTest = async () => {
@@ -40,5 +42,12 @@ export const setupApiTest = async () => {
   const loginAs = (did: string, target = client) => {
     target.headers.set("authorization", `Bearer ${did}`);
   };
-  return { client, createClient, loginAs, jobScheduler: services.jobScheduler };
+  return {
+    client,
+    createClient,
+    loginAs,
+    jobScheduler: services.jobScheduler,
+    didResolver: services.didResolver,
+    atprotoHandleResolver: services.atprotoHandleResolver,
+  };
 };

@@ -37,7 +37,6 @@ export const Default: Story = {
         backfillStatus: "error",
       },
     ],
-    total: 3,
   },
 };
 

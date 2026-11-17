@@ -29,18 +29,9 @@ export const getFollowListUseCaseFactory = ({
       kind === "followers" && filter === "known"
         ? await accountQuery.findKnownFollowers(did, account, cursor)
         : await accountQuery.findFollowList(did, account, kind);
-    if (kind === "followers" && filter !== "known") {
-      const { total, dids } = await followQuery.findRegisteredFollowers(
-        account,
-        filter === "registered" ? 100 : 1,
-      );
-      list = {
-        ...list,
-        registeredCount: total,
-        ...(filter === "registered" && {
-          accounts: await accountQuery.findProfiles(did, dids),
-        }),
-      };
+    if (kind === "followers" && filter === "registered") {
+      const dids = await followQuery.findRegisteredFollowers(account);
+      list = { ...list, accounts: await accountQuery.findProfiles(did, dids) };
     }
     const statuses = await backfillQuery.findTrackedStatuses(
       list.accounts.map((item) => item.did),

@@ -1,7 +1,7 @@
 import type { $OutputBody as BannedAccountsResponse } from "@repo/client/me/subsco/admin/getBannedAccounts";
 import type { $OutputBody as ServerMembersResponse } from "@repo/client/me/subsco/admin/listServerMembers";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 import { alice, bob, queryClient } from "@/.storybook/query-client";
 import { ServerMemberListContainer } from "@/app/features/admin/server-member-list-container";
@@ -67,8 +67,8 @@ const serverMembersData = (
   pageParams: [undefined],
 });
 
-export const MemberCount: Story = {
-  name: "adminAccounts-s1: 見出しの横にメンバーの人数を出す",
+export const AddMemberDialog: Story = {
+  name: "adminAccounts-s3: 「メンバー」タブの見出しの横の「メンバーを追加」で、ハンドルかDIDを入力するダイアログを開く",
   beforeEach: () => {
     queryClient.setQueryData(
       ["serverMembers"],
@@ -79,7 +79,17 @@ export const MemberCount: Story = {
     children: <ServerMemberListContainer />,
   },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByText("2人")).toBeVisible();
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "メンバーを追加" }),
+    );
+
+    const dialog = canvas.getByRole("dialog", { name: "メンバーを追加" });
+    await expect(dialog).toBeVisible();
+    await expect(
+      within(dialog).getByRole("textbox", { name: "ハンドルまたはDID" }),
+    ).toBeVisible();
   },
 };
 

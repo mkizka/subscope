@@ -50,13 +50,10 @@ export const subscopeQueryFactory = ({
     },
     async findMembers(q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-      const { serverMembers, cursor } = await publicClient.call(
-        getServerMembers,
-        {
-          limit: 100,
-          q,
-        },
-      );
+      const { serverMembers } = await publicClient.call(getServerMembers, {
+        limit: 100,
+        q,
+      });
       return {
         serverMembers: serverMembers.map(({ profile, isAdmin }) => ({
           did: profile.did,
@@ -66,16 +63,14 @@ export const subscopeQueryFactory = ({
           description: profile.description,
           isAdmin,
         })),
-        hasMore: cursor !== undefined,
       };
     },
     async findFollowedAccounts(did, q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-      const { followedAccounts, total } = await (
+      const { followedAccounts } = await (
         await restore(did)
       ).call(getFollowedAccounts, { limit: 100, q });
       return {
-        total,
         accounts: followedAccounts.map(
           ({ profile, registeredFollowersCount }) => ({
             did: profile.did,
