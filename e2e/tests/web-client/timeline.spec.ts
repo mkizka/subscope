@@ -321,11 +321,9 @@ test.describe("ローカルタイムライン", () => {
     await createPosts(request, texts);
     texts.reverse();
 
-    await page.goto("/");
-    await page.getByRole("tab", { name: "ローカル" }).click();
-
     await expect(async () => {
-      await page.reload();
+      await page.goto("/");
+      await page.getByRole("tab", { name: "ローカル" }).click();
       await expect(page.getByText(/^localTimeline-e1: /)).toHaveText(texts, {
         timeout: 1000,
       });
@@ -343,10 +341,9 @@ test.describe("ローカルタイムライン", () => {
     });
     await createPosts(request, ["localTimeline-e2: メンバーの投稿"]);
 
-    await page.goto("/?tab=local");
-
     await expect(async () => {
-      await page.reload();
+      await page.goto("/");
+      await page.getByRole("tab", { name: "ローカル" }).click();
       await expect(
         page.getByText("localTimeline-e2: メンバーの投稿"),
       ).toBeVisible({ timeout: 1000 });
@@ -362,13 +359,27 @@ test.describe("ローカルタイムライン", () => {
   }) => {
     await createPosts(request, ["localTimeline-e3: 投稿"]);
 
-    await page.goto("/?tab=local");
+    await page.goto("/");
+    await page.getByRole("tab", { name: "ローカル" }).click();
     await page.getByRole("tab", { name: "フォロー中" }).click();
 
-    await expect(page).toHaveURL("/");
     await expect(page.getByRole("tab", { name: "フォロー中" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
+  });
+
+  test("localTimeline-e4: 「フォロー中」「ローカル」のタブを切り替えても、URLは変えない", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await page.getByRole("tab", { name: "ローカル" }).click();
+
+    await expect(page.getByRole("tab", { name: "ローカル" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(page).toHaveURL("/");
   });
 });

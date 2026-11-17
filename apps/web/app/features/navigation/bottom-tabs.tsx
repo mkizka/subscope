@@ -54,7 +54,7 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
         to="/"
         label="ホーム"
         icon={<HomeIcon className="size-6" />}
-        onClick={() => reloadTimeline("/")}
+        onClick={() => reloadTimeline()}
       />
       <Tab to="/search" label="検索" icon={<SearchIcon className="size-6" />} />
       <Tab
