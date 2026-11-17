@@ -64,10 +64,11 @@ test.describe("サーバー", () => {
 
     await page.getByRole("tab", { name: /^誰かがフォロー/ }).click();
 
-    await expect(page).toHaveURL("/server?tab=tracked");
+    await expect(page).toHaveURL("/server");
     const bob = items(page).filter({ hasText: "Bob" });
     await expect(async () => {
       await page.reload();
+      await page.getByRole("tab", { name: /^誰かがフォロー/ }).click();
       await expect(bob).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(bob.getByText(/^@/)).toBeVisible();
@@ -96,36 +97,37 @@ test.describe("サーバー", () => {
     ).toBeVisible();
   });
 
-  test("server-e6: 旧URLの `/server/accounts`、`/accounts`、`/registered-accounts`、`/tracked-accounts` は `/server` の該当タブに移動する", async ({
+  test("server-e6: 旧URLの `/server/accounts`、`/accounts`、`/registered-accounts`、`/tracked-accounts` は `/server` に移動する", async ({
     page,
   }) => {
-    await page.goto("/server/accounts?tab=tracked");
-    await expect(page).toHaveURL("/server?tab=tracked");
+    await page.goto("/server/accounts?q=bob");
+    await expect(page).toHaveURL("/server?q=bob");
 
-    await page.goto("/accounts?tab=tracked");
-    await expect(page).toHaveURL("/server?tab=tracked");
+    await page.goto("/accounts?q=bob");
+    await expect(page).toHaveURL("/server?q=bob");
 
     await page.goto("/registered-accounts");
     await expect(page).toHaveURL("/server");
 
     await page.goto("/tracked-accounts");
-    await expect(page).toHaveURL("/server?tab=tracked");
+    await expect(page).toHaveURL("/server");
   });
 
   test("server-e7: 検索欄に入力すると、選んでいるタブの全件を表示名かハンドルの部分一致で絞り込み、検索語をURLに入れる", async ({
     page,
   }) => {
-    await page.goto("/server?tab=tracked");
+    await page.goto("/server");
+    await page.getByRole("tab", { name: /^誰かがフォロー/ }).click();
     await expect(items(page).filter({ hasText: "Bob" })).toBeVisible();
 
     await page.getByPlaceholder("名前・ハンドルで検索").fill("bob");
 
-    await expect(page).toHaveURL("/server?tab=tracked&q=bob");
+    await expect(page).toHaveURL("/server?q=bob");
     await expect(items(page).filter({ hasText: "Bob" })).toBeVisible();
 
     await page.getByPlaceholder("名前・ハンドルで検索").fill("alice");
 
-    await expect(page).toHaveURL("/server?tab=tracked&q=alice");
+    await expect(page).toHaveURL("/server?q=alice");
     await expect(items(page).filter({ hasText: "Bob" })).toBeHidden();
   });
 });
