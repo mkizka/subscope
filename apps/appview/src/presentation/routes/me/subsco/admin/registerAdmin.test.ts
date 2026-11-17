@@ -2,7 +2,12 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import registerAdmin from "@repo/client/me/subsco/admin/registerAdmin";
 import { schema } from "@repo/db";
-import { accountFactory, testSetup } from "@repo/test-utils";
+import {
+  accountFactory,
+  followFactory,
+  recordFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -51,16 +56,30 @@ describe("me.subsco.admin.registerAdmin", () => {
     });
   });
 
-  test("registerAdmin-3: 閲覧者をTapに追加するジョブを積む", async () => {
+  test("registerAdmin-3: 閲覧者とその保存済みのフォロー先をTapに追加するジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
-    loginAs(requesterDid);
+    const account = await accountFactory(ctx.db).create();
+    const followee = await accountFactory(ctx.db).create();
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ account: () => account })
+            .create(),
+        followee: () => followee,
+      })
+      .create();
+    loginAs(account.did);
 
     // act
     await client.call(registerAdmin);
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: requesterDid }]);
+    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
+      { did: account.did },
+      { did: followee.did },
+    ]);
   });
 
   test("registerAdmin-4: 閲覧者のプロフィールを取得するジョブを積む", async () => {

@@ -1,5 +1,6 @@
 import type { Did } from "@atproto/did";
 import {
+  type AfterCommitContext,
   type IJobScheduler,
   type ITransactionManager,
   type TransactionContext,
@@ -72,6 +73,30 @@ export class RegisterAccountService {
     await this.inviteCodeRepository.save({ inviteCode, ctx });
   }
 
+  async createRegistration({
+    ctx,
+    accountDid,
+    code,
+  }: {
+    ctx: AfterCommitContext;
+    accountDid: Did;
+    code?: string;
+  }): Promise<void> {
+    const registration = new Registration({
+      accountDid,
+      inviteCode: code,
+      createdAt: new Date(),
+    });
+    await this.registrationRepository.save({ ctx, registration });
+
+    ctx.afterCommit(async () => {
+      const followeeDids = await this.followQuery.findFolloweeDids(accountDid);
+      for (const did of [accountDid, ...followeeDids]) {
+        await this.jobScheduler.scheduleSyncTapRepo(did);
+      }
+    });
+  }
+
   async register({
     accountDid,
     code,
@@ -100,17 +125,7 @@ export class RegisterAccountService {
         await this.accountRepository.save({ ctx, account });
       }
 
-      const registration = new Registration({
-        accountDid,
-        inviteCode: code,
-        createdAt: new Date(),
-      });
-      await this.registrationRepository.save({ ctx, registration });
+      await this.createRegistration({ ctx, accountDid, code });
     });
-
-    const followeeDids = await this.followQuery.findFolloweeDids(accountDid);
-    for (const did of [accountDid, ...followeeDids]) {
-      await this.jobScheduler.scheduleSyncTapRepo(did);
-    }
   }
 }
