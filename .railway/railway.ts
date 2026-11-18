@@ -49,6 +49,7 @@ export default defineRailway(() => {
       TAP_METRICS_LISTEN: ":6009",
       TAP_COLLECTION_FILTERS: "app.bsky.*",
       TAP_OUTBOX_CAPACITY: "10000",
+      TAP_RESYNC_PARALLELISM: "2",
     },
   });
 
