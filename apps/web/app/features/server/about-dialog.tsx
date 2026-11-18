@@ -53,10 +53,13 @@ export function AboutDialog({ children }: Props) {
             <p>
               またBlueskyのシステムにはなるべく頼らない作りにしています
               <sup>
-                <a href="#about-note-1" className="
-                  text-brand
-                  hover:underline
-                ">
+                <a
+                  href="#about-note-1"
+                  className="
+                    text-brand
+                    hover:underline
+                  "
+                >
                   [1]
                 </a>
               </sup>
