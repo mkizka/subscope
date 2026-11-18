@@ -46,11 +46,11 @@ export const SetupNotice: Story = {
 };
 
 export const Description: Story = {
-  name: "login-s2: ログイン画面にはBlueskyのアカウントでログインする招待制のサーバーであることを出す",
+  name: "login-s2: ログイン画面には、テスト中であることと招待コードで新規登録できることを出す",
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText(
-        "招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。",
+        "ただいまテスト中！招待コードで新規登録してください",
       ),
     ).toBeVisible();
   },
@@ -144,10 +144,12 @@ export const PassportButton: Story = {
 };
 
 export const AboutDialog: Story = {
-  name: "login-s11: 説明の下の「詳しく見る」を押すと、「Subscopeとは」のモーダルを開く",
+  name: "login-s11: 説明の下の「Subscopeについて」を押すと、「Subscopeとは」のモーダルを開く",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: "詳しく見る" }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Subscopeについて" }),
+    );
     await expect(
       canvas.getByRole("dialog", { name: "Subscopeとは" }),
     ).toBeVisible();

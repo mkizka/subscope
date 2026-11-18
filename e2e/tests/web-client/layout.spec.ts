@@ -17,7 +17,7 @@ test.describe("レイアウト", () => {
     await page.goto("/server");
 
     await expect(
-      page.getByRole("main").getByRole("button", { name: "Subscopeとは" }),
+      page.getByRole("main").getByRole("button", { name: "Subscopeについて" }),
     ).toBeVisible();
     await expect(
       rightColumn(page).getByRole("link", { name: /サーバーについて/ }),

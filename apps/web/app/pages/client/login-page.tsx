@@ -41,10 +41,14 @@ export function LoginPage({
             <h1 className="text-title">Subscope</h1>
           </div>
           <h2 className="text-heading">
-            SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
+            Blueskyでフォローしている人だけを
+            <br />
+            表示する分散SNS実装
           </h2>
           <p className="text-label">
-            招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。
+            ただいまテスト中！
+            <br />
+            招待コードで新規登録してください
           </p>
           <AboutDialog>
             {(open) => (
@@ -56,7 +60,7 @@ export function LoginPage({
                 "
                 onClick={open}
               >
-                詳しく見る
+                Subscopeについて
                 <ChevronRightIcon className="size-4" />
               </button>
             )}

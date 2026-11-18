@@ -37,33 +37,41 @@ export function AboutDialog({ children }: Props) {
         </div>
         <div className="space-y-4 overflow-y-auto p-4 text-label">
           <p>
-            SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
+            SubscopeはBlueskyでフォローしている人だけを表示する分散SNS実装です。
           </p>
           <section className="space-y-1">
             <h3 className="font-bold">Blueskyとの違い</h3>
             <p>
-              Subscopeでは、サーバーに登録しているアカウント、または登録アカウントからフォローされているアカウントのみが表示されます。
-            </p>
-            <p>そのためBlueskyと比べて、以下の違いがあります。</p>
-            <ul className="list-disc pl-5">
-              <li>
-                いいね、リポスト、フォロワーなどの数は、多くの場合Blueskyより少なく表示されます
-              </li>
-              <li>検索結果に出てくる投稿やアカウントも少なくなります</li>
-            </ul>
-            <p>
-              機能面では「限られた部分だけ表示するBluesky」です。なお、一部の機能は未実装です。
+              表示されるのは登録しているアカウントとそのフォロー先だけです。さらに登録アカウント以外のアカウントは表示されるデータが不完全なものになっています。
             </p>
           </section>
           <section className="space-y-1">
             <h3 className="font-bold">Subscopeの目的</h3>
             <p>
-              通常、Blueskyと連携する分散SNSを作るには、Blueskyと同等の性能を持つサーバーが必要です。
+              Blueskyと連携するSNSを普通に作るとBluesky並みに大きなサーバーが必要です。Subscopeは保存するデータを絞ることでサーバー代をできるだけ抑えています。
             </p>
             <p>
-              Subscopeは保存するデータを一部に絞ることで、サーバーの保存量を大幅に減らし、誰でも個人で運営できるBluesky連携の分散SNSを目指しています。
+              またBlueskyのシステムにはなるべく頼らない作りにしています
+              <sup>
+                <a
+                  href="#about-note-1"
+                  className="
+                    text-brand
+                    hover:underline
+                  "
+                >
+                  [1]
+                </a>
+              </sup>
+              。Blueskyを離れたくなったときに、現実的な範囲の費用で、誰でも自分のサーバーを持てることを目指しています。
             </p>
           </section>
+          <ol className="border-t border-line pt-3 text-caption text-muted">
+            <li id="about-note-1">
+              1.
+              今はリレー、plc.directory、モデレーションについてBlueskyのものを使っています。詳しい人なら自前のものに置き換えられるはずです。
+            </li>
+          </ol>
         </div>
       </dialog>
     </>
