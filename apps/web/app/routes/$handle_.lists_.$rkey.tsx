@@ -19,7 +19,7 @@ export const action = async ({
   const formData = await request.formData();
   if (formData.get("intent") === "delete") {
     await di.deleteListUseCase.execute(context.get(didContext), params.rkey);
-    return redirect(`/${params.handle}/lists`);
+    return redirect(`/${params.handle}`);
   }
   const submission = parseWithZod(formData, {
     schema: listSchema,

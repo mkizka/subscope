@@ -26,7 +26,7 @@ export class InMemoryRegistrationRepository implements IRegistrationRepository {
     return Promise.resolve();
   }
 
-  delete(accountDid: Did): Promise<void> {
+  delete({ accountDid }: { accountDid: Did }): Promise<void> {
     this.registrations.delete(accountDid);
     return Promise.resolve();
   }

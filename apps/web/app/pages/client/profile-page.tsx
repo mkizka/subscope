@@ -8,7 +8,7 @@ type Props = {
 export function ProfilePage({ handle }: Props) {
   return (
     <ThreeColumnLayout>
-      <ProfileContainer handle={handle} />
+      <ProfileContainer key={handle} handle={handle} />
     </ThreeColumnLayout>
   );
 }

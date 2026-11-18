@@ -4,7 +4,7 @@ import addMember from "@repo/client/me/subsco/admin/addMember";
 import {
   AlreadyRegisteredError,
   BannedError,
-} from "../../../../../application/service/sync/register-account-service.js";
+} from "../../../../../application/service/sync/validate-registration-service.js";
 import {
   AccountNotFoundError,
   type AddMemberUseCase,

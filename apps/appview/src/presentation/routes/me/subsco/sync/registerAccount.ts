@@ -5,9 +5,11 @@ import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 import {
   AlreadyRegisteredError,
   BannedError,
+} from "../../../../../application/service/sync/validate-registration-service.js";
+import {
   InvalidInviteCodeError,
-} from "../../../../../application/service/sync/register-account-service.js";
-import type { RegisterAccountUseCase } from "../../../../../application/use-cases/sync/register-account-use-case.js";
+  type RegisterAccountUseCase,
+} from "../../../../../application/use-cases/sync/register-account-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
 export class RegisterAccount {

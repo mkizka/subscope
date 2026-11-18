@@ -86,7 +86,10 @@ describe("RegistrationRepository", () => {
         .create();
 
       // act
-      await registrationRepository.delete(asDid(registration.accountDid));
+      await registrationRepository.delete({
+        ctx,
+        accountDid: asDid(registration.accountDid),
+      });
 
       // assert
       const deleted = await registrationRepository.find(
@@ -101,7 +104,7 @@ describe("RegistrationRepository", () => {
 
       // act & assert
       await expect(
-        registrationRepository.delete(nonExistentDid),
+        registrationRepository.delete({ ctx, accountDid: nonExistentDid }),
       ).resolves.not.toThrow();
     });
   });

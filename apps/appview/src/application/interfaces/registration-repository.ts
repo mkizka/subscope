@@ -9,5 +9,8 @@ export interface IRegistrationRepository {
     registration: Registration;
     ctx: TransactionContext;
   }) => Promise<void>;
-  delete: (accountDid: Did) => Promise<void>;
+  delete: (params: {
+    ctx: TransactionContext;
+    accountDid: Did;
+  }) => Promise<void>;
 }

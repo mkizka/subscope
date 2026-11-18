@@ -47,8 +47,9 @@ import type { ITokenVerifier } from "../application/interfaces/token-verifier.js
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { AtUriService } from "../application/service/at-uri-service.js";
 import { PostThreadService } from "../application/service/feed/post-thread-service.js";
-import { RegisterAccountService } from "../application/service/sync/register-account-service.js";
+import { CreateRegistrationService } from "../application/service/sync/create-registration-service.js";
 import { UnregisterAccountService } from "../application/service/sync/unregister-account-service.js";
+import { ValidateRegistrationService } from "../application/service/sync/validate-registration-service.js";
 import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
 import { GetProfilesUseCase } from "../application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "../application/use-cases/actor/search-actors-typeahead-use-case.js";
@@ -230,7 +231,8 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["accountRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("registerAccountService", ["transactionManager", "accountRepository", "inviteCodeRepository", "registrationRepository", "jobScheduler"], asClassArgs(RegisterAccountService))
+    .service("validateRegistrationService", ["accountRepository", "registrationRepository"], asClassArgs(ValidateRegistrationService))
+    .service("createRegistrationService", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(CreateRegistrationService))
     .service("unregisterAccountService", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(UnregisterAccountService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "accountRepository"], asClassArgs(AdminMiddleware))
@@ -277,7 +279,7 @@ export const createAppRegistry = (env: Env) =>
     .service("listServerMembersUseCase", ["viewContextFactory", "profileViews", "accountRepository", "registrationQuery"], asClassArgs(ListServerMembersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "accountRepository", "registrationRepository"], asClassArgs(GrantAdminUseCase))
     .service("revokeAdminUseCase", ["transactionManager", "accountRepository"], asClassArgs(RevokeAdminUseCase))
-    .service("registerAdminUseCase", ["transactionManager", "accountQuery", "registrationRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
+    .service("registerAdminUseCase", ["transactionManager", "accountQuery", "createAdminService", "createRegistrationService"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["accountRepository"], asClassArgs(VerifyAccessUseCase))
     .service("getServerMembersUseCase", ["registrationQuery", "accountRepository", "viewContextFactory", "profileViews"], asClassArgs(GetServerMembersUseCase))
     .service("getOperatorUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetOperatorUseCase))
@@ -286,9 +288,9 @@ export const createAppRegistry = (env: Env) =>
     .service("getFollowedAccountsUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowedAccountsUseCase))
     .service("getBackfillStatusesUseCase", ["registrationQuery"], asClassArgs(GetBackfillStatusesUseCase))
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
-    .service("registerAccountUseCase", ["registerAccountService"], asClassArgs(RegisterAccountUseCase))
-    .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "registerAccountService"], asClassArgs(AddMemberUseCase))
-    .service("unregisterAccountUseCase", ["unregisterAccountService"], asClassArgs(UnregisterAccountUseCase))
+    .service("registerAccountUseCase", ["transactionManager", "accountRepository", "inviteCodeRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(RegisterAccountUseCase))
+    .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "transactionManager", "accountRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(AddMemberUseCase))
+    .service("unregisterAccountUseCase", ["transactionManager", "unregisterAccountService"], asClassArgs(UnregisterAccountUseCase))
     .service("unbanAccountUseCase", ["transactionManager", "accountRepository"], asClassArgs(UnbanAccountUseCase))
     .service("banAccountUseCase", ["transactionManager", "accountRepository", "unregisterAccountService"], asClassArgs(BanAccountUseCase))
     .service("updateSeenUseCase", ["transactionManager", "registrationRepository"], asClassArgs(UpdateSeenUseCase))
