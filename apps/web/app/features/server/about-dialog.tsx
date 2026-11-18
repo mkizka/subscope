@@ -51,12 +51,24 @@ export function AboutDialog({ children }: Props) {
               Blueskyと連携するSNSを普通に作るとBluesky並みに大きなサーバーが必要です。Subscopeは保存するデータを絞ることでサーバー代をできるだけ抑えています。
             </p>
             <p>
-              またBlueskyのシステムにはなるべく頼らない作りにしています※。Blueskyを離れたくなったときに、現実的な範囲の費用で、誰でも自分のサーバーを持てることを目指しています。
-            </p>
-            <p className="text-caption text-muted">
-              ※今はリレー、plc.directory、モデレーションについてBlueskyのものを使っています。詳しい人なら自前のものに置き換えられるはずです。
+              またBlueskyのシステムにはなるべく頼らない作りにしています
+              <sup>
+                <a href="#about-note-1" className="
+                  text-brand
+                  hover:underline
+                ">
+                  [1]
+                </a>
+              </sup>
+              。Blueskyを離れたくなったときに、現実的な範囲の費用で、誰でも自分のサーバーを持てることを目指しています。
             </p>
           </section>
+          <ol className="border-t border-line pt-3 text-caption text-muted">
+            <li id="about-note-1">
+              1.
+              今はリレー、plc.directory、モデレーションについてBlueskyのものを使っています。詳しい人なら自前のものに置き換えられるはずです。
+            </li>
+          </ol>
         </div>
       </dialog>
     </>
