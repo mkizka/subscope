@@ -47,7 +47,6 @@ import type { IPostStatsRepository } from "../application/interfaces/repositorie
 import type { IProfileRepository } from "../application/interfaces/repositories/profile-repository.js";
 import type { IPushSubscriptionRepository } from "../application/interfaces/repositories/push-subscription-repository.js";
 import type { IRecordRepository } from "../application/interfaces/repositories/record-repository.js";
-import type { IRecordRevRepository } from "../application/interfaces/repositories/record-rev-repository.js";
 import type { IRepoRevRepository } from "../application/interfaces/repositories/repo-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
@@ -103,7 +102,6 @@ import { PostStatsRepository } from "../infrastructure/repositories/post-stats-r
 import { ProfileRepository } from "../infrastructure/repositories/profile-repository/profile-repository.js";
 import { PushSubscriptionRepository } from "../infrastructure/repositories/push-subscription-repository/push-subscription-repository.js";
 import { RecordRepository } from "../infrastructure/repositories/record-repository/record-repository.js";
-import { RecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.js";
 import { RepoRevRepository } from "../infrastructure/repositories/repo-rev-repository/repo-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
 import { TapClient } from "../infrastructure/tap-client/tap-client.js";
@@ -145,7 +143,6 @@ export const createWorkerRegistry = (env: Env) =>
     .service("postQuery", asClassArgs<IPostQuery>()(PostQuery))
     .service("profileQuery", asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("recordRepository", asClassArgs<IRecordRepository>()(RecordRepository))
-    .service("recordRevRepository", asClassArgs<IRecordRevRepository>()(RecordRevRepository))
     .service("repoRevRepository", asClassArgs<IRepoRevRepository>()(RepoRevRepository))
     .service("followRepository", asClassArgs<IFollowRepository>()(FollowRepository))
     .service("generatorRepository", asClassArgs<IGeneratorRepository>()(GeneratorRepository))
@@ -181,7 +178,7 @@ export const createWorkerRegistry = (env: Env) =>
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidService"], asClassArgs(UpsertIdentityUseCase))
-    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService", "recordRevRepository"], asClassArgs(IndexCommitUseCase))
+    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService"], asClassArgs(IndexCommitUseCase))
     .service("updateRepoRevUseCase", ["transactionManager", "repoRevRepository"], asClassArgs(UpdateRepoRevUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
