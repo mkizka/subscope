@@ -20,6 +20,10 @@ export class InMemoryAccountQuery implements IAccountQuery {
     );
   }
 
+  findRepoRev(): Promise<string | null> {
+    return Promise.resolve(null);
+  }
+
   findBannedDids(params: { limit: number; cursor?: string }): Promise<Did[]> {
     const dids = [...this.accounts.values()]
       .filter((account) => account.isBanned)

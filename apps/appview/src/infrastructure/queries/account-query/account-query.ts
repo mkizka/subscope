@@ -18,6 +18,14 @@ export class AccountQuery implements IAccountQuery {
     return rows.length > 0;
   }
 
+  async findRepoRev(did: Did): Promise<string | null> {
+    const [row] = await this.db
+      .select({ rev: schema.accounts.rev })
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, did));
+    return row?.rev ?? null;
+  }
+
   async findBannedDids(params: {
     limit: number;
     cursor?: string;

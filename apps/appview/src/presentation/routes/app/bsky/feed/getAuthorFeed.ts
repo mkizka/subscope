@@ -4,12 +4,14 @@ import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
 import type { GetAuthorFeedUseCase } from "../../../../../application/use-cases/feed/get-author-feed-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetAuthorFeed {
   constructor(
     private getAuthorFeedUseCase: GetAuthorFeedUseCase,
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
+    private repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -28,7 +30,10 @@ export class GetAuthorFeed {
           includePins: params.includePins,
           viewerDid: viewerDid ?? undefined,
         });
-        return { body };
+        return {
+          headers: await this.repoRevMiddleware.headers(viewerDid),
+          body,
+        };
       },
     });
   }

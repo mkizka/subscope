@@ -36,6 +36,7 @@ export const accountFactory = (db: Database) =>
           status: (): AccountStatus => "active",
           backfillStatus: () =>
             null as "inProgress" | "completed" | "error" | null,
+          rev: () => null as string | null,
         },
         vars: {},
       },

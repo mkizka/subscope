@@ -3,11 +3,13 @@ import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
 
 import type { GetTimelineUseCase } from "../../../../../application/use-cases/feed/get-timeline-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetTimeline {
   constructor(
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getTimelineUseCase: GetTimelineUseCase,
+    private readonly repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -20,7 +22,10 @@ export class GetTimeline {
           cursor: params.cursor,
           viewerDid: credentials.did,
         });
-        return { body };
+        return {
+          headers: await this.repoRevMiddleware.headers(credentials.did),
+          body,
+        };
       },
     });
   }

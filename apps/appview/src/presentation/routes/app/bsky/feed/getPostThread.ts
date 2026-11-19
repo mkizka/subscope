@@ -6,12 +6,14 @@ import type { AtUriService } from "../../../../../application/service/at-uri-ser
 import { PostNotFoundError } from "../../../../../application/service/feed/post-thread-service.js";
 import type { GetPostThreadUseCase } from "../../../../../application/use-cases/feed/get-post-thread-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetPostThread {
   constructor(
     private readonly getPostThreadUseCase: GetPostThreadUseCase,
     private readonly atUriService: AtUriService,
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
+    private readonly repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -30,14 +32,16 @@ export class GetPostThread {
             viewerDid: viewerDid || undefined,
           });
           return {
+            headers: await this.repoRevMiddleware.headers(viewerDid),
             body: result,
           };
         } catch (error) {
           if (error instanceof PostNotFoundError) {
-            throw new LexServerError(400, {
-              error: error.name,
-              message: error.message,
-            });
+            throw new LexServerError(
+              400,
+              { error: error.name, message: error.message },
+              await this.repoRevMiddleware.headers(viewerDid),
+            );
           }
           throw error;
         }

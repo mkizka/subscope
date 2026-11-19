@@ -39,6 +39,16 @@
 
 ヘッダーのredactの指定は応答のヘッダーにそのまま返すだけで、テイクダウンには使わない。
 
+## atproto-repo-revヘッダー
+
+ログイン中の本人のリポジトリのrevを返す。PDSはこのrevより新しい本人のレコードを応答に足し、投稿した直後でも表示に出るようにする。対応しているのはgetProfile、getProfiles、getTimeline、getListFeed、getPostThread、getAuthorFeed、getActorLikes。
+
+| ID              | 仕様                                                            |
+| --------------- | --------------------------------------------------------------- |
+| repoRevHeader-1 | ログイン中なら、本人のrevを応答のatproto-repo-revヘッダーで返す |
+| repoRevHeader-2 | revを記録していないときは、ヘッダーを付けない                   |
+| repoRevHeader-3 | getPostThreadは、投稿が見つからないエラーでもヘッダーを返す     |
+
 ## 返信制限
 
 スレッドの起点の投稿者がthreadgateで決めた「返信できる人」を、投稿のビューに反映する。

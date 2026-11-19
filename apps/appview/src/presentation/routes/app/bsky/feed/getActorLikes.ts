@@ -4,12 +4,14 @@ import getActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
 import type { GetActorLikesUseCase } from "../../../../../application/use-cases/feed/get-actor-likes-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetActorLikes {
   constructor(
     private getActorLikesUseCase: GetActorLikesUseCase,
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
+    private repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -27,7 +29,10 @@ export class GetActorLikes {
           viewerDid: viewerDid ?? undefined,
         });
 
-        return { body };
+        return {
+          headers: await this.repoRevMiddleware.headers(viewerDid),
+          body,
+        };
       },
     });
   }
