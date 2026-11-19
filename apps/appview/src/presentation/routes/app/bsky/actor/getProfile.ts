@@ -9,12 +9,14 @@ import {
 } from "../../../../../application/use-cases/actor/get-profile-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetProfile {
   constructor(
     private getProfileUseCase: GetProfileUseCase,
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
+    private repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -51,6 +53,7 @@ export class GetProfile {
         }
 
         return {
+          headers: await this.repoRevMiddleware.headers(viewerDid),
           body: profile,
         };
       },

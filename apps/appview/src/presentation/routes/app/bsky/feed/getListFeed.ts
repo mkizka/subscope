@@ -3,11 +3,13 @@ import getListFeed from "@repo/client/app/bsky/feed/getListFeed";
 
 import type { GetListFeedUseCase } from "../../../../../application/use-cases/feed/get-list-feed-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetListFeed {
   constructor(
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getListFeedUseCase: GetListFeedUseCase,
+    private readonly repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -20,7 +22,10 @@ export class GetListFeed {
           cursor: params.cursor,
           viewerDid: viewerDid ?? undefined,
         });
-        return { body };
+        return {
+          headers: await this.repoRevMiddleware.headers(viewerDid),
+          body,
+        };
       },
     });
   }

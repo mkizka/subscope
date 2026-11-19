@@ -133,6 +133,7 @@ import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.j
 import { AdminMiddleware } from "../presentation/middleware/admin-middleware.js";
 import { AuthVerifierMiddleware } from "../presentation/middleware/auth-verifier-middleware.js";
 import { HandleMiddleware } from "../presentation/middleware/handle-middleware.js";
+import { RepoRevMiddleware } from "../presentation/middleware/repo-rev-middleware.js";
 import { GetPreferences } from "../presentation/routes/app/bsky/actor/getPreferences.js";
 import { GetProfile } from "../presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "../presentation/routes/app/bsky/actor/getProfiles.js";
@@ -237,6 +238,7 @@ export const createAppRegistry = (env: Env) =>
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "accountRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
+    .service("repoRevMiddleware", ["accountQuery"], asClassArgs(RepoRevMiddleware))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "accountStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
@@ -296,14 +298,14 @@ export const createAppRegistry = (env: Env) =>
     .service("updateSeenUseCase", ["transactionManager", "registrationRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))
-    .service("getProfile", ["getProfileUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfile))
-    .service("getProfiles", ["getProfilesUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfiles))
+    .service("getProfile", ["getProfileUseCase", "handleMiddleware", "authVerifierMiddleware", "repoRevMiddleware"], asClassArgs(GetProfile))
+    .service("getProfiles", ["getProfilesUseCase", "handleMiddleware", "authVerifierMiddleware", "repoRevMiddleware"], asClassArgs(GetProfiles))
     .service("searchActors", ["authVerifierMiddleware", "searchActorsUseCase"], asClassArgs(SearchActors))
     .service("searchActorsTypeahead", ["authVerifierMiddleware", "searchActorsTypeaheadUseCase"], asClassArgs(SearchActorsTypeahead))
     .service("getPosts", ["getPostsUseCase", "authVerifierMiddleware"], asClassArgs(GetPosts))
-    .service("getPostThread", ["getPostThreadUseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThread))
+    .service("getPostThread", ["getPostThreadUseCase", "atUriService", "authVerifierMiddleware", "repoRevMiddleware"], asClassArgs(GetPostThread))
     .service("getPostThreadV2", ["getPostThreadV2UseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThreadV2))
-    .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase"], asClassArgs(GetTimeline))
+    .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase", "repoRevMiddleware"], asClassArgs(GetTimeline))
     .service("listNotifications", ["authVerifierMiddleware", "listNotificationsUseCase"], asClassArgs(ListNotifications))
     .service("getGroupedNotificationsUseCase", ["notificationQuery", "registrationRepository", "viewContextFactory", "notificationViews"], asClassArgs(GetGroupedNotificationsUseCase))
     .service("getGroupedNotifications", ["authVerifierMiddleware", "getGroupedNotificationsUseCase"], asClassArgs(GetGroupedNotifications))
@@ -311,11 +313,11 @@ export const createAppRegistry = (env: Env) =>
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
     .service("searchPosts", ["searchPostsUseCase", "authVerifierMiddleware"], asClassArgs(SearchPosts))
     .service("searchPostsV2", ["searchPostsUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(SearchPostsV2))
-    .service("getActorLikes", ["getActorLikesUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetActorLikes))
-    .service("getAuthorFeed", ["getAuthorFeedUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetAuthorFeed))
+    .service("getActorLikes", ["getActorLikesUseCase", "handleMiddleware", "authVerifierMiddleware", "repoRevMiddleware"], asClassArgs(GetActorLikes))
+    .service("getAuthorFeed", ["getAuthorFeedUseCase", "handleMiddleware", "authVerifierMiddleware", "repoRevMiddleware"], asClassArgs(GetAuthorFeed))
     .service("getFeedGenerators", ["getFeedGeneratorsUseCase", "authVerifierMiddleware"], asClassArgs(GetFeedGenerators))
     .service("getLikes", ["getLikesUseCase", "authVerifierMiddleware"], asClassArgs(GetLikes))
-    .service("getListFeed", ["authVerifierMiddleware", "getListFeedUseCase"], asClassArgs(GetListFeed))
+    .service("getListFeed", ["authVerifierMiddleware", "getListFeedUseCase", "repoRevMiddleware"], asClassArgs(GetListFeed))
     .service("getQuotes", ["getQuotesUseCase", "authVerifierMiddleware"], asClassArgs(GetQuotes))
     .service("getRepostedBy", ["getRepostedByUseCase", "authVerifierMiddleware"], asClassArgs(GetRepostedBy))
     .service("getFollows", ["getFollowsUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetFollows))

@@ -6,12 +6,14 @@ import { isHandle } from "@repo/common/utils";
 import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
+import type { RepoRevMiddleware } from "../../../../../presentation/middleware/repo-rev-middleware.js";
 
 export class GetProfiles {
   constructor(
     private getProfilesUseCase: GetProfilesUseCase,
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
+    private repoRevMiddleware: RepoRevMiddleware,
   ) {}
 
   handle(router: LexRouter) {
@@ -25,6 +27,7 @@ export class GetProfiles {
           await this.handleMiddleware.resolveHandleOrDids(handleOrDids);
         const profiles = await this.getProfilesUseCase.execute(dids, viewerDid);
         return {
+          headers: await this.repoRevMiddleware.headers(viewerDid),
           body: { profiles },
         };
       },
