@@ -41,11 +41,6 @@ export const records = pgTable("records", {
   indexedAt: timestamp().notNull(),
 });
 
-export const recordRevs = pgTable("record_revs", {
-  uri: varchar({ length: 256 }).primaryKey(),
-  rev: varchar({ length: 256 }).notNull(),
-});
-
 export const follows = pgTable(
   "follows",
   {
