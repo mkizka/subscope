@@ -48,6 +48,7 @@ import type { IProfileRepository } from "../application/interfaces/repositories/
 import type { IPushSubscriptionRepository } from "../application/interfaces/repositories/push-subscription-repository.js";
 import type { IRecordRepository } from "../application/interfaces/repositories/record-repository.js";
 import type { IRecordRevRepository } from "../application/interfaces/repositories/record-rev-repository.js";
+import type { IRepoRevRepository } from "../application/interfaces/repositories/repo-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
 import { IndexLabelService } from "../application/services/index-label-service.js";
@@ -73,6 +74,7 @@ import { ScheduleBackfillChecksUseCase } from "../application/use-cases/async/sc
 import { SendPushNotificationUseCase } from "../application/use-cases/async/send-push-notification-use-case.js";
 import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
+import { UpdateRepoRevUseCase } from "../application/use-cases/commit/update-repo-rev-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
@@ -102,6 +104,7 @@ import { ProfileRepository } from "../infrastructure/repositories/profile-reposi
 import { PushSubscriptionRepository } from "../infrastructure/repositories/push-subscription-repository/push-subscription-repository.js";
 import { RecordRepository } from "../infrastructure/repositories/record-repository/record-repository.js";
 import { RecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.js";
+import { RepoRevRepository } from "../infrastructure/repositories/repo-rev-repository/repo-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
 import { TapClient } from "../infrastructure/tap-client/tap-client.js";
 import { WebPushSender } from "../infrastructure/web-push-sender/web-push-sender.js";
@@ -143,6 +146,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("profileQuery", asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("recordRepository", asClassArgs<IRecordRepository>()(RecordRepository))
     .service("recordRevRepository", asClassArgs<IRecordRevRepository>()(RecordRevRepository))
+    .service("repoRevRepository", asClassArgs<IRepoRevRepository>()(RepoRevRepository))
     .service("followRepository", asClassArgs<IFollowRepository>()(FollowRepository))
     .service("generatorRepository", asClassArgs<IGeneratorRepository>()(GeneratorRepository))
     .service("listRepository", asClassArgs<IListRepository>()(ListRepository))
@@ -178,6 +182,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidService"], asClassArgs(UpsertIdentityUseCase))
     .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService", "recordRevRepository"], asClassArgs(IndexCommitUseCase))
+    .service("updateRepoRevUseCase", ["transactionManager", "repoRevRepository"], asClassArgs(UpdateRepoRevUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClassArgs(AggregateAccountStatsUseCase))
@@ -189,6 +194,6 @@ export const createWorkerRegistry = (env: Env) =>
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["env"], healthRouterFactory)
-    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClassArgs(TapSubscriber))
+    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "updateRepoRevUseCase", "upsertIdentityUseCase", "env"], asClassArgs(TapSubscriber))
     .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "env"], asClassArgs(LabelSubscriber))
     .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClassArgs(WorkerServer));

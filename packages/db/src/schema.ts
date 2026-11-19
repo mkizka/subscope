@@ -26,6 +26,7 @@ export const accounts = pgTable(
     backfillStatus: varchar({ length: 16 }).$type<
       "inProgress" | "completed" | "error"
     >(),
+    rev: varchar({ length: 32 }),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("handle_idx").on(table.handle)],

@@ -1,0 +1,1 @@
+ALTER TABLE "accounts" ADD COLUMN "rev" varchar(32);
