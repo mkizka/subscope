@@ -5,6 +5,7 @@ import type { Logger } from "../interface/logger.js";
 export function loggingMiddleware(logger: Logger, isDevelopment: boolean) {
   return pinoHttp({
     logger,
+    redact: ["req.headers.authorization", "req.headers.cookie"],
     autoLogging: {
       ignore: (req) => req.url === "/metrics",
     },
