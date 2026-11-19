@@ -13,7 +13,6 @@ import {
 } from "@repo/common/test";
 import { schema } from "@repo/db";
 import { accountFactory, randomCid, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
@@ -41,17 +40,6 @@ describe("commit", () => {
     await services.indexCommitUseCase.execute(command);
   };
 
-  const deleteEvent = (did: string, rev: string): RecordEvent => ({
-    id: 1,
-    type: "record",
-    action: "delete",
-    did: asDid(did),
-    rev,
-    collection: "app.bsky.feed.post",
-    rkey: "123",
-    live: true,
-  });
-
   const postEvent = (
     did: string,
     action: "create" | "update",
@@ -72,101 +60,6 @@ describe("commit", () => {
       createdAt: new Date().toISOString(),
     },
     live: true,
-  });
-
-  const findPost = async (did: string) => {
-    const uri = AtUri.make(did, "app.bsky.feed.post", "123").toString();
-    const [post] = await ctx.db
-      .select()
-      .from(schema.posts)
-      .where(eq(schema.posts.uri, uri));
-    return post ?? null;
-  };
-
-  test("index-5: 削除したレコードを、それより古いコミットで復活させない", async () => {
-    // arrange
-    const account = await accountFactory(ctx.db)
-      .use((t) => t.serverMember())
-      .create();
-    await processCommit(deleteEvent(account.did, "3bbbbbbbbbbbb"));
-
-    // act
-    await processCommit(
-      postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
-    );
-
-    // assert
-    expect(await findPost(account.did)).toBeNull();
-  });
-
-  test("index-6: 更新したレコードを、それより古いコミットで古い内容に戻さない", async () => {
-    // arrange
-    const account = await accountFactory(ctx.db)
-      .use((t) => t.serverMember())
-      .create();
-    await processCommit(
-      postEvent(account.did, "update", "3bbbbbbbbbbbb", "new"),
-    );
-
-    // act
-    await processCommit(
-      postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
-    );
-
-    // assert
-    expect((await findPost(account.did))?.text).toBe("new");
-  });
-
-  test("index-8: 処理済みと同じrevのコミットは、もう一度処理する", async () => {
-    // arrange
-    const account = await accountFactory(ctx.db)
-      .use((t) => t.serverMember())
-      .create();
-    await processCommit(
-      postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
-    );
-
-    // act
-    await processCommit(
-      postEvent(account.did, "create", "3aaaaaaaaaaaa", "new"),
-    );
-
-    // assert
-    expect((await findPost(account.did))?.text).toBe("new");
-  });
-
-  test("index-14: 保存しないレコードのコミットは、revを記録しない", async () => {
-    // arrange
-    const liker = await accountFactory(ctx.db).create();
-    const uri = AtUri.make(liker.did, "app.bsky.feed.like", "123");
-
-    // act
-    await processCommit({
-      id: 1,
-      type: "record",
-      action: "create",
-      did: asDid(liker.did),
-      rev: "3aaaaaaaaaaaa",
-      collection: "app.bsky.feed.like",
-      rkey: "123",
-      cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
-      record: {
-        $type: "app.bsky.feed.like",
-        subject: {
-          uri: `at://${liker.did}/app.bsky.feed.post/123`,
-          cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
-        },
-        createdAt: new Date().toISOString(),
-      },
-      live: true,
-    });
-
-    // assert
-    const revs = await ctx.db
-      .select()
-      .from(schema.recordRevs)
-      .where(eq(schema.recordRevs.uri, uri.toString()));
-    expect(revs).toEqual([]);
   });
 
   test("index-15: 投稿のgallery埋め込みの画像を、images埋め込みと区別して保存する", async () => {

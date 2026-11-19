@@ -4,7 +4,6 @@ import {
 } from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
-import type { IRecordRevRepository } from "../../interfaces/repositories/record-rev-repository.js";
 import type { IndexRecordService } from "../../services/index-record-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
@@ -15,7 +14,6 @@ export class IndexCommitUseCase {
     loggerManager: ILoggerManager,
     private readonly transactionManager: ITransactionManager,
     private readonly indexRecordService: IndexRecordService,
-    private readonly recordRevRepository: IRecordRevRepository,
   ) {
     this.logger = loggerManager.createLogger("IndexCommitUseCase");
   }
@@ -41,14 +39,6 @@ export class IndexCommitUseCase {
           record: commit.record,
         }))
       ) {
-        return;
-      }
-      const isSaved = await this.recordRevRepository.save({
-        ctx,
-        uri: commit.uri,
-        rev: commit.rev,
-      });
-      if (!isSaved) {
         return;
       }
       switch (commit.operation) {
