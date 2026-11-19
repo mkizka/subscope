@@ -74,6 +74,7 @@ describe("Tapからのイベント受信", () => {
       services.loggerManager,
       services.metricReporter,
       services.indexCommitUseCase,
+      services.updateRepoRevUseCase,
       services.upsertIdentityUseCase,
       {
         TAP_URL: `http://localhost:${address.port}`,
@@ -204,5 +205,87 @@ describe("Tapからのイベント受信", () => {
     expect(transaction).toHaveBeenCalledOnce();
     blocker.reject(new Error("db down"));
     await vi.waitFor(() => expect(acks).toEqual([2]));
+  });
+
+  const findRev = async (did: string) => {
+    const [found] = await ctx.db
+      .select({ rev: schema.accounts.rev })
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, did));
+    return found?.rev;
+  };
+
+  test("repoRev-1: recordイベントを処理したら、そのアカウントのrevをイベントのrevにする", async () => {
+    // arrange
+    await connect();
+    const account = await accountFactory(ctx.db).create();
+
+    // act
+    send(recordEvent(1, account.did, { rev: "3aaaaaaaaaaaa" }));
+
+    // assert
+    await vi.waitFor(() => expect(acks).toEqual([1]));
+    expect(await findRev(account.did)).toBe("3aaaaaaaaaaaa");
+  });
+
+  test("repoRev-2: 保存しないレコードやサポートしないコレクションのイベントでも、revを記録する", async () => {
+    // arrange
+    await connect();
+    const unsupported = await accountFactory(ctx.db).create();
+    const invalid = await accountFactory(ctx.db).create();
+
+    // act
+    send(
+      recordEvent(1, unsupported.did, {
+        rev: "3aaaaaaaaaaaa",
+        collection: "com.example.unknown",
+      }),
+      recordEvent(2, invalid.did, {
+        rev: "3bbbbbbbbbbbb",
+        record: { $type: "app.bsky.feed.post", text: "no createdAt" },
+      }),
+    );
+
+    // assert
+    await vi.waitFor(() => expect(acks.toSorted()).toEqual([1, 2]));
+    expect(await findRev(unsupported.did)).toBe("3aaaaaaaaaaaa");
+    expect(await findRev(invalid.did)).toBe("3bbbbbbbbbbbb");
+  });
+
+  test("repoRev-3: 記録済みより古いrevでは更新しない", async () => {
+    // arrange
+    await connect();
+    const account = await accountFactory(ctx.db).create();
+    await ctx.db
+      .update(schema.accounts)
+      .set({ rev: "3bbbbbbbbbbbb" })
+      .where(eq(schema.accounts.did, account.did));
+
+    // act
+    send(recordEvent(1, account.did, { rev: "3aaaaaaaaaaaa" }));
+
+    // assert
+    await vi.waitFor(() => expect(acks).toEqual([1]));
+    expect(await findRev(account.did)).toBe("3bbbbbbbbbbbb");
+  });
+
+  test("repoRev-4: DBに保存できなかったイベントのrevは記録しない", async () => {
+    // arrange
+    await connect();
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const transaction = vi
+      .spyOn(services.transactionManager, "transaction")
+      .mockRejectedValueOnce(new Error("db down"));
+
+    // act
+    send(recordEvent(1, account.did, { rev: "3aaaaaaaaaaaa" }));
+    await vi.waitFor(() => expect(transaction).toHaveBeenCalledOnce());
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // assert
+    expect(acks).toEqual([]);
+    expect(await findRev(account.did)).toBeNull();
   });
 });

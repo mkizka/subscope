@@ -7,6 +7,7 @@ import { isSupportedCollection } from "@repo/common/utils";
 
 import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
+import type { UpdateRepoRevUseCase } from "../application/use-cases/commit/update-repo-rev-use-case.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import type { Env } from "../shared/env.js";
 
@@ -46,6 +47,7 @@ export class TapSubscriber {
     loggerManager: ILoggerManager,
     private readonly metricReporter: IMetricReporter,
     private readonly indexCommitUseCase: IndexCommitUseCase,
+    private readonly updateRepoRevUseCase: UpdateRepoRevUseCase,
     private readonly upsertIdentityUseCase: UpsertIdentityUseCase,
     private readonly env: Pick<Env, "TAP_URL" | "TAP_CONCURRENCY">,
   ) {
@@ -62,6 +64,11 @@ export class TapSubscriber {
       });
       return;
     }
+    await this.indexRecordEvent(event);
+    await this.updateRepoRevUseCase.execute({ did: event.did, rev: event.rev });
+  }
+
+  private async indexRecordEvent(event: RecordEvent) {
     if (!isSupportedCollection(event.collection)) return;
     const command = indexCommitCommandFactory(event);
     if (!command) {

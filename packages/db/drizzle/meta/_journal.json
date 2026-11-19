@@ -229,8 +229,15 @@
     {
       "idx": 32,
       "version": "7",
-      "when": 1795060119933,
-      "tag": "0032_drop-record-revs",
+      "when": 1795059644189,
+      "tag": "0032_add-accounts-rev",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795060816023,
+      "tag": "0033_drop-record-revs",
       "breakpoints": true
     }
   ]

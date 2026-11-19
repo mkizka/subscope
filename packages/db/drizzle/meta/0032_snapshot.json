@@ -1,5 +1,5 @@
 {
-  "id": "34b347a2-566b-4646-ae1d-5ea7f98c2e32",
+  "id": "d806b611-4925-447a-83dc-fe531e10df16",
   "prevId": "41442ea7-cb5f-4cfd-aceb-a3767db017c0",
   "version": "7",
   "dialect": "postgresql",
@@ -94,6 +94,12 @@
         "backfill_status": {
           "name": "backfill_status",
           "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rev": {
+          "name": "rev",
+          "type": "varchar(32)",
           "primaryKey": false,
           "notNull": false
         },
@@ -1725,6 +1731,31 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.record_revs": {
+      "name": "record_revs",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "rev": {
+          "name": "rev",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
