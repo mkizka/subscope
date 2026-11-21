@@ -169,7 +169,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("followIndexer", ["followRepository", "jobScheduler", "indexAccountService", "registrationQuery", "notificationService"], asClassArgs(FollowIndexer))
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
-    .service("listItemIndexer", ["listItemRepository", "indexAccountService"], asClassArgs(ListItemIndexer))
+    .service("listItemIndexer", ["listItemRepository", "indexAccountService", "registrationQuery"], asClassArgs(ListItemIndexer))
     .service("gateIndexer", asClassArgs(GateIndexer))
     .service("linkIndexer", asClassArgs(LinkIndexer))
     .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(LikeIndexer))
