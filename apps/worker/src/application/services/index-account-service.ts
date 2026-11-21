@@ -25,12 +25,14 @@ export class IndexAccountService {
     handle,
     status,
     live,
+    fetchMissing = true,
   }: {
     ctx: AfterCommitContext;
     did: Did;
     handle?: Handle;
     status?: AccountStatus;
     live: boolean;
+    fetchMissing?: boolean;
   }): Promise<void> {
     const existingAccount = await this.accountRepository.find({ ctx, did });
     const account = existingAccount ?? Account.create({ did });
@@ -48,6 +50,10 @@ export class IndexAccountService {
 
     if (changed) {
       await this.accountRepository.save({ ctx, account });
+    }
+
+    if (!fetchMissing) {
+      return;
     }
 
     if (!account.handle) {

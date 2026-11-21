@@ -34,6 +34,15 @@ const createPosts = async (request: APIRequestContext, texts: string[]) => {
   }
 };
 
+const createNumberedPosts = async (
+  request: APIRequestContext,
+  label: string,
+) => {
+  const texts = Array.from({ length: 55 }, (_, i) => `${label}: 投稿${i + 1}`);
+  await createPosts(request, texts);
+  return texts.reverse();
+};
+
 test.describe("タイムライン", () => {
   test("timeline-e1: 自分とフォロー先の投稿を、新しいものほど上に並べる", async ({
     page,
@@ -57,51 +66,39 @@ test.describe("タイムライン", () => {
     page,
     request,
   }) => {
-    const texts = Array.from(
-      { length: 55 },
-      (_, i) => `timeline-e3: 投稿${i + 1}`,
-    );
-    await createPosts(request, texts);
+    const texts = await createNumberedPosts(request, "timeline-e3");
 
-    const oldestPost = page.getByText("timeline-e3: 投稿1", { exact: true });
     await expect(async () => {
       await page.goto("/");
-      await expect(page.getByText("timeline-e3: 投稿55")).toBeVisible({
+      await expect(page.getByText(/^timeline-e3: /)).toHaveText(
+        texts.slice(0, 50),
+        { timeout: 1000 },
+      );
+      await page.evaluate(() =>
+        window.scrollTo(
+          0,
+          document.body.scrollHeight - window.innerHeight * 2.5,
+        ),
+      );
+      await expect(page.getByText(/^timeline-e3: /)).toHaveText(texts, {
         timeout: 1000,
       });
     }).toPass();
-    await expect(oldestPost).toHaveCount(0);
-
-    await page.evaluate(() =>
-      window.scrollTo(0, document.body.scrollHeight - window.innerHeight * 2.5),
-    );
-
-    await expect(oldestPost).toBeAttached();
   });
 
   test("timeline-e6: 投稿は1回に50件ずつ読み込む", async ({
     page,
     request,
   }) => {
-    const texts = Array.from(
-      { length: 55 },
-      (_, i) => `timeline-e6: 投稿${i + 1}`,
-    );
-    await createPosts(request, texts);
+    const texts = await createNumberedPosts(request, "timeline-e6");
 
     await expect(async () => {
       await page.goto("/");
-      await expect(page.getByText("timeline-e6: 投稿55")).toBeVisible({
-        timeout: 1000,
-      });
+      await expect(page.getByText(/^timeline-e6: /)).toHaveText(
+        texts.slice(0, 50),
+        { timeout: 1000 },
+      );
     }).toPass();
-
-    await expect(
-      page.getByText("timeline-e6: 投稿6", { exact: true }),
-    ).toBeAttached();
-    await expect(
-      page.getByText("timeline-e6: 投稿5", { exact: true }),
-    ).toHaveCount(0);
   });
 
   test("timeline-e8: 表示中は60秒ごとに投稿を自動で読み込み直す", async ({
