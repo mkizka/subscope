@@ -1,6 +1,6 @@
 import { createServer, type Server } from "node:http";
 
-import { fakeDid } from "@repo/common/test";
+import { fakeCid, fakeDid } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import {
   afterAll,
@@ -20,6 +20,7 @@ const uri = `at://${did}/app.bsky.feed.post/3kxyzabc`;
 describe("FetchRecordUseCase", () => {
   let fetchRecordUseCase: TestServices["fetchRecordUseCase"];
   let didResolver: TestServices["didResolver"];
+  let jobScheduler: TestServices["jobScheduler"];
   let pdsResponse: { status: number; body: object };
   let server: Server;
   let pdsUrl: URL;
@@ -44,6 +45,7 @@ describe("FetchRecordUseCase", () => {
     const services = await testRegistry.resolve();
     fetchRecordUseCase = services.fetchRecordUseCase;
     didResolver = services.didResolver;
+    jobScheduler = services.jobScheduler;
     didResolver.setResolveResult(did, {
       handle: asHandle("alice.test"),
       signingKey: "test-key",
@@ -101,5 +103,37 @@ describe("FetchRecordUseCase", () => {
 
     // act & assert
     await expect(execute()).rejects.toThrow();
+  });
+
+  test("index-18: PDSから取得した投稿の返信先と起点は取得しない", async () => {
+    // arrange
+    const parentUri = "at://did:plc:parent/app.bsky.feed.post/parent";
+    const rootUri = "at://did:plc:root/app.bsky.feed.post/root";
+    pdsResponse = {
+      status: 200,
+      body: {
+        uri,
+        cid: fakeCid(),
+        value: {
+          $type: "app.bsky.feed.post",
+          text: "reply",
+          reply: {
+            parent: { uri: parentUri, cid: fakeCid() },
+            root: { uri: rootUri, cid: fakeCid() },
+          },
+          createdAt: new Date().toISOString(),
+        },
+      },
+    };
+
+    // act
+    await execute();
+
+    // assert
+    const fetchUris = jobScheduler
+      .getFetchRecordJobs()
+      .map((job) => job.uri.toString());
+    expect(fetchUris).not.toContain(parentUri);
+    expect(fetchUris).not.toContain(rootUri);
   });
 });
