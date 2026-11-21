@@ -25,10 +25,10 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/vitest": "workspace:*",
-    "@tsconfig/node-lts": "24.0.1",
-    "@types/node": "26.6.5",
+    "@tsconfig/node-lts": "26.0.1",
+    "@types/node": "26.6.6",
     "@types/web-push": "3.6.4",
-    "eslint": "10.13.0",
+    "eslint": "10.15.0",
     "typescript": "6.0.3",
     "web-push": "3.6.7"
   }

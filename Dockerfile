@@ -1,4 +1,4 @@
-FROM node:24.22.1-slim AS base
+FROM node:26.13.1-slim AS base
 ARG BUILD_TARGET
 ENV BUILD_TARGET=${BUILD_TARGET}
 ENV BUILD_PACKAGE=@repo/${BUILD_TARGET}
@@ -26,7 +26,7 @@ RUN mkdir -p /out/app && cp -r apps/${BUILD_TARGET}/package.json apps/${BUILD_TA
     && cp -rL apps/web/node_modules/@bull-board/ui /out/app/node_modules/@bull-board/; \
   fi
 
-FROM gcr.io/distroless/nodejs24-debian13:nonroot AS runner
+FROM gcr.io/distroless/nodejs26-debian13:nonroot AS runner
 ARG BUILD_TARGET
 COPY --from=builder /app/packages/db/drizzle /app/packages/db/drizzle
 COPY --from=builder /out/app /app/apps/${BUILD_TARGET}

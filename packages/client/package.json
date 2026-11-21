@@ -20,13 +20,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/lex": "0.4.2"
+    "@atproto/lex": "0.6.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@tsconfig/node-lts": "24.0.1",
-    "@types/node": "26.6.5",
-    "eslint": "10.13.0",
+    "@tsconfig/node-lts": "26.0.1",
+    "@types/node": "26.6.6",
+    "eslint": "10.15.0",
     "typescript": "6.0.3"
   },
   "sideEffects": false
