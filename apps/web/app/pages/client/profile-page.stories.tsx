@@ -27,6 +27,7 @@ const seed = (patch: Partial<ProfileData> = {}, tab = "posts") =>
         followersCount: 345,
       },
       isSelf: false,
+      isMember: true,
       backfillStatus: "completed",
       posts: TimelineFeedStories.args.posts,
       ...patch,
@@ -75,7 +76,13 @@ export const NoPosts: Story = {
 
 export const Untracked: Story = {
   beforeEach: () => {
-    seed({ backfillStatus: undefined });
+    seed({ isMember: false, backfillStatus: undefined });
+  },
+};
+
+export const Followee: Story = {
+  beforeEach: () => {
+    seed({ isMember: false });
   },
 };
 
@@ -304,7 +311,7 @@ export const KnownFollowersView: Story = {
 export const UntrackedBadge: Story = {
   name: "profile-s10: 追跡アカウントでないときは、ハンドルの横に「同期対象外」を出す",
   beforeEach: () => {
-    seed({ backfillStatus: undefined });
+    seed({ isMember: false, backfillStatus: undefined });
   },
   play: async ({ canvasElement }) => {
     await expect(
@@ -314,21 +321,51 @@ export const UntrackedBadge: Story = {
 };
 
 export const UntrackedNotice: Story = {
-  name: "profile-s11: 追跡アカウントでないときは、全てのタブの下に、同期されていないことと、フォローすると同期を始めることを出す",
+  name: "profile-s11: 追跡アカウントでないときは、全てのタブの下に、取得済みの投稿だけを表示していることと、フォローすると同期を始めることを出す",
   beforeEach: () => {
-    seed({ backfillStatus: undefined });
-    seed({ backfillStatus: undefined }, "likes");
+    seed({ isMember: false, backfillStatus: undefined });
+    seed({ isMember: false, backfillStatus: undefined }, "likes");
   },
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
     const notice = page.getByText(
-      "このアカウントのデータはサーバーに同期されていません。フォローすると同期を開始します。",
+      "このアカウントは同期されていないため、引用などで取得した投稿だけを表示しています。フォローすると同期を開始します。",
     );
     await expect(notice).toBeVisible();
 
     await userEvent.click(page.getByRole("tab", { name: "いいね" }));
 
     await expect(notice).toBeVisible();
+  },
+};
+
+export const FolloweeNotice: Story = {
+  name: "profile-s15: メンバー以外の追跡アカウントでは、全てのタブの下に、同期を始める1日前より古い投稿は表示されないことを出す",
+  beforeEach: () => {
+    seed({ isMember: false });
+    seed({ isMember: false }, "likes");
+  },
+  play: async ({ canvasElement }) => {
+    const page = main(canvasElement);
+    const notice = page.getByText(
+      "このアカウントはメンバーではないため、同期を始める1日前より古い投稿は表示されません。",
+    );
+    await expect(notice).toBeVisible();
+
+    await userEvent.click(page.getByRole("tab", { name: "いいね" }));
+
+    await expect(notice).toBeVisible();
+  },
+};
+
+export const MemberNoNotice: Story = {
+  name: "profile-s16: メンバーのプロフィールには、表示が不十分であることの案内を出さない",
+  play: async ({ canvasElement }) => {
+    const page = main(canvasElement);
+    await expect(page.getByRole("tab", { name: "投稿" })).toBeVisible();
+    await expect(
+      page.queryByText(/表示されません|同期されていない/),
+    ).toBeNull();
   },
 };
 
@@ -349,6 +386,7 @@ export const ImageViewerProfile: Story = {
           followersCount: 0,
         },
         isSelf: false,
+        isMember: true,
         backfillStatus: "completed",
         posts: [],
       }),

@@ -22,7 +22,7 @@ export const getServerMembersUseCaseFactory = ({
       ...result,
       serverMembers: result.serverMembers.map((serverMember) => ({
         ...serverMember,
-        backfillStatus: statuses[serverMember.did],
+        backfillStatus: statuses[serverMember.did]?.status,
       })),
     };
   },
