@@ -6,9 +6,13 @@ export interface ICollectionIndexer {
   shouldIndex?: ({
     ctx,
     record,
+    live,
+    depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
+    live: boolean;
+    depth: number;
   }) => Promise<boolean>;
   upsert: ({
     ctx,

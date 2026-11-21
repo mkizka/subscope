@@ -72,15 +72,22 @@ export class IndexRecordService {
   async shouldIndex({
     ctx,
     record,
+    live,
+    depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
+    live: boolean;
+    depth: number;
   }): Promise<boolean> {
     const indexer = this.indexerFor(record);
     if (!isValidRecord(record)) {
       return false;
     }
-    return !indexer.shouldIndex || (await indexer.shouldIndex({ ctx, record }));
+    return (
+      !indexer.shouldIndex ||
+      (await indexer.shouldIndex({ ctx, record, live, depth }))
+    );
   }
 
   async upsert({

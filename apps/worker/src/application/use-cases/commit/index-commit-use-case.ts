@@ -37,6 +37,8 @@ export class IndexCommitUseCase {
         !(await this.indexRecordService.shouldIndex({
           ctx,
           record: commit.record,
+          live,
+          depth: 0,
         }))
       ) {
         return;
