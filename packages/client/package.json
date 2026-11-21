@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@tsconfig/node-lts": "24.0.1",
+    "@tsconfig/node-lts": "26.0.1",
     "@types/node": "26.6.5",
     "eslint": "10.13.0",
     "typescript": "6.0.3"

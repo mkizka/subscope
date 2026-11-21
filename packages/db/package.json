@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@tsconfig/node-lts": "24.0.1",
+    "@tsconfig/node-lts": "26.0.1",
     "@types/node": "26.6.5",
     "@types/pg": "8.23.1",
     "drizzle-kit": "0.31.11",
