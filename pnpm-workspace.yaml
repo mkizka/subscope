@@ -18,4 +18,4 @@ patchedDependencies:
   "@atproto/oauth-scopes": patches/@atproto__oauth-scopes.patch
   "@factory-js/factory": patches/@factory-js__factory.patch
 overrides:
-  "@opentelemetry/api": 1.9.1
+  "@opentelemetry/api": 1.10.0
