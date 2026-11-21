@@ -1,10 +1,6 @@
 import { Info } from "lucide-react";
 
-type Props = {
-  tracked: boolean;
-};
-
-export function IncompleteNotice({ tracked }: Props) {
+export function IncompleteNotice() {
   return (
     <div
       role="status"
@@ -15,9 +11,7 @@ export function IncompleteNotice({ tracked }: Props) {
     >
       <Info className="size-4 shrink-0" />
       <span>
-        {tracked
-          ? "このアカウントはメンバーではないため、同期を始める1日前より古い投稿は表示されません。"
-          : "このアカウントは同期されていないため、引用などで取得した投稿だけを表示しています。フォローすると同期を開始します。"}
+        このアカウントは一部のデータだけを保存しているため、投稿などが表示されないことがあります。
       </span>
     </div>
   );
