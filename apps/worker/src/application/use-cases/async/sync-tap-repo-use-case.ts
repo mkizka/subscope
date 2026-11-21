@@ -19,7 +19,10 @@ export class SyncTapRepoUseCase {
     private readonly transactionManager: ITransactionManager,
   ) {}
 
-  async execute(did: Did) {
+  async execute({ did, refetch }: { did: Did; refetch?: boolean }) {
+    if (refetch) {
+      await this.tapClient.removeRepo(did);
+    }
     const isTrackedAccount = await this.transactionManager.transaction(
       async (ctx) =>
         (await this.registrationQuery.isRegistered(ctx, did)) ||
