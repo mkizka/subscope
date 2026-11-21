@@ -1,6 +1,6 @@
 import { createPushReceiver } from "@repo/web-push-mock";
 import { afterEach, describe, expect, test } from "vitest";
-import webpush from "web-push";
+import * as webpush from "web-push";
 
 import { WebPushSender } from "./web-push-sender.js";
 
