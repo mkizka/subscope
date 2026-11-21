@@ -320,27 +320,8 @@ export const UntrackedBadge: Story = {
   },
 };
 
-export const UntrackedNotice: Story = {
-  name: "profile-s11: 追跡アカウントでないときは、全てのタブの下に、取得済みの投稿だけを表示していることと、フォローすると同期を始めることを出す",
-  beforeEach: () => {
-    seed({ isMember: false, backfillStatus: undefined });
-    seed({ isMember: false, backfillStatus: undefined }, "likes");
-  },
-  play: async ({ canvasElement }) => {
-    const page = main(canvasElement);
-    const notice = page.getByText(
-      "このアカウントは同期されていないため、引用などで取得した投稿だけを表示しています。フォローすると同期を開始します。",
-    );
-    await expect(notice).toBeVisible();
-
-    await userEvent.click(page.getByRole("tab", { name: "いいね" }));
-
-    await expect(notice).toBeVisible();
-  },
-};
-
-export const FolloweeNotice: Story = {
-  name: "profile-s15: メンバー以外の追跡アカウントでは、全てのタブの下に、同期を始める1日前より古い投稿は表示されないことを出す",
+export const IncompleteNotice: Story = {
+  name: "profile-s11: メンバーでないときは、全てのタブの下に、表示が不十分な場合があることを出す",
   beforeEach: () => {
     seed({ isMember: false });
     seed({ isMember: false }, "likes");
@@ -348,7 +329,7 @@ export const FolloweeNotice: Story = {
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
     const notice = page.getByText(
-      "このアカウントはメンバーではないため、同期を始める1日前より古い投稿は表示されません。",
+      "このアカウントは一部のデータだけを保存しているため、投稿などが表示されないことがあります。",
     );
     await expect(notice).toBeVisible();
 
@@ -363,9 +344,7 @@ export const MemberNoNotice: Story = {
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
     await expect(page.getByRole("tab", { name: "投稿" })).toBeVisible();
-    await expect(
-      page.queryByText(/表示されません|同期されていない/),
-    ).toBeNull();
+    await expect(page.queryByText(/一部のデータだけを保存/)).toBeNull();
   },
 };
 

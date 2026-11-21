@@ -9,10 +9,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Tracked: Story = {
-  args: { tracked: true },
-};
-
-export const Untracked: Story = {
-  args: { tracked: false },
-};
+export const Default: Story = {};

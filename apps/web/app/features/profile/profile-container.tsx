@@ -93,9 +93,7 @@ export function ProfileContainer({ handle }: Props) {
           }))}
         />
       )}
-      {data && !data.isMember && (
-        <IncompleteNotice tracked={!!data.backfillStatus} />
-      )}
+      {data && !data.isMember && <IncompleteNotice />}
       {tab === "lists" ? (
         <ListsContainer handle={handle} />
       ) : pages && data && !isPlaceholderData ? (
