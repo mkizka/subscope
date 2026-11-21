@@ -84,7 +84,7 @@ Reactコンポーネントは以下の方針で実装しています。
   - apps/web/DESIGN.md
 - Lexiconのインデックス実装追加ガイド
   - docs/dev/lexicon-implementation.md
-- リポジトリとクエリサービスの使い分け
+- 表の分け方、リポジトリとクエリサービスの使い分け
   - docs/dev/repository-and-query.md
 - appviewのビュー生成(ViewContext、*Views)
   - docs/dev/view-pipeline.md
