@@ -265,8 +265,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/vitest
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/express':
         specifier: 5.0.6
         version: 5.0.6
@@ -546,8 +546,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/web-push-mock
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/express':
         specifier: 5.0.6
         version: 5.0.6
@@ -594,8 +594,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/web-push-mock
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -616,8 +616,8 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -689,8 +689,8 @@ importers:
         specifier: workspace:*
         version: link:../vitest
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/express':
         specifier: 5.0.6
         version: 5.0.6
@@ -720,8 +720,8 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -781,8 +781,8 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -803,8 +803,8 @@ importers:
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.1.1)(@vitest/coverage-v8@5.1.1)(@vitest/ui@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
     devDependencies:
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -818,8 +818,8 @@ importers:
         specifier: workspace:*
         version: link:../vitest
       '@tsconfig/node-lts':
-        specifier: 24.0.1
-        version: 24.0.1
+        specifier: 26.0.1
+        version: 26.0.1
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -3520,8 +3520,8 @@ packages:
   '@ts-morph/common@0.28.1':
     resolution: {integrity: sha512-W74iWf7ILp1ZKNYXY5qbddNaml7e9Sedv5lvU1V8lftlitkc9Pq1A+jlH23ltDgWYeZFFEqGCD1Ies9hqu3O+g==}
 
-  '@tsconfig/node-lts@24.0.1':
-    resolution: {integrity: sha512-xo+1KtV5zVb90fyyeglG1n5cqg3cQXLlCkEpLptYlZUNk28xmwhuD5GmxoXwmrVtUTvaMyclun9kAd0TK7H+Pg==}
+  '@tsconfig/node-lts@26.0.1':
+    resolution: {integrity: sha512-Z8DWX8MgVR006YMHZYf7d2lzWMBfYAhW4lMyhdeMG9+KGAgbJuGYuoWOAlYipfggCkiHCAZVm/Wiw6IuG5lcnw==}
 
   '@turbo/darwin-64@2.11.13':
     resolution: {integrity: sha512-5IT29i4j55E5O66+la7L8Y46ut7dFaNZqrgUIYYNtcpMt9Ql7aYnSQb/6tZ+prE2AfX1RBCAtRJE41txS2rG3w==}
@@ -10321,7 +10321,7 @@ snapshots:
       path-browserify: 1.0.1
       tinyglobby: 0.2.17
 
-  '@tsconfig/node-lts@24.0.1': {}
+  '@tsconfig/node-lts@26.0.1': {}
 
   '@turbo/darwin-64@2.11.13':
     optional: true
