@@ -8,6 +8,7 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
+import { InMemoryAccountQuery } from "../infrastructure/queries/account-query/account-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/queries/profile-query/profile-query.in-memory.js";
 import { InMemoryRegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.in-memory.js";
@@ -60,6 +61,7 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("notificationRepository", asClassArgs(InMemoryNotificationRepository))
   .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
   .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
+  .replaceService("accountQuery", asClassArgs(InMemoryAccountQuery))
   .replaceService("postQuery", ["postRepository"], asClassArgs(InMemoryPostQuery))
   .replaceService("profileQuery", ["profileRepository"], asClassArgs(InMemoryProfileQuery))
   .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))

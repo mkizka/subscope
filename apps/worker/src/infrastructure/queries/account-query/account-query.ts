@@ -17,6 +17,15 @@ export class AccountQuery implements IAccountQuery {
     return row !== undefined;
   }
 
+  async findTrackedAt({ ctx, did }: { ctx: TransactionContext; did: Did }) {
+    const [row] = await ctx.db
+      .select({ trackedAt: schema.trackings.trackedAt })
+      .from(schema.trackings)
+      .where(eq(schema.trackings.accountDid, did))
+      .limit(1);
+    return row?.trackedAt ?? null;
+  }
+
   async findTrackedDidsWithoutBackfillStatus(ctx: TransactionContext) {
     const trackedDids = union(
       ctx.db
