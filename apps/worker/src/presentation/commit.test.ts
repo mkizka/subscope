@@ -12,7 +12,13 @@ import {
   InMemoryJobQueue,
 } from "@repo/common/test";
 import { schema } from "@repo/db";
-import { accountFactory, randomCid, testSetup } from "@repo/test-utils";
+import {
+  accountFactory,
+  randomCid,
+  registrationFactory,
+  testSetup,
+} from "@repo/test-utils";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
@@ -60,6 +66,95 @@ describe("commit", () => {
       createdAt: new Date().toISOString(),
     },
     live: true,
+  });
+
+  describe("過去のレコードの期間", () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    const trackedAt = new Date("2026-01-10T00:00:00.000Z");
+    const old = new Date(trackedAt.getTime() - 2 * DAY);
+    const recent = new Date(trackedAt.getTime() - DAY / 2);
+
+    test.each([
+      { name: "古い投稿", collection: "post", createdAt: old, saved: false },
+      {
+        name: "古いリポスト",
+        collection: "repost",
+        createdAt: old,
+        saved: false,
+      },
+      { name: "古いいいね", collection: "like", createdAt: old, saved: false },
+      {
+        name: "1日前以降の投稿",
+        collection: "post",
+        createdAt: recent,
+        saved: true,
+      },
+      {
+        name: "ライブの古い投稿",
+        collection: "post",
+        createdAt: old,
+        live: true,
+        saved: true,
+      },
+      {
+        name: "メンバーの古い投稿",
+        collection: "post",
+        createdAt: old,
+        member: true,
+        saved: true,
+      },
+    ])(
+      "index-19: メンバー以外の過去の投稿・リポスト・いいねは、追跡開始の1日前以降の分だけ保存する($name)",
+      async ({
+        collection,
+        createdAt,
+        live = false,
+        member = false,
+        saved,
+      }) => {
+        // arrange
+        const author = await accountFactory(ctx.db).create();
+        await ctx.db
+          .insert(schema.trackings)
+          .values({ accountDid: author.did, trackedAt });
+        if (member) {
+          await registrationFactory(ctx.db)
+            .vars({ account: () => author })
+            .create();
+        }
+        const serverMember = await accountFactory(ctx.db)
+          .use((t) => t.serverMember())
+          .create();
+        const subject = {
+          uri: AtUri.make(
+            serverMember.did,
+            "app.bsky.feed.post",
+            "1",
+          ).toString(),
+          cid: await randomCid(),
+        };
+        const event: RecordEvent = {
+          ...postEvent(author.did, "create", "3aaaaaaaaaaaa", "past"),
+          collection: `app.bsky.feed.${collection}`,
+          record: {
+            $type: `app.bsky.feed.${collection}`,
+            ...(collection === "post" ? { text: "past" } : { subject }),
+            createdAt: createdAt.toISOString(),
+          },
+          live,
+        };
+
+        // act
+        await processCommit(event);
+
+        // assert
+        const records = await ctx.db
+          .select()
+          .from(schema.records)
+          .where(eq(schema.records.accountDid, author.did));
+        expect(records).toHaveLength(saved ? 1 : 0);
+      },
+    );
   });
 
   test("index-15: 投稿のgallery埋め込みの画像を、images埋め込みと区別して保存する", async () => {
