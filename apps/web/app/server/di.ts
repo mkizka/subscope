@@ -220,7 +220,7 @@ export const di = await createRegistry()
   )
   .service(
     "getProfilePageUseCase",
-    ["accountQuery", "backfillQuery"],
+    ["accountQuery", "backfillQuery", "subscopeQuery"],
     getProfilePageUseCaseFactory,
   )
   .service(

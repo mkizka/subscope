@@ -22,7 +22,7 @@ export const getFollowedAccountsUseCaseFactory = ({
       ...result,
       accounts: result.accounts.map((account) => ({
         ...account,
-        backfillStatus: statuses[account.did]?.status,
+        backfillStatus: statuses[account.did],
       })),
     };
   },

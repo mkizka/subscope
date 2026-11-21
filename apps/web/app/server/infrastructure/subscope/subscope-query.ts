@@ -1,5 +1,6 @@
 import { Client } from "@atproto/lex";
 import getFollowedAccounts from "@repo/client/me/subsco/server/getFollowedAccounts";
+import getMemberStatus from "@repo/client/me/subsco/server/getMemberStatus";
 import getOperator from "@repo/client/me/subsco/server/getOperator";
 import getServerMembers from "@repo/client/me/subsco/server/getServerMembers";
 import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
@@ -36,6 +37,10 @@ export const subscopeQueryFactory = ({
     async isRegistered(did) {
       const response = await (await restore(did)).call(getRegistrationStatus);
       return registered.isTypeOf(response);
+    },
+    async isMember(did) {
+      const { isMember } = await publicClient.call(getMemberStatus, { did });
+      return isMember;
     },
     async findOperator() {
       const { operator } = await publicClient.call(getOperator);
