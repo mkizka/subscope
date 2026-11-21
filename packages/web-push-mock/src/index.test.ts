@@ -1,7 +1,7 @@
 import { runInThisContext } from "node:vm";
 
 import { afterEach, describe, expect, test, vi } from "vitest";
-import webpush from "web-push";
+import * as webpush from "web-push";
 
 import {
   createPushReceiver,
