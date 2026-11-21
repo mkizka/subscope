@@ -25,5 +25,5 @@ export interface IRegistrationQuery {
   countRegisteredFollowers: (subjectDid: Did) => Promise<number>;
   findTrackedBackfillStatuses: (
     dids: Did[],
-  ) => Promise<{ did: Did; status: BackfillStatus; isMember: boolean }[]>;
+  ) => Promise<{ did: Did; status: BackfillStatus }[]>;
 }

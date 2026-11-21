@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get the backfill status of tracked accounts and whether each is a member. Accounts that are not tracked are omitted.",
+      "description": "Get the backfill status of tracked accounts. Accounts that are not tracked are omitted.",
       "parameters": {
         "type": "params",
         "required": ["dids"],
@@ -38,7 +38,7 @@
     },
     "backfillStatus": {
       "type": "object",
-      "required": ["did", "status", "isMember"],
+      "required": ["did", "status"],
       "properties": {
         "did": {
           "type": "string",
@@ -47,9 +47,6 @@
         "status": {
           "type": "string",
           "knownValues": ["inProgress", "completed", "error"]
-        },
-        "isMember": {
-          "type": "boolean"
         }
       }
     }

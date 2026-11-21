@@ -56,8 +56,8 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
     // assert
     expect(res.statuses.sort((a, b) => a.did.localeCompare(b.did))).toEqual(
       [
-        { did: serverMember.did, status: "inProgress", isMember: true },
-        { did: followee.did, status: "completed", isMember: false },
+        { did: serverMember.did, status: "inProgress" },
+        { did: followee.did, status: "completed" },
       ].sort((a, b) => a.did.localeCompare(b.did)),
     );
   });
@@ -74,7 +74,7 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
 
     // assert
     expect(res.statuses).toEqual([
-      { did: serverMember.did, status: "inProgress", isMember: true },
+      { did: serverMember.did, status: "inProgress" },
     ]);
   });
 
@@ -90,23 +90,5 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
 
     // assert
     expect(res.statuses).toHaveLength(1);
-  });
-
-  test("getBackfillStatuses-4: アカウントごとにメンバーかどうかを返す", async () => {
-    // arrange
-    const { client } = await setupApiTest();
-    const serverMember = await createServerMember();
-    const followee = await createAccount();
-    await follow(serverMember, followee);
-
-    // act
-    const res = await client.call(getBackfillStatuses, {
-      dids: [serverMember, followee].map((a) => asDid(a.did)),
-    });
-
-    // assert
-    expect(
-      Object.fromEntries(res.statuses.map((s) => [s.did, s.isMember])),
-    ).toEqual({ [serverMember.did]: true, [followee.did]: false });
   });
 });
