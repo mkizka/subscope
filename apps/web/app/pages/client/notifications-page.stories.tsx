@@ -198,6 +198,7 @@ export const Loading: Story = {
         return { notifications: [], cursor: undefined, subjectTexts: {} };
       },
       initialPageParam: undefined,
+      getNextPageParam: () => undefined,
     });
   },
   play: async ({ canvasElement }) => {
@@ -221,6 +222,7 @@ export const LoadingSkeleton: Story = {
       queryKey: ["notifications"],
       queryFn: () => new Promise<never>(() => {}),
       initialPageParam: undefined,
+      getNextPageParam: () => undefined,
     });
   },
   play: async ({ canvasElement }) => {

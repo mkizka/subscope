@@ -13,12 +13,12 @@
     "vrt": "pnpm --filter @repo/web exec storybook build && playwright test -c playwright.vrt.config.ts"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.65.1",
     "@repo/eslint-config": "workspace:*",
     "@repo/web-push-mock": "workspace:*",
     "@tsconfig/node-lts": "24.0.1",
-    "@types/node": "26.6.5",
-    "eslint": "10.13.0",
+    "@types/node": "26.6.6",
+    "eslint": "10.15.0",
     "typescript": "6.0.3"
   }
 }
