@@ -2,16 +2,15 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
-import { type Like, parseLike } from "../../dto/like.js";
+import { parseLike } from "../../dto/like.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
-import type { ITrackingRepository } from "../../interfaces/repositories/tracking-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
-import { isWithinPastRecordWindow } from "../past-record-filter-service.js";
+import type { PastRecordFilterService } from "../past-record-filter-service.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
@@ -20,7 +19,7 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationService: NotificationService,
     private readonly postQuery: IPostQuery,
-    private readonly trackingRepository: ITrackingRepository,
+    private readonly pastRecordFilterService: PastRecordFilterService,
   ) {}
 
   async shouldIndex({
@@ -85,20 +84,17 @@ export class LikeIndexer implements ICollectionIndexer {
       subjectUri.collection === "app.bsky.feed.post" &&
       (await this.registrationQuery.isRegistered(ctx, like.accountDid)) &&
       !(await this.postQuery.exists(ctx, subjectUri)) &&
-      (live || (await this.isCreatedAfterTracking(ctx, like)))
+      (live ||
+        (await this.pastRecordFilterService.isWithinWindow({
+          ctx,
+          did: asDid(like.accountDid),
+          createdAt: like.createdAt,
+        })))
     ) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleFetchRecord(subjectUri, { live, depth }),
       );
     }
-  }
-
-  private async isCreatedAfterTracking(ctx: AfterCommitContext, like: Like) {
-    const tracking = await this.trackingRepository.find({
-      ctx,
-      did: asDid(like.accountDid),
-    });
-    return !!tracking && isWithinPastRecordWindow(tracking, like.createdAt);
   }
 
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
