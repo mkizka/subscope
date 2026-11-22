@@ -1,4 +1,4 @@
-import { asDid, type Did } from "@atproto/did";
+import type { Did } from "@atproto/did";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "./record.js";
@@ -17,7 +17,7 @@ export function parseFollow(record: Record): Follow {
   return {
     uri: record.uri.toString(),
     cid: record.cid,
-    accountDid: asDid(record.uri.host),
+    accountDid: record.uri.did,
     indexedAt: record.indexedAt,
     subjectDid: parsed.subject,
     createdAt: new Date(parsed.createdAt),

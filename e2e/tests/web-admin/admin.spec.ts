@@ -191,7 +191,7 @@ test.describe("メンバー", () => {
     ).toBeVisible();
   });
 
-  test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー・登録停止中）を出す", async ({
+  test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー）を出す", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");

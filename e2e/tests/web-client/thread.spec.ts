@@ -1,8 +1,9 @@
+import { AtUri } from "@atproto/syntax";
 import { expect, type Page, test } from "@playwright/test";
 
 import { createRecord } from "../../helpers/pds";
 
-const threadPath = (uri: string) => `/alice.test/post/${uri.split("/").pop()}`;
+const threadPath = (uri: string) => `/alice.test/post/${new AtUri(uri).rkey}`;
 
 const post = (text: string, parent?: { uri: string; cid: string }) =>
   createRecord("alice.test", "app.bsky.feed.post", {

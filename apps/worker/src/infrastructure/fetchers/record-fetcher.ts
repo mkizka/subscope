@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import { Client, lexToJson, XrpcResponseError } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 import type { IDidResolver, IMetricReporter } from "@repo/common/interface";
@@ -48,7 +47,7 @@ export class RecordFetcher implements IRecordFetcher {
   }
 
   private async getRecord(uri: AtUri) {
-    const did = asDid(uri.hostname);
+    const did = uri.did;
     const { pds } = await this.didResolver.resolve(did);
     const client = new Client(pds);
     try {

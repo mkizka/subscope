@@ -13,7 +13,7 @@ describe("IndexCommitUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
-  let accountQuery: TestServices["accountQuery"];
+  let trackingRepo: TestServices["trackingRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   let ctx: { db: TestServices["db"] };
@@ -25,7 +25,7 @@ describe("IndexCommitUseCase", () => {
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
-    accountQuery = services.accountQuery;
+    trackingRepo = services.trackingRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
     ctx = { db };
@@ -105,13 +105,17 @@ describe("IndexCommitUseCase", () => {
       const account = accountFactory();
       accountRepo.add(account);
       const gate = (collection: string, rkey: string, postRkey: string) => {
-        const uri = new AtUri(`at://${account.did}/${collection}/${rkey}`);
+        const uri = AtUri.make(account.did, collection, rkey);
         const record = {
           uri,
           cid: "cid123",
           json: {
             $type: collection,
-            post: `at://${account.did}/app.bsky.feed.post/${postRkey}`,
+            post: AtUri.make(
+              account.did,
+              "app.bsky.feed.post",
+              postRkey,
+            ).toString(),
             createdAt: new Date().toISOString(),
           },
           indexedAt: new Date(),
@@ -208,7 +212,7 @@ describe("IndexCommitUseCase", () => {
     }) => {
       const liker = accountFactory();
       registrationQuery.add(liker.did);
-      accountQuery.setTrackedAt(liker.did, trackedAt);
+      await trackingRepo.save({ ctx, tracking: { did: liker.did, trackedAt } });
       const uri = new AtUri(`at://${liker.did}/app.bsky.feed.like/123`);
       const record = {
         uri,
@@ -227,7 +231,7 @@ describe("IndexCommitUseCase", () => {
       return jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString());
     };
 
-    test("index-19: メンバーがいいねした投稿は、保存していなければPDSから取得する", async () => {
+    test("index-20: メンバーがいいねした投稿は、保存していなければPDSから取得する", async () => {
       // act
       const fetchUris = await indexMemberLike({
         live: true,
@@ -242,7 +246,7 @@ describe("IndexCommitUseCase", () => {
       { name: "1日前ちょうど", offset: -DAY_MS, expected: true },
       { name: "1日前より古い", offset: -DAY_MS - 1, expected: false },
     ])(
-      "index-20: バックフィルのいいねでは、作成日時が追跡を始めた時刻の1日前より古いものの投稿は取得しない($name)",
+      "index-21: メンバーの過去のいいねでは、作成日時が追跡を始めた時刻の1日前より古いものの投稿は取得しない($name)",
       async ({ offset, expected }) => {
         // act
         const fetchUris = await indexMemberLike({
@@ -272,7 +276,7 @@ describe("IndexCommitUseCase", () => {
         if (member) {
           registrationQuery.add(author.did);
         }
-        const uri = new AtUri(`at://${author.did}/${collection}/123`);
+        const uri = AtUri.make(author.did, collection, "123");
         const record = {
           uri,
           cid: "cid123",

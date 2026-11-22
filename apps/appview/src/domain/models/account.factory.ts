@@ -7,7 +7,6 @@ export function accountFactory(params?: Partial<AccountParams>): Account {
     did: params?.did ?? fakeDid(),
     handle: params?.handle !== undefined ? params.handle : fakeHandle(),
     isAdmin: params?.isAdmin ?? false,
-    isBanned: params?.isBanned ?? false,
     indexedAt: params?.indexedAt ?? fakeDate(),
   });
 }

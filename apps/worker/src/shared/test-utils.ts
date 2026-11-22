@@ -8,7 +8,6 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
-import { InMemoryAccountQuery } from "../infrastructure/queries/account-query/account-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/queries/profile-query/profile-query.in-memory.js";
 import { InMemoryRegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.in-memory.js";
@@ -25,6 +24,7 @@ import { InMemoryPostRepository } from "../infrastructure/repositories/post-repo
 import { InMemoryProfileRepository } from "../infrastructure/repositories/profile-repository/profile-repository.in-memory.js";
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
+import { InMemoryTrackingRepository } from "../infrastructure/repositories/tracking-repository/tracking-repository.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import { InMemoryWebPushSender } from "../infrastructure/web-push-sender/web-push-sender.in-memory.js";
 import type { Env } from "./env.js";
@@ -61,11 +61,11 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("notificationRepository", asClassArgs(InMemoryNotificationRepository))
   .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
   .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
-  .replaceService("accountQuery", asClassArgs(InMemoryAccountQuery))
   .replaceService("postQuery", ["postRepository"], asClassArgs(InMemoryPostQuery))
   .replaceService("profileQuery", ["profileRepository"], asClassArgs(InMemoryProfileQuery))
   .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
   .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
+  .replaceService("trackingRepository", asClassArgs(InMemoryTrackingRepository))
   .replaceService("registrationQuery", asClassArgs(InMemoryRegistrationQuery))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
   .replaceService("tapClient", asClassArgs(InMemoryTapClient))

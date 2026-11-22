@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import { asDid, isDid } from "@atproto/did";
+import { isDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { SupportedCollection } from "@repo/common/utils";
 import { asSupportedCollection } from "@repo/common/utils";
@@ -23,7 +23,7 @@ export class ResolvedAtUri {
   }
 
   getDid(): Did {
-    return asDid(this.value.host);
+    return this.value.did;
   }
 
   getCollection(): SupportedCollection {
