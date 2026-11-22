@@ -1,4 +1,3 @@
-import type { $OutputBody as BannedAccountsResponse } from "@repo/client/me/subsco/admin/getBannedAccounts";
 import type { $OutputBody as ServerMembersResponse } from "@repo/client/me/subsco/admin/listServerMembers";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
@@ -68,7 +67,7 @@ const serverMembersData = (
 });
 
 export const AddMemberDialog: Story = {
-  name: "adminAccounts-s3: 「メンバー」タブの見出しの横の「メンバーを追加」で、ハンドルかDIDを入力するダイアログを開く",
+  name: "adminAccounts-s3: 見出しの横の「メンバーを追加」で、ハンドルかDIDを入力するダイアログを開く",
   beforeEach: () => {
     queryClient.setQueryData(
       ["serverMembers"],
@@ -93,41 +92,13 @@ export const AddMemberDialog: Story = {
   },
 };
 
-export const BannedAccounts: Story = {
-  name: "adminAccounts-s2: 「停止中」タブには登録を停止したアカウントを並べ、名前・ハンドルを出す",
-  beforeEach: () => {
-    queryClient.setQueryData(["bannedAccounts"], {
-      pages: [{ actors: [alice, bob] } satisfies BannedAccountsResponse],
-      pageParams: [undefined],
-    });
-  },
-  args: {
-    children: <ServerMemberListContainer />,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("tab", { name: "停止中" }));
-    const [first, second, ...rest] = within(
-      canvas.getByRole("main"),
-    ).getAllByRole("listitem");
-
-    await expect(rest).toHaveLength(0);
-    await expect(first).toHaveTextContent("Alice@alice.bsky.social");
-    await expect(second).toHaveTextContent("Bob@bob.bsky.social");
-  },
-};
-
 export const ProfileLinks: Story = {
-  name: "adminAccounts-s4: メンバーと停止中のアカウントは、アバターや名前を押すとそのアカウントのプロフィールを開く",
+  name: "adminAccounts-s4: メンバーは、アバターや名前を押すとそのアカウントのプロフィールを開く",
   beforeEach: () => {
     queryClient.setQueryData(
       ["serverMembers"],
       serverMembersData("completed", alice),
     );
-    queryClient.setQueryData(["bannedAccounts"], {
-      pages: [{ actors: [bob] } satisfies BannedAccountsResponse],
-      pageParams: [undefined],
-    });
   },
   args: {
     children: <ServerMemberListContainer />,
@@ -139,13 +110,6 @@ export const ProfileLinks: Story = {
     await expect(main.getByRole("link", { name: /Alice/ })).toHaveAttribute(
       "href",
       "/alice.bsky.social",
-    );
-
-    await userEvent.click(canvas.getByRole("tab", { name: "停止中" }));
-
-    await expect(main.getByRole("link", { name: /Bob/ })).toHaveAttribute(
-      "href",
-      "/bob.bsky.social",
     );
   },
 };

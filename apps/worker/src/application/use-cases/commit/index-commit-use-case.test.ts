@@ -13,6 +13,7 @@ describe("IndexCommitUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
@@ -23,6 +24,7 @@ describe("IndexCommitUseCase", () => {
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
+    jobScheduler = services.jobScheduler;
     db = services.db;
     ctx = { db };
   });
@@ -188,6 +190,59 @@ describe("IndexCommitUseCase", () => {
         expect((await recordRepo.find({ ctx, uri })) !== null).toBe(
           liker || author,
         );
+      },
+    );
+  });
+
+  describe("フォロー・リスト項目の相手", () => {
+    test.each([
+      { collection: "app.bsky.graph.follow", member: true },
+      { collection: "app.bsky.graph.follow", member: false },
+      { collection: "app.bsky.graph.listitem", member: true },
+      { collection: "app.bsky.graph.listitem", member: false },
+    ])(
+      "index-17: フォローとリスト項目の相手のプロフィールとハンドルは、メンバーの分だけ取る($collection, メンバー=$member)",
+      async ({ collection, member }) => {
+        // arrange
+        const author = accountFactory();
+        accountRepo.add(author);
+        const subject = accountFactory();
+        if (member) {
+          registrationQuery.add(author.did);
+        }
+        const uri = new AtUri(`at://${author.did}/${collection}/123`);
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: collection,
+            subject: subject.did,
+            list: `at://${author.did}/app.bsky.graph.list/123`,
+            createdAt: new Date().toISOString(),
+          },
+          indexedAt: new Date(),
+        };
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: true,
+        });
+
+        // assert
+        expect(
+          await accountRepo.find({ ctx, did: subject.did }),
+        ).not.toBeNull();
+        expect(
+          jobScheduler
+            .getResolveDidJobs()
+            .some((job) => job.did === subject.did),
+        ).toBe(member);
+        expect(
+          jobScheduler
+            .getFetchRecordJobs()
+            .some((job) => job.uri.host === subject.did),
+        ).toBe(member);
       },
     );
   });
