@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 import type { Origin } from "../dto/origin.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import { recordFactory } from "../dto/record.factory.js";
 
 describe("FetchPolicyService", () => {
@@ -30,7 +31,8 @@ describe("FetchPolicyService", () => {
     // act
     const targets = await fetchPolicyService.targetsForRecord({
       ctx: { db },
-      record,
+      parsed: parseRecord(record),
+      author: { did, isMember: false },
       origin: { type: "tapLive" },
     });
 
@@ -55,8 +57,9 @@ describe("FetchPolicyService", () => {
     async ({ origin, expected }) => {
       // arrange
       const quotedUri = `at://${fakeDid()}/app.bsky.feed.post/quoted`;
+      const did = fakeDid();
       const record = recordFactory({
-        uri: `at://${fakeDid()}/app.bsky.feed.post/123`,
+        uri: `at://${did}/app.bsky.feed.post/123`,
         json: {
           $type: "app.bsky.feed.post",
           text: "quote",
@@ -71,7 +74,8 @@ describe("FetchPolicyService", () => {
       // act
       const targets = await fetchPolicyService.targetsForRecord({
         ctx: { db },
-        record,
+        parsed: parseRecord(record),
+        author: { did, isMember: false },
         origin,
       });
 

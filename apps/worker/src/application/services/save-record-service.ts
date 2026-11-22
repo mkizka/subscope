@@ -1,16 +1,8 @@
 import type { TransactionContext } from "@repo/common/interface";
-import { validateRecord } from "@repo/common/utils";
 
 import { feedItemFromPost, feedItemFromRepost } from "../dto/feed-item.js";
-import { parseFollow } from "../dto/follow.js";
-import { parseGenerator } from "../dto/generator.js";
-import { parseLike } from "../dto/like.js";
-import { parseList } from "../dto/list.js";
-import { parseListItem } from "../dto/list-item.js";
-import { parsePost } from "../dto/post.js";
-import { parseProfile } from "../dto/profile.js";
+import type { ParsedRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
-import { parseRepost } from "../dto/repost.js";
 import type { IFeedItemRepository } from "../interfaces/repositories/feed-item-repository.js";
 import type { IFollowRepository } from "../interfaces/repositories/follow-repository.js";
 import type { IGeneratorRepository } from "../interfaces/repositories/generator-repository.js";
@@ -38,16 +30,24 @@ export class SaveRecordService {
     private readonly listItemRepository: IListItemRepository,
   ) {}
 
-  async save({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+  async save({
+    ctx,
+    record,
+    parsed,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+    parsed: ParsedRecord;
+  }) {
     await this.indexAccountService.upsert({ ctx, did: record.uri.did });
     await this.recordRepository.save({ ctx, record });
-    await this.saveCollection(ctx, record);
+    await this.saveCollection(ctx, parsed);
   }
 
-  private async saveCollection(ctx: TransactionContext, record: Record) {
-    switch (record.uri.collection) {
+  private async saveCollection(ctx: TransactionContext, parsed: ParsedRecord) {
+    switch (parsed.collection) {
       case "app.bsky.feed.post": {
-        const post = parsePost(record);
+        const { post } = parsed;
         await this.postRepository.save({ ctx, post });
         await this.feedItemRepository.save({
           ctx,
@@ -56,7 +56,7 @@ export class SaveRecordService {
         return;
       }
       case "app.bsky.feed.repost": {
-        const repost = parseRepost(record);
+        const { repost } = parsed;
         await this.repostRepository.save({ ctx, repost });
         await this.feedItemRepository.save({
           ctx,
@@ -65,16 +65,16 @@ export class SaveRecordService {
         return;
       }
       case "app.bsky.feed.like":
-        await this.likeRepository.save({ ctx, like: parseLike(record) });
+        await this.likeRepository.save({ ctx, like: parsed.like });
         return;
       case "app.bsky.graph.follow": {
-        const follow = parseFollow(record);
+        const { follow } = parsed;
         await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
         await this.followRepository.save({ ctx, follow });
         return;
       }
       case "app.bsky.graph.listitem": {
-        const listItem = parseListItem(record);
+        const { listItem } = parsed;
         await this.indexAccountService.upsert({
           ctx,
           did: listItem.subjectDid,
@@ -85,26 +85,22 @@ export class SaveRecordService {
       case "app.bsky.actor.profile":
         await this.profileRepository.save({
           ctx,
-          profile: parseProfile(record),
+          profile: parsed.profile,
         });
         return;
       case "app.bsky.feed.generator":
         await this.generatorRepository.save({
           ctx,
-          generator: parseGenerator(record),
+          generator: parsed.generator,
         });
         return;
       case "app.bsky.graph.list":
-        await this.listRepository.save({ ctx, list: parseList(record) });
+        await this.listRepository.save({ ctx, list: parsed.list });
         return;
       case "app.bsky.actor.link":
-        validateRecord("app.bsky.actor.link", record);
-        return;
       case "app.bsky.feed.threadgate":
       case "app.bsky.feed.postgate":
         return;
-      default:
-        throw new Error(`Unsupported collection: ${record.uri.collection}`);
     }
   }
 }

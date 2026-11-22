@@ -1,36 +1,21 @@
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
-import { validateRecord } from "@repo/common/utils";
 
+import type { Author } from "../dto/author.js";
 import type { Origin } from "../dto/origin.js";
+import type { ParsedRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
-
-const PAST_LIMITED_COLLECTIONS = [
-  "app.bsky.feed.post",
-  "app.bsky.feed.repost",
-  "app.bsky.feed.like",
-] as const;
 
 // Postgresには`\u0000`を含む文字列を保存できないため
 const containsNullChar = (record: Record) =>
   JSON.stringify(record.json).includes("\\u0000");
 
-const isGateOfSamePost = (record: Record) => {
-  const gate = validateRecord(
-    record.uri.collection === "app.bsky.feed.threadgate"
-      ? "app.bsky.feed.threadgate"
-      : "app.bsky.feed.postgate",
-    record,
-  );
-  const postUri = new AtUri(gate.post);
-  return (
-    postUri.host === record.uri.did &&
-    postUri.collection === "app.bsky.feed.post" &&
-    postUri.rkey === record.uri.rkey
-  );
-};
+const isGateOfSamePost = (record: Record, postUri: AtUri) =>
+  postUri.host === record.uri.did &&
+  postUri.collection === "app.bsky.feed.post" &&
+  postUri.rkey === record.uri.rkey;
 
 export class StoragePolicyService {
   constructor(
@@ -41,57 +26,59 @@ export class StoragePolicyService {
   async shouldStore({
     ctx,
     record,
+    parsed,
+    author,
     origin,
   }: {
     ctx: TransactionContext;
     record: Record;
+    parsed: ParsedRecord;
+    author: Author;
     origin: Origin;
   }): Promise<boolean> {
-    const isOutsidePastWindow =
-      origin.type === "tapPast" &&
-      !(await this.isWithinPastWindow(ctx, record));
-    if (isOutsidePastWindow) {
-      return false;
-    }
     if (containsNullChar(record)) {
       return false;
     }
-    switch (record.uri.collection) {
+    switch (parsed.collection) {
+      case "app.bsky.feed.post":
+        return this.isWithinPastWindow(ctx, author, origin, parsed.post);
+      case "app.bsky.feed.repost":
+        return this.isWithinPastWindow(ctx, author, origin, parsed.repost);
+      case "app.bsky.feed.like":
+        return (
+          (await this.isWithinPastWindow(ctx, author, origin, parsed.like)) &&
+          (author.isMember ||
+            (await this.registrationQuery.isRegistered(
+              ctx,
+              new AtUri(parsed.like.subjectUri).host,
+            )))
+        );
       case "app.bsky.feed.threadgate":
       case "app.bsky.feed.postgate":
-        return isGateOfSamePost(record);
-      case "app.bsky.feed.like":
-        return this.isLikeAroundMember(ctx, record);
-      default:
+        return isGateOfSamePost(record, parsed.postUri);
+      case "app.bsky.graph.follow":
+      case "app.bsky.graph.listitem":
+      case "app.bsky.actor.profile":
+      case "app.bsky.feed.generator":
+      case "app.bsky.graph.list":
+      case "app.bsky.actor.link":
         return true;
     }
   }
 
-  private async isWithinPastWindow(ctx: TransactionContext, record: Record) {
-    const collection = PAST_LIMITED_COLLECTIONS.find(
-      (collection) => collection === record.uri.collection,
-    );
-    if (!collection) {
+  private async isWithinPastWindow(
+    ctx: TransactionContext,
+    author: Author,
+    origin: Origin,
+    { createdAt }: { createdAt: Date },
+  ) {
+    if (origin.type !== "tapPast" || author.isMember) {
       return true;
     }
-    const did = record.uri.did;
-    const isRegistered = await this.registrationQuery.isRegistered(ctx, did);
-    if (isRegistered) {
-      return true;
-    }
-    const tracking = await this.trackingRepository.find({ ctx, did });
-    const { createdAt } = validateRecord(collection, record);
-    return !!tracking && tracking.covers(new Date(createdAt));
-  }
-
-  private async isLikeAroundMember(ctx: TransactionContext, record: Record) {
-    const like = validateRecord("app.bsky.feed.like", record);
-    return (
-      (await this.registrationQuery.isRegistered(ctx, record.uri.did)) ||
-      (await this.registrationQuery.isRegistered(
-        ctx,
-        new AtUri(like.subject.uri).host,
-      ))
-    );
+    const tracking = await this.trackingRepository.find({
+      ctx,
+      did: author.did,
+    });
+    return !!tracking && tracking.covers(createdAt);
   }
 }

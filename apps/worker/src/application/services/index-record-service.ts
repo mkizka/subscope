@@ -2,7 +2,9 @@ import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/interface";
 
 import type { JobPriority, Origin } from "../dto/origin.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
+import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { INotificationRepository } from "../interfaces/repositories/notification-repository.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { FetchPolicyService } from "./fetch-policy-service.js";
@@ -17,6 +19,7 @@ export class IndexRecordService {
   constructor(
     private readonly recordRepository: IRecordRepository,
     private readonly notificationRepository: INotificationRepository,
+    private readonly registrationQuery: IRegistrationQuery,
     private readonly saveRecordService: SaveRecordService,
     private readonly storagePolicyService: StoragePolicyService,
     private readonly fetchPolicyService: FetchPolicyService,
@@ -37,20 +40,24 @@ export class IndexRecordService {
     origin: Origin;
     priority: JobPriority;
   }): Promise<void> {
+    const parsed = parseRecord(record);
+    const author = await this.authorOf(ctx, record);
     const shouldStore = await this.storagePolicyService.shouldStore({
       ctx,
       record,
+      parsed,
+      author,
       origin,
     });
     if (!shouldStore) {
       return;
     }
-    await this.saveRecordService.save({ ctx, record });
+    await this.saveRecordService.save({ ctx, record, parsed });
 
     const notifications = await this.notificationPolicyService.notificationsFor(
       {
         ctx,
-        record,
+        parsed,
         origin,
       },
     );
@@ -64,14 +71,12 @@ export class IndexRecordService {
       priority,
       fetch: await this.fetchPolicyService.targetsForRecord({
         ctx,
-        record,
+        parsed,
+        author,
         origin,
       }),
-      stats: this.statsPolicyService.targetsFor(record),
-      reposToSync: await this.trackingPolicyService.reposToSync({
-        ctx,
-        record,
-      }),
+      stats: this.statsPolicyService.targetsFor(parsed),
+      reposToSync: this.trackingPolicyService.reposToSync({ parsed, author }),
       pushes,
     });
   }
@@ -84,14 +89,23 @@ export class IndexRecordService {
     if (!existingRecord) {
       return;
     }
+    const parsed = parseRecord(existingRecord);
     this.indexJobService.schedule({
       ctx,
       priority: "high",
-      stats: this.statsPolicyService.targetsFor(existingRecord),
-      reposToSync: await this.trackingPolicyService.reposToSync({
-        ctx,
-        record: existingRecord,
+      stats: this.statsPolicyService.targetsFor(parsed),
+      reposToSync: this.trackingPolicyService.reposToSync({
+        parsed,
+        author: await this.authorOf(ctx, existingRecord),
       }),
     });
+  }
+
+  private async authorOf(ctx: AfterCommitContext, record: Record) {
+    const did = record.uri.did;
+    return {
+      did,
+      isMember: await this.registrationQuery.isRegistered(ctx, did),
+    };
   }
 }
