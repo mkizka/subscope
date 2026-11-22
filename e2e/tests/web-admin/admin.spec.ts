@@ -144,7 +144,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("adminAccounts-e2: 管理者でないメンバーは、確認のうえ「サーバー登録を停止する」で登録を解除でき、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("adminAccounts-e2: 管理者でないメンバーは、確認のうえ「メンバーから外す」で登録を解除でき、そのアカウントは招待コードで再登録できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -164,16 +164,14 @@ test.describe("メンバー", () => {
       .filter({ has: page.getByTitle(daveDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    await row.getByRole("button", { name: "サーバー登録を停止する" }).click();
+    await row.getByRole("button", { name: "メンバーから外す" }).click();
     await page
       .getByRole("dialog")
-      .getByRole("button", { name: "停止する" })
+      .getByRole("button", { name: "外す" })
       .click();
 
     await expect(row).toHaveCount(0);
-    await expect(
-      registerAccount("dave.test", await createInviteCode()),
-    ).rejects.toThrow("Banned");
+    await registerAccount("dave.test", await createInviteCode());
   });
 
   test("adminAccounts-e7: 追加ダイアログで入力したアカウントを、本人のログインなしでメンバーにして一覧の先頭に出す", async ({
