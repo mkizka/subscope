@@ -28,15 +28,15 @@ export class CreateAdminService {
 
     if (!account.handle) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleResolveDid(did, { live: true }),
+        this.jobScheduler.scheduleResolveDid(did, { priority: "high" }),
       );
     }
 
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
     ctx.afterCommit(() =>
       this.jobScheduler.scheduleFetchRecord(profileUri, {
-        live: true,
-        depth: 0,
+        hop: 1,
+        priority: "high",
       }),
     );
   }

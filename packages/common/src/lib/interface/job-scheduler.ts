@@ -1,12 +1,17 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
+export type JobPriority = "high" | "low";
+
 export interface IJobScheduler {
   scheduleFetchRecord: (
     uri: AtUri,
-    options: { live: boolean; depth: number },
+    options: { hop: number; priority: JobPriority },
   ) => Promise<void>;
-  scheduleResolveDid: (did: Did, options: { live: boolean }) => Promise<void>;
+  scheduleResolveDid: (
+    did: Did,
+    options: { priority: JobPriority },
+  ) => Promise<void>;
   scheduleSyncTapRepo: (
     did: Did,
     options?: { refetch: boolean },

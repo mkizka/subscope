@@ -83,8 +83,8 @@ export class SyncWorker {
         async (job) => {
           await fetchRecordUseCase.execute({
             uri: job.data.uri,
-            depth: job.data.depth,
-            live: job.data.live,
+            hop: job.data.hop,
+            priority: job.data.priority,
             jobLogger: createJobLogger(job),
           });
         },

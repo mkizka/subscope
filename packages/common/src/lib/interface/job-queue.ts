@@ -1,10 +1,12 @@
 import type { Did } from "@atproto/did";
 import type { Queue } from "bullmq";
 
+import type { JobPriority } from "./job-scheduler.js";
+
 type FetchRecordData = {
   uri: string;
-  depth: number;
-  live: boolean;
+  hop: number;
+  priority: JobPriority;
 };
 
 type AggregateAccountStatsData = {
