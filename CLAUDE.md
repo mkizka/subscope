@@ -109,21 +109,9 @@ Reactコンポーネントは以下の方針で実装しています。
    - テスト名は`"{ID}: {仕様項目の文}"`とし、仕様項目とテストを1対1で対応させる
 3. テストが通るように実装する
 
-仕様IDとテストの1対1対応は `pnpm check:specs` がCIで検査します。
-
 ### 仕様書の書き方
 
-- docs/specs には worker/ 以下・web/ 以下・appview/ 以下の機能ごとのファイル(worker: index.md、backfill.md、label.md、account.md、stats.md、notification.md / web: common.md、login.md、timeline.md、post.md、thread.md、notification.md、profile.md、search.md、server.md、admin.md / appview: index.md、views.md、actor.md、feed.md、notification.md、graph.md、subsco.md)のみを置き、1アプリの振る舞いを定める
-- 見出しはAPIの名前か機能・画面の名前とし、直後にその機能が何をするかを1〜2文で書く
-- 仕様項目は「〜の場合、〜を返す」というテストの条件ではなく、「〜する」「〜は含めない」という振る舞いのルールを1つだけ書く
-- IDは`{見出しの短い名前}-{連番}`とする。見出しの短い名前はcamelCaseにする(例: getTimeline-1, postForm-e1)
-  - webは`{見出しの短い名前}-e{連番}`(E2E)か`{見出しの短い名前}-s{連番}`(play)とする(例: login-e1, login-s1)
-  - 連番は見出しごと(webはeとsそれぞれ)に、追加した順に次の番号を振る。項目を削除しても詰めず、仕様書内の並び順も問わない
-- 理由や補足などテストできない記述はIDなしの地の文にする
-- 正確さより読みやすさを優先して簡潔に書く。実装の全パターンを文章にせず、仕様を理解するための文にする
-- コード表記は画面のURL、環境変数名、デプロイ手順のコマンドだけにする。ファイルパス、クラス名、列名などは書かず、lexiconの名前や項目名は地の文で書く
-- 仕様項目は「ID」と「仕様」の2列の表に書く。補足も表にできるものは表にする
-- 仕様IDは変えない。項目の文を変えたら、同じPRでテスト名の文も合わせる
+仕様書を書く・直すときは、必ず `.claude/skills/spec-writing/SKILL.md` に従ってください。
 
 ## PRの作成
 

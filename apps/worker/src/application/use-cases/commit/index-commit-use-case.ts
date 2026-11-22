@@ -40,20 +40,19 @@ export class IndexCommitUseCase {
         return;
       }
       const { record } = commit;
-      if (
-        !live &&
-        !(await this.pastRecordFilterService.shouldIndex({ ctx, record }))
-      ) {
+      const isPastRecordIndexable =
+        live ||
+        (await this.pastRecordFilterService.shouldIndex({ ctx, record }));
+      if (!isPastRecordIndexable) {
         return;
       }
-      if (
-        !(await this.indexRecordService.shouldIndex({
-          ctx,
-          record,
-          live,
-          depth: 0,
-        }))
-      ) {
+      const shouldIndex = await this.indexRecordService.shouldIndex({
+        ctx,
+        record,
+        live,
+        depth: 0,
+      });
+      if (!shouldIndex) {
         return;
       }
       await this.indexRecordService.upsert({ ctx, record, live, depth: 0 });

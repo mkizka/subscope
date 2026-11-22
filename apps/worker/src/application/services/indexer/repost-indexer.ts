@@ -41,12 +41,12 @@ export class RepostIndexer implements ICollectionIndexer {
 
     const subjectUri = new AtUri(repost.subjectUri);
     const recipientDid = subjectUri.host;
-    if (
+    const shouldNotify =
       live &&
       depth === 0 &&
       recipientDid !== repost.accountDid &&
-      (await this.registrationQuery.isRegistered(ctx, recipientDid))
-    ) {
+      (await this.registrationQuery.isRegistered(ctx, recipientDid));
+    if (shouldNotify) {
       await this.notificationService.create({
         ctx,
         notifications: [

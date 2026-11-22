@@ -62,14 +62,13 @@ export class FetchRecordUseCase {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
     await this.transactionManager.transaction(async (ctx) => {
-      if (
-        !(await this.indexRecordService.shouldIndex({
-          ctx,
-          record,
-          live,
-          depth: depth + 1,
-        }))
-      ) {
+      const shouldIndex = await this.indexRecordService.shouldIndex({
+        ctx,
+        record,
+        live,
+        depth: depth + 1,
+      });
+      if (!shouldIndex) {
         return;
       }
       await this.indexRecordService.upsert({
