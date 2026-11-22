@@ -14,7 +14,7 @@ describe("StatsPolicyService", () => {
     statsPolicyService = services.statsPolicyService;
   });
 
-  test("投稿の場合、作者の投稿数と、投稿・リプライ先・引用元の集計を対象にする", () => {
+  test("aggregate-5: 投稿の保存・削除で、作者の投稿数、返信先の返信数、引用元の引用数を数え直す", () => {
     // arrange
     const author = accountFactory();
     const parentUri = "at://did:plc:parent/app.bsky.feed.post/parent";
@@ -40,21 +40,20 @@ describe("StatsPolicyService", () => {
     // assert
     expect(targets).toEqual({
       accounts: [author.did],
-      posts: [record.uri, new AtUri(parentUri), new AtUri(quotedUri)],
+      posts: expect.arrayContaining([
+        new AtUri(parentUri),
+        new AtUri(quotedUri),
+      ]),
     });
   });
 
-  test.each([
-    { collection: "app.bsky.feed.like" },
-    { collection: "app.bsky.feed.repost" },
-  ])("$collection の場合、対象の投稿の集計を対象にする", ({ collection }) => {
+  test("aggregate-6: 投稿を保存したら、先に保存されていたその投稿へのいいね・リポスト・返信・引用も数える", () => {
     // arrange
-    const subjectUri = "at://did:plc:author/app.bsky.feed.post/123";
     const record = recordFactory({
-      uri: AtUri.make(accountFactory().did, collection, "rkey").toString(),
+      uri: `at://${accountFactory().did}/app.bsky.feed.post/123`,
       json: {
-        $type: collection,
-        subject: { uri: subjectUri, cid: fakeCid() },
+        $type: "app.bsky.feed.post",
+        text: "hello",
         createdAt: new Date().toISOString(),
       },
     });
@@ -63,10 +62,35 @@ describe("StatsPolicyService", () => {
     const targets = statsPolicyService.targetsFor(parseRecord(record));
 
     // assert
-    expect(targets).toEqual({ accounts: [], posts: [new AtUri(subjectUri)] });
+    expect(targets.posts).toEqual([record.uri]);
   });
 
-  test("フォローの場合、フォローした側とされた側のアカウントの集計を対象にする", () => {
+  test.each([
+    { collection: "app.bsky.feed.like" },
+    { collection: "app.bsky.feed.repost" },
+  ])(
+    "aggregate-7: いいね・リポストの保存・削除で、対象の投稿のいいね数・リポスト数を数え直す($collection)",
+    ({ collection }) => {
+      // arrange
+      const subjectUri = "at://did:plc:author/app.bsky.feed.post/123";
+      const record = recordFactory({
+        uri: AtUri.make(accountFactory().did, collection, "rkey").toString(),
+        json: {
+          $type: collection,
+          subject: { uri: subjectUri, cid: fakeCid() },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      const targets = statsPolicyService.targetsFor(record);
+
+      // assert
+      expect(targets).toEqual({ accounts: [], posts: [new AtUri(subjectUri)] });
+    },
+  );
+
+  test("aggregate-8: フォローの保存・削除で、フォローした人のフォロー数とされた人のフォロワー数を数え直す", () => {
     // arrange
     const follower = accountFactory();
     const followee = accountFactory();
