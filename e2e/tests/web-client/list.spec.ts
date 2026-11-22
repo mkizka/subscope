@@ -215,7 +215,8 @@ test.describe("リスト", () => {
     expect(
       records.filter(
         ({ value }) =>
-          value.list === `at://${alice}/app.bsky.graph.list/${rkey}`,
+          value.list ===
+          AtUri.make(alice, "app.bsky.graph.list", rkey).toString(),
       ),
     ).toEqual([]);
   });
