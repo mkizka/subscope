@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import { validateRecord } from "@repo/common/utils";
+import { RecordValidationError, validateRecord } from "@repo/common/utils";
 
 import { type Follow, parseFollow } from "./follow.js";
 import { type Generator, parseGenerator } from "./generator.js";
@@ -28,6 +28,10 @@ export type ParsedRecord =
     };
 
 export function parseRecord(record: Record): ParsedRecord {
+  // Postgresには`\u0000`を含む文字列を保存できないため
+  if (JSON.stringify(record.json).includes("\\u0000")) {
+    throw new RecordValidationError("null character", record.uri);
+  }
   const collection = record.uri.collection;
   switch (collection) {
     case "app.bsky.feed.post":

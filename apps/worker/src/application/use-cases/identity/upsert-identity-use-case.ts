@@ -33,10 +33,9 @@ export class UpsertIdentityUseCase {
         handle,
         status: command.status,
       });
-      const targets = await this.fetchPolicyService.targetsForAccount({
-        ctx,
-        did: command.did,
-      });
+      const targets = await this.fetchPolicyService.targetsForAccounts(ctx, [
+        command.did,
+      ]);
       this.indexJobService.schedule({ ctx, priority: "high", fetch: targets });
     });
     if (handle === "handle.invalid") {

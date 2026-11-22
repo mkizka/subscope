@@ -1,12 +1,18 @@
-import { AtUri } from "@atproto/syntax";
 import { fakeCid, fakeDid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 import type { Origin } from "../dto/origin.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import { parsePost } from "../dto/post.js";
 import { recordFactory } from "../dto/record.factory.js";
 import type { Record } from "../dto/record.js";
+
+const authorOf = (record: Record) => ({
+  did: record.uri.did,
+  isMember: false,
+  tracking: null,
+});
 
 const postRecord = (uri: `at://${string}`) =>
   recordFactory({
@@ -29,12 +35,16 @@ describe("FetchPolicyService", () => {
     db = services.db;
   });
 
-  const recordTargetUris = async (record: Record) => {
-    const targets = await fetchPolicyService.targetsForRecord({
+  const targetsFor = (record: Record, origin: Origin) =>
+    fetchPolicyService.targetsForRecord({
       ctx: { db },
-      record,
-      origin: { type: "tapLive" },
+      parsed: parseRecord(record),
+      author: authorOf(record),
+      origin,
     });
+
+  const recordTargetUris = async (record: Record) => {
+    const targets = await targetsFor(record, { type: "tapLive" });
     return targets.flatMap((target) =>
       target.type === "record" ? [target.uri.toString()] : [],
     );
@@ -46,20 +56,12 @@ describe("FetchPolicyService", () => {
     const record = postRecord(`at://${did}/app.bsky.feed.post/123`);
 
     // act
-    const targets = await fetchPolicyService.targetsForRecord({
-      ctx: { db },
-      record,
-      origin: { type: "tapLive" },
-    });
+    const targets = await targetsFor(record, { type: "tapLive" });
 
     // assert
     expect(targets).toEqual([
       { type: "handle", did },
-      {
-        type: "record",
-        uri: AtUri.make(did, "app.bsky.actor.profile", "self"),
-        hop: 1,
-      },
+      { type: "profile", did },
     ]);
   });
 
@@ -87,11 +89,7 @@ describe("FetchPolicyService", () => {
       });
 
       // act
-      const targets = await fetchPolicyService.targetsForRecord({
-        ctx: { db },
-        record,
-        origin,
-      });
+      const targets = await targetsFor(record, origin);
 
       // assert
       const hops = targets.flatMap((target) =>
@@ -112,7 +110,7 @@ describe("FetchPolicyService", () => {
       // arrange
       const quotedUri = `at://${fakeDid()}/app.bsky.feed.post/quoted` as const;
       if (saved) {
-        postRepository.add(parsePost(postRecord(quotedUri)));
+        postRepository.add(parsePost(postRecord(quotedUri)).post);
       }
       const record = recordFactory({
         uri: `at://${fakeDid()}/app.bsky.feed.post/123`,
@@ -145,7 +143,7 @@ describe("FetchPolicyService", () => {
       const subjectUri =
         `at://${fakeDid()}/app.bsky.feed.post/subject` as const;
       if (saved) {
-        postRepository.add(parsePost(postRecord(subjectUri)));
+        postRepository.add(parsePost(postRecord(subjectUri)).post);
       }
       const record = recordFactory({
         uri: `at://${fakeDid()}/app.bsky.feed.repost/123`,

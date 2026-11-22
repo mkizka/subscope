@@ -39,7 +39,7 @@ describe("TrackingPolicyService", () => {
     // act
     const dids = trackingPolicyService.reposToSync({
       parsed: parseRecord(record),
-      author: { did: follower.did, isMember },
+      author: { did: follower.did, isMember, tracking: null },
     });
 
     // assert

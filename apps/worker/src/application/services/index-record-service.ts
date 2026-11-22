@@ -1,12 +1,14 @@
 import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, JobPriority } from "@repo/common/interface";
 
+import type { Author } from "../dto/author.js";
 import type { Origin } from "../dto/origin.js";
 import { parseRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { INotificationRepository } from "../interfaces/repositories/notification-repository.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
+import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 import type { FetchPolicyService } from "./fetch-policy-service.js";
 import type { IndexJobService } from "./index-job-service.js";
 import type { NotificationPolicyService } from "./notification-policy-service.js";
@@ -20,6 +22,7 @@ export class IndexRecordService {
     private readonly recordRepository: IRecordRepository,
     private readonly notificationRepository: INotificationRepository,
     private readonly registrationQuery: IRegistrationQuery,
+    private readonly trackingRepository: ITrackingRepository,
     private readonly saveRecordService: SaveRecordService,
     private readonly storagePolicyService: StoragePolicyService,
     private readonly fetchPolicyService: FetchPolicyService,
@@ -101,11 +104,15 @@ export class IndexRecordService {
     });
   }
 
-  private async authorOf(ctx: AfterCommitContext, record: Record) {
+  private async authorOf(
+    ctx: AfterCommitContext,
+    record: Record,
+  ): Promise<Author> {
     const did = record.uri.did;
     return {
       did,
       isMember: await this.registrationQuery.isRegistered(ctx, did),
+      tracking: await this.trackingRepository.find({ ctx, did }),
     };
   }
 }

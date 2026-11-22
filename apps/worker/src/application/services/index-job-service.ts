@@ -33,14 +33,24 @@ export class IndexJobService {
   }) {
     ctx.afterCommit(async () => {
       await Promise.all([
-        ...fetch.map((target) =>
-          target.type === "handle"
-            ? this.jobScheduler.scheduleResolveDid(target.did, { priority })
-            : this.jobScheduler.scheduleFetchRecord(target.uri, {
+        ...fetch.map((target) => {
+          switch (target.type) {
+            case "record":
+              return this.jobScheduler.scheduleFetchRecord(target.uri, {
                 hop: target.hop,
                 priority,
-              }),
-        ),
+              });
+            case "profile":
+              return this.jobScheduler.scheduleFetchRecord(
+                AtUri.make(target.did, "app.bsky.actor.profile", "self"),
+                { hop: 1, priority },
+              );
+            case "handle":
+              return this.jobScheduler.scheduleResolveDid(target.did, {
+                priority,
+              });
+          }
+        }),
         ...stats.accounts.map((did) =>
           this.jobScheduler.scheduleAggregateAccountStats(did),
         ),

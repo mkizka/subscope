@@ -6,22 +6,23 @@ import type { Origin } from "../dto/origin.js";
 import type { ParsedRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
-import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
-
-// Postgresには`\u0000`を含む文字列を保存できないため
-const containsNullChar = (record: Record) =>
-  JSON.stringify(record.json).includes("\\u0000");
 
 const isGateOfSamePost = (record: Record, postUri: AtUri) =>
   postUri.host === record.uri.did &&
   postUri.collection === "app.bsky.feed.post" &&
   postUri.rkey === record.uri.rkey;
 
+const isWithinPastWindow = (
+  author: Author,
+  origin: Origin,
+  { createdAt }: { createdAt: Date },
+) =>
+  origin.type !== "tapPast" ||
+  author.isMember ||
+  !!author.tracking?.covers(createdAt);
+
 export class StoragePolicyService {
-  constructor(
-    private readonly registrationQuery: IRegistrationQuery,
-    private readonly trackingRepository: ITrackingRepository,
-  ) {}
+  constructor(private readonly registrationQuery: IRegistrationQuery) {}
 
   async shouldStore({
     ctx,
@@ -36,17 +37,14 @@ export class StoragePolicyService {
     author: Author;
     origin: Origin;
   }): Promise<boolean> {
-    if (containsNullChar(record)) {
-      return false;
-    }
     switch (parsed.collection) {
       case "app.bsky.feed.post":
-        return this.isWithinPastWindow(ctx, author, origin, parsed.post);
+        return isWithinPastWindow(author, origin, parsed.post);
       case "app.bsky.feed.repost":
-        return this.isWithinPastWindow(ctx, author, origin, parsed.repost);
+        return isWithinPastWindow(author, origin, parsed.repost);
       case "app.bsky.feed.like":
         return (
-          (await this.isWithinPastWindow(ctx, author, origin, parsed.like)) &&
+          isWithinPastWindow(author, origin, parsed.like) &&
           (author.isMember ||
             (await this.registrationQuery.isRegistered(
               ctx,
@@ -64,21 +62,5 @@ export class StoragePolicyService {
       case "app.bsky.actor.link":
         return true;
     }
-  }
-
-  private async isWithinPastWindow(
-    ctx: TransactionContext,
-    author: Author,
-    origin: Origin,
-    { createdAt }: { createdAt: Date },
-  ) {
-    if (origin.type !== "tapPast" || author.isMember) {
-      return true;
-    }
-    const tracking = await this.trackingRepository.find({
-      ctx,
-      did: author.did,
-    });
-    return !!tracking && tracking.covers(createdAt);
   }
 }

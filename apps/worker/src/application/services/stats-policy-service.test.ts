@@ -83,7 +83,7 @@ describe("StatsPolicyService", () => {
       });
 
       // act
-      const targets = statsPolicyService.targetsFor(record);
+      const targets = statsPolicyService.targetsFor(parseRecord(record));
 
       // assert
       expect(targets).toEqual({ accounts: [], posts: [new AtUri(subjectUri)] });
