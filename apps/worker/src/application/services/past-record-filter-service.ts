@@ -37,7 +37,8 @@ export class PastRecordFilterService {
       return true;
     }
     const did = record.uri.did;
-    if (await this.registrationQuery.isRegistered(ctx, did)) {
+    const isRegistered = await this.registrationQuery.isRegistered(ctx, did);
+    if (isRegistered) {
       return true;
     }
     const tracking = await this.trackingRepository.find({ ctx, did });
