@@ -264,6 +264,156 @@ describe("IndexCommitUseCase", () => {
     );
   });
 
+  describe("集計ジョブ", () => {
+    const indexMemberRecord = async (
+      collection: string,
+      json: { [key: string]: unknown },
+    ) => {
+      const member = accountFactory();
+      accountRepo.add(member);
+      registrationQuery.add(member.did);
+      const uri = AtUri.make(member.did, collection, "123");
+      const record = {
+        uri,
+        cid: "cid123",
+        json: {
+          $type: collection,
+          createdAt: new Date().toISOString(),
+          ...json,
+        },
+        indexedAt: new Date(),
+      };
+      await indexCommitUseCase.execute({
+        commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+        live: true,
+      });
+      return { member, uri };
+    };
+    const postStatsUris = () =>
+      jobScheduler.getAggregatePostStatsUris().map((uri) => uri.toString());
+
+    test("投稿を保存した場合、投稿・返信先・引用元の投稿と作者の集計ジョブを積む", async () => {
+      // arrange
+      const parent = {
+        uri: "at://did:plc:other/app.bsky.feed.post/parent",
+        cid: fakeCid(),
+      };
+      const quoted = {
+        uri: "at://did:plc:other/app.bsky.feed.post/quoted",
+        cid: fakeCid(),
+      };
+
+      // act
+      const { member, uri } = await indexMemberRecord("app.bsky.feed.post", {
+        text: "reply",
+        reply: { root: parent, parent },
+        embed: { $type: "app.bsky.embed.record", record: quoted },
+      });
+
+      // assert
+      expect(postStatsUris()).toEqual(
+        expect.arrayContaining([uri.toString(), parent.uri, quoted.uri]),
+      );
+      expect(jobScheduler.getAggregateAccountStatsDids()).toContain(member.did);
+    });
+
+    test.each(["app.bsky.feed.like", "app.bsky.feed.repost"])(
+      "%sを保存した場合、対象の投稿の集計ジョブを積む",
+      async (collection) => {
+        // arrange
+        const subject = {
+          uri: "at://did:plc:other/app.bsky.feed.post/1",
+          cid: fakeCid(),
+        };
+
+        // act
+        await indexMemberRecord(collection, { subject });
+
+        // assert
+        expect(postStatsUris()).toContain(subject.uri);
+      },
+    );
+
+    test("フォローを保存した場合、フォローした人とされた人の集計ジョブを積む", async () => {
+      // arrange
+      const subject = accountFactory();
+
+      // act
+      const { member } = await indexMemberRecord("app.bsky.graph.follow", {
+        subject: subject.did,
+      });
+
+      // assert
+      expect(jobScheduler.getAggregateAccountStatsDids()).toEqual(
+        expect.arrayContaining([member.did, subject.did]),
+      );
+    });
+
+    test("保存済みのいいねを削除した場合、対象の投稿の集計ジョブを積む", async () => {
+      // arrange
+      const subject = {
+        uri: "at://did:plc:other/app.bsky.feed.post/1",
+        cid: fakeCid(),
+      };
+      const { uri } = await indexMemberRecord("app.bsky.feed.like", {
+        subject,
+      });
+      jobScheduler.clear();
+
+      // act
+      await indexCommitUseCase.execute({
+        commit: { operation: "delete", uri, rev: "3bbbbbbbbbbbb" },
+        live: true,
+      });
+
+      // assert
+      expect(postStatsUris()).toContain(subject.uri);
+    });
+  });
+
+  describe("取得ジョブ", () => {
+    test.each([
+      { name: "ライブ", live: true },
+      { name: "バックフィル", live: false },
+    ])(
+      "index-12: バックフィルのレコードから積むジョブは、ライブのものより低い優先度で積む($name)",
+      async ({ live }) => {
+        // arrange
+        const member = accountFactory();
+        accountRepo.add(member);
+        registrationQuery.add(member.did);
+        const quotedUri = "at://did:plc:other/app.bsky.feed.post/quoted";
+        const uri = AtUri.make(member.did, "app.bsky.feed.post", "123");
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: "app.bsky.feed.post",
+            text: "quote",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: { uri: quotedUri, cid: fakeCid() },
+            },
+            createdAt: new Date().toISOString(),
+          },
+          indexedAt: new Date(),
+        };
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live,
+        });
+
+        // assert
+        const job = jobScheduler
+          .getFetchRecordJobs()
+          .find((job) => job.uri.toString() === quotedUri);
+        expect(job).toMatchObject({ live, depth: 0 });
+      },
+    );
+  });
+
   describe("フォロー・リスト項目の相手", () => {
     test.each([
       { collection: "app.bsky.graph.follow", member: true },
