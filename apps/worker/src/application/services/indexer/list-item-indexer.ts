@@ -1,4 +1,4 @@
-import type { AfterCommitContext } from "@repo/common/interface";
+import type { AfterCommitContext, Origin } from "@repo/common/interface";
 
 import { parseListItem } from "../../dto/list-item.js";
 import type { Record } from "../../dto/record.js";
@@ -17,17 +17,17 @@ export class ListItemIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
+    origin: Origin;
   }) {
     const listItem = parseListItem(record);
     await this.indexAccountService.upsert({
       ctx,
       did: listItem.subjectDid,
-      live,
+      origin,
       fetchMissing: await this.registrationQuery.isRegistered(
         ctx,
         listItem.accountDid,

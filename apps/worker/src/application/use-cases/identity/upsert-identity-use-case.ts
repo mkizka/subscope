@@ -28,7 +28,7 @@ export class UpsertIdentityUseCase {
         did: command.did,
         handle,
         status: command.status,
-        live: true,
+        origin: { via: "tap", live: true },
       }),
     );
     if (handle === "handle.invalid") {

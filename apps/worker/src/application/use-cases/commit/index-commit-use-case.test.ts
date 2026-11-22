@@ -57,7 +57,10 @@ describe("IndexCommitUseCase", () => {
         rev: "3aaaaaaaaaaaa",
         record,
       };
-      const command: IndexCommitCommand = { commit, live: true };
+      const command: IndexCommitCommand = {
+        commit,
+        origin: { via: "tap", live: true },
+      };
 
       // act
       await indexCommitUseCase.execute(command);
@@ -90,7 +93,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = {
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        live: true,
+        origin: { via: "tap", live: true },
       };
 
       // act
@@ -121,18 +124,16 @@ describe("IndexCommitUseCase", () => {
           },
           indexedAt: new Date(),
         };
-        return {
-          uri,
-          command: {
-            commit: {
-              operation: "create" as const,
-              uri,
-              rev: "3aaaaaaaaaaaa",
-              record,
-            },
-            live: true,
+        const command: IndexCommitCommand = {
+          commit: {
+            operation: "create",
+            uri,
+            rev: "3aaaaaaaaaaaa",
+            record,
           },
+          origin: { via: "tap", live: true },
         };
+        return { uri, command };
       };
       const threadgate = gate("app.bsky.feed.threadgate", "123", "123");
       const postgate = gate("app.bsky.feed.postgate", "123", "123");
@@ -187,7 +188,7 @@ describe("IndexCommitUseCase", () => {
         // act
         await indexCommitUseCase.execute({
           commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-          live: true,
+          origin: { via: "tap", live: true },
         });
 
         // assert
@@ -230,7 +231,7 @@ describe("IndexCommitUseCase", () => {
       };
       await indexCommitUseCase.execute({
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        live,
+        origin: { via: "tap", live },
       });
       return jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString());
     };
@@ -296,7 +297,7 @@ describe("IndexCommitUseCase", () => {
         // act
         await indexCommitUseCase.execute({
           commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-          live: true,
+          origin: { via: "tap", live: true },
         });
 
         // assert
@@ -343,13 +344,13 @@ describe("IndexCommitUseCase", () => {
           rev: "3aaaaaaaaaaaa",
           record,
         },
-        live: true,
+        origin: { via: "tap", live: true },
       };
       await indexCommitUseCase.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
         commit: { operation: "delete" as const, uri, rev: "3bbbbbbbbbbbb" },
-        live: true,
+        origin: { via: "tap", live: true },
       };
 
       // act
@@ -385,7 +386,10 @@ describe("IndexCommitUseCase", () => {
         rev: "3aaaaaaaaaaaa",
         record,
       };
-      const command: IndexCommitCommand = { commit, live: true };
+      const command: IndexCommitCommand = {
+        commit,
+        origin: { via: "tap", live: true },
+      };
 
       // act
       await indexCommitUseCase.execute(command);
@@ -412,7 +416,10 @@ describe("IndexCommitUseCase", () => {
         rev: "3aaaaaaaaaaaa",
         record,
       };
-      const command: IndexCommitCommand = { commit, live: true };
+      const command: IndexCommitCommand = {
+        commit,
+        origin: { via: "tap", live: true },
+      };
 
       // act & assert
       await expect(indexCommitUseCase.execute(command)).rejects.toThrow(

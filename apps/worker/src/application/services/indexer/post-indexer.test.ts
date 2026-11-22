@@ -48,8 +48,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -96,16 +95,14 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
 
       // assert
       expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
         {
           uri: new AtUri(embedUri),
-          depth: 0,
-          live: false,
+          origin: { via: "pds", hop: 1, live: false },
         },
       ]);
     });
@@ -127,8 +124,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -152,8 +148,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -192,7 +187,11 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        origin: { via: "tap", live: true },
+      });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -230,7 +229,11 @@ describe("PostIndexer", () => {
         postRecord("mention", mentioned.did, true),
         postRecord("quote", quoted.did, false),
       ]) {
-        await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+        await postIndexer.upsert({
+          ctx,
+          record,
+          origin: { via: "tap", live: true },
+        });
       }
 
       // assert
@@ -278,7 +281,11 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        origin: { via: "tap", live: true },
+      });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(
@@ -309,8 +316,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -353,8 +359,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -394,8 +399,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -434,8 +438,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 

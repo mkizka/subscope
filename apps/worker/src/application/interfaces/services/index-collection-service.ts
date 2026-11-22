@@ -1,4 +1,4 @@
-import type { AfterCommitContext } from "@repo/common/interface";
+import type { AfterCommitContext, Origin } from "@repo/common/interface";
 
 import type { Record } from "../../dto/record.js";
 
@@ -13,13 +13,11 @@ export interface ICollectionIndexer {
   upsert: ({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) => Promise<void>;
   afterAction?: ({
     ctx,

@@ -2,7 +2,10 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
 import type { IJobQueue } from "../../interface/job-queue.js";
-import type { IJobScheduler } from "../../interface/job-scheduler.js";
+import type {
+  IJobScheduler,
+  PdsOrigin,
+} from "../../interface/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
 
@@ -17,22 +20,19 @@ const CHECK_BACKFILL_DELAYS_MS = [
 export class JobScheduler implements IJobScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
 
-  async scheduleFetchRecord(
-    uri: AtUri,
-    { live, depth }: { live: boolean; depth: number },
-  ): Promise<void> {
+  async scheduleFetchRecord(uri: AtUri, origin: PdsOrigin): Promise<void> {
     const uriString = uri.toString();
     await this.jobQueue.add({
       queueName: "fetchRecord",
       jobName: uriString,
       data: {
         uri: uriString,
-        depth,
-        live,
+        hop: origin.hop,
+        live: origin.live,
       },
       options: {
         jobId: uriString,
-        priority: live ? undefined : 1,
+        priority: origin.live ? undefined : 1,
       },
     });
   }

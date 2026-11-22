@@ -26,7 +26,7 @@ describe("ListItemIndexer", () => {
     await listItemIndexer.upsert({
       ctx: { db, afterCommit },
       record,
-      live: false,
+      origin: { via: "tap", live: false },
     });
 
     // assert

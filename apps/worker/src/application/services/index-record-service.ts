@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { AfterCommitContext } from "@repo/common/interface";
+import type { AfterCommitContext, Origin } from "@repo/common/interface";
 import {
   isSupportedCollection,
   type SupportedCollection,
@@ -85,23 +85,21 @@ export class IndexRecordService {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }): Promise<void> {
     const indexer = this.indexerFor(record);
     await this.indexAccountService.upsert({
       ctx,
       did: record.uri.did,
-      live,
+      origin,
     });
     await this.recordRepository.save({ ctx, record });
 
-    await indexer.upsert({ ctx, record, live, depth });
+    await indexer.upsert({ ctx, record, origin });
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
   }
 

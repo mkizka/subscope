@@ -1,4 +1,8 @@
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
+import type {
+  AfterCommitContext,
+  IJobScheduler,
+  Origin,
+} from "@repo/common/interface";
 
 import { parseFollow } from "../../dto/follow.js";
 import type { Record } from "../../dto/record.js";
@@ -21,13 +25,11 @@ export class FollowIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) {
     const follow = parseFollow(record);
     const isFollowerServerMember = await this.registrationQuery.isRegistered(
@@ -37,7 +39,7 @@ export class FollowIndexer implements ICollectionIndexer {
     await this.indexAccountService.upsert({
       ctx,
       did: follow.subjectDid,
-      live,
+      origin,
       fetchMissing: isFollowerServerMember,
     });
     await this.followRepository.save({ ctx, follow });
@@ -49,8 +51,8 @@ export class FollowIndexer implements ICollectionIndexer {
     }
 
     const shouldNotify =
-      live &&
-      depth === 0 &&
+      origin.via === "tap" &&
+      origin.live &&
       follow.subjectDid !== follow.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, follow.subjectDid));
     if (shouldNotify) {

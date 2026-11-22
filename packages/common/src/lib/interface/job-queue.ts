@@ -3,7 +3,7 @@ import type { Queue } from "bullmq";
 
 type FetchRecordData = {
   uri: string;
-  depth: number;
+  hop: number;
   live: boolean;
 };
 

@@ -47,7 +47,11 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
+      await likeIndexer.upsert({
+        ctx,
+        record,
+        origin: { via: "tap", live: false },
+      });
 
       // assert
       const like = await likeRepo.find({ ctx, uri: record.uri });
@@ -102,8 +106,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        live: true,
-        depth: 0,
+        origin: { via: "tap", live: true },
       });
 
       // assert
@@ -113,11 +116,17 @@ describe("LikeIndexer", () => {
 
   describe("notify-9", () => {
     test.each([
-      { name: "バックフィルで受け取ったレコード", live: false, depth: 0 },
-      { name: "取得しに行ったレコード", live: true, depth: 1 },
+      {
+        name: "バックフィルで受け取ったレコード",
+        origin: { via: "tap", live: false } as const,
+      },
+      {
+        name: "取得しに行ったレコード",
+        origin: { via: "pds", hop: 1, live: true } as const,
+      },
     ])(
       "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルや取得しに行ったレコードでは作らない ($name)",
-      async ({ live, depth }) => {
+      async ({ origin }) => {
         // arrange
         const liker = accountFactory();
         const author = accountFactory();
@@ -138,8 +147,7 @@ describe("LikeIndexer", () => {
         await likeIndexer.upsert({
           ctx: { db, afterCommit },
           record,
-          live,
-          depth,
+          origin,
         });
 
         // assert
@@ -166,7 +174,11 @@ describe("LikeIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
+      await likeIndexer.upsert({
+        ctx,
+        record,
+        origin: { via: "tap", live: false },
+      });
 
       // act
       likeIndexer.afterAction({ ctx: { db, afterCommit }, record });

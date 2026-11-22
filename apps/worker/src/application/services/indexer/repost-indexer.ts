@@ -1,6 +1,11 @@
 import { AtUri } from "@atproto/syntax";
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
+import type {
+  AfterCommitContext,
+  IJobScheduler,
+  Origin,
+} from "@repo/common/interface";
 
+import { fetchedFrom } from "../../../domain/origin.js";
 import { feedItemFromRepost } from "../../dto/feed-item.js";
 import type { Record } from "../../dto/record.js";
 import { parseRepost } from "../../dto/repost.js";
@@ -25,13 +30,11 @@ export class RepostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) {
     const repost = parseRepost(record);
     await this.repostRepository.save({ ctx, repost });
@@ -42,8 +45,8 @@ export class RepostIndexer implements ICollectionIndexer {
     const subjectUri = new AtUri(repost.subjectUri);
     const recipientDid = subjectUri.host;
     const shouldNotify =
-      live &&
-      depth === 0 &&
+      origin.via === "tap" &&
+      origin.live &&
       recipientDid !== repost.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, recipientDid));
     if (shouldNotify) {
@@ -65,10 +68,7 @@ export class RepostIndexer implements ICollectionIndexer {
     const subjectExists = await this.postQuery.exists(ctx, subjectUri);
     if (!subjectExists) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(subjectUri, {
-          live,
-          depth,
-        }),
+        this.jobScheduler.scheduleFetchRecord(subjectUri, fetchedFrom(origin)),
       );
     }
   }

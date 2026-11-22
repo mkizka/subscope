@@ -35,7 +35,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -49,8 +49,7 @@ describe("IndexAccountService", () => {
       expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
         expect.objectContaining({
           uri: profileUri,
-          depth: 0,
-          live: false,
+          origin: { via: "pds", hop: 1, live: false },
         }),
       );
     });
@@ -71,7 +70,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -97,7 +96,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: existingHandle,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -124,7 +123,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -143,7 +142,7 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: newDid,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -174,7 +173,7 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: existingDidNoHandle,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -208,7 +207,7 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: existingDid,
-        live: false,
+        origin: { via: "tap", live: false },
       });
 
       // assert

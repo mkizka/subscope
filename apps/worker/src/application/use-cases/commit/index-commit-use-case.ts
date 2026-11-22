@@ -32,7 +32,7 @@ export class IndexCommitUseCase {
     }
   }
 
-  private async doIndexCommit({ commit, live }: IndexCommitCommand) {
+  private async doIndexCommit({ commit, origin }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
       if (commit.operation === "delete") {
         // Related data is also deleted by cascade
@@ -41,7 +41,7 @@ export class IndexCommitUseCase {
       }
       const { record } = commit;
       const isPastRecordIndexable =
-        live ||
+        origin.live ||
         (await this.pastRecordFilterService.shouldIndex({ ctx, record }));
       if (!isPastRecordIndexable) {
         return;
@@ -53,7 +53,7 @@ export class IndexCommitUseCase {
       if (!shouldIndex) {
         return;
       }
-      await this.indexRecordService.upsert({ ctx, record, live, depth: 0 });
+      await this.indexRecordService.upsert({ ctx, record, origin });
     });
   }
 }

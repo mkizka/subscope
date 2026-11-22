@@ -1,7 +1,12 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
+import type {
+  AfterCommitContext,
+  IJobScheduler,
+  Origin,
+} from "@repo/common/interface";
 
+import { fetchedFrom } from "../../../domain/origin.js";
 import { type Like, parseLike } from "../../dto/like.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
@@ -42,13 +47,11 @@ export class LikeIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) {
     const like = parseLike(record);
     const recipientDid = new AtUri(like.subjectUri).host;
@@ -59,8 +62,8 @@ export class LikeIndexer implements ICollectionIndexer {
     await this.likeRepository.save({ ctx, like });
 
     if (
-      live &&
-      depth === 0 &&
+      origin.via === "tap" &&
+      origin.live &&
       recipientDid !== like.accountDid &&
       isRecipientServerMember
     ) {
@@ -84,11 +87,11 @@ export class LikeIndexer implements ICollectionIndexer {
       ctx,
       like,
       subjectUri,
-      live,
+      live: origin.live,
     });
     if (shouldFetch) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(subjectUri, { live, depth }),
+        this.jobScheduler.scheduleFetchRecord(subjectUri, fetchedFrom(origin)),
       );
     }
   }

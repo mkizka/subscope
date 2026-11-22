@@ -35,8 +35,9 @@ export class CreateAdminService {
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
     ctx.afterCommit(() =>
       this.jobScheduler.scheduleFetchRecord(profileUri, {
+        via: "pds",
+        hop: 1,
         live: true,
-        depth: 0,
       }),
     );
   }

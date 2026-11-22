@@ -52,7 +52,11 @@ describe("FetchRecordUseCase", () => {
   });
 
   const execute = () =>
-    fetchRecordUseCase.execute({ uri, depth: 0, live: false, jobLogger });
+    fetchRecordUseCase.execute({
+      uri,
+      origin: { via: "pds", hop: 1, live: false },
+      jobLogger,
+    });
 
   test("fetchRecord-1: PDSにレコードがなければ、再試行せずに終える", async () => {
     // arrange

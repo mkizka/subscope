@@ -1,6 +1,11 @@
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
+import type {
+  AfterCommitContext,
+  IJobScheduler,
+  Origin,
+} from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
+import { fetchedFrom } from "../../../domain/origin.js";
 import { feedItemFromPost } from "../../dto/feed-item.js";
 import { getEmbedRecordUri, parsePost, type Post } from "../../dto/post.js";
 import type { Record } from "../../dto/record.js";
@@ -28,13 +33,11 @@ export class PostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) {
     const post = parsePost(record);
     await this.postRepository.save({ ctx, post });
@@ -42,7 +45,7 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = feedItemFromPost(post);
     await this.feedItemRepository.save({ ctx, feedItem });
 
-    if (live && depth === 0) {
+    if (origin.via === "tap" && origin.live) {
       await this.createNotifications(ctx, record, post);
     }
 
@@ -51,7 +54,7 @@ export class PostIndexer implements ICollectionIndexer {
       const embedExists = await this.postQuery.exists(ctx, embedUri);
       if (!embedExists) {
         ctx.afterCommit(() =>
-          this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth }),
+          this.jobScheduler.scheduleFetchRecord(embedUri, fetchedFrom(origin)),
         );
       }
     }

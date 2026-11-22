@@ -3,6 +3,7 @@ import { AtUri } from "@atproto/syntax";
 import {
   type AfterCommitContext,
   type IJobScheduler,
+  type Origin,
   type TransactionContext,
 } from "@repo/common/interface";
 import type { Handle } from "@repo/common/utils";
@@ -24,14 +25,14 @@ export class IndexAccountService {
     did,
     handle,
     status,
-    live,
+    origin,
     fetchMissing = true,
   }: {
     ctx: AfterCommitContext;
     did: Did;
     handle?: Handle;
     status?: AccountStatus;
-    live: boolean;
+    origin: Origin;
     fetchMissing?: boolean;
   }): Promise<void> {
     const existingAccount = await this.accountRepository.find({ ctx, did });
@@ -58,7 +59,7 @@ export class IndexAccountService {
 
     if (!account.handle) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleResolveDid(did, { live }),
+        this.jobScheduler.scheduleResolveDid(did, { live: origin.live }),
       );
     }
 
@@ -70,8 +71,9 @@ export class IndexAccountService {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleFetchRecord(profileUri, {
-          live,
-          depth: 0,
+          via: "pds",
+          hop: 1,
+          live: origin.live,
         }),
       );
     }

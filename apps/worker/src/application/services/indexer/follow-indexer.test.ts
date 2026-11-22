@@ -46,8 +46,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
 
       // assert
@@ -75,7 +74,11 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await followIndexer.upsert({
+        ctx,
+        record,
+        origin: { via: "tap", live: true },
+      });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -106,8 +109,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        origin: { via: "tap", live: false },
       });
 
       // act
