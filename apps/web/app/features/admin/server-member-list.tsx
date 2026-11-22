@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { BanIcon, EllipsisIcon, ShieldIcon } from "lucide-react";
+import { EllipsisIcon, ShieldIcon, UserMinusIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
@@ -69,8 +69,8 @@ type Props = {
   hasNextPage?: boolean;
   onGrantAdmin?: (did: string) => void;
   grantingDid?: string | null;
-  onBan?: (did: string) => void;
-  banningDid?: string | null;
+  onRemove?: (did: string) => void;
+  removingDid?: string | null;
   addMemberButton?: ReactNode;
 };
 
@@ -82,8 +82,8 @@ export function ServerMemberList({
   hasNextPage,
   onGrantAdmin,
   grantingDid,
-  onBan,
-  banningDid,
+  onRemove,
+  removingDid,
   addMemberButton,
 }: Props) {
   return (
@@ -118,13 +118,13 @@ export function ServerMemberList({
               >
                 {(openGrantAdmin) => (
                   <ConfirmDialog
-                    title={`@${serverMember.handle} のサーバー登録を停止しますか？`}
-                    description="サーバー登録が停止され、招待コードでも再登録できなくなります。"
-                    confirmLabel="停止する"
+                    title={`@${serverMember.handle} をメンバーから外しますか？`}
+                    description="サーバーへの登録を解除します。招待コードがあれば再登録できます。"
+                    confirmLabel="外す"
                     danger
-                    onConfirm={() => onBan?.(serverMember.did)}
+                    onConfirm={() => onRemove?.(serverMember.did)}
                   >
-                    {(openBan) => (
+                    {(openRemove) => (
                       <Menu
                         label="操作"
                         trigger={<EllipsisIcon className="size-4" />}
@@ -141,11 +141,11 @@ export function ServerMemberList({
                         <button
                           type="button"
                           className={clsx(menuItemClass, "text-danger")}
-                          disabled={banningDid === serverMember.did}
-                          onClick={openBan}
+                          disabled={removingDid === serverMember.did}
+                          onClick={openRemove}
                         >
-                          <BanIcon className="size-4" />
-                          サーバー登録を停止する
+                          <UserMinusIcon className="size-4" />
+                          メンバーから外す
                         </button>
                       </Menu>
                     )}

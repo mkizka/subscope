@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import banAccount from "@repo/client/me/subsco/admin/banAccount";
+import removeMember from "@repo/client/me/subsco/admin/removeMember";
 import { schema } from "@repo/db";
 import {
   accountFactory,
@@ -12,10 +12,10 @@ import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
-describe("me.subsco.admin.banAccount", () => {
+describe("me.subsco.admin.removeMember", () => {
   const { ctx } = testSetup;
 
-  test("banAccount-1: 管理者は登録停止せず、400とCannotBanAdminを返す", async () => {
+  test("removeMember-1: 管理者は登録を消さず、400とCannotRemoveAdminを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -25,16 +25,16 @@ describe("me.subsco.admin.banAccount", () => {
     loginAs(admin.did);
 
     // act
-    const promise = client.call(banAccount, { did: asDid(admin.did) });
+    const promise = client.call(removeMember, { did: asDid(admin.did) });
 
     // assert
     await expect(promise).rejects.toMatchObject({
       status: 400,
-      error: "CannotBanAdmin",
+      error: "CannotRemoveAdmin",
     });
   });
 
-  test("banAccount-2: 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む", async () => {
+  test("removeMember-2: 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -56,7 +56,7 @@ describe("me.subsco.admin.banAccount", () => {
     loginAs(admin.did);
 
     // act
-    await client.call(banAccount, { did: asDid(serverMember.did) });
+    await client.call(removeMember, { did: asDid(serverMember.did) });
 
     // assert
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
@@ -65,7 +65,7 @@ describe("me.subsco.admin.banAccount", () => {
     ]);
   });
 
-  test("banAccount-3: 登録を消し、登録停止中にする", async () => {
+  test("removeMember-3: 登録を消す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -77,7 +77,7 @@ describe("me.subsco.admin.banAccount", () => {
     loginAs(admin.did);
 
     // act
-    await client.call(banAccount, { did: asDid(serverMember.did) });
+    await client.call(removeMember, { did: asDid(serverMember.did) });
 
     // assert
     const registrations = await ctx.db
@@ -85,10 +85,5 @@ describe("me.subsco.admin.banAccount", () => {
       .from(schema.registrations)
       .where(eq(schema.registrations.accountDid, serverMember.did));
     expect(registrations).toEqual([]);
-    const [account] = await ctx.db
-      .select()
-      .from(schema.accounts)
-      .where(eq(schema.accounts.did, serverMember.did));
-    expect(account?.isBanned).toBe(true);
   });
 });

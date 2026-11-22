@@ -10,8 +10,8 @@ export interface IAdminCommand {
     did: string,
     actor: AtIdentifierString,
   ) => Promise<AddMemberResult>;
-  banAccount: (did: string, target: DidString) => Promise<void>;
   grantAdmin: (did: string, target: DidString) => Promise<void>;
+  removeMember: (did: string, target: DidString) => Promise<void>;
   createInviteCode: (did: string) => Promise<CreateInviteCodeOutput>;
   deleteInviteCode: (did: string, code: string) => Promise<void>;
 }

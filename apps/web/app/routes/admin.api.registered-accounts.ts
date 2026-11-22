@@ -57,7 +57,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       .object({ did: z.custom<DidString>(isValidDid) })
       .parse(await request.json());
     const useCase =
-      request.method === "DELETE" ? di.banAccountUseCase : di.grantAdminUseCase;
+      request.method === "DELETE"
+        ? di.removeMemberUseCase
+        : di.grantAdminUseCase;
     await useCase(did, target);
     return data({ success: true });
   } catch (e) {

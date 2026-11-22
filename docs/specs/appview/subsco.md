@@ -182,15 +182,15 @@ qは大文字と小文字を区別しない。
 | revokeAdmin-2 | 自分自身なら400とCannotRevokeSelfを返す    |
 | revokeAdmin-3 | メンバーでなければ400とNotRegisteredを返す |
 
-## me.subsco.admin.banAccount
+## me.subsco.admin.removeMember
 
-メンバーを登録停止する。管理者の認証が必要。メンバーでなければ400とNotRegisteredを返す。登録の削除と登録停止はまとめて行い、途中で失敗しても片方だけが反映されることはない。
+メンバーから外す。管理者の認証が必要。メンバーでなければ400とNotRegisteredを返す。外したアカウントも、招待コードがあれば再登録できる。
 
-| ID           | 仕様                                                                    |
-| ------------ | ----------------------------------------------------------------------- |
-| banAccount-1 | 管理者は登録停止せず、400とCannotBanAdminを返す                         |
-| banAccount-2 | 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む |
-| banAccount-3 | 登録を消し、登録停止中にする                                            |
+| ID             | 仕様                                                                    |
+| -------------- | ----------------------------------------------------------------------- |
+| removeMember-1 | 管理者は登録を消さず、400とCannotRemoveAdminを返す                      |
+| removeMember-2 | 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む |
+| removeMember-3 | 登録を消す                                                              |
 
 ## me.subsco.admin.createInviteCode
 
