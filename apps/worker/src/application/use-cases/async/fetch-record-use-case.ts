@@ -27,6 +27,19 @@ export class FetchRecordUseCase {
     live: boolean;
     jobLogger: JobLogger;
   }): Promise<void> {
+    // 深さが2以上の場合は処理を中止
+    //
+    // 例:
+    //   引用投稿
+    //   -> 引用された投稿(0)
+    //   → さらに引用された投稿(1)
+    //   → さらにさらに引用された投稿(2なので中止)
+    if (depth >= 2) {
+      await jobLogger.log(
+        `Skipping fetch for ${uri} - depth limit reached (depth: ${depth})`,
+      );
+      return;
+    }
     try {
       await this.doFetchRecord(uri, depth, live);
     } catch (error) {
@@ -48,13 +61,20 @@ export class FetchRecordUseCase {
   ): Promise<void> {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
-    await this.transactionManager.transaction((ctx) =>
-      this.indexRecordService.index({
+    await this.transactionManager.transaction(async (ctx) => {
+      const shouldIndex = await this.indexRecordService.shouldIndex({
         ctx,
         record,
-        origin: { type: "pds", hop: depth + 1 },
-        priority: live ? "high" : "low",
-      }),
-    );
+      });
+      if (!shouldIndex) {
+        return;
+      }
+      await this.indexRecordService.upsert({
+        ctx,
+        record,
+        live,
+        depth: depth + 1,
+      });
+    });
   }
 }
