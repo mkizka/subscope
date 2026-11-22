@@ -31,8 +31,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 const ADD_MEMBER_ERRORS = {
   accountNotFound: "アカウントが見つかりません",
   alreadyRegistered: "すでにメンバーです",
-  banned:
-    "登録停止中のアカウントです。「停止中」タブで登録を再開してから追加してください",
+  banned: "登録停止中のアカウントです",
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {

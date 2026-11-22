@@ -1,4 +1,3 @@
-import getBannedAccounts from "@repo/client/me/subsco/admin/getBannedAccounts";
 import getInviteCodes from "@repo/client/me/subsco/admin/getInviteCodes";
 import listServerMembers from "@repo/client/me/subsco/admin/listServerMembers";
 
@@ -22,10 +21,6 @@ export const adminQueryFactory = ({
     async listServerMembers(did, cursor) {
       const agent = await restore(did);
       return agent.call(listServerMembers, { limit: 20, cursor });
-    },
-    async getBannedAccounts(did, cursor) {
-      const agent = await restore(did);
-      return agent.call(getBannedAccounts, { limit: 20, cursor });
     },
     async getInviteCodes(did, cursor) {
       const agent = await restore(did);

@@ -87,13 +87,11 @@
     "me.subsco.admin.banAccount",
     "me.subsco.admin.createInviteCode",
     "me.subsco.admin.deleteInviteCode",
-    "me.subsco.admin.getBannedAccounts",
     "me.subsco.admin.getInviteCodes",
     "me.subsco.admin.grantAdmin",
     "me.subsco.admin.listServerMembers",
     "me.subsco.admin.registerAdmin",
     "me.subsco.admin.revokeAdmin",
-    "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
     "me.subsco.authFull",
     "me.subsco.graph.getServerMemberFollowers",
@@ -392,10 +390,6 @@
       "uri": "file://./lexicons/me/subsco/admin/deleteInviteCode.json",
       "cid": "bafyreifh5jqpyvvp45rhvmkt33yojwdok6zc2cy5cpci3kiebfhkefaw5i"
     },
-    "me.subsco.admin.getBannedAccounts": {
-      "uri": "file://./lexicons/me/subsco/admin/getBannedAccounts.json",
-      "cid": "bafyreiay53g3764rfb2se6sq5mjedfzg5xgwd4vlnrqqu6swqvanadsvma"
-    },
     "me.subsco.admin.getInviteCodes": {
       "uri": "file://./lexicons/me/subsco/admin/getInviteCodes.json",
       "cid": "bafyreibuqqttk42fvohuom5axi4myelti4risi4fuwe6zj4h342qtgttma"
@@ -416,17 +410,13 @@
       "uri": "file://./lexicons/me/subsco/admin/revokeAdmin.json",
       "cid": "bafyreigblxekxqvj5b4f7mew4epsz6hq3ehadiv26ywqsqesxq5ygtckji"
     },
-    "me.subsco.admin.unbanAccount": {
-      "uri": "file://./lexicons/me/subsco/admin/unbanAccount.json",
-      "cid": "bafyreiducxmp2knqgny57mwtci2ipzrep2j3vkjxnfjnqkdn4mpesydqmq"
-    },
     "me.subsco.admin.verifyAccess": {
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
     },
     "me.subsco.authFull": {
       "uri": "file://./lexicons/me/subsco/authFull.json",
-      "cid": "bafyreial7zfatzuvnio4h7rjhfxk2pk4yd2ghrr6rh3ab2ek2jchefjur4"
+      "cid": "bafyreiaiq66orkpzul2ir5dguxt5tloplbj7bhakypssfasctqqooreece"
     },
     "me.subsco.graph.getServerMemberFollowers": {
       "uri": "file://./lexicons/me/subsco/graph/getServerMemberFollowers.json",
