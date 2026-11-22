@@ -50,17 +50,6 @@ qは大文字と小文字を区別しない。
 | getOperator-1 | 管理者のうち最初に登録したメンバー1人を返す |
 | getOperator-2 | 管理者がいなければoperatorを含めない        |
 
-## me.subsco.server.getMemberStatus
-
-指定したアカウントがメンバーかどうかを返す。認証は不要。
-
-| ID                | 仕様                                    |
-| ----------------- | --------------------------------------- |
-| getMemberStatus-1 | メンバーならisMemberをtrueにする        |
-| getMemberStatus-2 | メンバーでなければisMemberをfalseにする |
-
-メンバー以外のアカウントは保存する範囲が狭いので、画面で表示が不十分だと示すのに使う。
-
 ## me.subsco.server.getFollowedAccounts
 
 メンバーの1人以上にフォローされているアカウント（メンバーも含む）を、フォローしているメンバーの数と総数とともに返す。認証が必要。
@@ -102,15 +91,18 @@ qは大文字と小文字を区別しない。
 | unregisterAccount-2 | 登録を消し、使った招待コードは使用済みのまま残す                        |
 | unregisterAccount-3 | 登録していなければ400とNotRegisteredを返す                              |
 
-## me.subsco.sync.getBackfillStatuses
+## me.subsco.sync.getTrackingStatuses
 
-指定したアカウントのうち、追跡アカウントのバックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
+指定したアカウントのうち、追跡アカウントについて、メンバーかどうかとバックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
 
 | ID                    | 仕様                                                 |
 | --------------------- | ---------------------------------------------------- |
-| getBackfillStatuses-1 | 追跡アカウントの状態だけを返す                       |
-| getBackfillStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
-| getBackfillStatuses-3 | 認証がなくても状態を返す                             |
+| getTrackingStatuses-1 | 追跡アカウントだけを返す                             |
+| getTrackingStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
+| getTrackingStatuses-3 | 認証がなくても状態を返す                             |
+| getTrackingStatuses-4 | アカウントごとにメンバーかどうかを返す               |
+
+メンバー以外のアカウントは保存する範囲が狭いので、画面で表示が不十分だと示すのに使う。
 
 ## me.subsco.sync.getRegistrationStatus
 
@@ -193,33 +185,15 @@ qは大文字と小文字を区別しない。
 | revokeAdmin-2 | 自分自身なら400とCannotRevokeSelfを返す    |
 | revokeAdmin-3 | メンバーでなければ400とNotRegisteredを返す |
 
-## me.subsco.admin.banAccount
+## me.subsco.admin.removeMember
 
-メンバーを登録停止する。管理者の認証が必要。メンバーでなければ400とNotRegisteredを返す。登録の削除と登録停止はまとめて行い、途中で失敗しても片方だけが反映されることはない。
+メンバーから外す。管理者の認証が必要。メンバーでなければ400とNotRegisteredを返す。外したアカウントも、招待コードがあれば再登録できる。
 
-| ID           | 仕様                                                                    |
-| ------------ | ----------------------------------------------------------------------- |
-| banAccount-1 | 管理者は登録停止せず、400とCannotBanAdminを返す                         |
-| banAccount-2 | 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む |
-| banAccount-3 | 登録を消し、登録停止中にする                                            |
-
-## me.subsco.admin.getBannedAccounts
-
-登録停止中のアカウントを返す。管理者の認証が必要。limitとcursorでページングする。
-
-| ID                  | 仕様                                      |
-| ------------------- | ----------------------------------------- |
-| getBannedAccounts-1 | 登録停止中のアカウントをprofileViewで返す |
-| getBannedAccounts-2 | 登録停止中でないアカウントは含めない      |
-
-## me.subsco.admin.unbanAccount
-
-登録停止を取り消す。管理者の認証が必要。メンバーには戻さず、本人が改めて登録する。
-
-| ID             | 仕様                                           |
-| -------------- | ---------------------------------------------- |
-| unbanAccount-1 | 取り消したアカウントは招待コードで再登録できる |
-| unbanAccount-2 | 登録停止中でなければ400とNotBannedを返す       |
+| ID             | 仕様                                                                    |
+| -------------- | ----------------------------------------------------------------------- |
+| removeMember-1 | 管理者は登録を消さず、400とCannotRemoveAdminを返す                      |
+| removeMember-2 | 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む |
+| removeMember-3 | 登録を消す                                                              |
 
 ## me.subsco.admin.createInviteCode
 

@@ -68,17 +68,3 @@ export const LoadingMore: Story = {
     isFetchingNextPage: true,
   },
 };
-
-export const Banned: Story = {
-  args: {
-    tab: "banned",
-    serverMembers: [],
-    bannedAccounts: [
-      {
-        did: "did:plc:example999",
-        handle: "mallory.bsky.social",
-        displayName: "Mallory",
-      },
-    ],
-  },
-};

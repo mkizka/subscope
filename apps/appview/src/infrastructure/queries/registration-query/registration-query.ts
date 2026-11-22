@@ -161,9 +161,11 @@ export class RegistrationQuery implements IRegistrationQuery {
     return row?.total ?? 0;
   }
 
-  async findTrackedBackfillStatuses(
+  async findTrackingStatuses(
     dids: Did[],
-  ): Promise<{ did: Did; status: BackfillStatus }[]> {
+  ): Promise<
+    { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[]
+  > {
     if (dids.length === 0) {
       return [];
     }
@@ -179,14 +181,20 @@ export class RegistrationQuery implements IRegistrationQuery {
         ),
     );
     const rows = await this.db
-      .select({ did: accounts.did, status: accounts.backfillStatus })
+      .select({
+        did: accounts.did,
+        memberDid: registrations.accountDid,
+        backfillStatus: accounts.backfillStatus,
+      })
       .from(accounts)
+      .leftJoin(registrations, eq(registrations.accountDid, accounts.did))
       .where(
         and(inArray(accounts.did, dids), inArray(accounts.did, trackedDids)),
       );
     return rows.map((row) => ({
       did: asDid(row.did),
-      status: row.status ?? "inProgress",
+      isMember: row.memberDid !== null,
+      backfillStatus: row.backfillStatus ?? "inProgress",
     }));
   }
 

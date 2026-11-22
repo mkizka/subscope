@@ -63,8 +63,4 @@ export class Account {
   ban(): void {
     this._isBanned = true;
   }
-
-  unban(): void {
-    this._isBanned = false;
-  }
 }

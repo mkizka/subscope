@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "me.subsco.sync.getBackfillStatuses",
+  "id": "me.subsco.sync.getTrackingStatuses",
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get the backfill status of tracked accounts. Accounts that are not tracked are omitted.",
+      "description": "Get whether each tracked account is a member and its backfill status. Accounts that are not tracked are omitted.",
       "parameters": {
         "type": "params",
         "required": ["dids"],
@@ -29,22 +29,25 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#backfillStatus"
+                "ref": "#trackingStatus"
               }
             }
           }
         }
       }
     },
-    "backfillStatus": {
+    "trackingStatus": {
       "type": "object",
-      "required": ["did", "status"],
+      "required": ["did", "isMember", "backfillStatus"],
       "properties": {
         "did": {
           "type": "string",
           "format": "did"
         },
-        "status": {
+        "isMember": {
+          "type": "boolean"
+        },
+        "backfillStatus": {
           "type": "string",
           "knownValues": ["inProgress", "completed", "error"]
         }

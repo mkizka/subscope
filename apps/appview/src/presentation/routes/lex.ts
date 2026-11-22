@@ -31,26 +31,23 @@ import type { ListNotifications } from "./app/bsky/notification/listNotification
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetPostThreadV2 } from "./app/bsky/unspecced/getPostThreadV2.js";
 import type { AddMember } from "./me/subsco/admin/addMember.js";
-import type { BanAccount } from "./me/subsco/admin/banAccount.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
-import type { GetBannedAccounts } from "./me/subsco/admin/getBannedAccounts.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
 import type { ListServerMembers } from "./me/subsco/admin/listServerMembers.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
+import type { RemoveMember } from "./me/subsco/admin/removeMember.js";
 import type { RevokeAdmin } from "./me/subsco/admin/revokeAdmin.js";
-import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetServerMemberFollowers } from "./me/subsco/graph/getServerMemberFollowers.js";
 import type { GetFollowedAccounts } from "./me/subsco/server/getFollowedAccounts.js";
 import type { GetLocalTimeline } from "./me/subsco/server/getLocalTimeline.js";
-import type { GetMemberStatus } from "./me/subsco/server/getMemberStatus.js";
 import type { GetOperator } from "./me/subsco/server/getOperator.js";
 import type { GetServerMembers } from "./me/subsco/server/getServerMembers.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
-import type { GetBackfillStatuses } from "./me/subsco/sync/getBackfillStatuses.js";
 import type { GetRegistrationStatus } from "./me/subsco/sync/getRegistrationStatus.js";
+import type { GetTrackingStatuses } from "./me/subsco/sync/getTrackingStatuses.js";
 import type { RegisterAccount } from "./me/subsco/sync/registerAccount.js";
 import type { UnregisterAccount } from "./me/subsco/sync/unregisterAccount.js";
 
@@ -72,11 +69,10 @@ export const lexRouterFactory = (
   getGroupedNotifications: GetGroupedNotifications,
   updateSeen: UpdateSeen,
   getRegistrationStatus: GetRegistrationStatus,
-  getBackfillStatuses: GetBackfillStatuses,
+  getTrackingStatuses: GetTrackingStatuses,
   registerAccount: RegisterAccount,
   unregisterAccount: UnregisterAccount,
-  banAccount: BanAccount,
-  unbanAccount: UnbanAccount,
+  removeMember: RemoveMember,
   createInviteCode: CreateInviteCode,
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
@@ -88,7 +84,6 @@ export const lexRouterFactory = (
   getLocalTimeline: GetLocalTimeline,
   getServerMembers: GetServerMembers,
   getSetupStatus: GetSetupStatus,
-  getMemberStatus: GetMemberStatus,
   getOperator: GetOperator,
   getFollowedAccounts: GetFollowedAccounts,
   getServerMemberFollowers: GetServerMemberFollowers,
@@ -98,7 +93,6 @@ export const lexRouterFactory = (
   searchActors: SearchActors,
   searchActorsTypeahead: SearchActorsTypeahead,
   listServerMembers: ListServerMembers,
-  getBannedAccounts: GetBannedAccounts,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
   getQuotes: GetQuotes,
@@ -125,11 +119,10 @@ export const lexRouterFactory = (
     getGroupedNotifications,
     updateSeen,
     getRegistrationStatus,
-    getBackfillStatuses,
+    getTrackingStatuses,
     registerAccount,
     unregisterAccount,
-    banAccount,
-    unbanAccount,
+    removeMember,
     createInviteCode,
     deleteInviteCode,
     getInviteCodes,
@@ -141,7 +134,6 @@ export const lexRouterFactory = (
     getLocalTimeline,
     getServerMembers,
     getSetupStatus,
-    getMemberStatus,
     getOperator,
     getFollowedAccounts,
     getServerMemberFollowers,
@@ -151,7 +143,6 @@ export const lexRouterFactory = (
     searchActors,
     searchActorsTypeahead,
     listServerMembers,
-    getBannedAccounts,
     getLikes,
     getRepostedBy,
     getQuotes,
