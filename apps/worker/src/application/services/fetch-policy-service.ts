@@ -4,9 +4,9 @@ import type { TransactionContext } from "@repo/common/interface";
 
 import type { FetchTarget } from "../dto/fetch-target.js";
 import type { Origin } from "../dto/origin.js";
-import type { IPostQuery } from "../interfaces/queries/post-query.js";
 import type { IProfileQuery } from "../interfaces/queries/profile-query.js";
 import type { IAccountRepository } from "../interfaces/repositories/account-repository.js";
+import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 
 const MAX_HOP = 2;
 
@@ -14,7 +14,7 @@ export class FetchPolicyService {
   constructor(
     private readonly accountRepository: IAccountRepository,
     private readonly profileQuery: IProfileQuery,
-    private readonly postQuery: IPostQuery,
+    private readonly recordRepository: IRecordRepository,
   ) {}
 
   async targetsFor({
@@ -31,8 +31,8 @@ export class FetchPolicyService {
     const hop = origin.type === "pds" ? origin.hop + 1 : 1;
     const targets: FetchTarget[] = [];
     for (const uri of hop > MAX_HOP ? [] : records) {
-      const exists = await this.postQuery.exists(ctx, uri);
-      if (!exists) {
+      const record = await this.recordRepository.find({ ctx, uri });
+      if (!record) {
         targets.push({ type: "record", uri, hop });
       }
     }

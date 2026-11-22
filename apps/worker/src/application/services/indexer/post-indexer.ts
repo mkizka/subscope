@@ -2,9 +2,7 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Author } from "../../dto/author.js";
 import { feedItemFromPost } from "../../dto/feed-item.js";
-import type { Origin } from "../../dto/origin.js";
 import { getEmbedRecordUri, parsePost, type Post } from "../../dto/post.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
@@ -12,10 +10,7 @@ import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { Notification } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import {
-  type ICollectionIndexer,
-  isWithinPastWindow,
-} from "./collection-indexer.js";
+import type { ICollectionIndexer } from "./collection-indexer.js";
 
 type ParsedPost = { post: Post; mentionDids: Did[] };
 
@@ -32,16 +27,8 @@ export class PostIndexer implements ICollectionIndexer<ParsedPost> {
     return parsePost(record);
   }
 
-  shouldStore({
-    parsed,
-    author,
-    origin,
-  }: {
-    parsed: ParsedPost;
-    author: Author;
-    origin: Origin;
-  }) {
-    return isWithinPastWindow(author, origin, parsed.post.createdAt);
+  pastWindowDate(parsed: ParsedPost) {
+    return parsed.post.createdAt;
   }
 
   async save({

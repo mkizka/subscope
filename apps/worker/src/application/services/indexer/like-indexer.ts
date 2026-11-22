@@ -9,10 +9,7 @@ import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { Notification } from "../../interfaces/repositories/notification-repository.js";
-import {
-  type ICollectionIndexer,
-  isWithinPastWindow,
-} from "./collection-indexer.js";
+import type { ICollectionIndexer } from "./collection-indexer.js";
 
 export class LikeIndexer implements ICollectionIndexer<Like> {
   constructor(
@@ -24,24 +21,25 @@ export class LikeIndexer implements ICollectionIndexer<Like> {
     return parseLike(record);
   }
 
+  pastWindowDate(parsed: Like) {
+    return parsed.createdAt;
+  }
+
   async shouldStore({
     ctx,
     parsed,
     author,
-    origin,
   }: {
     ctx: TransactionContext;
     parsed: Like;
     author: Author;
-    origin: Origin;
   }) {
     return (
-      isWithinPastWindow(author, origin, parsed.createdAt) &&
-      (author.isMember ||
-        (await this.registrationQuery.isRegistered(
-          ctx,
-          new AtUri(parsed.subjectUri).host,
-        )))
+      author.isMember ||
+      (await this.registrationQuery.isRegistered(
+        ctx,
+        new AtUri(parsed.subjectUri).host,
+      ))
     );
   }
 

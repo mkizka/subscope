@@ -170,7 +170,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("indexLabelService", ["labelRepository", "accountQuery"], asClassArgs(IndexLabelService))
     .service("trackingService", ["tapClient", "trackingRepository", "labelFetcher", "indexLabelService", "jobScheduler", "transactionManager"], asClassArgs(TrackingService))
     .service("indexAccountService", ["accountRepository"], asClassArgs(IndexAccountService))
-    .service("fetchPolicyService", ["accountRepository", "profileQuery", "postQuery"], asClassArgs(FetchPolicyService))
+    .service("fetchPolicyService", ["accountRepository", "profileQuery", "recordRepository"], asClassArgs(FetchPolicyService))
     .service("indexJobService", ["jobScheduler"], asClassArgs(IndexJobService))
     .service("postIndexer", ["postRepository", "feedItemRepository", "postQuery"], asClassArgs(PostIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository"], asClassArgs(RepostIndexer))

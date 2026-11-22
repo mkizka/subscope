@@ -10,6 +10,7 @@ import type { Notification } from "../../interfaces/repositories/notification-re
 
 export interface ICollectionIndexer<T> {
   parse: (record: Record) => T;
+  pastWindowDate?: (parsed: T) => Date;
   shouldStore?: (input: {
     ctx: TransactionContext;
     parsed: T;
@@ -35,12 +36,3 @@ export interface ICollectionIndexer<T> {
 export type CollectionIndexers = {
   [collection in SupportedCollection]: ICollectionIndexer<unknown>;
 };
-
-export const isWithinPastWindow = (
-  author: Author,
-  origin: Origin,
-  createdAt: Date,
-) =>
-  origin.type !== "tapPast" ||
-  author.isMember ||
-  !!author.tracking?.covers(createdAt);

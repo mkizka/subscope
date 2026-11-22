@@ -2,13 +2,14 @@ import { AtUri } from "@atproto/syntax";
 import { fakeCid, fakeDid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
 } from "../../shared/test-utils.js";
 import type { Origin } from "../dto/origin.js";
-import { parsePost } from "../dto/post.js";
+import { parseProfile } from "../dto/profile.js";
 import { recordFactory } from "../dto/record.factory.js";
 import type { Record } from "../dto/record.js";
 
@@ -39,14 +40,18 @@ const quoteRecord = (quotedUri: string, authorDid = fakeDid()) =>
 describe("レコードの取得の予約", () => {
   let indexRecordService: TestServices["indexRecordService"];
   let jobScheduler: TestServices["jobScheduler"];
-  let postRepository: TestServices["postRepository"];
+  let recordRepository: TestServices["recordRepository"];
+  let accountRepository: TestServices["accountRepository"];
+  let profileRepository: TestServices["profileRepository"];
   let registrationQuery: TestServices["registrationQuery"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     indexRecordService = services.indexRecordService;
     jobScheduler = services.jobScheduler;
-    postRepository = services.postRepository;
+    recordRepository = services.recordRepository;
+    accountRepository = services.accountRepository;
+    profileRepository = services.profileRepository;
     registrationQuery = services.registrationQuery;
     db = services.db;
   });
@@ -64,20 +69,40 @@ describe("レコードの取得の予約", () => {
       .getFetchRecordJobs()
       .filter((job) => job.uri.toString() === uri);
 
-  test("fetchRecord-8: レコードの作者のプロフィールとハンドルは、保存していなければ取得する", async () => {
-    // arrange
-    const did = fakeDid();
-    const record = postRecord(`at://${did}/app.bsky.feed.post/123`);
+  test.each([
+    { name: "未保存", saved: false, expected: 1 },
+    { name: "保存済み", saved: true, expected: 0 },
+  ])(
+    "fetchRecord-8: レコードの作者のプロフィールとハンドルは、保存していなければ取得する($name)",
+    async ({ saved, expected }) => {
+      // arrange
+      const account = accountFactory({ handle: saved ? "example.com" : null });
+      const profileUri = AtUri.make(
+        account.did,
+        "app.bsky.actor.profile",
+        "self",
+      ).toString();
+      if (saved) {
+        accountRepository.add(account);
+        profileRepository.add(
+          parseProfile(
+            recordFactory({
+              uri: profileUri,
+              json: { $type: "app.bsky.actor.profile" },
+            }),
+          ),
+        );
+      }
+      const record = postRecord(`at://${account.did}/app.bsky.feed.post/123`);
 
-    // act
-    await index(record);
+      // act
+      await index(record);
 
-    // assert
-    expect(jobScheduler.getResolveDidJobs()).toMatchObject([{ did }]);
-    expect(
-      fetchJobsOf(AtUri.make(did, "app.bsky.actor.profile", "self").toString()),
-    ).toHaveLength(1);
-  });
+      // assert
+      expect(jobScheduler.getResolveDidJobs()).toHaveLength(expected);
+      expect(fetchJobsOf(profileUri)).toHaveLength(expected);
+    },
+  );
 
   test.each<{ origin: Origin; expected: number[] }>([
     { origin: { type: "tapLive" }, expected: [1] },
@@ -102,15 +127,17 @@ describe("レコードの取得の予約", () => {
   );
 
   test.each([
-    { name: "未保存", saved: false, expected: 1 },
-    { name: "保存済み", saved: true, expected: 0 },
+    { collection: "app.bsky.feed.post", saved: false, expected: 1 },
+    { collection: "app.bsky.feed.post", saved: true, expected: 0 },
+    { collection: "app.bsky.feed.generator", saved: false, expected: 1 },
+    { collection: "app.bsky.feed.generator", saved: true, expected: 0 },
   ])(
-    "fetchRecord-5: 引用された投稿とフィードは、保存していなければ取得する($name)",
-    async ({ saved, expected }) => {
+    "fetchRecord-5: 引用された投稿とフィードは、保存していなければ取得する($collection, 保存済み=$saved)",
+    async ({ collection, saved, expected }) => {
       // arrange
-      const quotedUri = `at://${fakeDid()}/app.bsky.feed.post/quoted` as const;
+      const quotedUri = AtUri.make(fakeDid(), collection, "quoted").toString();
       if (saved) {
-        postRepository.add(parsePost(postRecord(quotedUri)).post);
+        recordRepository.add(recordFactory({ uri: quotedUri }));
       }
       const record = quoteRecord(quotedUri);
 
@@ -132,7 +159,7 @@ describe("レコードの取得の予約", () => {
       const subjectUri =
         `at://${fakeDid()}/app.bsky.feed.post/subject` as const;
       if (saved) {
-        postRepository.add(parsePost(postRecord(subjectUri)).post);
+        recordRepository.add(postRecord(subjectUri));
       }
       const record = recordFactory({
         uri: `at://${fakeDid()}/app.bsky.feed.repost/123`,

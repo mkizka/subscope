@@ -129,7 +129,7 @@ const ctx = {
   db: testInjector.resolve("db"),
 };
 
-await saveRecordService.save({ ctx, record });
+await recordRepository.save({ ctx, record });
 ```
 
 ## テストすべきケース

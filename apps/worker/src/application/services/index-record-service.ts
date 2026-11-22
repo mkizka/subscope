@@ -18,6 +18,11 @@ import type { IndexJobService } from "./index-job-service.js";
 import type { CollectionIndexers } from "./indexer/collection-indexer.js";
 import type { NotificationPolicyService } from "./notification-policy-service.js";
 
+const isWithinPastWindow = (author: Author, origin: Origin, createdAt: Date) =>
+  origin.type !== "tapPast" ||
+  author.isMember ||
+  !!author.tracking?.covers(createdAt);
+
 export class IndexRecordService {
   constructor(
     private readonly indexers: CollectionIndexers,
@@ -49,8 +54,10 @@ export class IndexRecordService {
     }
     const parsed = indexer.parse(record);
     const author = await this.authorOf(ctx, record);
+    const pastWindowDate = indexer.pastWindowDate?.(parsed);
     const shouldStore =
-      (await indexer.shouldStore?.({ ctx, parsed, author, origin })) ?? true;
+      (!pastWindowDate || isWithinPastWindow(author, origin, pastWindowDate)) &&
+      ((await indexer.shouldStore?.({ ctx, parsed, author, origin })) ?? true);
     if (!shouldStore) {
       return;
     }
@@ -96,6 +103,13 @@ export class IndexRecordService {
       return;
     }
     const indexer = this.indexerFor(existingRecord);
+    if (
+      !indexer.postsToAggregate &&
+      !indexer.accountsToAggregate &&
+      !indexer.reposToSync
+    ) {
+      return;
+    }
     const parsed = indexer.parse(existingRecord);
     const author = await this.authorOf(ctx, existingRecord);
     this.indexJobService.schedule({
