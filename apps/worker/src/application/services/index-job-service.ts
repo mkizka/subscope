@@ -8,7 +8,6 @@ import type {
 } from "@repo/common/interface";
 
 import type { FetchTarget } from "../dto/fetch-target.js";
-import type { StatsTargets } from "../dto/stats-targets.js";
 import type { Notification } from "../interfaces/repositories/notification-repository.js";
 
 type Push = Pick<Notification, "recordUri" | "recipientDid">;
@@ -27,7 +26,7 @@ export class IndexJobService {
     ctx: AfterCommitContext;
     priority: JobPriority;
     fetch?: FetchTarget[];
-    stats?: StatsTargets;
+    stats?: { accounts: Did[]; posts: AtUri[] };
     reposToSync?: Did[];
     pushes?: Push[];
   }) {

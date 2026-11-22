@@ -1,34 +1,33 @@
 import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, JobPriority } from "@repo/common/interface";
+import {
+  asSupportedCollection,
+  RecordValidationError,
+} from "@repo/common/utils";
 
 import type { Author } from "../dto/author.js";
 import type { Origin } from "../dto/origin.js";
-import { parseRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { INotificationRepository } from "../interfaces/repositories/notification-repository.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 import type { FetchPolicyService } from "./fetch-policy-service.js";
+import type { IndexAccountService } from "./index-account-service.js";
 import type { IndexJobService } from "./index-job-service.js";
+import type { CollectionIndexers } from "./indexer/collection-indexer.js";
 import type { NotificationPolicyService } from "./notification-policy-service.js";
-import type { SaveRecordService } from "./save-record-service.js";
-import type { StatsPolicyService } from "./stats-policy-service.js";
-import type { StoragePolicyService } from "./storage-policy-service.js";
-import type { TrackingPolicyService } from "./tracking-policy-service.js";
 
 export class IndexRecordService {
   constructor(
+    private readonly indexers: CollectionIndexers,
     private readonly recordRepository: IRecordRepository,
     private readonly notificationRepository: INotificationRepository,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly trackingRepository: ITrackingRepository,
-    private readonly saveRecordService: SaveRecordService,
-    private readonly storagePolicyService: StoragePolicyService,
+    private readonly indexAccountService: IndexAccountService,
     private readonly fetchPolicyService: FetchPolicyService,
     private readonly notificationPolicyService: NotificationPolicyService,
-    private readonly statsPolicyService: StatsPolicyService,
-    private readonly trackingPolicyService: TrackingPolicyService,
     private readonly indexJobService: IndexJobService,
   ) {}
 
@@ -43,26 +42,24 @@ export class IndexRecordService {
     origin: Origin;
     priority: JobPriority;
   }): Promise<void> {
-    const parsed = parseRecord(record);
+    const indexer = this.indexerFor(record);
+    // Postgresには`\u0000`を含む文字列を保存できないため
+    if (JSON.stringify(record.json).includes("\\u0000")) {
+      throw new RecordValidationError("null character", record.uri);
+    }
+    const parsed = indexer.parse(record);
     const author = await this.authorOf(ctx, record);
-    const shouldStore = await this.storagePolicyService.shouldStore({
-      ctx,
-      record,
-      parsed,
-      author,
-      origin,
-    });
+    const shouldStore =
+      (await indexer.shouldStore?.({ ctx, parsed, author, origin })) ?? true;
     if (!shouldStore) {
       return;
     }
-    await this.saveRecordService.save({ ctx, record, parsed });
+    await this.indexAccountService.upsert({ ctx, did: author.did });
+    await this.recordRepository.save({ ctx, record });
+    await indexer.save?.({ ctx, parsed });
 
     const notifications = await this.notificationPolicyService.notificationsFor(
-      {
-        ctx,
-        parsed,
-        origin,
-      },
+      { ctx, origin, indexer, parsed },
     );
     const pushes = await this.notificationRepository.save({
       ctx,
@@ -72,14 +69,20 @@ export class IndexRecordService {
     this.indexJobService.schedule({
       ctx,
       priority,
-      fetch: await this.fetchPolicyService.targetsForRecord({
+      fetch: await this.fetchPolicyService.targetsFor({
         ctx,
-        parsed,
-        author,
         origin,
+        records: indexer.recordsToFetch?.({ parsed, author, origin }) ?? [],
+        accounts: [
+          author.did,
+          ...(indexer.accountsToFetch?.({ parsed, author }) ?? []),
+        ],
       }),
-      stats: this.statsPolicyService.targetsFor(parsed),
-      reposToSync: this.trackingPolicyService.reposToSync({ parsed, author }),
+      stats: {
+        posts: indexer.postsToAggregate?.(parsed) ?? [],
+        accounts: indexer.accountsToAggregate?.(parsed) ?? [],
+      },
+      reposToSync: indexer.reposToSync?.({ parsed, author }) ?? [],
       pushes,
     });
   }
@@ -92,16 +95,22 @@ export class IndexRecordService {
     if (!existingRecord) {
       return;
     }
-    const parsed = parseRecord(existingRecord);
+    const indexer = this.indexerFor(existingRecord);
+    const parsed = indexer.parse(existingRecord);
+    const author = await this.authorOf(ctx, existingRecord);
     this.indexJobService.schedule({
       ctx,
       priority: "high",
-      stats: this.statsPolicyService.targetsFor(parsed),
-      reposToSync: this.trackingPolicyService.reposToSync({
-        parsed,
-        author: await this.authorOf(ctx, existingRecord),
-      }),
+      stats: {
+        posts: indexer.postsToAggregate?.(parsed) ?? [],
+        accounts: indexer.accountsToAggregate?.(parsed) ?? [],
+      },
+      reposToSync: indexer.reposToSync?.({ parsed, author }) ?? [],
     });
+  }
+
+  private indexerFor(record: Record) {
+    return this.indexers[asSupportedCollection(record.uri.collection)];
   }
 
   private async authorOf(

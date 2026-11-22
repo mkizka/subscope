@@ -1,14 +1,15 @@
 import { AtUri } from "@atproto/syntax";
 import { fakeCid } from "@repo/common/test";
+import { asSupportedCollection } from "@repo/common/utils";
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 import type { Origin } from "../dto/origin.js";
-import { parseRecord } from "../dto/parsed-record.js";
 import { postFactory } from "../dto/post.factory.js";
 import { recordFactory } from "../dto/record.factory.js";
+import type { Record } from "../dto/record.js";
 
 const mention = (did: string) => ({
   index: { byteStart: 0, byteEnd: 1 },
@@ -17,16 +18,32 @@ const mention = (did: string) => ({
 
 describe("NotificationPolicyService", () => {
   let notificationPolicyService: TestServices["notificationPolicyService"];
+  let collectionIndexers: TestServices["collectionIndexers"];
   let registrationQuery: TestServices["registrationQuery"];
   let postRepo: TestServices["postRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     notificationPolicyService = services.notificationPolicyService;
+    collectionIndexers = services.collectionIndexers;
     registrationQuery = services.registrationQuery;
     postRepo = services.postRepository;
     db = services.db;
   });
+
+  const notificationsFor = (
+    record: Record,
+    origin: Origin = { type: "tapLive" },
+  ) => {
+    const indexer =
+      collectionIndexers[asSupportedCollection(record.uri.collection)];
+    return notificationPolicyService.notificationsFor({
+      ctx: { db },
+      origin,
+      indexer,
+      parsed: indexer.parse(record),
+    });
+  };
 
   const likeRecord = (likerDid: string, authorDid: string) =>
     recordFactory({
@@ -71,11 +88,7 @@ describe("NotificationPolicyService", () => {
     const record = likeRecord(liker.did, author.did);
 
     // act
-    const notifications = await notificationPolicyService.notificationsFor({
-      ctx: { db },
-      parsed: parseRecord(record),
-      origin: { type: "tapLive" },
-    });
+    const notifications = await notificationsFor(record);
 
     // assert
     expect(notifications).toMatchObject(expected);
@@ -97,11 +110,7 @@ describe("NotificationPolicyService", () => {
     });
 
     // act
-    const notifications = await notificationPolicyService.notificationsFor({
-      ctx: { db },
-      parsed: parseRecord(record),
-      origin: { type: "tapLive" },
-    });
+    const notifications = await notificationsFor(record);
 
     // assert
     expect(notifications).toMatchObject([
@@ -130,11 +139,7 @@ describe("NotificationPolicyService", () => {
     });
 
     // act
-    const notifications = await notificationPolicyService.notificationsFor({
-      ctx: { db },
-      parsed: parseRecord(record),
-      origin: { type: "tapLive" },
-    });
+    const notifications = await notificationsFor(record);
 
     // assert
     expect(notifications).toMatchObject([
@@ -185,11 +190,7 @@ describe("NotificationPolicyService", () => {
     });
 
     // act
-    const notifications = await notificationPolicyService.notificationsFor({
-      ctx: { db },
-      parsed: parseRecord(record),
-      origin: { type: "tapLive" },
-    });
+    const notifications = await notificationsFor(record);
 
     // assert
     expect(notifications).toMatchObject(
@@ -223,11 +224,7 @@ describe("NotificationPolicyService", () => {
     });
 
     // act
-    const notifications = await notificationPolicyService.notificationsFor({
-      ctx: { db },
-      parsed: parseRecord(record),
-      origin: { type: "tapLive" },
-    });
+    const notifications = await notificationsFor(record);
 
     // assert
     expect(notifications).toMatchObject([
@@ -262,11 +259,7 @@ describe("NotificationPolicyService", () => {
       });
 
       // act
-      const notifications = await notificationPolicyService.notificationsFor({
-        ctx: { db },
-        parsed: parseRecord(record),
-        origin: { type: "tapLive" },
-      });
+      const notifications = await notificationsFor(record);
 
       // assert
       expect(notifications).toMatchObject([
@@ -288,11 +281,7 @@ describe("NotificationPolicyService", () => {
       const record = likeRecord(liker.did, author.did);
 
       // act
-      const notifications = await notificationPolicyService.notificationsFor({
-        ctx: { db },
-        parsed: parseRecord(record),
-        origin,
-      });
+      const notifications = await notificationsFor(record, origin);
 
       // assert
       expect(notifications).toEqual([]);

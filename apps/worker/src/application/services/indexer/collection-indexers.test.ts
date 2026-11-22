@@ -1,12 +1,15 @@
 import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { accountFactory } from "../../domain/account.factory.js";
-import { testRegistry, type TestServices } from "../../shared/test-utils.js";
-import { parseRecord } from "../dto/parsed-record.js";
-import { recordFactory } from "../dto/record.factory.js";
+import { accountFactory } from "../../../domain/account.factory.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
-describe("SaveRecordService", () => {
+describe("レコードの種類ごとの保存", () => {
   let services: TestServices;
   beforeEach(async () => {
     services = await testRegistry.resolve();
@@ -14,7 +17,7 @@ describe("SaveRecordService", () => {
 
   test("投稿の場合、投稿とフィードの項目を保存する", async () => {
     // arrange
-    const { saveRecordService, postRepository, feedItemRepository, db } =
+    const { indexRecordService, postRepository, feedItemRepository, db } =
       services;
     const author = accountFactory();
     const record = recordFactory({
@@ -27,10 +30,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -54,7 +58,7 @@ describe("SaveRecordService", () => {
 
   test("投稿の日付が無効（0000-01-01）な場合も、エラーなく保存する", async () => {
     // arrange
-    const { saveRecordService, postRepository, feedItemRepository, db } =
+    const { indexRecordService, postRepository, feedItemRepository, db } =
       services;
     const record = recordFactory({
       uri: `at://${accountFactory().did}/app.bsky.feed.post/postkey000`,
@@ -66,10 +70,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -84,7 +89,7 @@ describe("SaveRecordService", () => {
 
   test("リポストの場合、リポストとフィードの項目を保存する", async () => {
     // arrange
-    const { saveRecordService, repostRepository, feedItemRepository, db } =
+    const { indexRecordService, repostRepository, feedItemRepository, db } =
       services;
     const reposter = accountFactory();
     const subjectUri = `at://${accountFactory().did}/app.bsky.feed.post/123`;
@@ -98,10 +103,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -125,8 +131,10 @@ describe("SaveRecordService", () => {
 
   test("いいねの場合、いいねを保存する", async () => {
     // arrange
-    const { saveRecordService, likeRepository, db } = services;
+    const { indexRecordService, likeRepository, registrationQuery, db } =
+      services;
     const liker = accountFactory();
+    registrationQuery.add(liker.did);
     const postUri = "at://did:plc:other/app.bsky.feed.post/123";
     const record = recordFactory({
       uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
@@ -138,10 +146,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -157,7 +166,7 @@ describe("SaveRecordService", () => {
 
   test("フォローの場合、フォローとフォロー先のアカウントを保存する", async () => {
     // arrange
-    const { saveRecordService, followRepository, accountRepository, db } =
+    const { indexRecordService, followRepository, accountRepository, db } =
       services;
     const follower = accountFactory();
     const followee = accountFactory();
@@ -171,10 +180,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -193,7 +203,7 @@ describe("SaveRecordService", () => {
 
   test("リストの場合、リストを保存する", async () => {
     // arrange
-    const { saveRecordService, listRepository, db } = services;
+    const { indexRecordService, listRepository, db } = services;
     const account = accountFactory();
     const record = recordFactory({
       uri: `at://${account.did}/app.bsky.graph.list/listrkey123`,
@@ -206,10 +216,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -224,7 +235,7 @@ describe("SaveRecordService", () => {
 
   test("リスト項目の場合、リスト項目と対象のアカウントを保存する", async () => {
     // arrange
-    const { saveRecordService, listItemRepository, accountRepository, db } =
+    const { indexRecordService, listItemRepository, accountRepository, db } =
       services;
     const account = accountFactory();
     const subject = accountFactory();
@@ -240,10 +251,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert
@@ -263,7 +275,7 @@ describe("SaveRecordService", () => {
 
   test("プロフィールの場合、プロフィールを保存する", async () => {
     // arrange
-    const { saveRecordService, profileRepository, db } = services;
+    const { indexRecordService, profileRepository, db } = services;
     const account = accountFactory();
     const avatarCid = fakeCid();
     const bannerCid = fakeCid();
@@ -290,10 +302,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({
-      ctx: { db },
+    await indexRecordService.index({
+      ctx: { db, afterCommit },
       record,
-      parsed: parseRecord(record),
+      origin: { type: "tapLive" },
+      priority: "high",
     });
 
     // assert

@@ -292,7 +292,7 @@ describe("IndexCommitUseCase", () => {
     const postStatsUris = () =>
       jobScheduler.getAggregatePostStatsUris().map((uri) => uri.toString());
 
-    test("投稿を保存した場合、投稿・返信先・引用元の投稿と作者の集計ジョブを積む", async () => {
+    test("aggregate-5: 投稿の保存・削除で、作者の投稿数、返信先の返信数、引用元の引用数を数え直す", async () => {
       // arrange
       const parent = {
         uri: "at://did:plc:other/app.bsky.feed.post/parent",
@@ -304,7 +304,7 @@ describe("IndexCommitUseCase", () => {
       };
 
       // act
-      const { member, uri } = await indexMemberRecord("app.bsky.feed.post", {
+      const { member } = await indexMemberRecord("app.bsky.feed.post", {
         text: "reply",
         reply: { root: parent, parent },
         embed: { $type: "app.bsky.embed.record", record: quoted },
@@ -312,13 +312,23 @@ describe("IndexCommitUseCase", () => {
 
       // assert
       expect(postStatsUris()).toEqual(
-        expect.arrayContaining([uri.toString(), parent.uri, quoted.uri]),
+        expect.arrayContaining([parent.uri, quoted.uri]),
       );
       expect(jobScheduler.getAggregateAccountStatsDids()).toContain(member.did);
     });
 
+    test("aggregate-6: 投稿を保存したら、先に保存されていたその投稿へのいいね・リポスト・返信・引用も数える", async () => {
+      // act
+      const { uri } = await indexMemberRecord("app.bsky.feed.post", {
+        text: "hello",
+      });
+
+      // assert
+      expect(postStatsUris()).toContain(uri.toString());
+    });
+
     test.each(["app.bsky.feed.like", "app.bsky.feed.repost"])(
-      "%sを保存した場合、対象の投稿の集計ジョブを積む",
+      "aggregate-7: いいね・リポストの保存・削除で、対象の投稿のいいね数・リポスト数を数え直す(%s)",
       async (collection) => {
         // arrange
         const subject = {
@@ -334,7 +344,7 @@ describe("IndexCommitUseCase", () => {
       },
     );
 
-    test("フォローを保存した場合、フォローした人とされた人の集計ジョブを積む", async () => {
+    test("aggregate-8: フォローの保存・削除で、フォローした人のフォロー数とされた人のフォロワー数を数え直す", async () => {
       // arrange
       const subject = accountFactory();
 
