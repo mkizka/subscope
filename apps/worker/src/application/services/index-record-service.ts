@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
-import type { AfterCommitContext } from "@repo/common/interface";
+import type { AfterCommitContext, JobPriority } from "@repo/common/interface";
 
-import type { JobPriority, Origin } from "../dto/origin.js";
+import type { Origin } from "../dto/origin.js";
 import { parseRecord } from "../dto/parsed-record.js";
 import type { Record } from "../dto/record.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";

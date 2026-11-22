@@ -1,17 +1,20 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { IJobScheduler } from "../../interface/job-scheduler.js";
+import type {
+  IJobScheduler,
+  JobPriority,
+} from "../../interface/job-scheduler.js";
 
 interface ScheduledFetchRecord {
   uri: AtUri;
-  live: boolean;
-  depth: number;
+  hop: number;
+  priority: JobPriority;
 }
 
 interface ScheduledResolveDid {
   did: Did;
-  live: boolean;
+  priority: JobPriority;
 }
 
 interface ScheduledSyncTapRepo {
@@ -40,16 +43,16 @@ export class InMemoryJobScheduler implements IJobScheduler {
 
   async scheduleFetchRecord(
     uri: AtUri,
-    { live, depth }: { live: boolean; depth: number },
+    { hop, priority }: { hop: number; priority: JobPriority },
   ): Promise<void> {
-    this.fetchRecordJobs.push({ uri, live, depth });
+    this.fetchRecordJobs.push({ uri, hop, priority });
   }
 
   async scheduleResolveDid(
     did: Did,
-    { live }: { live: boolean },
+    { priority }: { priority: JobPriority },
   ): Promise<void> {
-    this.resolveDidJobs.push({ did, live });
+    this.resolveDidJobs.push({ did, priority });
   }
 
   async scheduleSyncTapRepo(

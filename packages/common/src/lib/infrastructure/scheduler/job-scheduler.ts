@@ -2,7 +2,10 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
 import type { IJobQueue } from "../../interface/job-queue.js";
-import type { IJobScheduler } from "../../interface/job-scheduler.js";
+import type {
+  IJobScheduler,
+  JobPriority,
+} from "../../interface/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
 
@@ -19,7 +22,7 @@ export class JobScheduler implements IJobScheduler {
 
   async scheduleFetchRecord(
     uri: AtUri,
-    { live, depth }: { live: boolean; depth: number },
+    { hop, priority }: { hop: number; priority: JobPriority },
   ): Promise<void> {
     const uriString = uri.toString();
     await this.jobQueue.add({
@@ -27,19 +30,19 @@ export class JobScheduler implements IJobScheduler {
       jobName: uriString,
       data: {
         uri: uriString,
-        depth,
-        live,
+        hop,
+        priority,
       },
       options: {
         jobId: uriString,
-        priority: live ? undefined : 1,
+        priority: priority === "high" ? undefined : 1,
       },
     });
   }
 
   async scheduleResolveDid(
     did: Did,
-    { live }: { live: boolean },
+    { priority }: { priority: JobPriority },
   ): Promise<void> {
     const jobName = `at://${did}`;
     await this.jobQueue.add({
@@ -48,7 +51,7 @@ export class JobScheduler implements IJobScheduler {
       data: did,
       options: {
         jobId: jobName,
-        priority: live ? undefined : 1,
+        priority: priority === "high" ? undefined : 1,
       },
     });
   }

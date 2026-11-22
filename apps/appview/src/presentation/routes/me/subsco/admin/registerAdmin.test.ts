@@ -94,8 +94,8 @@ describe("me.subsco.admin.registerAdmin", () => {
     expect(jobScheduler.getFetchRecordJobs()).toEqual([
       {
         uri: AtUri.make(requesterDid, "app.bsky.actor.profile", "self"),
-        live: true,
-        depth: 0,
+        hop: 1,
+        priority: "high",
       },
     ]);
   });
@@ -110,7 +110,7 @@ describe("me.subsco.admin.registerAdmin", () => {
 
     // assert
     expect(jobScheduler.getResolveDidJobs()).toEqual([
-      { did: requesterDid, live: true },
+      { did: requesterDid, priority: "high" },
     ]);
   });
 });

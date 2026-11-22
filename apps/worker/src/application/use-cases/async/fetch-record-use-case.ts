@@ -1,5 +1,8 @@
 import { AtUri } from "@atproto/syntax";
-import { type ITransactionManager } from "@repo/common/interface";
+import {
+  type ITransactionManager,
+  type JobPriority,
+} from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
 import type { JobLogger } from "../../../shared/job.js";
@@ -18,17 +21,17 @@ export class FetchRecordUseCase {
 
   async execute({
     uri,
-    depth,
-    live,
+    hop,
+    priority,
     jobLogger,
   }: {
     uri: string;
-    depth: number;
-    live: boolean;
+    hop: number;
+    priority: JobPriority;
     jobLogger: JobLogger;
   }): Promise<void> {
     try {
-      await this.doFetchRecord(uri, depth, live);
+      await this.doFetchRecord(uri, hop, priority);
     } catch (error) {
       if (
         error instanceof RecordFetchError ||
@@ -43,8 +46,8 @@ export class FetchRecordUseCase {
 
   private async doFetchRecord(
     uri: string,
-    depth: number,
-    live: boolean,
+    hop: number,
+    priority: JobPriority,
   ): Promise<void> {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
@@ -52,8 +55,8 @@ export class FetchRecordUseCase {
       this.indexRecordService.index({
         ctx,
         record,
-        origin: { type: "pds", hop: depth + 1 },
-        priority: live ? "high" : "low",
+        origin: { type: "pds", hop },
+        priority,
       }),
     );
   }
