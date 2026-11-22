@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 import type {
   IJobScheduler,
   ITransactionManager,
+  TransactionContext,
 } from "@repo/common/interface";
 
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
@@ -21,22 +22,28 @@ export class SyncTapRepoUseCase {
     private readonly transactionManager: ITransactionManager,
   ) {}
 
+  private async updateTracking(ctx: TransactionContext, did: Did) {
+    const isRegistered = await this.registrationQuery.isRegistered(ctx, did);
+    const isTracked =
+      isRegistered ||
+      (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did));
+    if (!isTracked) {
+      await this.trackingRepository.delete({ ctx, did });
+      return false;
+    }
+    const tracking = await this.trackingRepository.find({ ctx, did });
+    if (!tracking) {
+      await this.trackingRepository.save({
+        ctx,
+        tracking: { did, trackedAt: new Date() },
+      });
+    }
+    return true;
+  }
+
   async execute(did: Did) {
-    const isTrackedAccount = await this.transactionManager.transaction(
-      async (ctx) => {
-        const isTracked =
-          (await this.registrationQuery.isRegistered(ctx, did)) ||
-          (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did));
-        if (!isTracked) {
-          await this.trackingRepository.delete({ ctx, did });
-        } else if (!(await this.trackingRepository.find({ ctx, did }))) {
-          await this.trackingRepository.save({
-            ctx,
-            tracking: { did, trackedAt: new Date() },
-          });
-        }
-        return isTracked;
-      },
+    const isTrackedAccount = await this.transactionManager.transaction((ctx) =>
+      this.updateTracking(ctx, did),
     );
     if (isTrackedAccount) {
       await this.tapClient.addRepo(did);
