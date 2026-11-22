@@ -8,7 +8,6 @@ import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 import { TimelinePage } from "./timeline-page";
 
 const meta = {
-  title: "pages/client/Layout",
   beforeEach: () => {
     queryClient.setQueryData(
       ["timeline"],
