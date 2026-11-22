@@ -46,8 +46,8 @@ import type { GetLocalTimeline } from "./me/subsco/server/getLocalTimeline.js";
 import type { GetOperator } from "./me/subsco/server/getOperator.js";
 import type { GetServerMembers } from "./me/subsco/server/getServerMembers.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
-import type { GetBackfillStatuses } from "./me/subsco/sync/getBackfillStatuses.js";
 import type { GetRegistrationStatus } from "./me/subsco/sync/getRegistrationStatus.js";
+import type { GetTrackingStatuses } from "./me/subsco/sync/getTrackingStatuses.js";
 import type { RegisterAccount } from "./me/subsco/sync/registerAccount.js";
 import type { UnregisterAccount } from "./me/subsco/sync/unregisterAccount.js";
 
@@ -69,7 +69,7 @@ export const lexRouterFactory = (
   getGroupedNotifications: GetGroupedNotifications,
   updateSeen: UpdateSeen,
   getRegistrationStatus: GetRegistrationStatus,
-  getBackfillStatuses: GetBackfillStatuses,
+  getTrackingStatuses: GetTrackingStatuses,
   registerAccount: RegisterAccount,
   unregisterAccount: UnregisterAccount,
   removeMember: RemoveMember,
@@ -119,7 +119,7 @@ export const lexRouterFactory = (
     getGroupedNotifications,
     updateSeen,
     getRegistrationStatus,
-    getBackfillStatuses,
+    getTrackingStatuses,
     registerAccount,
     unregisterAccount,
     removeMember,
