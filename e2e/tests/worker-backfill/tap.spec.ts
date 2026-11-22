@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { expect, test } from "@playwright/test";
 
 import { createRecord, follow, registerAccount } from "../../helpers/pds";
@@ -22,7 +23,7 @@ test("tap-10: 登録されたアカウントは、Tapに追加済みでも外し
   });
   await page.goto("/");
   await expect(async () => {
-    await page.goto(`/ivan.test/post/${delivered.uri.split("/").pop()}`);
+    await page.goto(`/ivan.test/post/${new AtUri(delivered.uri).rkey}`);
     await expect(page.getByText("tap-10: いいねのあとの投稿")).toBeVisible({
       timeout: 1000,
     });
@@ -34,7 +35,7 @@ test("tap-10: 登録されたアカウントは、Tapに追加済みでも外し
   await registerAccount("ivan.test", code);
 
   await expect(async () => {
-    await page.goto(`/erin.test/post/${subject.uri.split("/").pop()}`);
+    await page.goto(`/erin.test/post/${new AtUri(subject.uri).rkey}`);
     await expect(page.getByRole("link", { name: "1件のいいね" })).toBeVisible({
       timeout: 1000,
     });
