@@ -9,6 +9,8 @@ import type { JobPriority, Origin } from "../dto/origin.js";
 import type { Record } from "../dto/record.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
+import type { FetchJobService } from "./fetch-job-service.js";
+import type { FetchPolicyService } from "./fetch-policy-service.js";
 import type { IndexAccountService } from "./index-account-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";
@@ -33,6 +35,8 @@ export class IndexRecordService {
     private readonly recordRepository: IRecordRepository,
     private readonly indexAccountService: IndexAccountService,
     private readonly storagePolicyService: StoragePolicyService,
+    private readonly fetchPolicyService: FetchPolicyService,
+    private readonly fetchJobService: FetchJobService,
     postIndexer: PostIndexer,
     profileIndexer: ProfileIndexer,
     followIndexer: FollowIndexer,
@@ -88,15 +92,18 @@ export class IndexRecordService {
     }
     const live = priority === "high";
     const depth = origin.type === "pds" ? origin.hop : 0;
-    await this.indexAccountService.upsert({
-      ctx,
-      did: record.uri.did,
-      live,
-    });
+    await this.indexAccountService.upsert({ ctx, did: record.uri.did });
     await this.recordRepository.save({ ctx, record });
 
     await indexer.upsert({ ctx, record, live, depth });
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
+
+    const targets = await this.fetchPolicyService.targetsForRecord({
+      ctx,
+      record,
+      origin,
+    });
+    this.fetchJobService.schedule({ ctx, targets, priority });
   }
 
   async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {

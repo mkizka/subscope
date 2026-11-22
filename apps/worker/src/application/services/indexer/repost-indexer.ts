@@ -5,7 +5,6 @@ import { feedItemFromRepost } from "../../dto/feed-item.js";
 import type { Record } from "../../dto/record.js";
 import { parseRepost } from "../../dto/repost.js";
 import { getSortAt } from "../../dto/sort-at.js";
-import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
@@ -16,7 +15,6 @@ export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly postQuery: IPostQuery,
     private readonly jobScheduler: IJobScheduler,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationService: NotificationService,
@@ -60,16 +58,6 @@ export class RepostIndexer implements ICollectionIndexer {
           },
         ],
       });
-    }
-
-    const subjectExists = await this.postQuery.exists(ctx, subjectUri);
-    if (!subjectExists) {
-      ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(subjectUri, {
-          live,
-          depth,
-        }),
-      );
     }
   }
 

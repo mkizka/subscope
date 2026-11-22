@@ -50,6 +50,8 @@ import type { IRecordRepository } from "../application/interfaces/repositories/r
 import type { IRepoRevRepository } from "../application/interfaces/repositories/repo-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
 import type { ITrackingRepository } from "../application/interfaces/repositories/tracking-repository.js";
+import { FetchJobService } from "../application/services/fetch-job-service.js";
+import { FetchPolicyService } from "../application/services/fetch-policy-service.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
 import { IndexLabelService } from "../application/services/index-label-service.js";
 import { IndexRecordService } from "../application/services/index-record-service.js";
@@ -170,21 +172,23 @@ export const createWorkerRegistry = (env: Env) =>
     .service("postIndexer", ["postRepository", "postQuery", "feedItemRepository", "registrationQuery", "notificationService", "jobScheduler"], asClassArgs(PostIndexer))
     .service("indexLabelService", ["labelRepository", "accountQuery"], asClassArgs(IndexLabelService))
     .service("trackingService", ["tapClient", "trackingRepository", "labelFetcher", "indexLabelService", "jobScheduler", "transactionManager"], asClassArgs(TrackingService))
-    .service("indexAccountService", ["accountRepository", "profileQuery", "jobScheduler"], asClassArgs(IndexAccountService))
+    .service("indexAccountService", ["accountRepository"], asClassArgs(IndexAccountService))
+    .service("fetchPolicyService", ["accountRepository", "profileQuery", "postQuery", "registrationQuery", "trackingRepository"], asClassArgs(FetchPolicyService))
+    .service("fetchJobService", ["jobScheduler"], asClassArgs(FetchJobService))
     .service("resolveDidService", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidService))
     .service("followIndexer", ["followRepository", "jobScheduler", "indexAccountService", "registrationQuery", "notificationService"], asClassArgs(FollowIndexer))
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
-    .service("listItemIndexer", ["listItemRepository", "indexAccountService", "registrationQuery"], asClassArgs(ListItemIndexer))
+    .service("listItemIndexer", ["listItemRepository", "indexAccountService"], asClassArgs(ListItemIndexer))
     .service("gateIndexer", asClassArgs(GateIndexer))
     .service("linkIndexer", asClassArgs(LinkIndexer))
-    .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService", "postQuery", "trackingRepository"], asClassArgs(LikeIndexer))
-    .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(RepostIndexer))
+    .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(LikeIndexer))
+    .service("repostIndexer", ["repostRepository", "feedItemRepository", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(RepostIndexer))
     .service("storagePolicyService", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicyService))
-    .service("indexRecordService", ["recordRepository", "indexAccountService", "storagePolicyService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
+    .service("indexRecordService", ["recordRepository", "indexAccountService", "storagePolicyService", "fetchPolicyService", "fetchJobService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
-    .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidService"], asClassArgs(UpsertIdentityUseCase))
+    .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidService", "fetchPolicyService", "fetchJobService"], asClassArgs(UpsertIdentityUseCase))
     .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService"], asClassArgs(IndexCommitUseCase))
     .service("updateRepoRevUseCase", ["transactionManager", "repoRevRepository"], asClassArgs(UpdateRepoRevUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))

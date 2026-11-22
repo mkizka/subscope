@@ -45,16 +45,6 @@ export class PostIndexer implements ICollectionIndexer {
     if (live && depth === 0) {
       await this.createNotifications(ctx, record, post);
     }
-
-    const embedUri = getEmbedRecordUri(post);
-    if (embedUri) {
-      const embedExists = await this.postQuery.exists(ctx, embedUri);
-      if (!embedExists) {
-        ctx.afterCommit(() =>
-          this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth }),
-        );
-      }
-    }
   }
 
   private async createNotifications(

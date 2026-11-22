@@ -34,12 +34,7 @@ export class FollowIndexer implements ICollectionIndexer {
       ctx,
       follow.accountDid,
     );
-    await this.indexAccountService.upsert({
-      ctx,
-      did: follow.subjectDid,
-      live,
-      fetchMissing: isFollowerServerMember,
-    });
+    await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
     await this.followRepository.save({ ctx, follow });
 
     if (isFollowerServerMember) {

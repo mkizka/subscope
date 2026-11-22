@@ -1,4 +1,3 @@
-import { AtUri } from "@atproto/syntax";
 import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -76,14 +75,6 @@ describe("RepostIndexer", () => {
         accountDid: reposter.did,
         subjectUri: subjectUri,
       });
-
-      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
-        {
-          uri: new AtUri(subjectUri),
-          depth: 0,
-          live: false,
-        },
-      ]);
     });
 
     test("notify-4: リポストされた投稿の作者に repost の通知を作る", async () => {
