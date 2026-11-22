@@ -4,7 +4,6 @@ import type {
   ITransactionManager,
 } from "@repo/common/interface";
 
-import { Tracking } from "../../../domain/tracking.js";
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -24,19 +23,22 @@ export class SyncTapRepoUseCase {
 
   async execute(did: Did) {
     const isTrackedAccount = await this.transactionManager.transaction(
-      async (ctx) =>
-        (await this.registrationQuery.isRegistered(ctx, did)) ||
-        (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did)),
-    );
-    if (isTrackedAccount) {
-      await this.transactionManager.transaction(async (ctx) => {
-        if (!(await this.trackingRepository.find({ ctx, did }))) {
+      async (ctx) => {
+        const isTracked =
+          (await this.registrationQuery.isRegistered(ctx, did)) ||
+          (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did));
+        if (!isTracked) {
+          await this.trackingRepository.delete({ ctx, did });
+        } else if (!(await this.trackingRepository.find({ ctx, did }))) {
           await this.trackingRepository.save({
             ctx,
-            tracking: Tracking.create(did),
+            tracking: { did, trackedAt: new Date() },
           });
         }
-      });
+        return isTracked;
+      },
+    );
+    if (isTrackedAccount) {
       await this.tapClient.addRepo(did);
       await this.jobScheduler.scheduleCheckBackfill(did, 0);
       for (const label of await this.labelFetcher.fetchByAccount(did)) {
@@ -46,9 +48,6 @@ export class SyncTapRepoUseCase {
       }
     } else {
       await this.tapClient.removeRepo(did);
-      await this.transactionManager.transaction((ctx) =>
-        this.trackingRepository.delete({ ctx, did }),
-      );
     }
   }
 }
