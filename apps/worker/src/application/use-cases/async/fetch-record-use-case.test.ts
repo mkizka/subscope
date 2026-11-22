@@ -105,7 +105,7 @@ describe("FetchRecordUseCase", () => {
     await expect(execute()).rejects.toThrow();
   });
 
-  test("index-20: PDSから取得した投稿の返信先と起点は取得しない", async () => {
+  test("index-22: PDSから取得した投稿の返信先と起点は取得しない", async () => {
     // arrange
     const parentUri = "at://did:plc:parent/app.bsky.feed.post/parent";
     const rootUri = "at://did:plc:root/app.bsky.feed.post/root";
