@@ -37,7 +37,7 @@ describe("IndexCommitUseCase", () => {
 
       registrationQuery.add(account.did);
 
-      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = {
         uri,
         cid: "cid123",
@@ -74,7 +74,7 @@ describe("IndexCommitUseCase", () => {
       accountRepo.add(account);
       const saveSpy = vi.spyOn(accountRepo, "save");
 
-      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = {
         uri,
         cid: "cid123",
@@ -301,7 +301,7 @@ describe("IndexCommitUseCase", () => {
 
       registrationQuery.add(account.did);
 
-      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = {
         uri,
         cid: "cid123",
@@ -345,7 +345,7 @@ describe("IndexCommitUseCase", () => {
 
       registrationQuery.add(account.did);
 
-      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = {
         uri,
         cid: "cid123",
