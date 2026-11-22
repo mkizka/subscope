@@ -23,10 +23,11 @@ export const backfillQueryFactory = ({
       const { statuses } = await publicClient.call(getTrackingStatuses, {
         dids: dids.filter(isValidDid),
       });
-      const result: Record<string, BackfillStatus> = {};
-      for (const { did, backfillStatus } of statuses) {
+      const result: Awaited<ReturnType<IBackfillQuery["findTrackedStatuses"]>> =
+        {};
+      for (const { did, backfillStatus, isMember } of statuses) {
         if (isBackfillStatus(backfillStatus)) {
-          result[did] = backfillStatus;
+          result[did] = { status: backfillStatus, isMember };
         }
       }
       return result;

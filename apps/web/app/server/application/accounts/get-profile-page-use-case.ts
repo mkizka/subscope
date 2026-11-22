@@ -16,6 +16,7 @@ export interface IGetProfilePageUseCase {
   ) => Promise<{
     profile: ProfileViewDetailed;
     isSelf: boolean;
+    isMember: boolean;
     backfillStatus?: BackfillStatus;
     posts: TimelinePostDto[];
     cursor?: string;
@@ -35,10 +36,12 @@ export const getProfilePageUseCaseFactory = ({
       accountQuery.findPosts(did, account, tab, cursor),
     ]);
     const statuses = await backfillQuery.findTrackedStatuses([profile.did]);
+    const tracked = statuses[profile.did];
     return {
       profile,
       isSelf: profile.did === did,
-      backfillStatus: statuses[profile.did],
+      isMember: !!tracked?.isMember,
+      backfillStatus: tracked?.status,
       posts,
       cursor: next,
     };
