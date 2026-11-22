@@ -1,10 +1,7 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import addMember from "@repo/client/me/subsco/admin/addMember";
 
-import {
-  AlreadyRegisteredError,
-  BannedError,
-} from "../../../../../application/service/sync/validate-registration-service.js";
+import { AlreadyRegisteredError } from "../../../../../application/service/sync/validate-registration-service.js";
 import {
   AccountNotFoundError,
   type AddMemberUseCase,
@@ -27,8 +24,7 @@ export class AddMember {
         } catch (error) {
           if (
             error instanceof AccountNotFoundError ||
-            error instanceof AlreadyRegisteredError ||
-            error instanceof BannedError
+            error instanceof AlreadyRegisteredError
           ) {
             throw new LexServerError(400, {
               error: error.name,

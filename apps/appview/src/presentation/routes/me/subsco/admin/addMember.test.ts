@@ -96,24 +96,6 @@ describe("me.subsco.admin.addMember", () => {
     });
   });
 
-  test("addMember-5: 登録停止中のアカウントは登録せず、400とBannedを返す", async () => {
-    // arrange
-    const { client } = await setupAsAdmin();
-    await accountFactory(ctx.db)
-      .props({ did: () => did, isBanned: () => true })
-      .create();
-
-    // act
-    const promise = client.call(addMember, { actor: did });
-
-    // assert
-    await expect(promise).rejects.toMatchObject({
-      status: 400,
-      error: "Banned",
-    });
-    expect(await findRegistration(did)).toBeUndefined();
-  });
-
   test("addMember-6: 管理者でなければ403を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();

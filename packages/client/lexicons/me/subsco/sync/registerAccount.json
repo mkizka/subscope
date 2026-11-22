@@ -42,10 +42,6 @@
         {
           "name": "AlreadyRegistered",
           "description": "The user is already registered with this server"
-        },
-        {
-          "name": "Banned",
-          "description": "The user is banned from this server"
         }
       ]
     }
