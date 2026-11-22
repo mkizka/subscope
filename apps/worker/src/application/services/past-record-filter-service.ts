@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
@@ -37,7 +36,7 @@ export class PastRecordFilterService {
     if (!collection) {
       return false;
     }
-    const did = asDid(record.uri.host);
+    const did = record.uri.did;
     if (await this.registrationQuery.isRegistered(ctx, did)) {
       return false;
     }
