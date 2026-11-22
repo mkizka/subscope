@@ -49,6 +49,8 @@ export class IndexCommitUseCase {
       const shouldIndex = await this.indexRecordService.shouldIndex({
         ctx,
         record,
+        live,
+        depth: 0,
       });
       if (!shouldIndex) {
         return;

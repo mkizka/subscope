@@ -65,6 +65,8 @@ export class FetchRecordUseCase {
       const shouldIndex = await this.indexRecordService.shouldIndex({
         ctx,
         record,
+        live,
+        depth: depth + 1,
       });
       if (!shouldIndex) {
         return;
