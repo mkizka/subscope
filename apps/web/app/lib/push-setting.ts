@@ -22,7 +22,8 @@ const request = async (method: string, body: unknown) => {
 };
 
 export const fetchPushSettingState = async (): Promise<PushSettingState> => {
-  if (!(await fetchPublicKey())) return "unavailable";
+  const publicKey = await fetchPublicKey();
+  if (!publicKey) return "unavailable";
   if (
     !("serviceWorker" in navigator) ||
     !("PushManager" in window) ||

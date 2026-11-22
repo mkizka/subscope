@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { expect, type Page, test } from "@playwright/test";
 
 import { createRecord } from "../../helpers/pds";
@@ -17,7 +18,7 @@ const openList = async (
     subject,
     createdAt: new Date().toISOString(),
   });
-  const rkey = subject.uri.split("/").pop();
+  const rkey = new AtUri(subject.uri).rkey;
 
   await page.goto("/");
   const link = page.getByRole("link", { name: `1件の${label}` });

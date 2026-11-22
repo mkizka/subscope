@@ -48,12 +48,12 @@ export class FollowIndexer implements ICollectionIndexer {
       );
     }
 
-    if (
+    const shouldNotify =
       live &&
       depth === 0 &&
       follow.subjectDid !== follow.accountDid &&
-      (await this.registrationQuery.isRegistered(ctx, follow.subjectDid))
-    ) {
+      (await this.registrationQuery.isRegistered(ctx, follow.subjectDid));
+    if (shouldNotify) {
       await this.notificationService.create({
         ctx,
         notifications: [
@@ -87,10 +87,10 @@ export class FollowIndexer implements ICollectionIndexer {
       this.jobScheduler.scheduleAggregateAccountStats(follow.subjectDid),
     );
 
-    if (
+    const shouldSyncSubject =
       action === "delete" &&
-      (await this.registrationQuery.isRegistered(ctx, follow.accountDid))
-    ) {
+      (await this.registrationQuery.isRegistered(ctx, follow.accountDid));
+    if (shouldSyncSubject) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );

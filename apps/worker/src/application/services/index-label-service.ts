@@ -22,7 +22,11 @@ export class IndexLabelService {
     const did = label.uri.startsWith("at://")
       ? new AtUri(label.uri).host
       : label.uri;
-    if (!isDid(did) || !(await this.accountQuery.exists({ ctx, did }))) {
+    if (!isDid(did)) {
+      return;
+    }
+    const accountExists = await this.accountQuery.exists({ ctx, did });
+    if (!accountExists) {
       return;
     }
     await this.labelRepository.save({ ctx, label, accountDid: did });

@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/interface";
 import {
@@ -97,7 +96,7 @@ export class IndexRecordService {
     const indexer = this.indexerFor(record);
     await this.indexAccountService.upsert({
       ctx,
-      did: asDid(record.uri.host),
+      did: record.uri.did,
       live,
     });
     await this.recordRepository.save({ ctx, record });

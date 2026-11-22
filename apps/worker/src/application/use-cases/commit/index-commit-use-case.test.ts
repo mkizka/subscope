@@ -103,13 +103,17 @@ describe("IndexCommitUseCase", () => {
       const account = accountFactory();
       accountRepo.add(account);
       const gate = (collection: string, rkey: string, postRkey: string) => {
-        const uri = new AtUri(`at://${account.did}/${collection}/${rkey}`);
+        const uri = AtUri.make(account.did, collection, rkey);
         const record = {
           uri,
           cid: "cid123",
           json: {
             $type: collection,
-            post: `at://${account.did}/app.bsky.feed.post/${postRkey}`,
+            post: AtUri.make(
+              account.did,
+              "app.bsky.feed.post",
+              postRkey,
+            ).toString(),
             createdAt: new Date().toISOString(),
           },
           indexedAt: new Date(),
@@ -210,7 +214,7 @@ describe("IndexCommitUseCase", () => {
         if (member) {
           registrationQuery.add(author.did);
         }
-        const uri = new AtUri(`at://${author.did}/${collection}/123`);
+        const uri = AtUri.make(author.did, collection, "123");
         const record = {
           uri,
           cid: "cid123",

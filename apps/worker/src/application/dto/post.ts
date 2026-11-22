@@ -1,4 +1,4 @@
-import { asDid, type Did } from "@atproto/did";
+import type { Did } from "@atproto/did";
 import { type BlobRef, getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 import external from "@repo/client/app/bsky/embed/external";
@@ -147,7 +147,7 @@ export function parsePost(record: Record): Post {
   return {
     uri: new AtUri(record.uri.toString()),
     cid: record.cid,
-    accountDid: asDid(record.uri.host),
+    accountDid: record.uri.did,
     text: parsed.text,
     replyRoot: toStrongRef(parsed.reply?.root),
     replyParent: toStrongRef(parsed.reply?.parent),

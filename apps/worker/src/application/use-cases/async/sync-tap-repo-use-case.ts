@@ -15,7 +15,8 @@ export class SyncTapRepoUseCase {
     if (refetch) {
       await this.trackingService.stop(did);
     }
-    if (await this.shouldTrack(did)) {
+    const shouldTrack = await this.shouldTrack(did);
+    if (shouldTrack) {
       await this.trackingService.start(did);
     } else {
       await this.trackingService.stop(did);

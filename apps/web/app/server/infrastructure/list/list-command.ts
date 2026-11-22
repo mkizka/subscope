@@ -52,7 +52,7 @@ export const listCommandFactory = ({
     },
     async delete(did, rkey) {
       const agent = await restore(did);
-      const listUri = `at://${did}/app.bsky.graph.list/${rkey}`;
+      const listUri = AtUri.make(did, "app.bsky.graph.list", rkey).toString();
       let cursor: string | undefined;
       do {
         const page = await agent.list(listitem, { limit: 100, cursor });
