@@ -97,7 +97,7 @@ describe("JobScheduler", () => {
       expect(jobs[0]).toMatchObject({
         queueName: "syncTapRepo",
         jobName: did,
-        data: did,
+        data: { did },
       });
       expect(jobs[0]?.options?.delay).toBeUndefined();
     });
