@@ -37,7 +37,8 @@ export class GateIndexer implements ICollectionIndexer {
     ) {
       return false;
     }
-    if (await this.postQuery.exists(ctx, postUri)) {
+    const postExists = await this.postQuery.exists(ctx, postUri);
+    if (postExists) {
       return true;
     }
     if (depth === 0) {
