@@ -1,8 +1,5 @@
 import type { Did } from "@atproto/did";
-import type {
-  IJobScheduler,
-  ITransactionManager,
-} from "@repo/common/interface";
+import type { ITransactionManager } from "@repo/common/interface";
 
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -15,7 +12,6 @@ export class SyncTapRepoUseCase {
     private readonly registrationQuery: IRegistrationQuery,
     private readonly labelFetcher: ILabelFetcher,
     private readonly indexLabelService: IndexLabelService,
-    private readonly jobScheduler: IJobScheduler,
     private readonly transactionManager: ITransactionManager,
   ) {}
 
@@ -37,7 +33,6 @@ export class SyncTapRepoUseCase {
 
   private async startTracking(did: Did) {
     await this.trackingService.start(did);
-    await this.jobScheduler.scheduleCheckBackfill(did, 0);
     for (const label of await this.labelFetcher.fetchByAccount(did)) {
       await this.transactionManager.transaction((ctx) =>
         this.indexLabelService.index({ ctx, label }),

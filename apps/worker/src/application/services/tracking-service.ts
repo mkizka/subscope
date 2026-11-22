@@ -1,5 +1,8 @@
 import type { Did } from "@atproto/did";
-import type { ITransactionManager } from "@repo/common/interface";
+import type {
+  IJobScheduler,
+  ITransactionManager,
+} from "@repo/common/interface";
 
 import type { ITapClient } from "../interfaces/external/tap-client.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
@@ -8,6 +11,7 @@ export class TrackingService {
   constructor(
     private readonly tapClient: ITapClient,
     private readonly trackingRepository: ITrackingRepository,
+    private readonly jobScheduler: IJobScheduler,
     private readonly transactionManager: ITransactionManager,
   ) {}
 
@@ -22,6 +26,7 @@ export class TrackingService {
       }
     });
     await this.tapClient.addRepo(did);
+    await this.jobScheduler.scheduleCheckBackfill(did, 0);
   }
 
   async stop(did: Did) {
