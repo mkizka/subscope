@@ -1,6 +1,6 @@
 ---
 name: domain-model
-description: worker・appview・webのapplication層で、新しい型をドメインモデル(domain以下のクラス)にするか単純な型(DTO)にするかを決めるとき、または既存の型の置き場所を見直すときに使用する。
+description: worker・appview・webのapplication層やdomain層に型やクラスを追加・変更する前に必ず参照する。新しいレコードやテーブルの型、リポジトリ、クエリサービスの戻り値、application/dtoやdomain以下のファイルを作るとき、「ドメインモデルにする?」「DTOでいい?」と迷ったときに使用する。
 ---
 
 # ドメインモデルにするかDTOにするか
