@@ -174,7 +174,7 @@ describe("IndexCommitUseCase", () => {
         ).not.toBeNull();
       });
 
-      test("index-19: 対象の投稿より先に届いたthreadgateとpostgateは、PDSから取り直して保存する", async () => {
+      test("index-20: 対象の投稿より先に届いたthreadgateとpostgateは、PDSから取り直して保存する", async () => {
         // arrange
         const { gate } = setup();
         const threadgate = gate("app.bsky.feed.threadgate", "123");
