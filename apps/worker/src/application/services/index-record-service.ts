@@ -67,7 +67,7 @@ export class IndexRecordService {
         record,
         origin,
       }),
-      stats: this.statsPolicyService.targetsFor({ record, action: "upsert" }),
+      stats: this.statsPolicyService.targetsFor(record),
       reposToSync: await this.trackingPolicyService.reposToSync({
         ctx,
         record,
@@ -87,10 +87,7 @@ export class IndexRecordService {
     this.indexJobService.schedule({
       ctx,
       priority: "high",
-      stats: this.statsPolicyService.targetsFor({
-        record: existingRecord,
-        action: "delete",
-      }),
+      stats: this.statsPolicyService.targetsFor(existingRecord),
       reposToSync: await this.trackingPolicyService.reposToSync({
         ctx,
         record: existingRecord,

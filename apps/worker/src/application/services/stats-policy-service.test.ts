@@ -13,7 +13,7 @@ describe("StatsPolicyService", () => {
     statsPolicyService = services.statsPolicyService;
   });
 
-  test("投稿を保存した場合、作者の投稿数と、投稿・リプライ先・引用元の集計を対象にする", () => {
+  test("投稿の場合、作者の投稿数と、投稿・リプライ先・引用元の集計を対象にする", () => {
     // arrange
     const author = accountFactory();
     const parentUri = "at://did:plc:parent/app.bsky.feed.post/parent";
@@ -34,32 +34,13 @@ describe("StatsPolicyService", () => {
     });
 
     // act
-    const targets = statsPolicyService.targetsFor({ record, action: "upsert" });
+    const targets = statsPolicyService.targetsFor(record);
 
     // assert
     expect(targets).toEqual({
       accounts: [author.did],
       posts: [record.uri, new AtUri(parentUri), new AtUri(quotedUri)],
     });
-  });
-
-  test("投稿を削除した場合、投稿自身の集計は対象にしない", () => {
-    // arrange
-    const author = accountFactory();
-    const record = recordFactory({
-      uri: `at://${author.did}/app.bsky.feed.post/deleted`,
-      json: {
-        $type: "app.bsky.feed.post",
-        text: "deleted",
-        createdAt: new Date().toISOString(),
-      },
-    });
-
-    // act
-    const targets = statsPolicyService.targetsFor({ record, action: "delete" });
-
-    // assert
-    expect(targets).toEqual({ accounts: [author.did], posts: [] });
   });
 
   test.each([
@@ -78,7 +59,7 @@ describe("StatsPolicyService", () => {
     });
 
     // act
-    const targets = statsPolicyService.targetsFor({ record, action: "upsert" });
+    const targets = statsPolicyService.targetsFor(record);
 
     // assert
     expect(targets).toEqual({ accounts: [], posts: [new AtUri(subjectUri)] });
@@ -98,7 +79,7 @@ describe("StatsPolicyService", () => {
     });
 
     // act
-    const targets = statsPolicyService.targetsFor({ record, action: "upsert" });
+    const targets = statsPolicyService.targetsFor(record);
 
     // assert
     expect(targets).toEqual({

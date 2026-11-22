@@ -8,13 +8,7 @@ import { parseRepost } from "../dto/repost.js";
 import type { StatsTargets } from "../dto/stats-targets.js";
 
 export class StatsPolicyService {
-  targetsFor({
-    record,
-    action,
-  }: {
-    record: Record;
-    action: "upsert" | "delete";
-  }): StatsTargets {
+  targetsFor(record: Record): StatsTargets {
     switch (record.uri.collection) {
       case "app.bsky.feed.post": {
         const post = parsePost(record);
@@ -29,7 +23,7 @@ export class StatsPolicyService {
             // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
             // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
             //    → このとき、リポスト数が0なので1にする必要がある
-            ...(action === "upsert" ? [post.uri] : []),
+            post.uri,
             ...(post.replyParent ? [post.replyParent.uri] : []),
             ...(embedUri ? [embedUri] : []),
           ],
