@@ -376,7 +376,7 @@ describe("IndexCommitUseCase", () => {
       { name: "ライブ", live: true },
       { name: "バックフィル", live: false },
     ])(
-      "index-12: バックフィルのレコードから積むジョブは、ライブのものより低い優先度で積む($name)",
+      "引用投稿を保存した場合、引用元の取得ジョブをレコードと同じliveで0段目として積む($name)",
       async ({ live }) => {
         // arrange
         const member = accountFactory();
