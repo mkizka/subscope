@@ -373,11 +373,11 @@ describe("IndexCommitUseCase", () => {
 
   describe("取得ジョブ", () => {
     test.each([
-      { name: "ライブ", live: true },
-      { name: "バックフィル", live: false },
+      { name: "ライブ", live: true, priority: "high" },
+      { name: "バックフィル", live: false, priority: "low" },
     ])(
-      "引用投稿を保存した場合、引用元の取得ジョブをレコードと同じliveで0段目として積む($name)",
-      async ({ live }) => {
+      "引用投稿を保存した場合、引用元の取得ジョブをライブなら高い優先度で1段目として積む($name)",
+      async ({ live, priority }) => {
         // arrange
         const member = accountFactory();
         accountRepo.add(member);
@@ -409,7 +409,7 @@ describe("IndexCommitUseCase", () => {
         const job = jobScheduler
           .getFetchRecordJobs()
           .find((job) => job.uri.toString() === quotedUri);
-        expect(job).toMatchObject({ live, depth: 0 });
+        expect(job).toMatchObject({ priority, hop: 1 });
       },
     );
   });
