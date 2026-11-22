@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
@@ -10,11 +11,17 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const params = new URL(request.url).searchParams;
-  const quotes = await di.getQuotesUseCase
-    .execute(
-      context.get(didContext),
-      `at://${params.get("handle")}/app.bsky.feed.post/${params.get("rkey")}`,
-      params.get("cursor") ?? undefined,
+  const quotes = await Promise.resolve()
+    .then(() =>
+      di.getQuotesUseCase.execute(
+        context.get(didContext),
+        AtUri.make(
+          params.get("handle") ?? "",
+          "app.bsky.feed.post",
+          params.get("rkey") ?? "",
+        ).toString(),
+        params.get("cursor") ?? undefined,
+      ),
     )
     .catch(() => null);
   if (!quotes) {

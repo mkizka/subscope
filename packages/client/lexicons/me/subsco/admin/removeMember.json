@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "me.subsco.admin.banAccount",
+  "id": "me.subsco.admin.removeMember",
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Unregister a registered account and prevent it from registering again",
+      "description": "Unregister a registered account",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -26,7 +26,7 @@
           "name": "NotRegistered"
         },
         {
-          "name": "CannotBanAdmin"
+          "name": "CannotRemoveAdmin"
         }
       ]
     }

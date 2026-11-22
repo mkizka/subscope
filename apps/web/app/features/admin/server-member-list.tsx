@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { BanIcon, EllipsisIcon, ShieldIcon, UndoIcon } from "lucide-react";
+import { EllipsisIcon, ShieldIcon, UserMinusIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
@@ -8,19 +8,17 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
-import { Button } from "@/app/components/ui/button";
 import { Menu, menuItemClass } from "@/app/components/ui/menu";
-import { Tabs } from "@/app/components/ui/tabs";
 import { formatDate } from "@/app/lib/format-date";
 
-export type BannedAccount = {
+type Account = {
   did: string;
   handle: string;
   displayName?: string;
   avatar?: string;
 };
 
-export type ServerMember = BannedAccount & {
+export type ServerMember = Account & {
   isAdmin: boolean;
   registeredAt: string;
   backfillStatus: string;
@@ -35,13 +33,11 @@ function BackfillBadge({ status }: { status: string }) {
 const rowClass =
   "flex items-center gap-3 border-b border-line px-4 py-3 hover:bg-surface-2";
 
-export type ServerMemberTab = "serverMembers" | "banned";
-
 function ProfileCell({
   account,
   children,
 }: {
-  account: BannedAccount;
+  account: Account;
   children?: ReactNode;
 }) {
   const profileId =
@@ -66,155 +62,99 @@ function ProfileCell({
 }
 
 type Props = {
-  tab?: ServerMemberTab;
-  onTabChange?: (tab: ServerMemberTab) => void;
   serverMembers: ServerMember[];
-  bannedAccounts?: BannedAccount[];
   isLoading?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
   onGrantAdmin?: (did: string) => void;
   grantingDid?: string | null;
-  onBan?: (did: string) => void;
-  banningDid?: string | null;
-  onUnban?: (did: string) => void;
-  unbanningDid?: string | null;
+  onRemove?: (did: string) => void;
+  removingDid?: string | null;
   addMemberButton?: ReactNode;
 };
 
 export function ServerMemberList({
-  tab = "serverMembers",
-  onTabChange,
   serverMembers,
-  bannedAccounts = [],
   isLoading,
   isFetchingNextPage,
   onLoadMore,
   hasNextPage,
   onGrantAdmin,
   grantingDid,
-  onBan,
-  banningDid,
-  onUnban,
-  unbanningDid,
+  onRemove,
+  removingDid,
   addMemberButton,
 }: Props) {
-  const isEmpty =
-    tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
   return (
     <>
       <div className="flex items-center justify-between gap-2 px-4 py-3">
         <h1 className="text-title">アカウント管理</h1>
-        {tab === "serverMembers" && addMemberButton}
+        {addMemberButton}
       </div>
-      <Tabs
-        tabs={[
-          {
-            label: "メンバー",
-            selected: tab === "serverMembers",
-            onClick: () => onTabChange?.("serverMembers"),
-          },
-          {
-            label: "停止中",
-            selected: tab === "banned",
-            onClick: () => onTabChange?.("banned"),
-          },
-        ]}
-      />
-      {!isLoading && isEmpty && (
+      {!isLoading && serverMembers.length === 0 && (
         <p className="py-8 text-center text-label text-muted">
-          {tab === "banned"
-            ? "停止中のアカウントはありません"
-            : "メンバーはまだありません"}
+          メンバーはまだありません
         </p>
       )}
       {isLoading && <AccountsSkeleton />}
       <ul>
-        {tab === "banned" &&
-          bannedAccounts.map((account) => (
-            <li key={account.did} className={rowClass}>
-              <ProfileCell account={account} />
+        {serverMembers.map((serverMember) => (
+          <li key={serverMember.did} className={rowClass}>
+            <ProfileCell account={serverMember}>
+              <div className="flex items-center gap-2 text-caption text-muted">
+                <BackfillBadge status={serverMember.backfillStatus} />
+                {formatDate(serverMember.registeredAt)} 登録
+              </div>
+            </ProfileCell>
+            {serverMember.isAdmin ? (
+              <Badge>管理者</Badge>
+            ) : (
               <ConfirmDialog
-                title={`@${account.handle} の登録を再開しますか？`}
-                description="再開すると、招待コードで再登録できるようになります。"
-                confirmLabel="再開する"
-                onConfirm={() => onUnban?.(account.did)}
+                title={`@${serverMember.handle} を管理者にしますか？`}
+                description="管理画面のすべての操作ができるようになります。"
+                confirmLabel="管理者にする"
+                onConfirm={() => onGrantAdmin?.(serverMember.did)}
               >
-                {(open) => (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    loading={unbanningDid === account.did}
-                    onClick={open}
+                {(openGrantAdmin) => (
+                  <ConfirmDialog
+                    title={`@${serverMember.handle} をメンバーから外しますか？`}
+                    description="サーバーへの登録を解除します。招待コードがあれば再登録できます。"
+                    confirmLabel="外す"
+                    danger
+                    onConfirm={() => onRemove?.(serverMember.did)}
                   >
-                    {unbanningDid !== account.did && (
-                      <UndoIcon className="size-4" />
+                    {(openRemove) => (
+                      <Menu
+                        label="操作"
+                        trigger={<EllipsisIcon className="size-4" />}
+                      >
+                        <button
+                          type="button"
+                          className={menuItemClass}
+                          disabled={grantingDid === serverMember.did}
+                          onClick={openGrantAdmin}
+                        >
+                          <ShieldIcon className="size-4" />
+                          管理者にする
+                        </button>
+                        <button
+                          type="button"
+                          className={clsx(menuItemClass, "text-danger")}
+                          disabled={removingDid === serverMember.did}
+                          onClick={openRemove}
+                        >
+                          <UserMinusIcon className="size-4" />
+                          メンバーから外す
+                        </button>
+                      </Menu>
                     )}
-                    登録を再開する
-                  </Button>
+                  </ConfirmDialog>
                 )}
               </ConfirmDialog>
-            </li>
-          ))}
-        {tab === "serverMembers" &&
-          serverMembers.map((serverMember) => (
-            <li key={serverMember.did} className={rowClass}>
-              <ProfileCell account={serverMember}>
-                <div className="flex items-center gap-2 text-caption text-muted">
-                  <BackfillBadge status={serverMember.backfillStatus} />
-                  {formatDate(serverMember.registeredAt)} 登録
-                </div>
-              </ProfileCell>
-              {serverMember.isAdmin ? (
-                <Badge>管理者</Badge>
-              ) : (
-                <ConfirmDialog
-                  title={`@${serverMember.handle} を管理者にしますか？`}
-                  description="管理画面のすべての操作ができるようになります。"
-                  confirmLabel="管理者にする"
-                  onConfirm={() => onGrantAdmin?.(serverMember.did)}
-                >
-                  {(openGrantAdmin) => (
-                    <ConfirmDialog
-                      title={`@${serverMember.handle} のサーバー登録を停止しますか？`}
-                      description="サーバー登録が停止され、招待コードでも再登録できなくなります。"
-                      confirmLabel="停止する"
-                      danger
-                      onConfirm={() => onBan?.(serverMember.did)}
-                    >
-                      {(openBan) => (
-                        <Menu
-                          label="操作"
-                          trigger={<EllipsisIcon className="size-4" />}
-                        >
-                          <button
-                            type="button"
-                            className={menuItemClass}
-                            disabled={grantingDid === serverMember.did}
-                            onClick={openGrantAdmin}
-                          >
-                            <ShieldIcon className="size-4" />
-                            管理者にする
-                          </button>
-                          <button
-                            type="button"
-                            className={clsx(menuItemClass, "text-danger")}
-                            disabled={banningDid === serverMember.did}
-                            onClick={openBan}
-                          >
-                            <BanIcon className="size-4" />
-                            サーバー登録を停止する
-                          </button>
-                        </Menu>
-                      )}
-                    </ConfirmDialog>
-                  )}
-                </ConfirmDialog>
-              )}
-            </li>
-          ))}
+            )}
+          </li>
+        ))}
       </ul>
       {isFetchingNextPage && (
         <p className="py-4 text-center text-label text-muted">読み込み中...</p>

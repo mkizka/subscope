@@ -60,7 +60,7 @@ export const postCommandFactory = ({
           ? { $type: "app.bsky.embed.images" as const, images: uploaded }
           : undefined;
       const record = quote && { record: toStrongRef(quote) };
-      const uri = `at://${did}/app.bsky.feed.post/${rkey}` as const;
+      const uri = AtUri.make(did, "app.bsky.feed.post", rkey).toString();
       const richText = new RichText({ text });
       richText.detectFacetsWithoutResolution();
       const facets = richText.facets?.filter((f) => facet.$matches(f));

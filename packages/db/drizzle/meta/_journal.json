@@ -239,6 +239,20 @@
       "when": 1795060816023,
       "tag": "0033_drop-record-revs",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1795274117435,
+      "tag": "0034_add-trackings",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1795321483019,
+      "tag": "0035_drop-accounts-is_banned",
+      "breakpoints": true
     }
   ]
 }

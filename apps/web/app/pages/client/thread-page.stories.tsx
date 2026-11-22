@@ -19,16 +19,21 @@ const meta = {
     queryClient.setQueryData<Data<typeof threadLoader>>(
       ["thread", alice.handle, "selected"],
       {
-        ancestors: [post("at://a/1", "親投稿です")],
+        ancestors: [
+          post("at://did:plc:alice/app.bsky.feed.post/1", "親投稿です"),
+        ],
         post: {
-          ...post("at://a/2", "選んだ投稿です"),
+          ...post("at://did:plc:alice/app.bsky.feed.post/2", "選んだ投稿です"),
           replyCount: 1,
           repostCount: 1,
           quoteCount: 2,
           likeCount: 8,
         },
         replies: [
-          [post("at://a/3", "返信です"), post("at://a/4", "返信への返信です")],
+          [
+            post("at://did:plc:alice/app.bsky.feed.post/3", "返信です"),
+            post("at://did:plc:alice/app.bsky.feed.post/4", "返信への返信です"),
+          ],
         ],
       },
     );
@@ -57,7 +62,7 @@ export const NoReplies: Story = {
       {
         ancestors: [],
         post: {
-          uri: "at://a/2",
+          uri: "at://did:plc:alice/app.bsky.feed.post/2",
           cid: "bafyexample",
           authorDisplayName: alice.displayName,
           authorHandle: alice.handle,
@@ -135,7 +140,7 @@ export const QuotedFeed: Story = {
       {
         ancestors: [],
         post: {
-          uri: "at://a/2",
+          uri: "at://did:plc:alice/app.bsky.feed.post/2",
           cid: "bafyexample",
           authorDisplayName: alice.displayName,
           authorHandle: alice.handle,

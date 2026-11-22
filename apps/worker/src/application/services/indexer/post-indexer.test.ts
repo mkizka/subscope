@@ -213,7 +213,7 @@ describe("PostIndexer", () => {
       const postRecord = (rkey: string, did: string, withMention: boolean) => {
         const subject = { uri: `at://${did}/app.bsky.feed.post/subject`, cid };
         return recordFactory({
-          uri: `at://${author.did}/app.bsky.feed.post/${rkey}`,
+          uri: AtUri.make(author.did, "app.bsky.feed.post", rkey).toString(),
           json: {
             $type: "app.bsky.feed.post",
             text: "@",
@@ -249,7 +249,11 @@ describe("PostIndexer", () => {
         registrationQuery.add(account.did);
         const { post } = postFactory({
           accountDid: account.did,
-          uri: `at://${account.did}/app.bsky.feed.post/ancestor${i}`,
+          uri: AtUri.make(
+            account.did,
+            "app.bsky.feed.post",
+            `ancestor${i}`,
+          ).toString(),
           replyParent: ancestors[0] && {
             uri: ancestors[0].uri,
             cid: ancestors[0].cid,

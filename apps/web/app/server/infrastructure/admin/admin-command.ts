@@ -1,10 +1,9 @@
 import { XrpcResponseError } from "@atproto/lex";
 import addMember from "@repo/client/me/subsco/admin/addMember";
-import banAccount from "@repo/client/me/subsco/admin/banAccount";
 import createInviteCode from "@repo/client/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/me/subsco/admin/deleteInviteCode";
 import grantAdmin from "@repo/client/me/subsco/admin/grantAdmin";
-import unbanAccount from "@repo/client/me/subsco/admin/unbanAccount";
+import removeMember from "@repo/client/me/subsco/admin/removeMember";
 
 import type { IAdminCommand } from "@/app/server/application/interfaces/admin-command";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
@@ -35,24 +34,18 @@ export const adminCommandFactory = ({
               return "accountNotFound";
             case "AlreadyRegistered":
               return "alreadyRegistered";
-            case "Banned":
-              return "banned";
           }
         }
         throw e;
       }
     },
-    async banAccount(did, target) {
-      const agent = await restore(did);
-      await agent.call(banAccount, { did: target });
-    },
     async grantAdmin(did, target) {
       const agent = await restore(did);
       await agent.call(grantAdmin, { did: target });
     },
-    async unbanAccount(did, target) {
+    async removeMember(did, target) {
       const agent = await restore(did);
-      await agent.call(unbanAccount, { did: target });
+      await agent.call(removeMember, { did: target });
     },
     async createInviteCode(did) {
       const agent = await restore(did);

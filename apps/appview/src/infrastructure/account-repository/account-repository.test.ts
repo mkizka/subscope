@@ -34,7 +34,6 @@ describe("AccountRepository", () => {
         did: account.did,
         handle: account.handle,
         isAdmin: account.isAdmin,
-        isBanned: account.isBanned,
         indexedAt: account.indexedAt,
       });
       expect(result).toEqual(expected);
@@ -49,7 +48,6 @@ describe("AccountRepository", () => {
         did: did,
         handle: "newactor.test",
         isAdmin: false,
-        isBanned: false,
         indexedAt: new Date(),
       });
 
@@ -69,7 +67,6 @@ describe("AccountRepository", () => {
         did: account.did,
         handle: "updated.test",
         isAdmin: false,
-        isBanned: false,
         indexedAt: account.indexedAt,
       });
 
