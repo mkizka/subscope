@@ -3,8 +3,8 @@ import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { Tracking } from "../../../application/dto/tracking.js";
 import type { ITrackingRepository } from "../../../application/interfaces/repositories/tracking-repository.js";
+import { Tracking } from "../../../domain/tracking.js";
 
 export class TrackingRepository implements ITrackingRepository {
   async save({
@@ -32,7 +32,10 @@ export class TrackingRepository implements ITrackingRepository {
     if (!row) {
       return null;
     }
-    return { did: asDid(row.accountDid), trackedAt: row.trackedAt };
+    return Tracking.reconstruct({
+      did: asDid(row.accountDid),
+      trackedAt: row.trackedAt,
+    });
   }
 
   async delete({ ctx, did }: { ctx: TransactionContext; did: Did }) {
