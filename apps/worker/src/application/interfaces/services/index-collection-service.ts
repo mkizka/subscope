@@ -3,13 +3,6 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import type { Record } from "../../dto/record.js";
 
 export interface ICollectionIndexer {
-  shouldIndex?: ({
-    ctx,
-    record,
-  }: {
-    ctx: AfterCommitContext;
-    record: Record;
-  }) => Promise<boolean>;
   upsert: ({
     ctx,
     record,
