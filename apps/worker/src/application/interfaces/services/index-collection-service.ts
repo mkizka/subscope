@@ -1,5 +1,6 @@
 import type { AfterCommitContext } from "@repo/common/interface";
 
+import type { JobPriority, Origin } from "../../dto/origin.js";
 import type { Record } from "../../dto/record.js";
 
 export interface ICollectionIndexer {
@@ -23,4 +24,15 @@ export interface ICollectionIndexer {
     record: Record;
     action: "upsert" | "delete";
   }) => void | Promise<void>;
+  afterSkip?: ({
+    ctx,
+    record,
+    origin,
+    priority,
+  }: {
+    ctx: AfterCommitContext;
+    record: Record;
+    origin: Origin;
+    priority: JobPriority;
+  }) => Promise<void>;
 }

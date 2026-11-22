@@ -4,6 +4,7 @@ import { validateRecord } from "@repo/common/utils";
 
 import type { Origin } from "../dto/origin.js";
 import type { Record } from "../dto/record.js";
+import type { IPostQuery } from "../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 
@@ -17,7 +18,7 @@ const PAST_LIMITED_COLLECTIONS = [
 const containsNullChar = (record: Record) =>
   JSON.stringify(record.json).includes("\\u0000");
 
-const isGateOfSamePost = (record: Record) => {
+export const isGateOfSamePost = (record: Record) => {
   const gate = validateRecord(
     record.uri.collection === "app.bsky.feed.threadgate"
       ? "app.bsky.feed.threadgate"
@@ -32,8 +33,12 @@ const isGateOfSamePost = (record: Record) => {
   );
 };
 
+export const gatedPostUri = (record: Record) =>
+  AtUri.make(record.uri.did, "app.bsky.feed.post", record.uri.rkey);
+
 export class StoragePolicyService {
   constructor(
+    private readonly postQuery: IPostQuery,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly trackingRepository: ITrackingRepository,
   ) {}
@@ -59,7 +64,10 @@ export class StoragePolicyService {
     switch (record.uri.collection) {
       case "app.bsky.feed.threadgate":
       case "app.bsky.feed.postgate":
-        return isGateOfSamePost(record);
+        return (
+          isGateOfSamePost(record) &&
+          this.postQuery.exists(ctx, gatedPostUri(record))
+        );
       case "app.bsky.feed.like":
         return this.isLikeAroundMember(ctx, record);
       default:

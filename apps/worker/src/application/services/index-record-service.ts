@@ -84,6 +84,7 @@ export class IndexRecordService {
       origin,
     });
     if (!shouldStore) {
+      await indexer.afterSkip?.({ ctx, record, origin, priority });
       return;
     }
     const live = priority === "high";
