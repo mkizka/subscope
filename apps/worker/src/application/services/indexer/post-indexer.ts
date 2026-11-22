@@ -10,7 +10,10 @@ import type { IRegistrationQuery } from "../../interfaces/queries/registration-q
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { Notification } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type {
+  ICollectionIndexer,
+  Indexing,
+} from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
@@ -28,13 +31,11 @@ export class PostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    indexing,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    indexing: Indexing;
   }) {
     const post = parsePost(record);
     await this.postRepository.save({ ctx, post });
@@ -42,18 +43,13 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = feedItemFromPost(post);
     await this.feedItemRepository.save({ ctx, feedItem });
 
-    if (live && depth === 0) {
+    if (indexing.live && indexing.depth === 0) {
       await this.createNotifications(ctx, record, post);
     }
 
     const embedUri = getEmbedRecordUri(post);
     if (embedUri) {
-      const embedExists = await this.postQuery.exists(ctx, embedUri);
-      if (!embedExists) {
-        ctx.afterCommit(() =>
-          this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth }),
-        );
-      }
+      await indexing.requestFetch(embedUri);
     }
   }
 

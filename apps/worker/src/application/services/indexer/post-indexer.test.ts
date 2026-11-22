@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { randomCid } from "@repo/test-utils";
-import { assert, beforeEach, describe, expect, test } from "vitest";
+import { assert, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import {
@@ -10,6 +10,9 @@ import {
 } from "../../../shared/test-utils.js";
 import { postFactory } from "../../dto/post.factory.js";
 import { recordFactory } from "../../dto/record.factory.js";
+import type { Indexing } from "../../interfaces/services/index-collection-service.js";
+
+const requestFetch = vi.fn<Indexing["requestFetch"]>();
 
 describe("PostIndexer", () => {
   let postIndexer: TestServices["postIndexer"];
@@ -20,6 +23,7 @@ describe("PostIndexer", () => {
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
+    requestFetch.mockClear();
     const services = await testRegistry.resolve();
     postIndexer = services.postIndexer;
     postRepo = services.postRepository;
@@ -48,8 +52,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
 
       // assert
@@ -70,7 +73,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    test("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
+    test("embedにレコードが含まれる場合、そのレコードの取得を依頼する", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
@@ -96,21 +99,14 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
 
       // assert
-      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
-        {
-          uri: new AtUri(embedUri),
-          depth: 0,
-          live: false,
-        },
-      ]);
+      expect(requestFetch).toHaveBeenCalledExactlyOnceWith(new AtUri(embedUri));
     });
 
-    test("embedがない場合、fetchRecordジョブは追加されない", async () => {
+    test("embedがない場合、取得を依頼しない", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
@@ -127,12 +123,11 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
 
       // assert
-      expect(jobScheduler.getFetchRecordJobs()).toEqual([]);
+      expect(requestFetch).not.toHaveBeenCalled();
     });
 
     test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {
@@ -152,8 +147,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
 
       // assert
@@ -192,7 +186,11 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        indexing: { live: true, depth: 0, requestFetch },
+      });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -230,7 +228,11 @@ describe("PostIndexer", () => {
         postRecord("mention", mentioned.did, true),
         postRecord("quote", quoted.did, false),
       ]) {
-        await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+        await postIndexer.upsert({
+          ctx,
+          record,
+          indexing: { live: true, depth: 0, requestFetch },
+        });
       }
 
       // assert
@@ -278,7 +280,11 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        indexing: { live: true, depth: 0, requestFetch },
+      });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(
@@ -309,8 +315,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -353,8 +358,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -394,8 +398,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -434,8 +437,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 

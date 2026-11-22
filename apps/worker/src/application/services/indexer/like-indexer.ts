@@ -5,11 +5,13 @@ import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 import { type Like, parseLike } from "../../dto/like.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
-import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { ITrackingRepository } from "../../interfaces/repositories/tracking-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type {
+  ICollectionIndexer,
+  Indexing,
+} from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
 
 export class LikeIndexer implements ICollectionIndexer {
@@ -18,7 +20,6 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly jobScheduler: IJobScheduler,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationService: NotificationService,
-    private readonly postQuery: IPostQuery,
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
@@ -42,13 +43,11 @@ export class LikeIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    indexing,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    indexing: Indexing;
   }) {
     const like = parseLike(record);
     const recipientDid = new AtUri(like.subjectUri).host;
@@ -59,8 +58,8 @@ export class LikeIndexer implements ICollectionIndexer {
     await this.likeRepository.save({ ctx, like });
 
     if (
-      live &&
-      depth === 0 &&
+      indexing.live &&
+      indexing.depth === 0 &&
       recipientDid !== like.accountDid &&
       isRecipientServerMember
     ) {
@@ -84,12 +83,10 @@ export class LikeIndexer implements ICollectionIndexer {
       ctx,
       like,
       subjectUri,
-      live,
+      live: indexing.live,
     });
     if (shouldFetch) {
-      ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(subjectUri, { live, depth }),
-      );
+      await indexing.requestFetch(subjectUri);
     }
   }
 
@@ -112,10 +109,6 @@ export class LikeIndexer implements ICollectionIndexer {
       like.accountDid,
     );
     if (!isMember) {
-      return false;
-    }
-    const subjectExists = await this.postQuery.exists(ctx, subjectUri);
-    if (subjectExists) {
       return false;
     }
     if (live) {

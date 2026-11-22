@@ -5,7 +5,10 @@ import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type {
+  ICollectionIndexer,
+  Indexing,
+} from "../../interfaces/services/index-collection-service.js";
 import type { IndexAccountService } from "../index-account-service.js";
 import type { NotificationService } from "../notification-service.js";
 
@@ -21,13 +24,11 @@ export class FollowIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    live,
-    depth,
+    indexing,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    indexing: Indexing;
   }) {
     const follow = parseFollow(record);
     const isFollowerServerMember = await this.registrationQuery.isRegistered(
@@ -37,7 +38,7 @@ export class FollowIndexer implements ICollectionIndexer {
     await this.indexAccountService.upsert({
       ctx,
       did: follow.subjectDid,
-      live,
+      live: indexing.live,
       fetchMissing: isFollowerServerMember,
     });
     await this.followRepository.save({ ctx, follow });
@@ -49,8 +50,8 @@ export class FollowIndexer implements ICollectionIndexer {
     }
 
     const shouldNotify =
-      live &&
-      depth === 0 &&
+      indexing.live &&
+      indexing.depth === 0 &&
       follow.subjectDid !== follow.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, follow.subjectDid));
     if (shouldNotify) {

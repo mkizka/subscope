@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { fakeCid } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import {
@@ -10,6 +10,9 @@ import {
 } from "../../../shared/test-utils.js";
 import { postFactory } from "../../dto/post.factory.js";
 import { recordFactory } from "../../dto/record.factory.js";
+import type { Indexing } from "../../interfaces/services/index-collection-service.js";
+
+const requestFetch = vi.fn<Indexing["requestFetch"]>();
 
 describe("RepostIndexer", () => {
   let repostIndexer: TestServices["repostIndexer"];
@@ -21,6 +24,7 @@ describe("RepostIndexer", () => {
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
+    requestFetch.mockClear();
     const services = await testRegistry.resolve();
     repostIndexer = services.repostIndexer;
     repostRepo = services.repostRepository;
@@ -56,8 +60,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx,
         record,
-        live: false,
-        depth: 0,
+        indexing: { live: false, depth: 0, requestFetch },
       });
 
       // assert
@@ -77,13 +80,9 @@ describe("RepostIndexer", () => {
         subjectUri: subjectUri,
       });
 
-      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
-        {
-          uri: new AtUri(subjectUri),
-          depth: 0,
-          live: false,
-        },
-      ]);
+      expect(requestFetch).toHaveBeenCalledExactlyOnceWith(
+        new AtUri(subjectUri),
+      );
     });
 
     test("notify-4: リポストされた投稿の作者に repost の通知を作る", async () => {
@@ -105,8 +104,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        live: true,
-        depth: 0,
+        indexing: { live: true, depth: 0, requestFetch },
       });
 
       // assert

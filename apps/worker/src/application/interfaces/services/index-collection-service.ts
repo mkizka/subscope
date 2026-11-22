@@ -1,6 +1,13 @@
+import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/interface";
 
 import type { Record } from "../../dto/record.js";
+
+export type Indexing = {
+  live: boolean;
+  depth: number;
+  requestFetch: (uri: AtUri) => Promise<void>;
+};
 
 export interface ICollectionIndexer {
   shouldIndex?: ({
@@ -13,13 +20,11 @@ export interface ICollectionIndexer {
   upsert: ({
     ctx,
     record,
-    live,
-    depth,
+    indexing,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    indexing: Indexing;
   }) => Promise<void>;
   afterAction?: ({
     ctx,
