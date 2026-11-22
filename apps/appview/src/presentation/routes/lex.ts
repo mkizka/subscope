@@ -31,13 +31,13 @@ import type { ListNotifications } from "./app/bsky/notification/listNotification
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetPostThreadV2 } from "./app/bsky/unspecced/getPostThreadV2.js";
 import type { AddMember } from "./me/subsco/admin/addMember.js";
-import type { BanAccount } from "./me/subsco/admin/banAccount.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
 import type { ListServerMembers } from "./me/subsco/admin/listServerMembers.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
+import type { RemoveMember } from "./me/subsco/admin/removeMember.js";
 import type { RevokeAdmin } from "./me/subsco/admin/revokeAdmin.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetServerMemberFollowers } from "./me/subsco/graph/getServerMemberFollowers.js";
@@ -72,7 +72,7 @@ export const lexRouterFactory = (
   getBackfillStatuses: GetBackfillStatuses,
   registerAccount: RegisterAccount,
   unregisterAccount: UnregisterAccount,
-  banAccount: BanAccount,
+  removeMember: RemoveMember,
   createInviteCode: CreateInviteCode,
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
@@ -122,7 +122,7 @@ export const lexRouterFactory = (
     getBackfillStatuses,
     registerAccount,
     unregisterAccount,
-    banAccount,
+    removeMember,
     createInviteCode,
     deleteInviteCode,
     getInviteCodes,

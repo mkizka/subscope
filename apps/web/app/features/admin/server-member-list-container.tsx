@@ -42,7 +42,7 @@ export function ServerMemberListContainer() {
     mutationFn: (did: string) => updateServerMember("POST", did),
     onSuccess,
   });
-  const banMutation = useMutation({
+  const removeMutation = useMutation({
     mutationFn: (did: string) => updateServerMember("DELETE", did),
     onSuccess,
   });
@@ -76,8 +76,8 @@ export function ServerMemberListContainer() {
       grantingDid={
         grantAdminMutation.isPending ? grantAdminMutation.variables : null
       }
-      onBan={banMutation.mutate}
-      banningDid={banMutation.isPending ? banMutation.variables : null}
+      onRemove={removeMutation.mutate}
+      removingDid={removeMutation.isPending ? removeMutation.variables : null}
       addMemberButton={<AddMemberDialogContainer />}
     />
   );
