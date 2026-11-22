@@ -32,13 +32,13 @@ export class IndexCommitUseCase {
 
   private async doIndexCommit({ commit, live }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      if (
-        commit.operation !== "delete" &&
-        !(await this.indexRecordService.shouldIndex({
+      const shouldIndex =
+        commit.operation === "delete" ||
+        (await this.indexRecordService.shouldIndex({
           ctx,
           record: commit.record,
-        }))
-      ) {
+        }));
+      if (!shouldIndex) {
         return;
       }
       switch (commit.operation) {
