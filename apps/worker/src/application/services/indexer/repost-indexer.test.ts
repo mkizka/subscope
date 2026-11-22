@@ -1,0 +1,150 @@
+import { AtUri } from "@atproto/syntax";
+import { fakeCid } from "@repo/common/test";
+import { beforeEach, describe, expect, test } from "vitest";
+
+import { accountFactory } from "../../../domain/account.factory.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
+import { postFactory } from "../../dto/post.factory.js";
+import { recordFactory } from "../../dto/record.factory.js";
+
+describe("RepostIndexer", () => {
+  let repostIndexer: TestServices["repostIndexer"];
+  let repostRepo: TestServices["repostRepository"];
+  let feedItemRepo: TestServices["feedItemRepository"];
+  let postRepo: TestServices["postRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let registrationQuery: TestServices["registrationQuery"];
+  let notificationRepo: TestServices["notificationRepository"];
+  let db: TestServices["db"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    repostIndexer = services.repostIndexer;
+    repostRepo = services.repostRepository;
+    feedItemRepo = services.feedItemRepository;
+    postRepo = services.postRepository;
+    jobScheduler = services.jobScheduler;
+    registrationQuery = services.registrationQuery;
+    notificationRepo = services.notificationRepository;
+    db = services.db;
+  });
+
+  describe("upsert", () => {
+    test("リポストレコードを正しく保存する", async () => {
+      const ctx = { db, afterCommit };
+      // arrange
+      const reposter = accountFactory();
+      const author = accountFactory();
+      const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
+
+      const record = recordFactory({
+        uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey123`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: subjectUri,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await repostIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
+
+      // assert
+      const repost = await repostRepo.find({ ctx, uri: record.uri });
+      expect(repost).toMatchObject({
+        uri: record.uri.toString(),
+        cid: record.cid,
+        accountDid: reposter.did,
+        subjectUri: subjectUri,
+      });
+
+      const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
+      expect(feedItem).toMatchObject({
+        uri: record.uri.toString(),
+        type: "repost",
+        accountDid: reposter.did,
+        subjectUri: subjectUri,
+      });
+
+      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
+        {
+          uri: new AtUri(subjectUri),
+          depth: 0,
+          live: false,
+        },
+      ]);
+    });
+
+    test("notify-4: リポストされた投稿の作者に repost の通知を作る", async () => {
+      // arrange
+      const reposter = accountFactory();
+      const author = accountFactory();
+      registrationQuery.add(author.did);
+      const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
+      const record = recordFactory({
+        uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: { uri: subjectUri, cid: fakeCid() },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await repostIndexer.upsert({
+        ctx: { db, afterCommit },
+        record,
+        live: true,
+        depth: 0,
+      });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject([
+        {
+          recordUri: record.uri.toString(),
+          recipientDid: author.did,
+          authorDid: reposter.did,
+          reason: "repost",
+          reasonSubject: subjectUri,
+        },
+      ]);
+    });
+  });
+
+  describe("afterAction", () => {
+    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", () => {
+      // arrange
+      const { post } = postFactory();
+      postRepo.add(post);
+
+      const record = recordFactory({
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: post.uri.toString(),
+            cid: post.cid,
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      repostIndexer.afterAction({ ctx: { db, afterCommit }, record });
+
+      // assert
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(post.uri);
+    });
+  });
+});

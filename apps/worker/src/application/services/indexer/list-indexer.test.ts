@@ -1,0 +1,34 @@
+import { describe, expect, test } from "vitest";
+
+import { accountFactory } from "../../../domain/account.factory.js";
+import { testRegistry } from "../../../shared/test-utils.js";
+import { recordFactory } from "../../dto/record.factory.js";
+
+describe("ListIndexer", () => {
+  test("リストレコードを正しく保存する", async () => {
+    // arrange
+    const { listIndexer, listRepository, db } = await testRegistry.resolve();
+    const account = accountFactory();
+    const record = recordFactory({
+      uri: `at://${account.did}/app.bsky.graph.list/listrkey123`,
+      json: {
+        $type: "app.bsky.graph.list",
+        purpose: "app.bsky.graph.defs#curatelist",
+        name: "テストリスト",
+        createdAt: new Date().toISOString(),
+      },
+    });
+
+    // act
+    await listIndexer.upsert({ ctx: { db }, record });
+
+    // assert
+    expect(
+      await listRepository.find({ ctx: { db }, uri: record.uri }),
+    ).toMatchObject({
+      accountDid: account.did,
+      purpose: "app.bsky.graph.defs#curatelist",
+      name: "テストリスト",
+    });
+  });
+});

@@ -5,6 +5,7 @@ import {
 import { RecordValidationError } from "@repo/common/utils";
 
 import type { IndexRecordService } from "../../services/index-record-service.js";
+import type { PastRecordFilterService } from "../../services/past-record-filter-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 export class IndexCommitUseCase {
@@ -14,6 +15,7 @@ export class IndexCommitUseCase {
     loggerManager: ILoggerManager,
     private readonly transactionManager: ITransactionManager,
     private readonly indexRecordService: IndexRecordService,
+    private readonly pastRecordFilterService: PastRecordFilterService,
   ) {
     this.logger = loggerManager.createLogger("IndexCommitUseCase");
   }
@@ -37,12 +39,21 @@ export class IndexCommitUseCase {
         await this.indexRecordService.delete({ ctx, uri: commit.uri });
         return;
       }
-      await this.indexRecordService.index({
+      const { record } = commit;
+      const isPastRecordIndexable =
+        live ||
+        (await this.pastRecordFilterService.shouldIndex({ ctx, record }));
+      if (!isPastRecordIndexable) {
+        return;
+      }
+      const shouldIndex = await this.indexRecordService.shouldIndex({
         ctx,
-        record: commit.record,
-        origin: { type: live ? "tapLive" : "tapPast" },
-        priority: live ? "high" : "low",
+        record,
       });
+      if (!shouldIndex) {
+        return;
+      }
+      await this.indexRecordService.upsert({ ctx, record, live, depth: 0 });
     });
   }
 }
