@@ -42,7 +42,7 @@ export class PastRecordFilterService {
     }
     const tracking = await this.trackingRepository.find({ ctx, did });
     if (!tracking) {
-      return false;
+      return true;
     }
     const { createdAt } = validateRecord(collection, record);
     return isOutsidePastRecordWindow(tracking, new Date(createdAt));

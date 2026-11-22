@@ -103,6 +103,13 @@ describe("commit", () => {
         member: true,
         saved: true,
       },
+      {
+        name: "追跡の記録がない人の1日前以降の投稿",
+        collection: "post",
+        createdAt: recent,
+        tracked: false,
+        saved: false,
+      },
     ])(
       "index-19: メンバー以外の過去の投稿・リポスト・いいねは、追跡開始の1日前以降の分だけ保存する($name)",
       async ({
@@ -110,13 +117,16 @@ describe("commit", () => {
         createdAt,
         live = false,
         member = false,
+        tracked = true,
         saved,
       }) => {
         // arrange
         const author = await accountFactory(ctx.db).create();
-        await ctx.db
-          .insert(schema.trackings)
-          .values({ accountDid: author.did, trackedAt });
+        if (tracked) {
+          await ctx.db
+            .insert(schema.trackings)
+            .values({ accountDid: author.did, trackedAt });
+        }
         if (member) {
           await registrationFactory(ctx.db)
             .vars({ account: () => author })
