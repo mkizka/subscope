@@ -34,13 +34,11 @@ import type { AddMember } from "./me/subsco/admin/addMember.js";
 import type { BanAccount } from "./me/subsco/admin/banAccount.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
-import type { GetBannedAccounts } from "./me/subsco/admin/getBannedAccounts.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
 import type { ListServerMembers } from "./me/subsco/admin/listServerMembers.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
 import type { RevokeAdmin } from "./me/subsco/admin/revokeAdmin.js";
-import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetServerMemberFollowers } from "./me/subsco/graph/getServerMemberFollowers.js";
 import type { GetFollowedAccounts } from "./me/subsco/server/getFollowedAccounts.js";
@@ -76,7 +74,6 @@ export const lexRouterFactory = (
   registerAccount: RegisterAccount,
   unregisterAccount: UnregisterAccount,
   banAccount: BanAccount,
-  unbanAccount: UnbanAccount,
   createInviteCode: CreateInviteCode,
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
@@ -98,7 +95,6 @@ export const lexRouterFactory = (
   searchActors: SearchActors,
   searchActorsTypeahead: SearchActorsTypeahead,
   listServerMembers: ListServerMembers,
-  getBannedAccounts: GetBannedAccounts,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
   getQuotes: GetQuotes,
@@ -129,7 +125,6 @@ export const lexRouterFactory = (
     registerAccount,
     unregisterAccount,
     banAccount,
-    unbanAccount,
     createInviteCode,
     deleteInviteCode,
     getInviteCodes,
@@ -151,7 +146,6 @@ export const lexRouterFactory = (
     searchActors,
     searchActorsTypeahead,
     listServerMembers,
-    getBannedAccounts,
     getLikes,
     getRepostedBy,
     getQuotes,
