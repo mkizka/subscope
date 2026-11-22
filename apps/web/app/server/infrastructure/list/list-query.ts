@@ -44,7 +44,7 @@ export const listQueryFactory = ({
     async findList(did, account, rkey) {
       const agent = await restore(did);
       const { list, items } = await agent.call(getList, {
-        list: `at://${account}/app.bsky.graph.list/${rkey}`,
+        list: AtUri.make(account, "app.bsky.graph.list", rkey).toString(),
       });
       return {
         list: toList(list),

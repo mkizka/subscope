@@ -15,7 +15,8 @@ allowBuilds:
   sharp: false
   ssh2: false
 patchedDependencies:
-  "@atproto/oauth-scopes@0.5.14": patches/@atproto__oauth-scopes@0.5.14.patch
+  "@atproto/oauth-scopes": patches/@atproto__oauth-scopes.patch
   "@factory-js/factory": patches/@factory-js__factory.patch
 overrides:
-  "@opentelemetry/api": 1.9.1
+  "bull-board-react-router>@bull-board/api": 9.13.2
+  "bull-board-react-router>@bull-board/ui": 9.13.2

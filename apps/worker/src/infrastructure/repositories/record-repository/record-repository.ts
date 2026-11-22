@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 import { type RecordInsert, schema } from "@repo/db";
@@ -36,7 +35,7 @@ export class RecordRepository implements IRecordRepository {
   async save({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const data = {
       cid: record.cid,
-      accountDid: asDid(record.uri.host),
+      accountDid: record.uri.did,
       json: record.json,
     } satisfies RecordInsert;
     await ctx.db

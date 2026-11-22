@@ -7,6 +7,14 @@ import { describe, expect, test } from "vitest";
 
 import { setupJobTest } from "../shared/job-test-utils.js";
 
+const findTrackedAt = async (did: string) => {
+  const [tracking] = await testSetup.ctx.db
+    .select({ trackedAt: schema.trackings.trackedAt })
+    .from(schema.trackings)
+    .where(eq(schema.trackings.accountDid, did));
+  return tracking?.trackedAt ?? null;
+};
+
 let revCount = 0;
 const nextRev = () => String(++revCount).padStart(13, "0");
 
@@ -164,6 +172,71 @@ describe("Tapへの登録", () => {
   });
 });
 
+describe("追跡を始めた時刻の記録", () => {
+  const { ctx } = testSetup;
+
+  test("tap-7: Tapに追加するときに、追跡を始めた時刻を記録する", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs } = await setupJobTest();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const followee = await accountFactory(ctx.db).create();
+    const before = new Date();
+
+    // act
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // assert
+    const trackedAt = await findTrackedAt(followee.did);
+    expect(trackedAt?.getTime()).toBeGreaterThanOrEqual(before.getTime());
+    expect(trackedAt?.getTime()).toBeLessThanOrEqual(Date.now());
+  });
+
+  test("tap-8: すでに追跡しているアカウントの、追跡を始めた時刻は変えない", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs } = await setupJobTest();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const otherServerMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const trackedAt = new Date("2026-01-01T00:00:00.000Z");
+    const followee = await accountFactory(ctx.db).create();
+    await ctx.db
+      .insert(schema.trackings)
+      .values({ accountDid: followee.did, trackedAt });
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+
+    // act
+    await indexCommit(await followEvent(otherServerMember.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(await findTrackedAt(followee.did)).toEqual(trackedAt);
+  });
+
+  test("tap-9: Tapから外したら、追跡を始めた時刻を消す", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs } = await setupJobTest();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const followee = await accountFactory(ctx.db).create();
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // act
+    await indexCommit(unfollowEvent(serverMember.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(await findTrackedAt(followee.did)).toBeNull();
+  });
+});
+
 describe("バックフィルの状態の確認", () => {
   const { ctx } = testSetup;
 
@@ -275,6 +348,32 @@ describe("バックフィルの状態の確認", () => {
     expect(await findBackfillStatus(did)).toBe("completed");
     expect(tapClient.getRegisteredDids()).toEqual([]);
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
+  });
+
+  test("backfill-7: 削除済みでTapから外したアカウントは、追跡を始めた時刻も消す", async () => {
+    // arrange
+    const {
+      indexCommit,
+      runSyncTapRepoJobs,
+      checkBackfill,
+      tapClient,
+      repoStatusFetcher,
+    } = await setupJobTest();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const followee = await accountFactory(ctx.db).create();
+    const did = asDid(followee.did);
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    await runSyncTapRepoJobs();
+    tapClient.setRepoState(did, "error");
+    repoStatusFetcher.setDeleted(did);
+
+    // act
+    await checkBackfill(did, 1);
+
+    // assert
+    expect(await findTrackedAt(did)).toBeNull();
   });
 
   test("backfill-5: 起動時に、状態をまだ確認していない追跡アカウントを確認する", async () => {

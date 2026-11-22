@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
@@ -88,7 +89,7 @@ export function PostToolbarContainer(props: Props) {
       onRepost={repost.toggle}
       deleteBusy={deleter.state !== "idle"}
       onDelete={
-        me && props.uri.startsWith(`at://${me.did}/`)
+        me && new AtUri(props.uri).host === me.did
           ? () =>
               void deleter.submit(
                 { uri: props.uri, redirectTo: props.deleteRedirectTo ?? "" },
@@ -99,7 +100,7 @@ export function PostToolbarContainer(props: Props) {
       pinned={pinned}
       pinBusy={pinner.state !== "idle"}
       onPin={
-        me && props.uri.startsWith(`at://${me.did}/`)
+        me && new AtUri(props.uri).host === me.did
           ? () =>
               void pinner.submit(
                 { uri: props.uri, cid: props.cid, pinned: String(!pinned) },
@@ -109,7 +110,7 @@ export function PostToolbarContainer(props: Props) {
       }
       onCopyLink={() =>
         void navigator.clipboard.writeText(
-          `${location.origin}/${props.authorHandle}/post/${props.uri.split("/").pop()}`,
+          `${location.origin}/${props.authorHandle}/post/${new AtUri(props.uri).rkey}`,
         )
       }
       onReply={() =>

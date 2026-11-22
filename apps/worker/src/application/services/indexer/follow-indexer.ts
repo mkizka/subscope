@@ -30,17 +30,18 @@ export class FollowIndexer implements ICollectionIndexer {
     depth: number;
   }) {
     const follow = parseFollow(record);
-    await this.indexAccountService.upsert({
-      ctx,
-      did: follow.subjectDid,
-      live,
-    });
-    await this.followRepository.save({ ctx, follow });
-
     const isFollowerServerMember = await this.registrationQuery.isRegistered(
       ctx,
       follow.accountDid,
     );
+    await this.indexAccountService.upsert({
+      ctx,
+      did: follow.subjectDid,
+      live,
+      fetchMissing: isFollowerServerMember,
+    });
+    await this.followRepository.save({ ctx, follow });
+
     if (isFollowerServerMember) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),

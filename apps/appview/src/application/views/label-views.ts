@@ -41,7 +41,7 @@ export const toSelfLabelViews = (
     typeof json.createdAt === "string" ? json.createdAt : "",
   );
   return json.labels.values.map(({ val }) => ({
-    src: asDid(new AtUri(record.uri).host),
+    src: new AtUri(record.uri).did,
     uri: asAtUriString(record.uri),
     cid: record.cid,
     val,

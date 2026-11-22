@@ -32,7 +32,6 @@ export const accountFactory = (db: Database) =>
           handle: () => fakeHandle() as string | null,
           indexedAt: () => faker.date.recent(),
           isAdmin: () => false,
-          isBanned: () => false,
           status: (): AccountStatus => "active",
           backfillStatus: () =>
             null as "inProgress" | "completed" | "error" | null,
