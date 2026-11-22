@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import {
   type APIRequestContext,
   expect,
@@ -298,7 +299,7 @@ test("postToolbar-e8: 「リンクをコピー」で、投稿のスレッドのU
   await post.getByRole("button", { name: "リンクをコピー" }).click();
 
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    `${new URL(page.url()).origin}/alice.test/post/${uri.split("/").pop()}`,
+    `${new URL(page.url()).origin}/alice.test/post/${new AtUri(uri).rkey}`,
   );
 });
 

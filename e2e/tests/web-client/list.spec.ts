@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { expect, test } from "@playwright/test";
 
 import {
@@ -25,7 +26,7 @@ const createList = async (name: string) => {
     list: list.uri,
     createdAt: new Date().toISOString(),
   });
-  return list.uri.split("/").at(-1);
+  return new AtUri(list.uri).rkey;
 };
 
 test.describe("リスト", () => {
@@ -223,7 +224,7 @@ test.describe("リスト", () => {
     page,
   }) => {
     const list = await createEmptyList(`list-e7のリスト ${Date.now()}`);
-    const rkey = list.uri.split("/").at(-1);
+    const rkey = new AtUri(list.uri).rkey;
     await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
