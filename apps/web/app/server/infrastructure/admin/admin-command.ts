@@ -4,7 +4,6 @@ import banAccount from "@repo/client/me/subsco/admin/banAccount";
 import createInviteCode from "@repo/client/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/me/subsco/admin/deleteInviteCode";
 import grantAdmin from "@repo/client/me/subsco/admin/grantAdmin";
-import unbanAccount from "@repo/client/me/subsco/admin/unbanAccount";
 
 import type { IAdminCommand } from "@/app/server/application/interfaces/admin-command";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
@@ -49,10 +48,6 @@ export const adminCommandFactory = ({
     async grantAdmin(did, target) {
       const agent = await restore(did);
       await agent.call(grantAdmin, { did: target });
-    },
-    async unbanAccount(did, target) {
-      const agent = await restore(did);
-      await agent.call(unbanAccount, { did: target });
     },
     async createInviteCode(did) {
       const agent = await restore(did);

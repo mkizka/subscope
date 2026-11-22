@@ -192,24 +192,6 @@ qは大文字と小文字を区別しない。
 | banAccount-2 | 本人とそのフォロー先について、Tapに追加するか外すかを決めるジョブを積む |
 | banAccount-3 | 登録を消し、登録停止中にする                                            |
 
-## me.subsco.admin.getBannedAccounts
-
-登録停止中のアカウントを返す。管理者の認証が必要。limitとcursorでページングする。
-
-| ID                  | 仕様                                      |
-| ------------------- | ----------------------------------------- |
-| getBannedAccounts-1 | 登録停止中のアカウントをprofileViewで返す |
-| getBannedAccounts-2 | 登録停止中でないアカウントは含めない      |
-
-## me.subsco.admin.unbanAccount
-
-登録停止を取り消す。管理者の認証が必要。メンバーには戻さず、本人が改めて登録する。
-
-| ID             | 仕様                                           |
-| -------------- | ---------------------------------------------- |
-| unbanAccount-1 | 取り消したアカウントは招待コードで再登録できる |
-| unbanAccount-2 | 登録停止中でなければ400とNotBannedを返す       |
-
 ## me.subsco.admin.createInviteCode
 
 招待コードを作る。管理者の認証が必要。

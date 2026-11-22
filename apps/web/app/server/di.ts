@@ -14,11 +14,9 @@ import { addMemberUseCaseFactory } from "./application/admin/add-member-use-case
 import { banAccountUseCaseFactory } from "./application/admin/ban-account-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
-import { getBannedAccountsUseCaseFactory } from "./application/admin/get-banned-accounts-use-case";
 import { getInviteCodesUseCaseFactory } from "./application/admin/get-invite-codes-use-case";
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { listServerMembersUseCaseFactory } from "./application/admin/list-server-members-use-case";
-import { unbanAccountUseCaseFactory } from "./application/admin/unban-account-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
@@ -188,12 +186,6 @@ export const di = await createRegistry()
   .service("addMemberUseCase", ["adminCommand"], addMemberUseCaseFactory)
   .service("banAccountUseCase", ["adminCommand"], banAccountUseCaseFactory)
   .service("grantAdminUseCase", ["adminCommand"], grantAdminUseCaseFactory)
-  .service(
-    "getBannedAccountsUseCase",
-    ["adminQuery"],
-    getBannedAccountsUseCaseFactory,
-  )
-  .service("unbanAccountUseCase", ["adminCommand"], unbanAccountUseCaseFactory)
   .service(
     "getInviteCodesUseCase",
     ["adminQuery"],

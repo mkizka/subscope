@@ -58,13 +58,11 @@ import { AddMemberUseCase } from "../application/use-cases/admin/add-member-use-
 import { BanAccountUseCase } from "../application/use-cases/admin/ban-account-use-case.js";
 import { CreateInviteCodeUseCase } from "../application/use-cases/admin/create-invite-code-use-case.js";
 import { DeleteInviteCodeUseCase } from "../application/use-cases/admin/delete-invite-code-use-case.js";
-import { GetBannedAccountsUseCase } from "../application/use-cases/admin/get-banned-accounts-use-case.js";
 import { GetInviteCodesUseCase } from "../application/use-cases/admin/get-invite-codes-use-case.js";
 import { GrantAdminUseCase } from "../application/use-cases/admin/grant-admin-use-case.js";
 import { ListServerMembersUseCase } from "../application/use-cases/admin/list-server-members-use-case.js";
 import { RegisterAdminUseCase } from "../application/use-cases/admin/register-admin-use-case.js";
 import { RevokeAdminUseCase } from "../application/use-cases/admin/revoke-admin-use-case.js";
-import { UnbanAccountUseCase } from "../application/use-cases/admin/unban-account-use-case.js";
 import { VerifyAccessUseCase } from "../application/use-cases/admin/verify-access-use-case.js";
 import { GetActorLikesUseCase } from "../application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "../application/use-cases/feed/get-author-feed-use-case.js";
@@ -168,13 +166,11 @@ import { AddMember } from "../presentation/routes/me/subsco/admin/addMember.js";
 import { BanAccount } from "../presentation/routes/me/subsco/admin/banAccount.js";
 import { CreateInviteCode } from "../presentation/routes/me/subsco/admin/createInviteCode.js";
 import { DeleteInviteCode } from "../presentation/routes/me/subsco/admin/deleteInviteCode.js";
-import { GetBannedAccounts } from "../presentation/routes/me/subsco/admin/getBannedAccounts.js";
 import { GetInviteCodes } from "../presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GrantAdmin } from "../presentation/routes/me/subsco/admin/grantAdmin.js";
 import { ListServerMembers } from "../presentation/routes/me/subsco/admin/listServerMembers.js";
 import { RegisterAdmin } from "../presentation/routes/me/subsco/admin/registerAdmin.js";
 import { RevokeAdmin } from "../presentation/routes/me/subsco/admin/revokeAdmin.js";
-import { UnbanAccount } from "../presentation/routes/me/subsco/admin/unbanAccount.js";
 import { VerifyAccess } from "../presentation/routes/me/subsco/admin/verifyAccess.js";
 import { GetServerMemberFollowers } from "../presentation/routes/me/subsco/graph/getServerMemberFollowers.js";
 import { GetFollowedAccounts } from "../presentation/routes/me/subsco/server/getFollowedAccounts.js";
@@ -276,7 +272,6 @@ export const createAppRegistry = (env: Env) =>
     .service("getListsUseCase", ["listQuery", "viewContextFactory", "listViews"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["transactionManager", "inviteCodeRepository", "env"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
-    .service("getBannedAccountsUseCase", ["accountQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedAccountsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
     .service("listServerMembersUseCase", ["viewContextFactory", "profileViews", "accountRepository", "registrationQuery"], asClassArgs(ListServerMembersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "accountRepository", "registrationRepository"], asClassArgs(GrantAdminUseCase))
@@ -293,7 +288,6 @@ export const createAppRegistry = (env: Env) =>
     .service("registerAccountUseCase", ["transactionManager", "accountRepository", "inviteCodeRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(RegisterAccountUseCase))
     .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "transactionManager", "accountRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(AddMemberUseCase))
     .service("unregisterAccountUseCase", ["transactionManager", "unregisterAccountService"], asClassArgs(UnregisterAccountUseCase))
-    .service("unbanAccountUseCase", ["transactionManager", "accountRepository"], asClassArgs(UnbanAccountUseCase))
     .service("banAccountUseCase", ["transactionManager", "accountRepository", "unregisterAccountService"], asClassArgs(BanAccountUseCase))
     .service("updateSeenUseCase", ["transactionManager", "registrationRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
@@ -329,7 +323,6 @@ export const createAppRegistry = (env: Env) =>
     .service("createInviteCode", ["createInviteCodeUseCase", "adminMiddleware"], asClassArgs(CreateInviteCode))
     .service("deleteInviteCode", ["deleteInviteCodeUseCase", "adminMiddleware"], asClassArgs(DeleteInviteCode))
     .service("getInviteCodes", ["getInviteCodesUseCase", "adminMiddleware"], asClassArgs(GetInviteCodes))
-    .service("getBannedAccounts", ["getBannedAccountsUseCase", "adminMiddleware"], asClassArgs(GetBannedAccounts))
     .service("listServerMembers", ["listServerMembersUseCase", "adminMiddleware"], asClassArgs(ListServerMembers))
     .service("grantAdmin", ["grantAdminUseCase", "adminMiddleware"], asClassArgs(GrantAdmin))
     .service("addMember", ["addMemberUseCase", "adminMiddleware"], asClassArgs(AddMember))
@@ -346,10 +339,9 @@ export const createAppRegistry = (env: Env) =>
     .service("getRegistrationStatus", ["getRegistrationStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetRegistrationStatus))
     .service("registerAccount", ["registerAccountUseCase", "authVerifierMiddleware"], asClassArgs(RegisterAccount))
     .service("unregisterAccount", ["unregisterAccountUseCase", "authVerifierMiddleware"], asClassArgs(UnregisterAccount))
-    .service("unbanAccount", ["unbanAccountUseCase", "adminMiddleware"], asClassArgs(UnbanAccount))
     .service("banAccount", ["banAccountUseCase", "adminMiddleware"], asClassArgs(BanAccount))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getKnownFollowers", "getList", "getLists", "getListsWithMembership", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "addMember", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getQuotes", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getKnownFollowers", "getList", "getLists", "getListsWithMembership", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "addMember", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getLikes", "getRepostedBy", "getQuotes", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["env"], healthRouterFactory)
     .service("wellKnownRouter", ["env"], wellKnownRouterFactory)
     // bootstrap

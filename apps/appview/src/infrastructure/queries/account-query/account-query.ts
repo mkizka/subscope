@@ -1,8 +1,7 @@
 import type { Did } from "@atproto/did";
-import { asDid } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
-import { and, asc, eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { IAccountQuery } from "../../../application/interfaces/queries/account-query.js";
 
@@ -24,23 +23,5 @@ export class AccountQuery implements IAccountQuery {
       .from(schema.accounts)
       .where(eq(schema.accounts.did, did));
     return row?.rev ?? null;
-  }
-
-  async findBannedDids(params: {
-    limit: number;
-    cursor?: string;
-  }): Promise<Did[]> {
-    const rows = await this.db
-      .select({ did: schema.accounts.did })
-      .from(schema.accounts)
-      .where(
-        and(
-          eq(schema.accounts.isBanned, true),
-          params.cursor ? gt(schema.accounts.did, params.cursor) : undefined,
-        ),
-      )
-      .orderBy(asc(schema.accounts.did))
-      .limit(params.limit);
-    return rows.map((row) => asDid(row.did));
   }
 }

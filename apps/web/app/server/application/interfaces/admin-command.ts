@@ -12,7 +12,6 @@ export interface IAdminCommand {
   ) => Promise<AddMemberResult>;
   banAccount: (did: string, target: DidString) => Promise<void>;
   grantAdmin: (did: string, target: DidString) => Promise<void>;
-  unbanAccount: (did: string, target: DidString) => Promise<void>;
   createInviteCode: (did: string) => Promise<CreateInviteCodeOutput>;
   deleteInviteCode: (did: string, code: string) => Promise<void>;
 }
