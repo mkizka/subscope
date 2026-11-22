@@ -170,7 +170,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("statsPolicyService", asClassArgs(StatsPolicyService))
     .service("trackingPolicyService", ["registrationQuery"], asClassArgs(TrackingPolicyService))
     .service("resolveDidService", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidService))
-    .service("storagePolicyService", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicyService))
+    .service("storagePolicyService", ["postQuery", "registrationQuery", "trackingRepository"], asClassArgs(StoragePolicyService))
     .service("indexRecordService", ["recordRepository", "notificationRepository", "saveRecordService", "storagePolicyService", "fetchPolicyService", "notificationPolicyService", "statsPolicyService", "trackingPolicyService", "indexJobService"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))

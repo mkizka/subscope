@@ -2,8 +2,10 @@ import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
+import { getGatedPostUri } from "../dto/gate.js";
 import type { Origin } from "../dto/origin.js";
 import type { Record } from "../dto/record.js";
+import type { IPostQuery } from "../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 
@@ -17,23 +19,9 @@ const PAST_LIMITED_COLLECTIONS = [
 const containsNullChar = (record: Record) =>
   JSON.stringify(record.json).includes("\\u0000");
 
-const isGateOfSamePost = (record: Record) => {
-  const gate = validateRecord(
-    record.uri.collection === "app.bsky.feed.threadgate"
-      ? "app.bsky.feed.threadgate"
-      : "app.bsky.feed.postgate",
-    record,
-  );
-  const postUri = new AtUri(gate.post);
-  return (
-    postUri.host === record.uri.did &&
-    postUri.collection === "app.bsky.feed.post" &&
-    postUri.rkey === record.uri.rkey
-  );
-};
-
 export class StoragePolicyService {
   constructor(
+    private readonly postQuery: IPostQuery,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly trackingRepository: ITrackingRepository,
   ) {}
@@ -59,12 +47,17 @@ export class StoragePolicyService {
     switch (record.uri.collection) {
       case "app.bsky.feed.threadgate":
       case "app.bsky.feed.postgate":
-        return isGateOfSamePost(record);
+        return this.isGateOfSavedPost(ctx, record);
       case "app.bsky.feed.like":
         return this.isLikeAroundMember(ctx, record);
       default:
         return true;
     }
+  }
+
+  private async isGateOfSavedPost(ctx: TransactionContext, record: Record) {
+    const postUri = getGatedPostUri(record);
+    return !!postUri && (await this.postQuery.exists(ctx, postUri));
   }
 
   private async isWithinPastWindow(ctx: TransactionContext, record: Record) {

@@ -101,54 +101,96 @@ describe("IndexCommitUseCase", () => {
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
-    test("index-9: threadgateとpostgateは、同じアカウントの同じrkeyの投稿に付くものだけ保存する", async () => {
-      // arrange
-      const account = accountFactory();
-      accountRepo.add(account);
-      const gate = (collection: string, rkey: string, postRkey: string) => {
-        const uri = AtUri.make(account.did, collection, rkey);
-        const record = {
-          uri,
+    describe("threadgateとpostgate", () => {
+      const setup = () => {
+        const account = accountFactory();
+        accountRepo.add(account);
+        registrationQuery.add(account.did);
+        const post = {
+          uri: AtUri.make(account.did, "app.bsky.feed.post", "123"),
           cid: "cid123",
           json: {
-            $type: collection,
-            post: AtUri.make(
-              account.did,
-              "app.bsky.feed.post",
-              postRkey,
-            ).toString(),
+            $type: "app.bsky.feed.post",
+            text: "Hello world",
             createdAt: new Date().toISOString(),
           },
           indexedAt: new Date(),
         };
-        return {
-          uri,
-          command: {
-            commit: {
-              operation: "create" as const,
-              uri,
-              rev: "3aaaaaaaaaaaa",
-              record,
+        const gate = (collection: string, rkey: string) => {
+          const uri = AtUri.make(account.did, collection, rkey);
+          return {
+            uri,
+            cid: "cid123",
+            json: {
+              $type: collection,
+              post: post.uri.toString(),
+              createdAt: new Date().toISOString(),
             },
-            live: true,
-          },
+            indexedAt: new Date(),
+          };
         };
+        return { post, gate };
       };
-      const threadgate = gate("app.bsky.feed.threadgate", "123", "123");
-      const postgate = gate("app.bsky.feed.postgate", "123", "123");
-      const mismatched = gate("app.bsky.feed.threadgate", "456", "123");
+      const create = (record: {
+        uri: AtUri;
+        cid: string;
+        json: object;
+        indexedAt: Date;
+      }) =>
+        indexCommitUseCase.execute({
+          commit: {
+            operation: "create",
+            uri: record.uri,
+            rev: "3aaaaaaaaaaaa",
+            record,
+          },
+          live: false,
+        });
 
-      // act
-      await indexCommitUseCase.execute(threadgate.command);
-      await indexCommitUseCase.execute(postgate.command);
-      await indexCommitUseCase.execute(mismatched.command);
+      test("index-9: threadgateとpostgateは、同じアカウントの同じrkeyの投稿に付くものだけ保存する", async () => {
+        // arrange
+        const { post, gate } = setup();
+        const mismatched = gate("app.bsky.feed.threadgate", "456");
+        await create(post);
 
-      // assert
-      expect(
-        await recordRepo.find({ ctx, uri: threadgate.uri }),
-      ).not.toBeNull();
-      expect(await recordRepo.find({ ctx, uri: postgate.uri })).not.toBeNull();
-      expect(await recordRepo.find({ ctx, uri: mismatched.uri })).toBeNull();
+        // act
+        await create(mismatched);
+
+        // assert
+        expect(await recordRepo.find({ ctx, uri: mismatched.uri })).toBeNull();
+      });
+
+      test("index-18: threadgateとpostgateは、対象の投稿を保存済みのときだけ保存する", async () => {
+        // arrange
+        const { post, gate } = setup();
+        const threadgate = gate("app.bsky.feed.threadgate", "123");
+        const postgate = gate("app.bsky.feed.postgate", "123");
+
+        // act
+        await create(threadgate);
+        await create(post);
+        await create(postgate);
+
+        // assert
+        expect(await recordRepo.find({ ctx, uri: threadgate.uri })).toBeNull();
+        expect(
+          await recordRepo.find({ ctx, uri: postgate.uri }),
+        ).not.toBeNull();
+      });
+
+      test("index-22: 対象の投稿より先に届いたthreadgateとpostgateは、PDSから取り直して保存する", async () => {
+        // arrange
+        const { gate } = setup();
+        const threadgate = gate("app.bsky.feed.threadgate", "123");
+
+        // act
+        await create(threadgate);
+
+        // assert
+        expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
+          { uri: threadgate.uri, live: false, depth: 0 },
+        ]);
+      });
     });
 
     test.each([

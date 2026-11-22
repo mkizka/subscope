@@ -4,6 +4,7 @@ import type { TransactionContext } from "@repo/common/interface";
 
 import type { FetchTarget } from "../dto/fetch-target.js";
 import { parseFollow } from "../dto/follow.js";
+import { getGatedPostUri } from "../dto/gate.js";
 import { type Like, parseLike } from "../dto/like.js";
 import { parseListItem } from "../dto/list-item.js";
 import type { Origin } from "../dto/origin.js";
@@ -40,6 +41,24 @@ export class FetchPolicyService {
       ...(await this.targetsForAccount({ ctx, did: record.uri.did })),
       ...(await this.relatedTargets(ctx, record, origin)),
     ];
+  }
+
+  async targetsForSkippedRecord({
+    ctx,
+    record,
+    origin,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+    origin: Origin;
+  }): Promise<FetchTarget[]> {
+    switch (record.uri.collection) {
+      case "app.bsky.feed.threadgate":
+      case "app.bsky.feed.postgate":
+        return this.gateBeforePost(ctx, record, origin);
+      default:
+        return [];
+    }
   }
 
   async targetsForAccount({
@@ -104,6 +123,22 @@ export class FetchPolicyService {
     }
     const exists = await this.postQuery.exists(ctx, uri);
     return exists ? [] : [{ type: "record", uri, hop }];
+  }
+
+  private async gateBeforePost(
+    ctx: TransactionContext,
+    record: Record,
+    origin: Origin,
+  ): Promise<FetchTarget[]> {
+    if (origin.type === "pds") {
+      return [];
+    }
+    const postUri = getGatedPostUri(record);
+    if (!postUri) {
+      return [];
+    }
+    const postExists = await this.postQuery.exists(ctx, postUri);
+    return postExists ? [] : [{ type: "record", uri: record.uri, hop: 1 }];
   }
 
   private async likedPost(

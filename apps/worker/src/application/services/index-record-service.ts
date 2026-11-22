@@ -43,6 +43,15 @@ export class IndexRecordService {
       origin,
     });
     if (!shouldStore) {
+      this.indexJobService.schedule({
+        ctx,
+        priority,
+        fetch: await this.fetchPolicyService.targetsForSkippedRecord({
+          ctx,
+          record,
+          origin,
+        }),
+      });
       return;
     }
     await this.saveRecordService.save({ ctx, record });
