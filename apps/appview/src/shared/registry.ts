@@ -42,6 +42,7 @@ import type { IRecordQuery } from "../application/interfaces/queries/record-quer
 import type { IRegistrationQuery } from "../application/interfaces/queries/registration-query.js";
 import type { IRepostQuery } from "../application/interfaces/queries/repost-query.js";
 import type { ITimelineQuery } from "../application/interfaces/queries/timeline-query.js";
+import type { ITrackingQuery } from "../application/interfaces/queries/tracking-query.js";
 import type { IRegistrationRepository } from "../application/interfaces/registration-repository.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
@@ -126,6 +127,7 @@ import { RecordQuery } from "../infrastructure/queries/record-query/record-query
 import { RegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.js";
 import { RepostQuery } from "../infrastructure/queries/repost-query/repost-query.js";
 import { TimelineQuery } from "../infrastructure/queries/timeline-query/timeline-query.js";
+import { TrackingQuery } from "../infrastructure/queries/tracking-query/tracking-query.js";
 import { RegistrationRepository } from "../infrastructure/registration-repository/registration-repository.js";
 import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.js";
 import { AdminMiddleware } from "../presentation/middleware/admin-middleware.js";
@@ -222,6 +224,7 @@ export const createAppRegistry = (env: Env) =>
     .service("inviteCodeQuery", ["db"], asClassArgs<IInviteCodeQuery>()(InviteCodeQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("registrationQuery", ["db"], asClassArgs<IRegistrationQuery>()(RegistrationQuery))
+    .service("trackingQuery", ["db"], asClassArgs<ITrackingQuery>()(TrackingQuery))
     .service("registrationRepository", ["db"], asClassArgs<IRegistrationRepository>()(RegistrationRepository))
     .service("tokenVerifier", ["didResolver", "env"], asClassArgs<ITokenVerifier>()(TokenVerifier))
     .service("assetUrlBuilder", ["env"], asClassArgs<IAssetUrlBuilder>()(AssetUrlBuilder))
@@ -283,7 +286,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getSetupStatusUseCase", ["accountQuery"], asClassArgs(GetSetupStatusUseCase))
     .service("getServerMemberFollowersUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetServerMemberFollowersUseCase))
     .service("getFollowedAccountsUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowedAccountsUseCase))
-    .service("getTrackingStatusesUseCase", ["registrationQuery"], asClassArgs(GetTrackingStatusesUseCase))
+    .service("getTrackingStatusesUseCase", ["trackingQuery"], asClassArgs(GetTrackingStatusesUseCase))
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
     .service("registerAccountUseCase", ["transactionManager", "accountRepository", "inviteCodeRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(RegisterAccountUseCase))
     .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "transactionManager", "accountRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(AddMemberUseCase))
