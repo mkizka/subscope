@@ -7,6 +7,14 @@ import { describe, expect, test } from "vitest";
 
 import { setupJobTest } from "../shared/job-test-utils.js";
 
+const findTrackedAt = async (did: string) => {
+  const [tracking] = await testSetup.ctx.db
+    .select({ trackedAt: schema.trackings.trackedAt })
+    .from(schema.trackings)
+    .where(eq(schema.trackings.accountDid, did));
+  return tracking?.trackedAt ?? null;
+};
+
 let revCount = 0;
 const nextRev = () => String(++revCount).padStart(13, "0");
 
@@ -166,14 +174,6 @@ describe("Tapへの登録", () => {
 
 describe("追跡を始めた時刻の記録", () => {
   const { ctx } = testSetup;
-
-  const findTrackedAt = async (did: string) => {
-    const [tracking] = await ctx.db
-      .select({ trackedAt: schema.trackings.trackedAt })
-      .from(schema.trackings)
-      .where(eq(schema.trackings.accountDid, did));
-    return tracking?.trackedAt ?? null;
-  };
 
   test("tap-7: Tapに追加するときに、追跡を始めた時刻を記録する", async () => {
     // arrange
@@ -348,6 +348,32 @@ describe("バックフィルの状態の確認", () => {
     expect(await findBackfillStatus(did)).toBe("completed");
     expect(tapClient.getRegisteredDids()).toEqual([]);
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
+  });
+
+  test("backfill-7: 削除済みでTapから外したアカウントは、追跡を始めた時刻も消す", async () => {
+    // arrange
+    const {
+      indexCommit,
+      runSyncTapRepoJobs,
+      checkBackfill,
+      tapClient,
+      repoStatusFetcher,
+    } = await setupJobTest();
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const followee = await accountFactory(ctx.db).create();
+    const did = asDid(followee.did);
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    await runSyncTapRepoJobs();
+    tapClient.setRepoState(did, "error");
+    repoStatusFetcher.setDeleted(did);
+
+    // act
+    await checkBackfill(did, 1);
+
+    // assert
+    expect(await findTrackedAt(did)).toBeNull();
   });
 
   test("backfill-5: 起動時に、状態をまだ確認していない追跡アカウントを確認する", async () => {
