@@ -51,7 +51,7 @@ describe("FetchPolicyService", () => {
     { origin: { type: "pds", hop: 1 }, expected: [2] },
     { origin: { type: "pds", hop: 2 }, expected: [] },
   ])(
-    "引用された投稿は2段目まで返す($origin.type, $origin.hop)",
+    "引用元の投稿の段が2以下になる場合だけ、取得対象として返す($origin.type, $origin.hop)",
     async ({ origin, expected }) => {
       // arrange
       const quotedUri = `at://${fakeDid()}/app.bsky.feed.post/quoted`;
