@@ -22,23 +22,6 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
-  async shouldIndex({
-    ctx,
-    record,
-  }: {
-    ctx: AfterCommitContext;
-    record: Record;
-  }) {
-    const like = parseLike(record);
-    return (
-      (await this.registrationQuery.isRegistered(ctx, like.accountDid)) ||
-      (await this.registrationQuery.isRegistered(
-        ctx,
-        new AtUri(like.subjectUri).host,
-      ))
-    );
-  }
-
   async upsert({
     ctx,
     record,

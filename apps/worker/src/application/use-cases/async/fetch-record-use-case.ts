@@ -61,20 +61,13 @@ export class FetchRecordUseCase {
   ): Promise<void> {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
-    await this.transactionManager.transaction(async (ctx) => {
-      const shouldIndex = await this.indexRecordService.shouldIndex({
+    await this.transactionManager.transaction((ctx) =>
+      this.indexRecordService.index({
         ctx,
         record,
-      });
-      if (!shouldIndex) {
-        return;
-      }
-      await this.indexRecordService.upsert({
-        ctx,
-        record,
-        live,
-        depth: depth + 1,
-      });
-    });
+        origin: { type: "pds", hop: depth + 1 },
+        priority: live ? "high" : "low",
+      }),
+    );
   }
 }

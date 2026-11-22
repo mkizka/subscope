@@ -64,8 +64,8 @@ import { PostIndexer } from "../application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
 import { NotificationService } from "../application/services/notification-service.js";
-import { PastRecordFilterService } from "../application/services/past-record-filter-service.js";
 import { ResolveDidService } from "../application/services/resolve-did-service.js";
+import { StoragePolicyService } from "../application/services/storage-policy-service.js";
 import { TrackingService } from "../application/services/tracking-service.js";
 import { AggregateAccountStatsUseCase } from "../application/use-cases/async/aggregate-account-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
@@ -180,12 +180,12 @@ export const createWorkerRegistry = (env: Env) =>
     .service("linkIndexer", asClassArgs(LinkIndexer))
     .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService", "postQuery", "trackingRepository"], asClassArgs(LikeIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(RepostIndexer))
-    .service("pastRecordFilterService", ["registrationQuery", "trackingRepository"], asClassArgs(PastRecordFilterService))
-    .service("indexRecordService", ["recordRepository", "indexAccountService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
+    .service("storagePolicyService", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicyService))
+    .service("indexRecordService", ["recordRepository", "indexAccountService", "storagePolicyService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidService"], asClassArgs(UpsertIdentityUseCase))
-    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService", "pastRecordFilterService"], asClassArgs(IndexCommitUseCase))
+    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService"], asClassArgs(IndexCommitUseCase))
     .service("updateRepoRevUseCase", ["transactionManager", "repoRevRepository"], asClassArgs(UpdateRepoRevUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
