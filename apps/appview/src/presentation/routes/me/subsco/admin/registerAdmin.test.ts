@@ -94,7 +94,7 @@ describe("me.subsco.admin.registerAdmin", () => {
     expect(jobScheduler.getFetchRecordJobs()).toEqual([
       {
         uri: AtUri.make(requesterDid, "app.bsky.actor.profile", "self"),
-        origin: { via: "tap", live: true },
+        origin: { via: "pds", hop: 1, live: true },
       },
     ]);
   });
