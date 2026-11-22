@@ -1,108 +1,79 @@
 import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/interface";
-import {
-  isSupportedCollection,
-  type SupportedCollection,
-} from "@repo/common/utils";
 
+import type { JobPriority, Origin } from "../dto/origin.js";
 import type { Record } from "../dto/record.js";
+import type { INotificationRepository } from "../interfaces/repositories/notification-repository.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
-import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
-import type { IndexAccountService } from "./index-account-service.js";
-import type { FollowIndexer } from "./indexer/follow-indexer.js";
-import type { GateIndexer } from "./indexer/gate-indexer.js";
-import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
-import type { LikeIndexer } from "./indexer/like-indexer.js";
-import type { LinkIndexer } from "./indexer/link-indexer.js";
-import type { ListIndexer } from "./indexer/list-indexer.js";
-import type { ListItemIndexer } from "./indexer/list-item-indexer.js";
-import type { PostIndexer } from "./indexer/post-indexer.js";
-import type { ProfileIndexer } from "./indexer/profile-indexer.js";
-import type { RepostIndexer } from "./indexer/repost-indexer.js";
-
-type CollectionIndexerMap = {
-  [key in SupportedCollection]: ICollectionIndexer;
-};
-
-const isValidRecord = (record: Record) => {
-  // Postgresには`\u0000`を含む文字列を保存できないため
-  return !JSON.stringify(record.json).includes("\\u0000");
-};
+import type { FetchPolicyService } from "./fetch-policy-service.js";
+import type { IndexJobService } from "./index-job-service.js";
+import type { NotificationPolicyService } from "./notification-policy-service.js";
+import type { SaveRecordService } from "./save-record-service.js";
+import type { StatsPolicyService } from "./stats-policy-service.js";
+import type { StoragePolicyService } from "./storage-policy-service.js";
+import type { TrackingPolicyService } from "./tracking-policy-service.js";
 
 export class IndexRecordService {
-  private readonly indexers: CollectionIndexerMap;
-
   constructor(
     private readonly recordRepository: IRecordRepository,
-    private readonly indexAccountService: IndexAccountService,
-    postIndexer: PostIndexer,
-    profileIndexer: ProfileIndexer,
-    followIndexer: FollowIndexer,
-    generatorIndexer: GeneratorIndexer,
-    likeIndexer: LikeIndexer,
-    repostIndexer: RepostIndexer,
-    listIndexer: ListIndexer,
-    listItemIndexer: ListItemIndexer,
-    gateIndexer: GateIndexer,
-    linkIndexer: LinkIndexer,
-  ) {
-    this.indexers = {
-      "app.bsky.feed.post": postIndexer,
-      "app.bsky.feed.generator": generatorIndexer,
-      "app.bsky.feed.repost": repostIndexer,
-      "app.bsky.actor.profile": profileIndexer,
-      "app.bsky.actor.link": linkIndexer,
-      "app.bsky.graph.follow": followIndexer,
-      "app.bsky.feed.like": likeIndexer,
-      "app.bsky.graph.list": listIndexer,
-      "app.bsky.graph.listitem": listItemIndexer,
-      "app.bsky.feed.threadgate": gateIndexer,
-      "app.bsky.feed.postgate": gateIndexer,
-    };
-  }
+    private readonly notificationRepository: INotificationRepository,
+    private readonly saveRecordService: SaveRecordService,
+    private readonly storagePolicyService: StoragePolicyService,
+    private readonly fetchPolicyService: FetchPolicyService,
+    private readonly notificationPolicyService: NotificationPolicyService,
+    private readonly statsPolicyService: StatsPolicyService,
+    private readonly trackingPolicyService: TrackingPolicyService,
+    private readonly indexJobService: IndexJobService,
+  ) {}
 
-  private indexerFor(record: Record) {
-    if (!isSupportedCollection(record.uri.collection)) {
-      throw new Error(`Unsupported collection: ${record.uri.collection}`);
-    }
-    return this.indexers[record.uri.collection];
-  }
-
-  async shouldIndex({
+  async index({
     ctx,
     record,
+    origin,
+    priority,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-  }): Promise<boolean> {
-    const indexer = this.indexerFor(record);
-    if (!isValidRecord(record)) {
-      return false;
-    }
-    return !indexer.shouldIndex || (await indexer.shouldIndex({ ctx, record }));
-  }
-
-  async upsert({
-    ctx,
-    record,
-    live,
-    depth,
-  }: {
-    ctx: AfterCommitContext;
-    record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
+    priority: JobPriority;
   }): Promise<void> {
-    const indexer = this.indexerFor(record);
-    await this.indexAccountService.upsert({
+    const shouldStore = await this.storagePolicyService.shouldStore({
       ctx,
-      did: record.uri.did,
-      live,
+      record,
+      origin,
     });
-    await this.recordRepository.save({ ctx, record });
+    if (!shouldStore) {
+      return;
+    }
+    await this.saveRecordService.save({ ctx, record });
 
-    await indexer.upsert({ ctx, record, live, depth });
-    await indexer.afterAction?.({ ctx, record, action: "upsert" });
+    const notifications = await this.notificationPolicyService.notificationsFor(
+      {
+        ctx,
+        record,
+        origin,
+      },
+    );
+    const pushes = await this.notificationRepository.save({
+      ctx,
+      notifications,
+    });
+
+    this.indexJobService.schedule({
+      ctx,
+      priority,
+      fetch: await this.fetchPolicyService.targetsForRecord({
+        ctx,
+        record,
+        origin,
+      }),
+      stats: this.statsPolicyService.targetsFor({ record, action: "upsert" }),
+      reposToSync: await this.trackingPolicyService.reposToSync({
+        ctx,
+        record,
+      }),
+      pushes,
+    });
   }
 
   async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {
@@ -110,16 +81,20 @@ export class IndexRecordService {
 
     await this.recordRepository.delete({ ctx, uri });
 
-    if (
-      existingRecord &&
-      isSupportedCollection(existingRecord.uri.collection)
-    ) {
-      const indexer = this.indexers[existingRecord.uri.collection];
-      await indexer.afterAction?.({
-        ctx,
+    if (!existingRecord) {
+      return;
+    }
+    this.indexJobService.schedule({
+      ctx,
+      priority: "high",
+      stats: this.statsPolicyService.targetsFor({
         record: existingRecord,
         action: "delete",
-      });
-    }
+      }),
+      reposToSync: await this.trackingPolicyService.reposToSync({
+        ctx,
+        record: existingRecord,
+      }),
+    });
   }
 }
