@@ -34,8 +34,6 @@ export const adminCommandFactory = ({
               return "accountNotFound";
             case "AlreadyRegistered":
               return "alreadyRegistered";
-            case "Banned":
-              return "banned";
           }
         }
         throw e;
