@@ -37,7 +37,7 @@ describe("IndexCommitUseCase", () => {
 
       registrationQuery.add(account.did);
 
-      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
+      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
       const record = {
         uri,
         cid: "cid123",
@@ -74,7 +74,7 @@ describe("IndexCommitUseCase", () => {
       accountRepo.add(account);
       const saveSpy = vi.spyOn(accountRepo, "save");
 
-      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
+      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
       const record = {
         uri,
         cid: "cid123",
@@ -103,7 +103,7 @@ describe("IndexCommitUseCase", () => {
         const account = accountFactory();
         accountRepo.add(account);
         const post = {
-          uri: new AtUri(`at://${account.did}/app.bsky.feed.post/123`),
+          uri: AtUri.make(account.did, "app.bsky.feed.post", "123"),
           cid: "cid123",
           json: {
             $type: "app.bsky.feed.post",
@@ -113,7 +113,7 @@ describe("IndexCommitUseCase", () => {
           indexedAt: new Date(),
         };
         const gate = (collection: string, rkey: string) => {
-          const uri = new AtUri(`at://${account.did}/${collection}/${rkey}`);
+          const uri = AtUri.make(account.did, collection, rkey);
           return {
             uri,
             cid: "cid123",
@@ -255,7 +255,7 @@ describe("IndexCommitUseCase", () => {
         if (member) {
           registrationQuery.add(author.did);
         }
-        const uri = new AtUri(`at://${author.did}/${collection}/123`);
+        const uri = AtUri.make(author.did, collection, "123");
         const record = {
           uri,
           cid: "cid123",
@@ -300,7 +300,7 @@ describe("IndexCommitUseCase", () => {
 
       registrationQuery.add(account.did);
 
-      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
+      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
       const record = {
         uri,
         cid: "cid123",
@@ -344,7 +344,7 @@ describe("IndexCommitUseCase", () => {
 
       registrationQuery.add(account.did);
 
-      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
+      const uri = AtUri.make(account.did, "app.bsky.feed.post", "123");
       const record = {
         uri,
         cid: "cid123",

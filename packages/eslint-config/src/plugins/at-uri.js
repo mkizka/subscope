@@ -14,5 +14,9 @@ export default {
       "CallExpression[callee.property.name='startsWith'][arguments.0.quasis.0.value.raw='at://']",
       "URIの持ち主を文字列で比べず、new AtUri(uri).hostで比べてください。",
     ),
+    "no-template-at-uri": syntaxRule(
+      "TemplateLiteral[quasis.0.value.raw=/^at:\\/\\//][expressions.1]",
+      "URIを文字列で組み立てず、AtUri.make(did, collection, rkey)を使ってください。",
+    ),
   },
 };

@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { expect, test } from "@playwright/test";
 
 import { createRecord } from "../../helpers/pds";
@@ -28,7 +29,7 @@ test.describe("引用投稿", () => {
     await link.click();
 
     await expect(page).toHaveURL(
-      `/alice.test/post/${quoted.uri.split("/").pop()}`,
+      `/alice.test/post/${new AtUri(quoted.uri).rkey}`,
     );
     await expect(page.getByLabel("選んだ投稿")).toContainText(
       "quote-e1: 引用される投稿",
@@ -49,7 +50,7 @@ test.describe("引用一覧", () => {
       embed: { $type: "app.bsky.embed.record", record: quoted },
       createdAt: new Date().toISOString(),
     });
-    const rkey = quoted.uri.split("/").pop();
+    const rkey = new AtUri(quoted.uri).rkey;
 
     await page.goto("/");
     const link = page.getByRole("link", { name: "1件の引用" });
@@ -83,7 +84,7 @@ test.describe("引用一覧", () => {
       .getByRole("region", { name: "引用" })
       .getByRole("article");
     await expect(async () => {
-      await page.goto(`/alice.test/post/${quoted.uri.split("/").pop()}/quotes`);
+      await page.goto(`/alice.test/post/${new AtUri(quoted.uri).rkey}/quotes`);
       await expect(articles).toHaveCount(2, { timeout: 1000 });
     }).toPass();
 

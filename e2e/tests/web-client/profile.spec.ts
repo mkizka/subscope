@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { expect, test } from "@playwright/test";
 
 import {
@@ -222,7 +223,7 @@ test.describe("プロフィール", () => {
     await article.locator('a[href="/alice.test"]').first().click();
     await expect(page).toHaveURL("/alice.test");
 
-    await page.goto(`/alice.test/post/${uri.split("/").pop()}`);
+    await page.goto(`/alice.test/post/${new AtUri(uri).rkey}`);
     await page
       .getByRole("article", { name: "選んだ投稿" })
       .getByRole("link", { name: /@alice\.test/ })
