@@ -5,7 +5,6 @@ import {
   type SupportedCollection,
 } from "@repo/common/utils";
 
-import type { JobPriority, Origin } from "../dto/origin.js";
 import type { Record } from "../dto/record.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
@@ -20,10 +19,14 @@ import type { ListItemIndexer } from "./indexer/list-item-indexer.js";
 import type { PostIndexer } from "./indexer/post-indexer.js";
 import type { ProfileIndexer } from "./indexer/profile-indexer.js";
 import type { RepostIndexer } from "./indexer/repost-indexer.js";
-import type { StoragePolicyService } from "./storage-policy-service.js";
 
 type CollectionIndexerMap = {
   [key in SupportedCollection]: ICollectionIndexer;
+};
+
+const isValidRecord = (record: Record) => {
+  // Postgresには`\u0000`を含む文字列を保存できないため
+  return !JSON.stringify(record.json).includes("\\u0000");
 };
 
 export class IndexRecordService {
@@ -32,7 +35,6 @@ export class IndexRecordService {
   constructor(
     private readonly recordRepository: IRecordRepository,
     private readonly indexAccountService: IndexAccountService,
-    private readonly storagePolicyService: StoragePolicyService,
     postIndexer: PostIndexer,
     profileIndexer: ProfileIndexer,
     followIndexer: FollowIndexer,
@@ -66,28 +68,32 @@ export class IndexRecordService {
     return this.indexers[record.uri.collection];
   }
 
-  async index({
+  async shouldIndex({
     ctx,
     record,
-    origin,
-    priority,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    origin: Origin;
-    priority: JobPriority;
+  }): Promise<boolean> {
+    const indexer = this.indexerFor(record);
+    if (!isValidRecord(record)) {
+      return false;
+    }
+    return !indexer.shouldIndex || (await indexer.shouldIndex({ ctx, record }));
+  }
+
+  async upsert({
+    ctx,
+    record,
+    live,
+    depth,
+  }: {
+    ctx: AfterCommitContext;
+    record: Record;
+    live: boolean;
+    depth: number;
   }): Promise<void> {
     const indexer = this.indexerFor(record);
-    const shouldStore = await this.storagePolicyService.shouldStore({
-      ctx,
-      record,
-      origin,
-    });
-    if (!shouldStore) {
-      return;
-    }
-    const live = priority === "high";
-    const depth = origin.type === "pds" ? origin.hop : 0;
     await this.indexAccountService.upsert({
       ctx,
       did: record.uri.did,
