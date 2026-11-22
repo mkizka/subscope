@@ -104,12 +104,15 @@ export class PostIndexer implements ICollectionIndexer {
       if (
         !candidate ||
         candidate.recipientDid === post.accountDid ||
-        notifications.has(candidate.recipientDid) ||
-        !(await this.registrationQuery.isRegistered(
-          ctx,
-          candidate.recipientDid,
-        ))
+        notifications.has(candidate.recipientDid)
       ) {
+        continue;
+      }
+      const isRecipientRegistered = await this.registrationQuery.isRegistered(
+        ctx,
+        candidate.recipientDid,
+      );
+      if (!isRecipientRegistered) {
         continue;
       }
       notifications.set(candidate.recipientDid, {

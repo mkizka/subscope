@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 
-export function UntrackedNotice() {
+export function IncompleteNotice() {
   return (
     <div
       role="status"
@@ -11,7 +11,7 @@ export function UntrackedNotice() {
     >
       <Info className="size-4 shrink-0" />
       <span>
-        このアカウントのデータはサーバーに同期されていません。フォローすると同期を開始します。
+        このアカウントは一部のデータだけを保存しているため、投稿などが表示されないことがあります。
       </span>
     </div>
   );

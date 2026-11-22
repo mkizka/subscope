@@ -17,7 +17,8 @@ export const getLocalTimelineUseCaseFactory = ({
   timelineQuery: ITimelineQuery;
 }): IGetTimelineUseCase => ({
   async execute(did, cursor) {
-    if (!(await timelineQuery.isRegistered(did))) return null;
+    const isRegistered = await timelineQuery.isRegistered(did);
+    if (!isRegistered) return null;
     return timelineQuery.findLocalPosts(did, cursor);
   },
 });
@@ -28,7 +29,8 @@ export const getTimelineUseCaseFactory = ({
   timelineQuery: ITimelineQuery;
 }): IGetTimelineUseCase => ({
   async execute(did, cursor) {
-    if (!(await timelineQuery.isRegistered(did))) return null;
+    const isRegistered = await timelineQuery.isRegistered(did);
+    if (!isRegistered) return null;
     return timelineQuery.findPosts(did, cursor);
   },
 });

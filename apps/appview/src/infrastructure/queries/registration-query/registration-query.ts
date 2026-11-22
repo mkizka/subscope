@@ -1,6 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
 import { type DatabaseClient } from "@repo/common/interface";
-import { type BackfillStatus } from "@repo/db";
 import { schema } from "@repo/db";
 import {
   and,
@@ -15,7 +14,6 @@ import {
   lt,
   or,
 } from "drizzle-orm";
-import { union } from "drizzle-orm/pg-core";
 
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 import { Registration } from "../../../domain/models/registration.js";
@@ -159,35 +157,6 @@ export class RegistrationQuery implements IRegistrationQuery {
       )
       .where(eq(follows.subjectDid, subjectDid));
     return row?.total ?? 0;
-  }
-
-  async findTrackedBackfillStatuses(
-    dids: Did[],
-  ): Promise<{ did: Did; status: BackfillStatus }[]> {
-    if (dids.length === 0) {
-      return [];
-    }
-    const { accounts, follows, registrations } = schema;
-    const trackedDids = union(
-      this.db.select({ did: registrations.accountDid }).from(registrations),
-      this.db
-        .select({ did: follows.subjectDid })
-        .from(follows)
-        .innerJoin(
-          registrations,
-          eq(follows.accountDid, registrations.accountDid),
-        ),
-    );
-    const rows = await this.db
-      .select({ did: accounts.did, status: accounts.backfillStatus })
-      .from(accounts)
-      .where(
-        and(inArray(accounts.did, dids), inArray(accounts.did, trackedDids)),
-      );
-    return rows.map((row) => ({
-      did: asDid(row.did),
-      status: row.status ?? "inProgress",
-    }));
   }
 
   private matching(q: string) {

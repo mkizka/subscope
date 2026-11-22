@@ -43,7 +43,9 @@ export class CheckBackfillUseCase {
       return;
     }
     const tapState = await this.tapClient.getRepoState(did);
-    if (tapState === "error" && (await this.repoStatusFetcher.isDeleted(did))) {
+    const isDeleted =
+      tapState === "error" && (await this.repoStatusFetcher.isDeleted(did));
+    if (isDeleted) {
       await this.trackingService.stop(did);
       account.updateBackfillStatus("completed");
       await this.transactionManager.transaction((ctx) =>

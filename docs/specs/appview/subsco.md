@@ -65,7 +65,7 @@ qは大文字と小文字を区別しない。
 
 ## me.subsco.sync.registerAccount
 
-閲覧者をメンバーに登録し、Tapに追加する。認証が必要。
+閲覧者をメンバーに登録し、Tapに追加し直す。認証が必要。
 
 | ID                | 仕様                                                                           |
 | ----------------- | ------------------------------------------------------------------------------ |
@@ -74,7 +74,7 @@ qは大文字と小文字を区別しない。
 | registerAccount-4 | 登録済みのアカウントは登録せず、400とAlreadyRegisteredを返す                   |
 | registerAccount-5 | 管理者は招待コードなしで登録する                                               |
 | registerAccount-6 | 登録に使った招待コードを使用済みにする                                         |
-| registerAccount-7 | 登録したアカウントをTapに追加する                                              |
+| registerAccount-7 | 登録したアカウントを、Tapから外して追加し直す                                  |
 | registerAccount-8 | まだ保存していないアカウントも登録する                                         |
 | registerAccount-9 | 登録したアカウントの保存済みのフォロー先もTapに追加する                        |
 
@@ -92,15 +92,18 @@ qは大文字と小文字を区別しない。
 | unregisterAccount-2 | 登録を消し、使った招待コードは使用済みのまま残す                        |
 | unregisterAccount-3 | 登録していなければ400とNotRegisteredを返す                              |
 
-## me.subsco.sync.getBackfillStatuses
+## me.subsco.sync.getTrackingStatuses
 
-指定したアカウントのうち、追跡アカウントのバックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
+指定したアカウントのうち、追跡アカウントについて、メンバーかどうかとバックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
 
 | ID                    | 仕様                                                 |
 | --------------------- | ---------------------------------------------------- |
-| getBackfillStatuses-1 | 追跡アカウントの状態だけを返す                       |
-| getBackfillStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
-| getBackfillStatuses-3 | 認証がなくても状態を返す                             |
+| getTrackingStatuses-1 | 追跡アカウントだけを返す                             |
+| getTrackingStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
+| getTrackingStatuses-3 | 認証がなくても状態を返す                             |
+| getTrackingStatuses-4 | アカウントごとにメンバーかどうかを返す               |
+
+メンバー以外のアカウントは保存する範囲が狭いので、画面で表示が不十分だと示すのに使う。
 
 ## me.subsco.sync.getRegistrationStatus
 

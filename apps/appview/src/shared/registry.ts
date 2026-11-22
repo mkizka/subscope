@@ -42,6 +42,7 @@ import type { IRecordQuery } from "../application/interfaces/queries/record-quer
 import type { IRegistrationQuery } from "../application/interfaces/queries/registration-query.js";
 import type { IRepostQuery } from "../application/interfaces/queries/repost-query.js";
 import type { ITimelineQuery } from "../application/interfaces/queries/timeline-query.js";
+import type { ITrackingQuery } from "../application/interfaces/queries/tracking-query.js";
 import type { IRegistrationRepository } from "../application/interfaces/registration-repository.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
@@ -92,8 +93,8 @@ import { GetFollowedAccountsUseCase } from "../application/use-cases/server/get-
 import { GetOperatorUseCase } from "../application/use-cases/server/get-operator-use-case.js";
 import { GetServerMembersUseCase } from "../application/use-cases/server/get-server-members-use-case.js";
 import { GetSetupStatusUseCase } from "../application/use-cases/server/get-setup-status-use-case.js";
-import { GetBackfillStatusesUseCase } from "../application/use-cases/sync/get-backfill-statuses-use-case.js";
 import { GetRegistrationStatusUseCase } from "../application/use-cases/sync/get-registration-status-use-case.js";
+import { GetTrackingStatusesUseCase } from "../application/use-cases/sync/get-tracking-statuses-use-case.js";
 import { RegisterAccountUseCase } from "../application/use-cases/sync/register-account-use-case.js";
 import { UnregisterAccountUseCase } from "../application/use-cases/sync/unregister-account-use-case.js";
 import { EmbedViews } from "../application/views/embed-views.js";
@@ -126,6 +127,7 @@ import { RecordQuery } from "../infrastructure/queries/record-query/record-query
 import { RegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.js";
 import { RepostQuery } from "../infrastructure/queries/repost-query/repost-query.js";
 import { TimelineQuery } from "../infrastructure/queries/timeline-query/timeline-query.js";
+import { TrackingQuery } from "../infrastructure/queries/tracking-query/tracking-query.js";
 import { RegistrationRepository } from "../infrastructure/registration-repository/registration-repository.js";
 import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.js";
 import { AdminMiddleware } from "../presentation/middleware/admin-middleware.js";
@@ -178,8 +180,8 @@ import { GetLocalTimeline } from "../presentation/routes/me/subsco/server/getLoc
 import { GetOperator } from "../presentation/routes/me/subsco/server/getOperator.js";
 import { GetServerMembers } from "../presentation/routes/me/subsco/server/getServerMembers.js";
 import { GetSetupStatus } from "../presentation/routes/me/subsco/server/getSetupStatus.js";
-import { GetBackfillStatuses } from "../presentation/routes/me/subsco/sync/getBackfillStatuses.js";
 import { GetRegistrationStatus } from "../presentation/routes/me/subsco/sync/getRegistrationStatus.js";
+import { GetTrackingStatuses } from "../presentation/routes/me/subsco/sync/getTrackingStatuses.js";
 import { RegisterAccount } from "../presentation/routes/me/subsco/sync/registerAccount.js";
 import { UnregisterAccount } from "../presentation/routes/me/subsco/sync/unregisterAccount.js";
 import { wellKnownRouterFactory } from "../presentation/routes/well-known.js";
@@ -222,6 +224,7 @@ export const createAppRegistry = (env: Env) =>
     .service("inviteCodeQuery", ["db"], asClassArgs<IInviteCodeQuery>()(InviteCodeQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("registrationQuery", ["db"], asClassArgs<IRegistrationQuery>()(RegistrationQuery))
+    .service("trackingQuery", ["db"], asClassArgs<ITrackingQuery>()(TrackingQuery))
     .service("registrationRepository", ["db"], asClassArgs<IRegistrationRepository>()(RegistrationRepository))
     .service("tokenVerifier", ["didResolver", "env"], asClassArgs<ITokenVerifier>()(TokenVerifier))
     .service("assetUrlBuilder", ["env"], asClassArgs<IAssetUrlBuilder>()(AssetUrlBuilder))
@@ -283,7 +286,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getSetupStatusUseCase", ["accountQuery"], asClassArgs(GetSetupStatusUseCase))
     .service("getServerMemberFollowersUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetServerMemberFollowersUseCase))
     .service("getFollowedAccountsUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowedAccountsUseCase))
-    .service("getBackfillStatusesUseCase", ["registrationQuery"], asClassArgs(GetBackfillStatusesUseCase))
+    .service("getTrackingStatusesUseCase", ["trackingQuery"], asClassArgs(GetTrackingStatusesUseCase))
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
     .service("registerAccountUseCase", ["transactionManager", "accountRepository", "inviteCodeRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(RegisterAccountUseCase))
     .service("addMemberUseCase", ["atprotoHandleResolver", "didResolver", "transactionManager", "accountRepository", "validateRegistrationService", "createRegistrationService"], asClassArgs(AddMemberUseCase))
@@ -335,13 +338,13 @@ export const createAppRegistry = (env: Env) =>
     .service("getOperator", ["getOperatorUseCase"], asClassArgs(GetOperator))
     .service("getServerMemberFollowers", ["getServerMemberFollowersUseCase", "handleMiddleware"], asClassArgs(GetServerMemberFollowers))
     .service("getFollowedAccounts", ["getFollowedAccountsUseCase", "authVerifierMiddleware"], asClassArgs(GetFollowedAccounts))
-    .service("getBackfillStatuses", ["getBackfillStatusesUseCase"], asClassArgs(GetBackfillStatuses))
+    .service("getTrackingStatuses", ["getTrackingStatusesUseCase"], asClassArgs(GetTrackingStatuses))
     .service("getRegistrationStatus", ["getRegistrationStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetRegistrationStatus))
     .service("registerAccount", ["registerAccountUseCase", "authVerifierMiddleware"], asClassArgs(RegisterAccount))
     .service("unregisterAccount", ["unregisterAccountUseCase", "authVerifierMiddleware"], asClassArgs(UnregisterAccount))
     .service("removeMember", ["removeMemberUseCase", "adminMiddleware"], asClassArgs(RemoveMember))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getKnownFollowers", "getList", "getLists", "getListsWithMembership", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "removeMember", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "addMember", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getLikes", "getRepostedBy", "getQuotes", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getKnownFollowers", "getList", "getLists", "getListsWithMembership", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getTrackingStatuses", "registerAccount", "unregisterAccount", "removeMember", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "addMember", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getLikes", "getRepostedBy", "getQuotes", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["env"], healthRouterFactory)
     .service("wellKnownRouter", ["env"], wellKnownRouterFactory)
     // bootstrap
