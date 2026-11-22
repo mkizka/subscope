@@ -97,12 +97,11 @@
     "me.subsco.graph.getServerMemberFollowers",
     "me.subsco.server.getFollowedAccounts",
     "me.subsco.server.getLocalTimeline",
-    "me.subsco.server.getMemberStatus",
     "me.subsco.server.getOperator",
     "me.subsco.server.getServerMembers",
     "me.subsco.server.getSetupStatus",
-    "me.subsco.sync.getBackfillStatuses",
     "me.subsco.sync.getRegistrationStatus",
+    "me.subsco.sync.getTrackingStatuses",
     "me.subsco.sync.registerAccount",
     "me.subsco.sync.unregisterAccount"
   ],
@@ -417,7 +416,7 @@
     },
     "me.subsco.authFull": {
       "uri": "file://./lexicons/me/subsco/authFull.json",
-      "cid": "bafyreie2jewrifycdg5si3p5oatiqjsdp7kunxsw3omsqt6wnqe7tnilzu"
+      "cid": "bafyreid3cxwzawbedri4olpewwj3iv7jg53stjplmaxuucuuqcvwtzbgwy"
     },
     "me.subsco.graph.getServerMemberFollowers": {
       "uri": "file://./lexicons/me/subsco/graph/getServerMemberFollowers.json",
@@ -431,10 +430,6 @@
       "uri": "file://./lexicons/me/subsco/server/getLocalTimeline.json",
       "cid": "bafyreibdcgs5b5d4dze6bir5wiz53k75achrahrikrcbichvmerh5eyluy"
     },
-    "me.subsco.server.getMemberStatus": {
-      "uri": "file://./lexicons/me/subsco/server/getMemberStatus.json",
-      "cid": "bafyreidkhps3d4be666ojmr32ll323u5yltyh6oezddm5iqodlmlb55pyi"
-    },
     "me.subsco.server.getOperator": {
       "uri": "file://./lexicons/me/subsco/server/getOperator.json",
       "cid": "bafyreiekdeugnm752ma577fk4xe7b66zrs5jd4wymsw2fa2zqiprulxcha"
@@ -447,13 +442,13 @@
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
       "cid": "bafyreiaml7lvp3tih3gcbfaxmpuc4eelqgpxy23ld7gzrejeqtu5ytqb2q"
     },
-    "me.subsco.sync.getBackfillStatuses": {
-      "uri": "file://./lexicons/me/subsco/sync/getBackfillStatuses.json",
-      "cid": "bafyreigsuu272wusyxpsw24lkmudsdjp2rionlf3utat6gkxbtkbv3ft6y"
-    },
     "me.subsco.sync.getRegistrationStatus": {
       "uri": "file://./lexicons/me/subsco/sync/getRegistrationStatus.json",
       "cid": "bafyreifevmts4z4kehmol32mw4fxciyrvlr2do2o3kryiixyxyhibaeire"
+    },
+    "me.subsco.sync.getTrackingStatuses": {
+      "uri": "file://./lexicons/me/subsco/sync/getTrackingStatuses.json",
+      "cid": "bafyreic4qroizikzuo5qnskbm75jpqmwpikow6tc2szxkaf5qi3apgfozq"
     },
     "me.subsco.sync.registerAccount": {
       "uri": "file://./lexicons/me/subsco/sync/registerAccount.json",

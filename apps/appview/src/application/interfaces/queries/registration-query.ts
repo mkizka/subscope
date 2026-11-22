@@ -23,7 +23,9 @@ export interface IRegistrationQuery {
     cursor?: string;
   }) => Promise<{ did: Did; sortAt: Date }[]>;
   countRegisteredFollowers: (subjectDid: Did) => Promise<number>;
-  findTrackedBackfillStatuses: (
+  findTrackingStatuses: (
     dids: Did[],
-  ) => Promise<{ did: Did; status: BackfillStatus }[]>;
+  ) => Promise<
+    { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[]
+  >;
 }

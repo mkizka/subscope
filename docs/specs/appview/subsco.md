@@ -50,17 +50,6 @@ qは大文字と小文字を区別しない。
 | getOperator-1 | 管理者のうち最初に登録したメンバー1人を返す |
 | getOperator-2 | 管理者がいなければoperatorを含めない        |
 
-## me.subsco.server.getMemberStatus
-
-指定したアカウントがメンバーかどうかを返す。認証は不要。
-
-| ID                | 仕様                                    |
-| ----------------- | --------------------------------------- |
-| getMemberStatus-1 | メンバーならisMemberをtrueにする        |
-| getMemberStatus-2 | メンバーでなければisMemberをfalseにする |
-
-メンバー以外のアカウントは保存する範囲が狭いので、画面で表示が不十分だと示すのに使う。
-
 ## me.subsco.server.getFollowedAccounts
 
 メンバーの1人以上にフォローされているアカウント（メンバーも含む）を、フォローしているメンバーの数と総数とともに返す。認証が必要。
@@ -102,15 +91,18 @@ qは大文字と小文字を区別しない。
 | unregisterAccount-2 | 登録を消し、使った招待コードは使用済みのまま残す                        |
 | unregisterAccount-3 | 登録していなければ400とNotRegisteredを返す                              |
 
-## me.subsco.sync.getBackfillStatuses
+## me.subsco.sync.getTrackingStatuses
 
-指定したアカウントのうち、追跡アカウントのバックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
+指定したアカウントのうち、追跡アカウントについて、メンバーかどうかとバックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
 
 | ID                    | 仕様                                                 |
 | --------------------- | ---------------------------------------------------- |
-| getBackfillStatuses-1 | 追跡アカウントの状態だけを返す                       |
-| getBackfillStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
-| getBackfillStatuses-3 | 認証がなくても状態を返す                             |
+| getTrackingStatuses-1 | 追跡アカウントだけを返す                             |
+| getTrackingStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
+| getTrackingStatuses-3 | 認証がなくても状態を返す                             |
+| getTrackingStatuses-4 | アカウントごとにメンバーかどうかを返す               |
+
+メンバー以外のアカウントは保存する範囲が狭いので、画面で表示が不十分だと示すのに使う。
 
 ## me.subsco.sync.getRegistrationStatus
 
