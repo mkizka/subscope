@@ -178,7 +178,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("listItemIndexer", ["listItemRepository", "indexAccountService", "registrationQuery"], asClassArgs(ListItemIndexer))
     .service("gateIndexer", asClassArgs(GateIndexer))
     .service("linkIndexer", asClassArgs(LinkIndexer))
-    .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(LikeIndexer))
+    .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationService", "postQuery", "trackingRepository"], asClassArgs(LikeIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "registrationQuery", "notificationService"], asClassArgs(RepostIndexer))
     .service("pastRecordFilterService", ["registrationQuery", "trackingRepository"], asClassArgs(PastRecordFilterService))
     .service("indexRecordService", ["recordRepository", "indexAccountService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
