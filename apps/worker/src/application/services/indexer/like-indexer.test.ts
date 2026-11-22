@@ -50,7 +50,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -106,7 +106,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       });
 
       // assert
@@ -118,11 +118,11 @@ describe("LikeIndexer", () => {
     test.each([
       {
         name: "バックフィルで受け取ったレコード",
-        origin: { via: "tap", live: false } as const,
+        origin: { hop: 0, live: false },
       },
       {
         name: "取得しに行ったレコード",
-        origin: { via: "pds", hop: 1, live: true } as const,
+        origin: { hop: 1, live: true },
       },
     ])(
       "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルや取得しに行ったレコードでは作らない ($name)",
@@ -177,7 +177,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // act

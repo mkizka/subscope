@@ -18,7 +18,7 @@ export const indexCommitCommandFactory = (
   if (event.action === "delete") {
     return {
       commit: { operation: event.action, uri, rev: event.rev },
-      origin: { via: "tap", live: event.live },
+      origin: { hop: 0, live: event.live },
     };
   }
   if (event.record === undefined || event.cid === undefined) {
@@ -36,7 +36,7 @@ export const indexCommitCommandFactory = (
         indexedAt: new Date(),
       },
     },
-    origin: { via: "tap", live: event.live },
+    origin: { hop: 0, live: event.live },
   };
 };
 

@@ -46,7 +46,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -77,7 +77,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       });
 
       // assert
@@ -109,7 +109,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // act

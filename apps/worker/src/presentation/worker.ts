@@ -83,7 +83,7 @@ export class SyncWorker {
         async (job) => {
           await fetchRecordUseCase.execute({
             uri: job.data.uri,
-            origin: { via: "pds", hop: job.data.hop, live: job.data.live },
+            origin: { hop: job.data.hop, live: job.data.live },
             jobLogger: createJobLogger(job),
           });
         },

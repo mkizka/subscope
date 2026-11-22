@@ -1,13 +1,11 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-export type Origin =
-  { via: "tap"; live: boolean } | { via: "pds"; hop: number; live: boolean };
-
-export type PdsOrigin = Extract<Origin, { via: "pds" }>;
-
 export interface IJobScheduler {
-  scheduleFetchRecord: (uri: AtUri, origin: PdsOrigin) => Promise<void>;
+  scheduleFetchRecord: (
+    uri: AtUri,
+    options: { hop: number; live: boolean },
+  ) => Promise<void>;
   scheduleResolveDid: (did: Did, options: { live: boolean }) => Promise<void>;
   scheduleSyncTapRepo: (
     did: Did,

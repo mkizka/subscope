@@ -56,7 +56,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -79,7 +79,8 @@ describe("RepostIndexer", () => {
       expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
         {
           uri: new AtUri(subjectUri),
-          origin: { via: "pds", hop: 1, live: false },
+          hop: 1,
+          live: false,
         },
       ]);
     });
@@ -103,7 +104,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       });
 
       // assert

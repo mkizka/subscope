@@ -1,10 +1,7 @@
-import type {
-  AfterCommitContext,
-  IJobScheduler,
-  Origin,
-} from "@repo/common/interface";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
 import { parseFollow } from "../../dto/follow.js";
+import type { Origin } from "../../dto/origin.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -51,7 +48,7 @@ export class FollowIndexer implements ICollectionIndexer {
     }
 
     const shouldNotify =
-      origin.via === "tap" &&
+      origin.hop === 0 &&
       origin.live &&
       follow.subjectDid !== follow.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, follow.subjectDid));

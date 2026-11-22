@@ -1,6 +1,6 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Origin } from "@repo/common/interface";
 
+import type { Origin } from "../../dto/origin.js";
 import type { Record } from "../../dto/record.js";
 
 export type IndexCommitCommand = {

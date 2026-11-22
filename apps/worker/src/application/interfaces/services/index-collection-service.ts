@@ -1,5 +1,6 @@
-import type { AfterCommitContext, Origin } from "@repo/common/interface";
+import type { AfterCommitContext } from "@repo/common/interface";
 
+import type { Origin } from "../../dto/origin.js";
 import type { Record } from "../../dto/record.js";
 
 export interface ICollectionIndexer {

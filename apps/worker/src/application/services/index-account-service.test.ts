@@ -35,7 +35,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -49,7 +49,8 @@ describe("IndexAccountService", () => {
       expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
         expect.objectContaining({
           uri: profileUri,
-          origin: { via: "pds", hop: 1, live: false },
+          hop: 1,
+          live: false,
         }),
       );
     });
@@ -70,7 +71,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -96,7 +97,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: existingHandle,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -123,7 +124,7 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -142,7 +143,7 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: newDid,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -173,7 +174,7 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: existingDidNoHandle,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -207,7 +208,7 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: existingDid,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert

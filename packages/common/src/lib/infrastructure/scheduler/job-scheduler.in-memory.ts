@@ -1,14 +1,12 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type {
-  IJobScheduler,
-  PdsOrigin,
-} from "../../interface/job-scheduler.js";
+import type { IJobScheduler } from "../../interface/job-scheduler.js";
 
 interface ScheduledFetchRecord {
   uri: AtUri;
-  origin: PdsOrigin;
+  hop: number;
+  live: boolean;
 }
 
 interface ScheduledResolveDid {
@@ -40,8 +38,11 @@ export class InMemoryJobScheduler implements IJobScheduler {
   private aggregatePostStatsUris: AtUri[] = [];
   private aggregateAccountStatsDids: Did[] = [];
 
-  async scheduleFetchRecord(uri: AtUri, origin: PdsOrigin): Promise<void> {
-    this.fetchRecordJobs.push({ uri, origin });
+  async scheduleFetchRecord(
+    uri: AtUri,
+    { hop, live }: { hop: number; live: boolean },
+  ): Promise<void> {
+    this.fetchRecordJobs.push({ uri, hop, live });
   }
 
   async scheduleResolveDid(

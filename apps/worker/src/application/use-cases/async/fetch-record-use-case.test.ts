@@ -54,7 +54,7 @@ describe("FetchRecordUseCase", () => {
   const execute = () =>
     fetchRecordUseCase.execute({
       uri,
-      origin: { via: "pds", hop: 1, live: false },
+      origin: { hop: 1, live: false },
       jobLogger,
     });
 

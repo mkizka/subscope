@@ -1,6 +1,7 @@
-import type { AfterCommitContext, Origin } from "@repo/common/interface";
+import type { AfterCommitContext } from "@repo/common/interface";
 
 import { parseListItem } from "../../dto/list-item.js";
+import type { Origin } from "../../dto/origin.js";
 import type { Record } from "../../dto/record.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IListItemRepository } from "../../interfaces/repositories/list-item-repository.js";

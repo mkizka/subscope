@@ -20,7 +20,7 @@ describe("JobScheduler", () => {
       const did = `did:plc:${live}` as const;
       await jobScheduler.scheduleFetchRecord(
         AtUri.make(did, "app.bsky.actor.profile", "self"),
-        { via: "pds", hop: 1, live },
+        { hop: 1, live },
       );
       await jobScheduler.scheduleResolveDid(did, { live });
     }
@@ -40,11 +40,7 @@ describe("JobScheduler", () => {
       const uri = AtUri.make("did:plc:test", "app.bsky.actor.profile", "self");
 
       // act
-      await jobScheduler.scheduleFetchRecord(uri, {
-        via: "pds",
-        hop: 1,
-        live: false,
-      });
+      await jobScheduler.scheduleFetchRecord(uri, { hop: 1, live: false });
 
       // assert
       const jobs = jobQueue.getJobs();

@@ -3,13 +3,13 @@ import { AtUri } from "@atproto/syntax";
 import {
   type AfterCommitContext,
   type IJobScheduler,
-  type Origin,
   type TransactionContext,
 } from "@repo/common/interface";
 import type { Handle } from "@repo/common/utils";
 
 import type { AccountStatus } from "../../domain/account.js";
 import { Account } from "../../domain/account.js";
+import type { Origin } from "../dto/origin.js";
 import type { IProfileQuery } from "../interfaces/queries/profile-query.js";
 import type { IAccountRepository } from "../interfaces/repositories/account-repository.js";
 
@@ -71,7 +71,6 @@ export class IndexAccountService {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleFetchRecord(profileUri, {
-          via: "pds",
           hop: 1,
           live: origin.live,
         }),

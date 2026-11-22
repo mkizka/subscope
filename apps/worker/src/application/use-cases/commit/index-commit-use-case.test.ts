@@ -59,7 +59,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = {
         commit,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       };
 
       // act
@@ -93,7 +93,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = {
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       };
 
       // act
@@ -131,7 +131,7 @@ describe("IndexCommitUseCase", () => {
             rev: "3aaaaaaaaaaaa",
             record,
           },
-          origin: { via: "tap", live: true },
+          origin: { hop: 0, live: true },
         };
         return { uri, command };
       };
@@ -188,7 +188,7 @@ describe("IndexCommitUseCase", () => {
         // act
         await indexCommitUseCase.execute({
           commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-          origin: { via: "tap", live: true },
+          origin: { hop: 0, live: true },
         });
 
         // assert
@@ -231,7 +231,7 @@ describe("IndexCommitUseCase", () => {
       };
       await indexCommitUseCase.execute({
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        origin: { via: "tap", live },
+        origin: { hop: 0, live },
       });
       return jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString());
     };
@@ -297,7 +297,7 @@ describe("IndexCommitUseCase", () => {
         // act
         await indexCommitUseCase.execute({
           commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-          origin: { via: "tap", live: true },
+          origin: { hop: 0, live: true },
         });
 
         // assert
@@ -344,13 +344,13 @@ describe("IndexCommitUseCase", () => {
           rev: "3aaaaaaaaaaaa",
           record,
         },
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       };
       await indexCommitUseCase.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
         commit: { operation: "delete" as const, uri, rev: "3bbbbbbbbbbbb" },
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       };
 
       // act
@@ -388,7 +388,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = {
         commit,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       };
 
       // act
@@ -418,7 +418,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = {
         commit,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       };
 
       // act & assert

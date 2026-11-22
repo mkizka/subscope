@@ -48,7 +48,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -95,14 +95,15 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
       expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
         {
           uri: new AtUri(embedUri),
-          origin: { via: "pds", hop: 1, live: false },
+          hop: 1,
+          live: false,
         },
       ]);
     });
@@ -124,7 +125,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -148,7 +149,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
 
       // assert
@@ -190,7 +191,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       });
 
       // assert
@@ -232,7 +233,7 @@ describe("PostIndexer", () => {
         await postIndexer.upsert({
           ctx,
           record,
-          origin: { via: "tap", live: true },
+          origin: { hop: 0, live: true },
         });
       }
 
@@ -284,7 +285,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: true },
+        origin: { hop: 0, live: true },
       });
 
       // assert
@@ -316,7 +317,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -359,7 +360,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -399,7 +400,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -438,7 +439,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        origin: { via: "tap", live: false },
+        origin: { hop: 0, live: false },
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 

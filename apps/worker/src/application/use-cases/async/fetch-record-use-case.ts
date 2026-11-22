@@ -1,11 +1,9 @@
 import { AtUri } from "@atproto/syntax";
-import {
-  type ITransactionManager,
-  type PdsOrigin,
-} from "@repo/common/interface";
+import { type ITransactionManager } from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
 import type { JobLogger } from "../../../shared/job.js";
+import type { Origin } from "../../dto/origin.js";
 import {
   type IRecordFetcher,
   RecordFetchError,
@@ -27,7 +25,7 @@ export class FetchRecordUseCase {
     jobLogger,
   }: {
     uri: string;
-    origin: PdsOrigin;
+    origin: Origin;
     jobLogger: JobLogger;
   }): Promise<void> {
     // 例:
@@ -55,7 +53,7 @@ export class FetchRecordUseCase {
     }
   }
 
-  private async doFetchRecord(uri: string, origin: PdsOrigin): Promise<void> {
+  private async doFetchRecord(uri: string, origin: Origin): Promise<void> {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
     await this.transactionManager.transaction(async (ctx) => {
