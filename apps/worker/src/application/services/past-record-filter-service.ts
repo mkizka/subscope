@@ -1,4 +1,3 @@
-import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
@@ -11,8 +10,6 @@ const LIMITED_COLLECTIONS = [
   "app.bsky.feed.repost",
   "app.bsky.feed.like",
 ] as const;
-
-const PAST_RECORD_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export class PastRecordFilterService {
   constructor(
@@ -38,24 +35,8 @@ export class PastRecordFilterService {
     if (isRegistered) {
       return true;
     }
-    const { createdAt } = validateRecord(collection, record);
-    return this.isWithinWindow({ ctx, did, createdAt: new Date(createdAt) });
-  }
-
-  async isWithinWindow({
-    ctx,
-    did,
-    createdAt,
-  }: {
-    ctx: TransactionContext;
-    did: Did;
-    createdAt: Date;
-  }) {
     const tracking = await this.trackingRepository.find({ ctx, did });
-    return (
-      !!tracking &&
-      createdAt.getTime() >=
-        tracking.trackedAt.getTime() - PAST_RECORD_WINDOW_MS
-    );
+    const { createdAt } = validateRecord(collection, record);
+    return !!tracking && tracking.covers(new Date(createdAt));
   }
 }

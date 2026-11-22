@@ -8,9 +8,9 @@ import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
+import type { ITrackingRepository } from "../../interfaces/repositories/tracking-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
-import type { PastRecordFilterService } from "../past-record-filter-service.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
@@ -19,7 +19,7 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationService: NotificationService,
     private readonly postQuery: IPostQuery,
-    private readonly pastRecordFilterService: PastRecordFilterService,
+    private readonly trackingRepository: ITrackingRepository,
   ) {}
 
   async shouldIndex({
@@ -121,11 +121,11 @@ export class LikeIndexer implements ICollectionIndexer {
     if (live) {
       return true;
     }
-    return this.pastRecordFilterService.isWithinWindow({
+    const tracking = await this.trackingRepository.find({
       ctx,
       did: asDid(like.accountDid),
-      createdAt: like.createdAt,
     });
+    return !!tracking && tracking.covers(like.createdAt);
   }
 
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {

@@ -4,6 +4,7 @@ import type {
   ITransactionManager,
 } from "@repo/common/interface";
 
+import { Tracking } from "../../domain/tracking.js";
 import type { ILabelFetcher } from "../interfaces/external/label-fetcher.js";
 import type { ITapClient } from "../interfaces/external/tap-client.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
@@ -25,7 +26,7 @@ export class TrackingService {
       if (!tracking) {
         await this.trackingRepository.save({
           ctx,
-          tracking: { did, trackedAt: new Date() },
+          tracking: Tracking.start(did),
         });
       }
     });

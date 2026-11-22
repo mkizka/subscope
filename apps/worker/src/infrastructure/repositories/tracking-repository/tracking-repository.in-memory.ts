@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Tracking } from "../../../application/dto/tracking.js";
 import type { ITrackingRepository } from "../../../application/interfaces/repositories/tracking-repository.js";
+import type { Tracking } from "../../../domain/tracking.js";
 
 export class InMemoryTrackingRepository implements ITrackingRepository {
   private trackings: Map<Did, Tracking> = new Map();

@@ -3,6 +3,7 @@ import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { Tracking } from "../../../domain/tracking.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
@@ -212,7 +213,10 @@ describe("IndexCommitUseCase", () => {
     }) => {
       const liker = accountFactory();
       registrationQuery.add(liker.did);
-      await trackingRepo.save({ ctx, tracking: { did: liker.did, trackedAt } });
+      await trackingRepo.save({
+        ctx,
+        tracking: Tracking.reconstruct({ did: liker.did, trackedAt }),
+      });
       const uri = new AtUri(`at://${liker.did}/app.bsky.feed.like/123`);
       const record = {
         uri,
