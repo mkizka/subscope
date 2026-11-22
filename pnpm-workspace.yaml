@@ -17,3 +17,6 @@ allowBuilds:
 patchedDependencies:
   "@atproto/oauth-scopes": patches/@atproto__oauth-scopes.patch
   "@factory-js/factory": patches/@factory-js__factory.patch
+overrides:
+  "bull-board-react-router>@bull-board/api": 9.13.2
+  "bull-board-react-router>@bull-board/ui": 9.13.2

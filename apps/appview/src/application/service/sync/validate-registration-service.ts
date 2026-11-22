@@ -11,13 +11,6 @@ export class AlreadyRegisteredError extends Error {
   }
 }
 
-export class BannedError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "Banned";
-  }
-}
-
 export class ValidateRegistrationService {
   constructor(
     private readonly accountRepository: IAccountRepository,
@@ -31,10 +24,6 @@ export class ValidateRegistrationService {
       throw new AlreadyRegisteredError("Already registered with this server");
     }
 
-    const existingAccount = await this.accountRepository.find(accountDid);
-    if (existingAccount?.isBanned) {
-      throw new BannedError("Banned from this server");
-    }
-    return existingAccount;
+    return await this.accountRepository.find(accountDid);
   }
 }

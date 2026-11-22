@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
@@ -32,7 +31,7 @@ export class GateIndexer implements ICollectionIndexer {
     );
     const postUri = new AtUri(gate.post);
     if (
-      postUri.host !== asDid(record.uri.host) ||
+      postUri.host !== record.uri.did ||
       postUri.collection !== "app.bsky.feed.post" ||
       postUri.rkey !== record.uri.rkey
     ) {

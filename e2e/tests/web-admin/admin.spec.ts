@@ -144,7 +144,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("adminAccounts-e2: 管理者でないメンバーは、確認のうえ「サーバー登録を停止する」で登録を解除でき、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("adminAccounts-e2: 管理者でないメンバーは、確認のうえ「メンバーから外す」で登録を解除でき、そのアカウントは招待コードで再登録できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -164,61 +164,14 @@ test.describe("メンバー", () => {
       .filter({ has: page.getByTitle(daveDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    await row.getByRole("button", { name: "サーバー登録を停止する" }).click();
+    await row.getByRole("button", { name: "メンバーから外す" }).click();
     await page
       .getByRole("dialog")
-      .getByRole("button", { name: "停止する" })
+      .getByRole("button", { name: "外す" })
       .click();
 
     await expect(row).toHaveCount(0);
-    await expect(
-      registerAccount("dave.test", await createInviteCode()),
-    ).rejects.toThrow("Banned");
-  });
-
-  const banAccount = async (page: Page, handle: string) => {
-    const response = await page.request.post("/admin/api/invite-codes");
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const { code } = (await response.json()) as { code: string };
-    await registerAccount(handle, code);
-    const did = await resolveHandle(handle);
-    await page.request.delete("/admin/api/registered-accounts", {
-      data: { did },
-    });
-    return did;
-  };
-
-  test("adminAccounts-e4: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const aliceDid = await resolveHandle("alice.test");
-
-    await page.goto("/admin/registered-accounts");
-    await page.getByRole("tab", { name: "停止中" }).click();
-
-    await expect(page.getByRole("tab", { name: "停止中" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    await expect(page.getByTitle(aliceDid)).toHaveCount(0);
-
-    await page.getByRole("tab", { name: "メンバー" }).click();
-
-    await expect(page.getByTitle(aliceDid)).toBeVisible();
-  });
-
-  test("adminAccounts-e6: 「メンバー」「停止中」のタブを切り替えても、URLは変えない", async ({
-    page,
-  }) => {
-    await page.goto("/admin/registered-accounts");
-    await page.getByRole("tab", { name: "停止中" }).click();
-
-    await expect(page.getByRole("tab", { name: "停止中" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    await expect(page).toHaveURL("/admin/registered-accounts");
+    await registerAccount("dave.test", await createInviteCode());
   });
 
   test("adminAccounts-e7: 追加ダイアログで入力したアカウントを、本人のログインなしでメンバーにして一覧の先頭に出す", async ({
@@ -238,7 +191,7 @@ test.describe("メンバー", () => {
     ).toBeVisible();
   });
 
-  test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー・登録停止中）を出す", async ({
+  test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー）を出す", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
@@ -249,32 +202,6 @@ test.describe("メンバー", () => {
 
     await expect(dialog.getByRole("alert")).toHaveText("すでにメンバーです");
     await expect(dialog).toBeVisible();
-  });
-
-  test("adminAccounts-e5: 停止中のアカウントは、確認のうえ「登録を再開する」で一覧から消え、招待コードで再登録できるようになる", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const frankDid = await banAccount(page, "frank.test");
-
-    await page.goto("/admin/registered-accounts");
-    await page.getByRole("tab", { name: "停止中" }).click();
-
-    const row = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ has: page.getByTitle(frankDid) });
-    await row.getByRole("button", { name: "登録を再開する" }).click();
-    await page
-      .getByRole("dialog")
-      .getByRole("button", { name: "再開する" })
-      .click();
-
-    await expect(row).toHaveCount(0);
-    const response = await page.request.post("/admin/api/invite-codes");
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const { code } = (await response.json()) as { code: string };
-    await registerAccount("frank.test", code);
   });
 });
 

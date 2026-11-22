@@ -1,34 +1,34 @@
 import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import banAccount from "@repo/client/me/subsco/admin/banAccount";
+import removeMember from "@repo/client/me/subsco/admin/removeMember";
 
 import { NotRegisteredError } from "../../../../../application/service/sync/unregister-account-service.js";
 import {
-  type BanAccountUseCase,
-  CannotBanAdminError,
-} from "../../../../../application/use-cases/admin/ban-account-use-case.js";
+  CannotRemoveAdminError,
+  type RemoveMemberUseCase,
+} from "../../../../../application/use-cases/admin/remove-member-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";
 
-export class BanAccount {
+export class RemoveMember {
   constructor(
-    private banAccountUseCase: BanAccountUseCase,
+    private removeMemberUseCase: RemoveMemberUseCase,
     private adminMiddleware: AdminMiddleware,
   ) {}
-  static inject = ["banAccountUseCase", "adminMiddleware"] as const;
+  static inject = ["removeMemberUseCase", "adminMiddleware"] as const;
 
   handle(router: LexRouter) {
-    router.add(banAccount, {
+    router.add(removeMember, {
       auth: (ctx) => this.adminMiddleware.requireAdmin(ctx),
       handler: async ({ input }) => {
         try {
-          await this.banAccountUseCase.execute({
+          await this.removeMemberUseCase.execute({
             did: asDid(input.body.did),
           });
           return {};
         } catch (error) {
           if (
             error instanceof NotRegisteredError ||
-            error instanceof CannotBanAdminError
+            error instanceof CannotRemoveAdminError
           ) {
             throw new LexServerError(400, {
               error: error.name,

@@ -17,7 +17,6 @@ export class AccountRepository implements IAccountRepository {
     const data = {
       handle: account.handle,
       isAdmin: account.isAdmin,
-      isBanned: account.isBanned,
     } satisfies AccountInsert;
     await ctx.db
       .insert(schema.accounts)
@@ -38,7 +37,6 @@ export class AccountRepository implements IAccountRepository {
         did: schema.accounts.did,
         handle: schema.accounts.handle,
         isAdmin: schema.accounts.isAdmin,
-        isBanned: schema.accounts.isBanned,
         backfillStatus: schema.accounts.backfillStatus,
         indexedAt: schema.accounts.indexedAt,
       })
@@ -54,7 +52,6 @@ export class AccountRepository implements IAccountRepository {
       did: asDid(row.did),
       handle: row.handle,
       isAdmin: row.isAdmin,
-      isBanned: row.isBanned,
       backfillStatus: row.backfillStatus,
       indexedAt: row.indexedAt,
     });

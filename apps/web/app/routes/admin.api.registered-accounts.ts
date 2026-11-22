@@ -31,8 +31,6 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 const ADD_MEMBER_ERRORS = {
   accountNotFound: "アカウントが見つかりません",
   alreadyRegistered: "すでにメンバーです",
-  banned:
-    "登録停止中のアカウントです。「停止中」タブで登録を再開してから追加してください",
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
@@ -59,7 +57,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       .object({ did: z.custom<DidString>(isValidDid) })
       .parse(await request.json());
     const useCase =
-      request.method === "DELETE" ? di.banAccountUseCase : di.grantAdminUseCase;
+      request.method === "DELETE"
+        ? di.removeMemberUseCase
+        : di.grantAdminUseCase;
     await useCase(did, target);
     return data({ success: true });
   } catch (e) {

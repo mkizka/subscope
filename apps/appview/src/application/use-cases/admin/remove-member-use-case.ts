@@ -7,14 +7,14 @@ import {
   type UnregisterAccountService,
 } from "../../service/sync/unregister-account-service.js";
 
-export class CannotBanAdminError extends Error {
+export class CannotRemoveAdminError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "CannotBanAdmin";
+    this.name = "CannotRemoveAdmin";
   }
 }
 
-export class BanAccountUseCase {
+export class RemoveMemberUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly accountRepository: IAccountRepository,
@@ -32,16 +32,14 @@ export class BanAccountUseCase {
       throw new NotRegisteredError("Not registered with this server");
     }
     if (account.isAdmin) {
-      throw new CannotBanAdminError("Cannot ban an admin");
+      throw new CannotRemoveAdminError("Cannot remove an admin");
     }
 
-    account.ban();
     await this.transactionManager.transaction(async (ctx) => {
       await this.unregisterAccountService.unregister({
         ctx,
         accountDid: params.did,
       });
-      await this.accountRepository.save({ ctx, account });
     });
   }
 }
