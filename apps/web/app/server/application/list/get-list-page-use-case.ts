@@ -36,7 +36,7 @@ export const getListPageUseCaseFactory = ({
       list,
       members: members.map((member) => ({
         ...member,
-        backfillStatus: statuses[member.did],
+        backfillStatus: statuses[member.did]?.status,
       })),
       posts,
       isSelf: list.creatorDid === did,

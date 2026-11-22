@@ -16,6 +16,7 @@ interface ScheduledResolveDid {
 
 interface ScheduledSyncTapRepo {
   did: Did;
+  refetch?: boolean;
 }
 
 interface ScheduledCheckBackfill {
@@ -51,8 +52,11 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.resolveDidJobs.push({ did, live });
   }
 
-  async scheduleSyncTapRepo(did: Did): Promise<void> {
-    this.syncTapRepoJobs.push({ did });
+  async scheduleSyncTapRepo(
+    did: Did,
+    options?: { refetch: boolean },
+  ): Promise<void> {
+    this.syncTapRepoJobs.push({ did, ...options });
   }
 
   async scheduleCheckBackfill(did: Did, attempt: number): Promise<void> {

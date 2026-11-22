@@ -32,7 +32,7 @@ export const searchUseCaseFactory = ({
     return {
       accounts: accounts.map((account) => ({
         ...account,
-        backfillStatus: statuses[account.did],
+        backfillStatus: statuses[account.did]?.status,
       })),
       posts: [],
     };

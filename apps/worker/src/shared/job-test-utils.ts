@@ -45,8 +45,8 @@ export const setupJobTest = async () => {
   const runSyncTapRepoJobs = async () => {
     const jobs = [...services.jobScheduler.getSyncTapRepoJobs()];
     services.jobScheduler.clear();
-    for (const { did } of jobs) {
-      await services.syncTapRepoUseCase.execute(did);
+    for (const job of jobs) {
+      await services.syncTapRepoUseCase.execute(job);
     }
   };
   const runCheckBackfillJobs = async () => {
@@ -79,7 +79,7 @@ export const setupJobTest = async () => {
     scheduleBackfillChecks: () =>
       services.scheduleBackfillChecksUseCase.execute(),
     jobScheduler: services.jobScheduler,
-    syncTapRepo: (did: Did) => services.syncTapRepoUseCase.execute(did),
+    syncTapRepo: (did: Did) => services.syncTapRepoUseCase.execute({ did }),
     checkBackfill: (did: Did, attempt = 0) =>
       services.checkBackfillUseCase.execute({ did, attempt }),
     indexLabel: (label: LabelData) => services.indexLabelUseCase.execute(label),

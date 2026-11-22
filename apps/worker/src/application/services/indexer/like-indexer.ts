@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
-import { parseLike } from "../../dto/like.js";
+import { type Like, parseLike } from "../../dto/like.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
@@ -80,21 +80,52 @@ export class LikeIndexer implements ICollectionIndexer {
     }
 
     const subjectUri = new AtUri(like.subjectUri);
-    if (
-      subjectUri.collection === "app.bsky.feed.post" &&
-      (await this.registrationQuery.isRegistered(ctx, like.accountDid)) &&
-      !(await this.postQuery.exists(ctx, subjectUri)) &&
-      (live ||
-        (await this.pastRecordFilterService.isWithinWindow({
-          ctx,
-          did: asDid(like.accountDid),
-          createdAt: like.createdAt,
-        })))
-    ) {
+    const shouldFetch = await this.shouldFetchSubject({
+      ctx,
+      like,
+      subjectUri,
+      live,
+    });
+    if (shouldFetch) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleFetchRecord(subjectUri, { live, depth }),
       );
     }
+  }
+
+  private async shouldFetchSubject({
+    ctx,
+    like,
+    subjectUri,
+    live,
+  }: {
+    ctx: AfterCommitContext;
+    like: Like;
+    subjectUri: AtUri;
+    live: boolean;
+  }) {
+    if (subjectUri.collection !== "app.bsky.feed.post") {
+      return false;
+    }
+    const isMember = await this.registrationQuery.isRegistered(
+      ctx,
+      like.accountDid,
+    );
+    if (!isMember) {
+      return false;
+    }
+    const exists = await this.postQuery.exists(ctx, subjectUri);
+    if (exists) {
+      return false;
+    }
+    if (live) {
+      return true;
+    }
+    return this.pastRecordFilterService.isWithinWindow({
+      ctx,
+      did: asDid(like.accountDid),
+      createdAt: like.createdAt,
+    });
   }
 
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {

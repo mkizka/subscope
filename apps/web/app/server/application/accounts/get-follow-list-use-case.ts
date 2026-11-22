@@ -40,7 +40,7 @@ export const getFollowListUseCaseFactory = ({
       ...list,
       accounts: list.accounts.map((item) => ({
         ...item,
-        backfillStatus: statuses[item.did],
+        backfillStatus: statuses[item.did]?.status,
       })),
     };
   },
