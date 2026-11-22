@@ -51,6 +51,7 @@ for (const name of [
   "frank",
   "grace",
   "heidi",
+  "ivan",
 ]) {
   await network.pds.getAgent().createAccount({
     handle: `${name}.test`,
@@ -105,7 +106,7 @@ const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:0")
   .start();
 
 process.stdout.write(
-  "Test accounts: alice.test, bob.test, carol.test, dave.test, erin.test, frank.test, grace.test, heidi.test / password\n",
+  "Test accounts: alice.test, bob.test, carol.test, dave.test, erin.test, frank.test, grace.test, heidi.test, ivan.test / password\n",
 );
 
 const app = spawn(process.argv.slice(2).join(" "), {

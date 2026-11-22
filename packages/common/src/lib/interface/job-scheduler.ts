@@ -7,7 +7,10 @@ export interface IJobScheduler {
     options: { live: boolean; depth: number },
   ) => Promise<void>;
   scheduleResolveDid: (did: Did, options: { live: boolean }) => Promise<void>;
-  scheduleSyncTapRepo: (did: Did) => Promise<void>;
+  scheduleSyncTapRepo: (
+    did: Did,
+    options?: { refetch: boolean },
+  ) => Promise<void>;
   scheduleCheckBackfill: (did: Did, attempt: number) => Promise<void>;
   scheduleAggregatePostStats: (uri: AtUri) => Promise<void>;
   scheduleSendPushNotification: (

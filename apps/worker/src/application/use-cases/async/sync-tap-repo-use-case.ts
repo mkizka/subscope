@@ -11,7 +11,10 @@ export class SyncTapRepoUseCase {
     private readonly transactionManager: ITransactionManager,
   ) {}
 
-  async execute(did: Did) {
+  async execute({ did, refetch }: { did: Did; refetch?: boolean }) {
+    if (refetch) {
+      await this.trackingService.stop(did);
+    }
     const shouldTrack = await this.shouldTrack(did);
     if (shouldTrack) {
       await this.trackingService.start(did);

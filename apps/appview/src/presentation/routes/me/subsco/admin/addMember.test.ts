@@ -44,7 +44,7 @@ describe("me.subsco.admin.addMember", () => {
 
     // assert
     expect(await findRegistration(did)).toMatchObject({ inviteCode: null });
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did }]);
+    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did, refetch: true }]);
   });
 
   test("addMember-2: ハンドルを指定すると、DIDに解決して登録する", async () => {

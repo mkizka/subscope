@@ -16,6 +16,6 @@ export const getBackfillStatusUseCaseFactory = ({
 }): IGetBackfillStatusUseCase => ({
   async execute(did) {
     const statuses = await backfillQuery.findTrackedStatuses([did]);
-    return { status: statuses[did] ?? "inProgress" };
+    return { status: statuses[did]?.status ?? "inProgress" };
   },
 });

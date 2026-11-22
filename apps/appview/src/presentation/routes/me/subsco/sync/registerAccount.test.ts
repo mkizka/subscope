@@ -145,7 +145,7 @@ describe("me.subsco.sync.registerAccount", () => {
     expect(updated?.usedAt).toBeInstanceOf(Date);
   });
 
-  test("registerAccount-7: 登録したアカウントをTapに追加する", async () => {
+  test("registerAccount-7: 登録したアカウントを、Tapから外して追加し直す", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
@@ -156,7 +156,9 @@ describe("me.subsco.sync.registerAccount", () => {
     await client.call(registerAccount, { inviteCode: inviteCode.code });
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: account.did }]);
+    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
+      { did: account.did, refetch: true },
+    ]);
   });
 
   test("registerAccount-8: まだ保存していないアカウントも登録する", async () => {
@@ -197,7 +199,7 @@ describe("me.subsco.sync.registerAccount", () => {
 
     // assert
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
-      { did: account.did },
+      { did: account.did, refetch: true },
       { did: followee.did },
     ]);
   });

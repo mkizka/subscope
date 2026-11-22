@@ -77,7 +77,7 @@ describe("me.subsco.admin.registerAdmin", () => {
 
     // assert
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
-      { did: account.did },
+      { did: account.did, refetch: true },
       { did: followee.did },
     ]);
   });

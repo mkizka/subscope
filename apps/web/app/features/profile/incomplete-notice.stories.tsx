@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { UntrackedNotice } from "./untracked-notice";
+import { IncompleteNotice } from "./incomplete-notice";
 
 const meta = {
-  component: UntrackedNotice,
-} satisfies Meta<typeof UntrackedNotice>;
+  component: IncompleteNotice,
+} satisfies Meta<typeof IncompleteNotice>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

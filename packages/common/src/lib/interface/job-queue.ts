@@ -16,6 +16,11 @@ type CheckBackfillData = {
   attempt: number;
 };
 
+type SyncTapRepoData = {
+  did: Did;
+  refetch?: boolean;
+};
+
 type SendPushNotificationData = {
   recordUri: string;
   recipientDid: Did;
@@ -26,7 +31,7 @@ export type JobData = {
   fetchRecord: FetchRecordData;
   aggregatePostStats: null;
   aggregateAccountStats: AggregateAccountStatsData;
-  syncTapRepo: Did;
+  syncTapRepo: SyncTapRepoData;
   checkBackfill: CheckBackfillData;
   sendPushNotification: SendPushNotificationData;
 };

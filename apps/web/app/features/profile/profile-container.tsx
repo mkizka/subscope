@@ -12,8 +12,8 @@ import { TimelineFeed } from "@/app/features/timeline/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
 
+import { IncompleteNotice } from "./incomplete-notice";
 import { ProfileHeader } from "./profile-header";
-import { UntrackedNotice } from "./untracked-notice";
 
 type ProfileResponse = Awaited<ReturnType<typeof loader>>["data"];
 
@@ -93,7 +93,7 @@ export function ProfileContainer({ handle }: Props) {
           }))}
         />
       )}
-      {data && !data.backfillStatus && <UntrackedNotice />}
+      {data && !data.isMember && <IncompleteNotice />}
       {tab === "lists" ? (
         <ListsContainer handle={handle} />
       ) : pages && data && !isPlaceholderData ? (
