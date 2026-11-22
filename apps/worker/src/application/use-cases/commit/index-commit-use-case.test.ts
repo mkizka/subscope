@@ -102,6 +102,7 @@ describe("IndexCommitUseCase", () => {
       const setup = () => {
         const account = accountFactory();
         accountRepo.add(account);
+        registrationQuery.add(account.did);
         const post = {
           uri: AtUri.make(account.did, "app.bsky.feed.post", "123"),
           cid: "cid123",
