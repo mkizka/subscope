@@ -4,13 +4,17 @@ import type {
   ITransactionManager,
 } from "@repo/common/interface";
 
+import type { ILabelFetcher } from "../interfaces/external/label-fetcher.js";
 import type { ITapClient } from "../interfaces/external/tap-client.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
+import type { IndexLabelService } from "./index-label-service.js";
 
 export class TrackingService {
   constructor(
     private readonly tapClient: ITapClient,
     private readonly trackingRepository: ITrackingRepository,
+    private readonly labelFetcher: ILabelFetcher,
+    private readonly indexLabelService: IndexLabelService,
     private readonly jobScheduler: IJobScheduler,
     private readonly transactionManager: ITransactionManager,
   ) {}
@@ -27,6 +31,12 @@ export class TrackingService {
     });
     await this.tapClient.addRepo(did);
     await this.jobScheduler.scheduleCheckBackfill(did, 0);
+    const labels = await this.labelFetcher.fetchByAccount(did);
+    await this.transactionManager.transaction(async (ctx) => {
+      for (const label of labels) {
+        await this.indexLabelService.index({ ctx, label });
+      }
+    });
   }
 
   async stop(did: Did) {
