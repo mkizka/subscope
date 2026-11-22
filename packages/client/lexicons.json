@@ -376,7 +376,7 @@
     },
     "me.subsco.admin.addMember": {
       "uri": "file://./lexicons/me/subsco/admin/addMember.json",
-      "cid": "bafyreieftuf4xi6fsamesq3yvm5hpj6tcgmecqb4rwmedtjqm4b3l46leq"
+      "cid": "bafyreiahc4sk3lswdya343x4q33oqf3twii7w3kv6q4sxzcjazny4ceaii"
     },
     "me.subsco.admin.createInviteCode": {
       "uri": "file://./lexicons/me/subsco/admin/createInviteCode.json",
@@ -452,7 +452,7 @@
     },
     "me.subsco.sync.registerAccount": {
       "uri": "file://./lexicons/me/subsco/sync/registerAccount.json",
-      "cid": "bafyreiblgognp3zu44am42hft2dhe5bvqzbyqcwab7jhl253foshple63e"
+      "cid": "bafyreih76igdohc2ufbdilckj5tqb656nuga6dozxh3v7msmobgtpcdzv4"
     },
     "me.subsco.sync.unregisterAccount": {
       "uri": "file://./lexicons/me/subsco/sync/unregisterAccount.json",
