@@ -114,8 +114,8 @@ export class LikeIndexer implements ICollectionIndexer {
     if (!isMember) {
       return false;
     }
-    const exists = await this.postQuery.exists(ctx, subjectUri);
-    if (exists) {
+    const subjectExists = await this.postQuery.exists(ctx, subjectUri);
+    if (subjectExists) {
       return false;
     }
     if (live) {
