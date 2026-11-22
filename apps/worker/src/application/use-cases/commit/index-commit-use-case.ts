@@ -5,6 +5,7 @@ import {
 import { RecordValidationError } from "@repo/common/utils";
 
 import type { IndexRecordService } from "../../services/index-record-service.js";
+import type { PastRecordFilterService } from "../../services/past-record-filter-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 export class IndexCommitUseCase {
@@ -14,6 +15,7 @@ export class IndexCommitUseCase {
     loggerManager: ILoggerManager,
     private readonly transactionManager: ITransactionManager,
     private readonly indexRecordService: IndexRecordService,
+    private readonly pastRecordFilterService: PastRecordFilterService,
   ) {
     this.logger = loggerManager.createLogger("IndexCommitUseCase");
   }
@@ -32,32 +34,26 @@ export class IndexCommitUseCase {
 
   private async doIndexCommit({ commit, live }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      if (
-        commit.operation !== "delete" &&
-        !(await this.indexRecordService.shouldIndex({
-          ctx,
-          record: commit.record,
-        }))
-      ) {
+      if (commit.operation === "delete") {
+        // Related data is also deleted by cascade
+        await this.indexRecordService.delete({ ctx, uri: commit.uri });
         return;
       }
-      switch (commit.operation) {
-        case "create":
-        case "update": {
-          await this.indexRecordService.upsert({
-            ctx,
-            record: commit.record,
-            live,
-            depth: 0,
-          });
-          break;
-        }
-        case "delete": {
-          // Related data is also deleted by cascade
-          await this.indexRecordService.delete({ ctx, uri: commit.uri });
-          break;
-        }
+      const { record } = commit;
+      const isPastRecordIndexable =
+        live ||
+        (await this.pastRecordFilterService.shouldIndex({ ctx, record }));
+      if (!isPastRecordIndexable) {
+        return;
       }
+      const shouldIndex = await this.indexRecordService.shouldIndex({
+        ctx,
+        record,
+      });
+      if (!shouldIndex) {
+        return;
+      }
+      await this.indexRecordService.upsert({ ctx, record, live, depth: 0 });
     });
   }
 }

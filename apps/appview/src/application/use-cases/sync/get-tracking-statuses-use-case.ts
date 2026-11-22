@@ -1,17 +1,15 @@
 import type { Did } from "@atproto/did";
 
 import type { BackfillStatus } from "../../../domain/models/account.js";
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
+import type { ITrackingQuery } from "../../interfaces/queries/tracking-query.js";
 
 export class GetTrackingStatusesUseCase {
-  constructor(private readonly registrationQuery: IRegistrationQuery) {}
+  constructor(private readonly trackingQuery: ITrackingQuery) {}
 
   async execute(params: { dids: Did[] }): Promise<{
     statuses: { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[];
   }> {
-    const statuses = await this.registrationQuery.findTrackingStatuses(
-      params.dids,
-    );
+    const statuses = await this.trackingQuery.findStatuses(params.dids);
     return { statuses };
   }
 }

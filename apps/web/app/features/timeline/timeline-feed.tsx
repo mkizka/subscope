@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { LoaderCircle } from "lucide-react";
 import { Fragment } from "react";
 import { Link } from "react-router";
@@ -21,7 +22,7 @@ type Props = {
 };
 
 export const threadPath = (post: TimelinePost) =>
-  `/${post.authorHandle}/post/${post.uri.split("/").pop()}`;
+  `/${post.authorHandle}/post/${new AtUri(post.uri).rkey}`;
 
 const postKey = (post: TimelinePost) =>
   `${post.uri}-${post.reasonRepost?.byHandle ?? ""}`;

@@ -1,6 +1,5 @@
 import type { Did } from "@atproto/did";
 
-import type { BackfillStatus } from "../../../domain/models/account.js";
 import type { Registration } from "../../../domain/models/registration.js";
 
 export interface IRegistrationQuery {
@@ -23,9 +22,4 @@ export interface IRegistrationQuery {
     cursor?: string;
   }) => Promise<{ did: Did; sortAt: Date }[]>;
   countRegisteredFollowers: (subjectDid: Did) => Promise<number>;
-  findTrackingStatuses: (
-    dids: Did[],
-  ) => Promise<
-    { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[]
-  >;
 }

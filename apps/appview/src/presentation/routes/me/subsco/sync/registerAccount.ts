@@ -2,10 +2,7 @@ import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 
-import {
-  AlreadyRegisteredError,
-  BannedError,
-} from "../../../../../application/service/sync/validate-registration-service.js";
+import { AlreadyRegisteredError } from "../../../../../application/service/sync/validate-registration-service.js";
 import {
   InvalidInviteCodeError,
   type RegisterAccountUseCase,
@@ -37,8 +34,7 @@ export class RegisterAccount {
         } catch (error) {
           if (
             error instanceof InvalidInviteCodeError ||
-            error instanceof AlreadyRegisteredError ||
-            error instanceof BannedError
+            error instanceof AlreadyRegisteredError
           ) {
             throw new LexServerError(400, {
               error: error.name,

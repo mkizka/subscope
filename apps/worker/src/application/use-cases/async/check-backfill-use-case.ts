@@ -9,6 +9,7 @@ import type { IRepoStatusFetcher } from "../../interfaces/external/repo-status-f
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
+import type { TrackingService } from "../../services/tracking-service.js";
 
 const IN_PROGRESS_STATES = ["pending", "desynchronized", "resyncing"];
 
@@ -22,6 +23,7 @@ export class CheckBackfillUseCase {
   constructor(
     private readonly tapClient: ITapClient,
     private readonly repoStatusFetcher: IRepoStatusFetcher,
+    private readonly trackingService: TrackingService,
     private readonly registrationQuery: IRegistrationQuery,
     private readonly accountRepository: IAccountRepository,
     private readonly jobScheduler: IJobScheduler,
@@ -41,8 +43,10 @@ export class CheckBackfillUseCase {
       return;
     }
     const tapState = await this.tapClient.getRepoState(did);
-    if (tapState === "error" && (await this.repoStatusFetcher.isDeleted(did))) {
-      await this.tapClient.removeRepo(did);
+    const isDeleted =
+      tapState === "error" && (await this.repoStatusFetcher.isDeleted(did));
+    if (isDeleted) {
+      await this.trackingService.stop(did);
       account.updateBackfillStatus("completed");
       await this.transactionManager.transaction((ctx) =>
         this.accountRepository.save({ ctx, account }),

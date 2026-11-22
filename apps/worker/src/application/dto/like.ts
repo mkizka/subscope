@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "./record.js";
@@ -18,7 +17,7 @@ export function parseLike(record: Record): Like {
   return {
     uri: record.uri.toString(),
     cid: record.cid,
-    accountDid: asDid(record.uri.host),
+    accountDid: record.uri.did,
     indexedAt: record.indexedAt,
     subjectUri: parsed.subject.uri,
     subjectCid: parsed.subject.cid,

@@ -48,27 +48,6 @@ describe("me.subsco.sync.registerAccount", () => {
     ]);
   });
 
-  test("registerAccount-2: 登録停止中のアカウントは登録せず、400とBannedを返す", async () => {
-    // arrange
-    const { client, loginAs } = await setupApiTest();
-    const account = await accountFactory(ctx.db)
-      .props({ isBanned: () => true })
-      .create();
-    const inviteCode = await inviteCodeFactory(ctx.db).create();
-    loginAs(account.did);
-
-    // act
-    const promise = client.call(registerAccount, {
-      inviteCode: inviteCode.code,
-    });
-
-    // assert
-    await expect(promise).rejects.toMatchObject({
-      status: 400,
-      error: "Banned",
-    });
-  });
-
   test.each([
     { name: "指定なし", code: () => Promise.resolve(undefined) },
     { name: "存在しない", code: () => Promise.resolve("not-found") },

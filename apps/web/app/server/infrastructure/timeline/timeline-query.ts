@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { view as externalView } from "@repo/client/app/bsky/embed/external";
 import {
   view as galleryView,
@@ -98,8 +99,8 @@ export function isShownInFeed({ post, reason }: FeedViewPost) {
     return true;
   }
   const { root, parent } = post.record.reply;
-  return [root, parent].every((ref) =>
-    ref.uri.startsWith(`at://${post.author.did}/`),
+  return [root, parent].every(
+    (ref) => new AtUri(ref.uri).host === post.author.did,
   );
 }
 
@@ -175,7 +176,7 @@ export function toTimelinePost({
           external: externalView.matches(quotedMedia)
             ? quotedMedia.external
             : undefined,
-          threadPath: `/${quoted.author.handle}/post/${quoted.uri.split("/").pop()}`,
+          threadPath: `/${quoted.author.handle}/post/${new AtUri(quoted.uri).rkey}`,
         }
       : undefined,
     quoteUnavailable: viewNotFound.matches(quoted)
@@ -191,7 +192,7 @@ export function toTimelinePost({
           displayName: quoted.displayName,
           creatorHandle: quoted.creator.handle,
           description: quoted.description,
-          url: `https://bsky.app/profile/${quoted.creator.did}/feed/${quoted.uri.split("/").pop()}`,
+          url: `https://bsky.app/profile/${quoted.creator.did}/feed/${new AtUri(quoted.uri).rkey}`,
         }
       : undefined,
     createdAt: maybeString(post.record.createdAt),

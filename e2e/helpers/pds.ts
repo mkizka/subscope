@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 export const PDS_URL = "http://localhost:2583";
 
 const xrpc = async <T>(
@@ -88,7 +89,7 @@ export const deleteRecord = async (handle: string, uri: string) => {
     "com.atproto.server.createSession",
     { identifier: handle, password: "password" },
   );
-  const [, collection, rkey] = uri.replace("at://", "").split("/");
+  const { collection, rkey } = new AtUri(uri);
   await xrpc(
     "com.atproto.repo.deleteRecord",
     { repo: did, collection, rkey },
