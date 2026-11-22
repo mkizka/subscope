@@ -14,8 +14,8 @@ const LIMITED_COLLECTIONS = [
 
 const PAST_RECORD_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-const isOutsidePastRecordWindow = (tracking: Tracking, createdAt: Date) =>
-  createdAt.getTime() < tracking.trackedAt.getTime() - PAST_RECORD_WINDOW_MS;
+const isWithinPastRecordWindow = (tracking: Tracking, createdAt: Date) =>
+  createdAt.getTime() >= tracking.trackedAt.getTime() - PAST_RECORD_WINDOW_MS;
 
 export class PastRecordFilterService {
   constructor(
@@ -23,7 +23,7 @@ export class PastRecordFilterService {
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
-  async isOutsideWindow({
+  async shouldIndex({
     ctx,
     record,
   }: {
@@ -34,17 +34,17 @@ export class PastRecordFilterService {
       (collection) => collection === record.uri.collection,
     );
     if (!collection) {
-      return false;
+      return true;
     }
     const did = record.uri.did;
     if (await this.registrationQuery.isRegistered(ctx, did)) {
-      return false;
+      return true;
     }
     const tracking = await this.trackingRepository.find({ ctx, did });
     if (!tracking) {
-      return true;
+      return false;
     }
     const { createdAt } = validateRecord(collection, record);
-    return isOutsidePastRecordWindow(tracking, new Date(createdAt));
+    return isWithinPastRecordWindow(tracking, new Date(createdAt));
   }
 }

@@ -42,7 +42,7 @@ export class IndexCommitUseCase {
       const { record } = commit;
       if (
         !live &&
-        (await this.pastRecordFilterService.isOutsideWindow({ ctx, record }))
+        !(await this.pastRecordFilterService.shouldIndex({ ctx, record }))
       ) {
         return;
       }
