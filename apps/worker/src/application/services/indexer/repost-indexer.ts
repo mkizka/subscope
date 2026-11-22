@@ -8,10 +8,7 @@ import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
-import type {
-  ICollectionIndexer,
-  Indexing,
-} from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
 
 export class RepostIndexer implements ICollectionIndexer {
@@ -26,11 +23,13 @@ export class RepostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    indexing,
+    live,
+    depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    indexing: Indexing;
+    live: boolean;
+    depth: number;
   }) {
     const repost = parseRepost(record);
     await this.repostRepository.save({ ctx, repost });
@@ -41,8 +40,8 @@ export class RepostIndexer implements ICollectionIndexer {
     const subjectUri = new AtUri(repost.subjectUri);
     const recipientDid = subjectUri.host;
     const shouldNotify =
-      indexing.live &&
-      indexing.depth === 0 &&
+      live &&
+      depth === 0 &&
       recipientDid !== repost.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, recipientDid));
     if (shouldNotify) {
@@ -60,8 +59,10 @@ export class RepostIndexer implements ICollectionIndexer {
         ],
       });
     }
+  }
 
-    await indexing.requestFetch(subjectUri);
+  urisToFetch({ record }: { record: Record }): Promise<AtUri[]> {
+    return Promise.resolve([new AtUri(parseRepost(record).subjectUri)]);
   }
 
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {

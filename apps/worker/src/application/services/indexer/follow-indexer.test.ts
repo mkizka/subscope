@@ -1,5 +1,5 @@
 import type { AfterCommitContext } from "@repo/common/interface";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import {
@@ -8,9 +8,6 @@ import {
   type TestServices,
 } from "../../../shared/test-utils.js";
 import { recordFactory } from "../../dto/record.factory.js";
-import type { Indexing } from "../../interfaces/services/index-collection-service.js";
-
-const requestFetch = vi.fn<Indexing["requestFetch"]>();
 
 describe("FollowIndexer", () => {
   let followIndexer: TestServices["followIndexer"];
@@ -49,7 +46,8 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexing: { live: false, depth: 0, requestFetch },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -77,11 +75,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({
-        ctx,
-        record,
-        indexing: { live: true, depth: 0, requestFetch },
-      });
+      await followIndexer.upsert({ ctx, record, live: true, depth: 0 });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -112,7 +106,8 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexing: { live: false, depth: 0, requestFetch },
+        live: false,
+        depth: 0,
       });
 
       // act

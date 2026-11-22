@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { fakeCid } from "@repo/common/test";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import {
@@ -10,9 +10,6 @@ import {
 } from "../../../shared/test-utils.js";
 import { postFactory } from "../../dto/post.factory.js";
 import { recordFactory } from "../../dto/record.factory.js";
-import type { Indexing } from "../../interfaces/services/index-collection-service.js";
-
-const requestFetch = vi.fn<Indexing["requestFetch"]>();
 
 describe("RepostIndexer", () => {
   let repostIndexer: TestServices["repostIndexer"];
@@ -24,7 +21,6 @@ describe("RepostIndexer", () => {
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
-    requestFetch.mockClear();
     const services = await testRegistry.resolve();
     repostIndexer = services.repostIndexer;
     repostRepo = services.repostRepository;
@@ -60,7 +56,8 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx,
         record,
-        indexing: { live: false, depth: 0, requestFetch },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -79,10 +76,25 @@ describe("RepostIndexer", () => {
         accountDid: reposter.did,
         subjectUri: subjectUri,
       });
+    });
 
-      expect(requestFetch).toHaveBeenCalledExactlyOnceWith(
-        new AtUri(subjectUri),
-      );
+    test("リポスト対象のURIを取得対象として返す", async () => {
+      // arrange
+      const subjectUri = "at://did:plc:author/app.bsky.feed.post/123";
+      const record = recordFactory({
+        uri: "at://did:plc:reposter/app.bsky.feed.repost/repostrkey",
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: { uri: subjectUri, cid: fakeCid() },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      const uris = await repostIndexer.urisToFetch({ record });
+
+      // assert
+      expect(uris).toEqual([new AtUri(subjectUri)]);
     });
 
     test("notify-4: リポストされた投稿の作者に repost の通知を作る", async () => {
@@ -104,7 +116,8 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        indexing: { live: true, depth: 0, requestFetch },
+        live: true,
+        depth: 0,
       });
 
       // assert

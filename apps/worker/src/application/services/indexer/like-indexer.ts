@@ -8,10 +8,7 @@ import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { ITrackingRepository } from "../../interfaces/repositories/tracking-repository.js";
-import type {
-  ICollectionIndexer,
-  Indexing,
-} from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
 
 export class LikeIndexer implements ICollectionIndexer {
@@ -43,11 +40,13 @@ export class LikeIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    indexing,
+    live,
+    depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    indexing: Indexing;
+    live: boolean;
+    depth: number;
   }) {
     const like = parseLike(record);
     const recipientDid = new AtUri(like.subjectUri).host;
@@ -58,8 +57,8 @@ export class LikeIndexer implements ICollectionIndexer {
     await this.likeRepository.save({ ctx, like });
 
     if (
-      indexing.live &&
-      indexing.depth === 0 &&
+      live &&
+      depth === 0 &&
       recipientDid !== like.accountDid &&
       isRecipientServerMember
     ) {
@@ -77,17 +76,26 @@ export class LikeIndexer implements ICollectionIndexer {
         ],
       });
     }
+  }
 
+  async urisToFetch({
+    ctx,
+    record,
+    live,
+  }: {
+    ctx: AfterCommitContext;
+    record: Record;
+    live: boolean;
+  }): Promise<AtUri[]> {
+    const like = parseLike(record);
     const subjectUri = new AtUri(like.subjectUri);
     const shouldFetch = await this.shouldFetchSubject({
       ctx,
       like,
       subjectUri,
-      live: indexing.live,
+      live,
     });
-    if (shouldFetch) {
-      await indexing.requestFetch(subjectUri);
-    }
+    return shouldFetch ? [subjectUri] : [];
   }
 
   private async shouldFetchSubject({

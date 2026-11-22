@@ -8,10 +8,7 @@ import {
 import type { Record } from "../dto/record.js";
 import type { IPostQuery } from "../interfaces/queries/post-query.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
-import type {
-  ICollectionIndexer,
-  Indexing,
-} from "../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexAccountService } from "./index-account-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";
@@ -109,36 +106,37 @@ export class IndexRecordService {
     });
     await this.recordRepository.save({ ctx, record });
 
-    const indexing: Indexing = {
-      live,
-      depth,
-      requestFetch: (uri) => this.requestFetch({ ctx, uri, live, depth }),
-    };
-    await indexer.upsert({ ctx, record, indexing });
+    await indexer.upsert({ ctx, record, live, depth });
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
+    await this.scheduleFetches({ ctx, indexer, record, live, depth });
   }
 
-  private async requestFetch({
+  private async scheduleFetches({
     ctx,
-    uri,
+    indexer,
+    record,
     live,
     depth,
   }: {
     ctx: AfterCommitContext;
-    uri: AtUri;
+    indexer: ICollectionIndexer;
+    record: Record;
     live: boolean;
     depth: number;
   }) {
-    if (depth >= MAX_FETCH_DEPTH) {
+    if (depth >= MAX_FETCH_DEPTH || !indexer.urisToFetch) {
       return;
     }
-    const exists = await this.postQuery.exists(ctx, uri);
-    if (exists) {
-      return;
+    const uris = await indexer.urisToFetch({ ctx, record, live });
+    for (const uri of uris) {
+      const exists = await this.postQuery.exists(ctx, uri);
+      if (exists) {
+        continue;
+      }
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleFetchRecord(uri, { live, depth }),
+      );
     }
-    ctx.afterCommit(() =>
-      this.jobScheduler.scheduleFetchRecord(uri, { live, depth }),
-    );
   }
 
   async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {

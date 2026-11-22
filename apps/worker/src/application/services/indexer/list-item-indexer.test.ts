@@ -1,11 +1,8 @@
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
 import { recordFactory } from "../../dto/record.factory.js";
-import type { Indexing } from "../../interfaces/services/index-collection-service.js";
-
-const requestFetch = vi.fn<Indexing["requestFetch"]>();
 
 describe("ListItemIndexer", () => {
   test("リスト項目レコードを保存し、対象アカウントを作成する", async () => {
@@ -29,7 +26,7 @@ describe("ListItemIndexer", () => {
     await listItemIndexer.upsert({
       ctx: { db, afterCommit },
       record,
-      indexing: { live: false, depth: 0, requestFetch },
+      live: false,
     });
 
     // assert

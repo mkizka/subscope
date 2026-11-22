@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { fakeCid } from "@repo/common/test";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import {
@@ -9,9 +9,6 @@ import {
   type TestServices,
 } from "../../../shared/test-utils.js";
 import { recordFactory } from "../../dto/record.factory.js";
-import type { Indexing } from "../../interfaces/services/index-collection-service.js";
-
-const requestFetch = vi.fn<Indexing["requestFetch"]>();
 
 describe("LikeIndexer", () => {
   let likeIndexer: TestServices["likeIndexer"];
@@ -50,11 +47,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({
-        ctx,
-        record,
-        indexing: { live: false, depth: 0, requestFetch },
-      });
+      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
 
       // assert
       const like = await likeRepo.find({ ctx, uri: record.uri });
@@ -109,7 +102,8 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx: { db, afterCommit },
         record,
-        indexing: { live: true, depth: 0, requestFetch },
+        live: true,
+        depth: 0,
       });
 
       // assert
@@ -144,7 +138,8 @@ describe("LikeIndexer", () => {
         await likeIndexer.upsert({
           ctx: { db, afterCommit },
           record,
-          indexing: { live, depth, requestFetch },
+          live,
+          depth,
         });
 
         // assert
@@ -171,11 +166,7 @@ describe("LikeIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await likeIndexer.upsert({
-        ctx,
-        record,
-        indexing: { live: false, depth: 0, requestFetch },
-      });
+      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
 
       // act
       likeIndexer.afterAction({ ctx: { db, afterCommit }, record });

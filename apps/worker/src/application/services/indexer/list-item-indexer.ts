@@ -4,10 +4,7 @@ import { parseListItem } from "../../dto/list-item.js";
 import type { Record } from "../../dto/record.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IListItemRepository } from "../../interfaces/repositories/list-item-repository.js";
-import type {
-  ICollectionIndexer,
-  Indexing,
-} from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexAccountService } from "../index-account-service.js";
 
 export class ListItemIndexer implements ICollectionIndexer {
@@ -20,17 +17,17 @@ export class ListItemIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    indexing,
+    live,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    indexing: Indexing;
+    live: boolean;
   }) {
     const listItem = parseListItem(record);
     await this.indexAccountService.upsert({
       ctx,
       did: listItem.subjectDid,
-      live: indexing.live,
+      live,
       fetchMissing: await this.registrationQuery.isRegistered(
         ctx,
         listItem.accountDid,

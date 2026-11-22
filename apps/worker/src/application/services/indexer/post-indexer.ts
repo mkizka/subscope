@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
@@ -10,10 +11,7 @@ import type { IRegistrationQuery } from "../../interfaces/queries/registration-q
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { Notification } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type {
-  ICollectionIndexer,
-  Indexing,
-} from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { NotificationService } from "../notification-service.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
@@ -31,11 +29,13 @@ export class PostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    indexing,
+    live,
+    depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    indexing: Indexing;
+    live: boolean;
+    depth: number;
   }) {
     const post = parsePost(record);
     await this.postRepository.save({ ctx, post });
@@ -43,14 +43,14 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = feedItemFromPost(post);
     await this.feedItemRepository.save({ ctx, feedItem });
 
-    if (indexing.live && indexing.depth === 0) {
+    if (live && depth === 0) {
       await this.createNotifications(ctx, record, post);
     }
+  }
 
-    const embedUri = getEmbedRecordUri(post);
-    if (embedUri) {
-      await indexing.requestFetch(embedUri);
-    }
+  urisToFetch({ record }: { record: Record }): Promise<AtUri[]> {
+    const embedUri = getEmbedRecordUri(parsePost(record));
+    return Promise.resolve(embedUri ? [embedUri] : []);
   }
 
   private async createNotifications(
