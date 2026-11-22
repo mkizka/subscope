@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
 import { validateRecord } from "@repo/common/utils";
 
@@ -21,7 +20,7 @@ export function parseList(record: Record): List {
   return {
     uri: record.uri.toString(),
     cid: record.cid,
-    accountDid: asDid(record.uri.host),
+    accountDid: record.uri.did,
     indexedAt: record.indexedAt,
     purpose: parsed.purpose,
     name: parsed.name,

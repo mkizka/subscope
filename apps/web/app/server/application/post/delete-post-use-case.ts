@@ -1,5 +1,7 @@
 import { setTimeout } from "node:timers/promises";
 
+import { AtUri } from "@atproto/syntax";
+
 import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
 import type { IPostQuery } from "@/app/server/application/interfaces/post-query";
 
@@ -15,7 +17,7 @@ export const deletePostUseCaseFactory = ({
   postQuery: IPostQuery;
 }): IDeletePostUseCase => ({
   async execute(did, uri) {
-    if (!uri.startsWith(`at://${did}/`)) {
+    if (new AtUri(uri).host !== did) {
       throw new Error("Cannot delete another user's post");
     }
     await postCommand.delete(did, uri);
