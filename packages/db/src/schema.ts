@@ -18,7 +18,6 @@ export const accounts = pgTable(
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
     isAdmin: boolean().default(false).notNull(),
-    isBanned: boolean().default(false).notNull(),
     status: varchar({ length: 32 })
       .$type<"active" | "deactivated" | "deleted" | "suspended" | "takendown">()
       .default("active")
