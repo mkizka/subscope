@@ -3,7 +3,7 @@ import type { TransactionContext } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "../dto/record.js";
-import { isOutsidePastRecordWindow } from "../dto/tracking.js";
+import type { Tracking } from "../dto/tracking.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 
@@ -12,6 +12,11 @@ const LIMITED_COLLECTIONS = [
   "app.bsky.feed.repost",
   "app.bsky.feed.like",
 ] as const;
+
+const PAST_RECORD_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+const isOutsidePastRecordWindow = (tracking: Tracking, createdAt: Date) =>
+  createdAt.getTime() < tracking.trackedAt.getTime() - PAST_RECORD_WINDOW_MS;
 
 export class PastRecordFilterService {
   constructor(
