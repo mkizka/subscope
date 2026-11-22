@@ -142,9 +142,9 @@ const toEmbed = (embed: RawEmbed): PostEmbed | null => {
   return toEmbedMedia(embed);
 };
 
-export function parsePost(record: Record): Post {
+export function parsePost(record: Record): { post: Post; mentionDids: Did[] } {
   const parsed = validatePost(record);
-  return {
+  const post = {
     uri: new AtUri(record.uri.toString()),
     cid: record.cid,
     accountDid: record.uri.did,
@@ -156,4 +156,8 @@ export function parsePost(record: Record): Post {
     createdAt: new Date(parsed.createdAt),
     indexedAt: record.indexedAt,
   };
+  const mentionDids = (parsed.facets ?? [])
+    .flatMap((facet) => facet.features)
+    .flatMap((feature) => ("did" in feature ? [feature.did] : []));
+  return { post, mentionDids };
 }

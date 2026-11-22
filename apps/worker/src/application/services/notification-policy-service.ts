@@ -1,13 +1,10 @@
+import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
-import { validateRecord } from "@repo/common/utils";
 
-import { parseFollow } from "../dto/follow.js";
-import { parseLike } from "../dto/like.js";
 import type { Origin } from "../dto/origin.js";
-import { getEmbedRecordUri, parsePost } from "../dto/post.js";
-import type { Record } from "../dto/record.js";
-import { parseRepost } from "../dto/repost.js";
+import type { ParsedRecord } from "../dto/parsed-record.js";
+import { getEmbedRecordUri, type Post } from "../dto/post.js";
 import { getSortAt } from "../dto/sort-at.js";
 import type { IPostQuery } from "../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
@@ -23,17 +20,17 @@ export class NotificationPolicyService {
 
   async notificationsFor({
     ctx,
-    record,
+    parsed,
     origin,
   }: {
     ctx: TransactionContext;
-    record: Record;
+    parsed: ParsedRecord;
     origin: Origin;
   }): Promise<Notification[]> {
     if (origin.type !== "tapLive") {
       return [];
     }
-    const candidates = await this.candidates(ctx, record);
+    const candidates = await this.candidates(ctx, parsed);
     const notifications = new Map<string, Notification>();
     for (const candidate of candidates) {
       if (
@@ -55,13 +52,13 @@ export class NotificationPolicyService {
 
   private async candidates(
     ctx: TransactionContext,
-    record: Record,
+    parsed: ParsedRecord,
   ): Promise<Notification[]> {
-    switch (record.uri.collection) {
+    switch (parsed.collection) {
       case "app.bsky.feed.post":
-        return this.postCandidates(ctx, record);
+        return this.postCandidates(ctx, parsed);
       case "app.bsky.feed.repost": {
-        const repost = parseRepost(record);
+        const { repost } = parsed;
         return [
           {
             recordUri: repost.uri,
@@ -74,7 +71,7 @@ export class NotificationPolicyService {
         ];
       }
       case "app.bsky.feed.like": {
-        const like = parseLike(record);
+        const { like } = parsed;
         return [
           {
             recordUri: like.uri,
@@ -87,7 +84,7 @@ export class NotificationPolicyService {
         ];
       }
       case "app.bsky.graph.follow": {
-        const follow = parseFollow(record);
+        const { follow } = parsed;
         return [
           {
             recordUri: follow.uri,
@@ -99,22 +96,22 @@ export class NotificationPolicyService {
           },
         ];
       }
-      default:
+      case "app.bsky.graph.listitem":
+      case "app.bsky.actor.profile":
+      case "app.bsky.feed.generator":
+      case "app.bsky.graph.list":
+      case "app.bsky.actor.link":
+      case "app.bsky.feed.threadgate":
+      case "app.bsky.feed.postgate":
         return [];
     }
   }
 
   private async postCandidates(
     ctx: TransactionContext,
-    record: Record,
+    { post, mentionDids }: { post: Post; mentionDids: Did[] },
   ): Promise<Notification[]> {
-    const post = parsePost(record);
     const quoteUri = getEmbedRecordUri(post);
-    const mentionDids = (
-      validateRecord("app.bsky.feed.post", record).facets ?? []
-    )
-      .flatMap((facet) => facet.features)
-      .flatMap((feature) => ("did" in feature ? [feature.did] : []));
     const replySubjects = [];
     for (
       let uri = post.replyParent?.uri ?? null;

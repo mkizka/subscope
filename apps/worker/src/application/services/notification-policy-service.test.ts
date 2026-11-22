@@ -6,6 +6,7 @@ import { assert, beforeEach, describe, expect, test } from "vitest";
 import { accountFactory } from "../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 import type { Origin } from "../dto/origin.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import { postFactory } from "../dto/post.factory.js";
 import { recordFactory } from "../dto/record.factory.js";
 
@@ -72,7 +73,7 @@ describe("NotificationPolicyService", () => {
     // act
     const notifications = await notificationPolicyService.notificationsFor({
       ctx: { db },
-      record,
+      parsed: parseRecord(record),
       origin: { type: "tapLive" },
     });
 
@@ -98,7 +99,7 @@ describe("NotificationPolicyService", () => {
     // act
     const notifications = await notificationPolicyService.notificationsFor({
       ctx: { db },
-      record,
+      parsed: parseRecord(record),
       origin: { type: "tapLive" },
     });
 
@@ -131,7 +132,7 @@ describe("NotificationPolicyService", () => {
     // act
     const notifications = await notificationPolicyService.notificationsFor({
       ctx: { db },
-      record,
+      parsed: parseRecord(record),
       origin: { type: "tapLive" },
     });
 
@@ -186,7 +187,7 @@ describe("NotificationPolicyService", () => {
     // act
     const notifications = await notificationPolicyService.notificationsFor({
       ctx: { db },
-      record,
+      parsed: parseRecord(record),
       origin: { type: "tapLive" },
     });
 
@@ -224,7 +225,7 @@ describe("NotificationPolicyService", () => {
     // act
     const notifications = await notificationPolicyService.notificationsFor({
       ctx: { db },
-      record,
+      parsed: parseRecord(record),
       origin: { type: "tapLive" },
     });
 
@@ -263,7 +264,7 @@ describe("NotificationPolicyService", () => {
       // act
       const notifications = await notificationPolicyService.notificationsFor({
         ctx: { db },
-        record,
+        parsed: parseRecord(record),
         origin: { type: "tapLive" },
       });
 
@@ -289,7 +290,7 @@ describe("NotificationPolicyService", () => {
       // act
       const notifications = await notificationPolicyService.notificationsFor({
         ctx: { db },
-        record,
+        parsed: parseRecord(record),
         origin,
       });
 

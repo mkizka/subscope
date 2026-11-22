@@ -1,28 +1,30 @@
 import type { Did } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/interface";
 
-import { parseFollow } from "../dto/follow.js";
-import type { Record } from "../dto/record.js";
-import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
+import type { Author } from "../dto/author.js";
+import type { ParsedRecord } from "../dto/parsed-record.js";
 
 export class TrackingPolicyService {
-  constructor(private readonly registrationQuery: IRegistrationQuery) {}
-
-  async reposToSync({
-    ctx,
-    record,
+  reposToSync({
+    parsed,
+    author,
   }: {
-    ctx: TransactionContext;
-    record: Record;
-  }): Promise<Did[]> {
-    if (record.uri.collection !== "app.bsky.graph.follow") {
-      return [];
+    parsed: ParsedRecord;
+    author: Author;
+  }): Did[] {
+    switch (parsed.collection) {
+      case "app.bsky.graph.follow":
+        return author.isMember ? [parsed.follow.subjectDid] : [];
+      case "app.bsky.feed.post":
+      case "app.bsky.feed.repost":
+      case "app.bsky.feed.like":
+      case "app.bsky.graph.listitem":
+      case "app.bsky.actor.profile":
+      case "app.bsky.feed.generator":
+      case "app.bsky.graph.list":
+      case "app.bsky.actor.link":
+      case "app.bsky.feed.threadgate":
+      case "app.bsky.feed.postgate":
+        return [];
     }
-    const follow = parseFollow(record);
-    const isFollowerMember = await this.registrationQuery.isRegistered(
-      ctx,
-      follow.accountDid,
-    );
-    return isFollowerMember ? [follow.subjectDid] : [];
   }
 }

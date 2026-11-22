@@ -2,17 +2,14 @@ import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
+import type { Author } from "../dto/author.js";
 import type { FetchTarget } from "../dto/fetch-target.js";
-import { parseFollow } from "../dto/follow.js";
-import { type Like, parseLike } from "../dto/like.js";
-import { parseListItem } from "../dto/list-item.js";
+import type { Like } from "../dto/like.js";
 import type { Origin } from "../dto/origin.js";
-import { getEmbedRecordUri, parsePost } from "../dto/post.js";
-import type { Record } from "../dto/record.js";
-import { parseRepost } from "../dto/repost.js";
+import type { ParsedRecord } from "../dto/parsed-record.js";
+import { getEmbedRecordUri } from "../dto/post.js";
 import type { IPostQuery } from "../interfaces/queries/post-query.js";
 import type { IProfileQuery } from "../interfaces/queries/profile-query.js";
-import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { IAccountRepository } from "../interfaces/repositories/account-repository.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 
@@ -23,22 +20,23 @@ export class FetchPolicyService {
     private readonly accountRepository: IAccountRepository,
     private readonly profileQuery: IProfileQuery,
     private readonly postQuery: IPostQuery,
-    private readonly registrationQuery: IRegistrationQuery,
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
   async targetsForRecord({
     ctx,
-    record,
+    parsed,
+    author,
     origin,
   }: {
     ctx: TransactionContext;
-    record: Record;
+    parsed: ParsedRecord;
+    author: Author;
     origin: Origin;
   }): Promise<FetchTarget[]> {
     return [
-      ...(await this.targetsForAccount({ ctx, did: record.uri.did })),
-      ...(await this.relatedTargets(ctx, record, origin)),
+      ...(await this.targetsForAccount({ ctx, did: author.did })),
+      ...(await this.relatedTargets(ctx, parsed, author, origin)),
     ];
   }
 
@@ -70,25 +68,37 @@ export class FetchPolicyService {
 
   private async relatedTargets(
     ctx: TransactionContext,
-    record: Record,
+    parsed: ParsedRecord,
+    author: Author,
     origin: Origin,
   ): Promise<FetchTarget[]> {
-    switch (record.uri.collection) {
+    switch (parsed.collection) {
       case "app.bsky.feed.post": {
-        const embedUri = getEmbedRecordUri(parsePost(record));
+        const embedUri = getEmbedRecordUri(parsed.post);
         return embedUri ? this.missingRecord(ctx, embedUri, origin) : [];
       }
-      case "app.bsky.feed.repost": {
-        const repost = parseRepost(record);
-        return this.missingRecord(ctx, new AtUri(repost.subjectUri), origin);
-      }
+      case "app.bsky.feed.repost":
+        return this.missingRecord(
+          ctx,
+          new AtUri(parsed.repost.subjectUri),
+          origin,
+        );
       case "app.bsky.feed.like":
-        return this.likedPost(ctx, parseLike(record), origin);
+        return author.isMember ? this.likedPost(ctx, parsed.like, origin) : [];
       case "app.bsky.graph.follow":
-        return this.subjectOfMember(ctx, parseFollow(record));
+        return author.isMember
+          ? this.targetsForAccount({ ctx, did: parsed.follow.subjectDid })
+          : [];
       case "app.bsky.graph.listitem":
-        return this.subjectOfMember(ctx, parseListItem(record));
-      default:
+        return author.isMember
+          ? this.targetsForAccount({ ctx, did: parsed.listItem.subjectDid })
+          : [];
+      case "app.bsky.actor.profile":
+      case "app.bsky.feed.generator":
+      case "app.bsky.graph.list":
+      case "app.bsky.actor.link":
+      case "app.bsky.feed.threadgate":
+      case "app.bsky.feed.postgate":
         return [];
     }
   }
@@ -115,13 +125,6 @@ export class FetchPolicyService {
     if (subjectUri.collection !== "app.bsky.feed.post") {
       return [];
     }
-    const isMember = await this.registrationQuery.isRegistered(
-      ctx,
-      like.accountDid,
-    );
-    if (!isMember) {
-      return [];
-    }
     if (origin.type !== "tapLive") {
       const tracking = await this.trackingRepository.find({
         ctx,
@@ -132,13 +135,5 @@ export class FetchPolicyService {
       }
     }
     return this.missingRecord(ctx, subjectUri, origin);
-  }
-
-  private async subjectOfMember(
-    ctx: TransactionContext,
-    { accountDid, subjectDid }: { accountDid: Did; subjectDid: Did },
-  ): Promise<FetchTarget[]> {
-    const isMember = await this.registrationQuery.isRegistered(ctx, accountDid);
-    return isMember ? this.targetsForAccount({ ctx, did: subjectDid }) : [];
   }
 }

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import { recordFactory } from "../dto/record.factory.js";
 
 describe("SaveRecordService", () => {
@@ -26,7 +27,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     expect(
@@ -61,7 +66,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     const post = await postRepository.find({ ctx: { db }, uri: record.uri });
@@ -89,7 +98,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     expect(
@@ -125,7 +138,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     expect(
@@ -154,7 +171,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     expect(
@@ -185,7 +206,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     expect(
@@ -215,7 +240,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     const listItem = await listItemRepository.find({
@@ -261,7 +290,11 @@ describe("SaveRecordService", () => {
     });
 
     // act
-    await saveRecordService.save({ ctx: { db }, record });
+    await saveRecordService.save({
+      ctx: { db },
+      record,
+      parsed: parseRecord(record),
+    });
 
     // assert
     expect(

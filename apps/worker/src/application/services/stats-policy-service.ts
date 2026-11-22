@@ -1,17 +1,13 @@
 import { AtUri } from "@atproto/syntax";
 
-import { parseFollow } from "../dto/follow.js";
-import { parseLike } from "../dto/like.js";
-import { parsePost } from "../dto/post.js";
-import type { Record } from "../dto/record.js";
-import { parseRepost } from "../dto/repost.js";
+import type { ParsedRecord } from "../dto/parsed-record.js";
 import type { StatsTargets } from "../dto/stats-targets.js";
 
 export class StatsPolicyService {
-  targetsFor(record: Record): StatsTargets {
-    switch (record.uri.collection) {
+  targetsFor(parsed: ParsedRecord): StatsTargets {
+    switch (parsed.collection) {
       case "app.bsky.feed.post": {
-        const post = parsePost(record);
+        const { post } = parsed;
         const embedUri =
           post.embed?.type === "record" ||
           post.embed?.type === "recordWithMedia"
@@ -30,20 +26,20 @@ export class StatsPolicyService {
         };
       }
       case "app.bsky.feed.repost":
-        return {
-          accounts: [],
-          posts: [new AtUri(parseRepost(record).subjectUri)],
-        };
+        return { accounts: [], posts: [new AtUri(parsed.repost.subjectUri)] };
       case "app.bsky.feed.like":
-        return {
-          accounts: [],
-          posts: [new AtUri(parseLike(record).subjectUri)],
-        };
+        return { accounts: [], posts: [new AtUri(parsed.like.subjectUri)] };
       case "app.bsky.graph.follow": {
-        const follow = parseFollow(record);
+        const { follow } = parsed;
         return { accounts: [follow.accountDid, follow.subjectDid], posts: [] };
       }
-      default:
+      case "app.bsky.graph.listitem":
+      case "app.bsky.actor.profile":
+      case "app.bsky.feed.generator":
+      case "app.bsky.graph.list":
+      case "app.bsky.actor.link":
+      case "app.bsky.feed.threadgate":
+      case "app.bsky.feed.postgate":
         return { accounts: [], posts: [] };
     }
   }

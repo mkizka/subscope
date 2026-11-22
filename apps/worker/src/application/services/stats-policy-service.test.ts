@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import { recordFactory } from "../dto/record.factory.js";
 
 describe("StatsPolicyService", () => {
@@ -34,7 +35,7 @@ describe("StatsPolicyService", () => {
     });
 
     // act
-    const targets = statsPolicyService.targetsFor(record);
+    const targets = statsPolicyService.targetsFor(parseRecord(record));
 
     // assert
     expect(targets).toEqual({
@@ -59,7 +60,7 @@ describe("StatsPolicyService", () => {
     });
 
     // act
-    const targets = statsPolicyService.targetsFor(record);
+    const targets = statsPolicyService.targetsFor(parseRecord(record));
 
     // assert
     expect(targets).toEqual({ accounts: [], posts: [new AtUri(subjectUri)] });
@@ -79,7 +80,7 @@ describe("StatsPolicyService", () => {
     });
 
     // act
-    const targets = statsPolicyService.targetsFor(record);
+    const targets = statsPolicyService.targetsFor(parseRecord(record));
 
     // assert
     expect(targets).toEqual({

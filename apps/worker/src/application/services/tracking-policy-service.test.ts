@@ -2,17 +2,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
+import { parseRecord } from "../dto/parsed-record.js";
 import { recordFactory } from "../dto/record.factory.js";
 
 describe("TrackingPolicyService", () => {
   let trackingPolicyService: TestServices["trackingPolicyService"];
-  let registrationQuery: TestServices["registrationQuery"];
-  let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     trackingPolicyService = services.trackingPolicyService;
-    registrationQuery = services.registrationQuery;
-    db = services.db;
   });
 
   test.each([
@@ -26,13 +23,10 @@ describe("TrackingPolicyService", () => {
       isMember: false,
       expected: false,
     },
-  ])("$name", async ({ isMember, expected }) => {
+  ])("$name", ({ isMember, expected }) => {
     // arrange
     const follower = accountFactory();
     const followee = accountFactory();
-    if (isMember) {
-      registrationQuery.add(follower.did);
-    }
     const record = recordFactory({
       uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
       json: {
@@ -43,9 +37,9 @@ describe("TrackingPolicyService", () => {
     });
 
     // act
-    const dids = await trackingPolicyService.reposToSync({
-      ctx: { db },
-      record,
+    const dids = trackingPolicyService.reposToSync({
+      parsed: parseRecord(record),
+      author: { did: follower.did, isMember },
     });
 
     // assert
