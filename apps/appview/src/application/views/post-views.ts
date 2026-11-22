@@ -1,4 +1,3 @@
-import { asDid } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
 import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
@@ -125,7 +124,7 @@ export class PostViews {
     if (!viewerDid) {
       return undefined;
     }
-    const ownerDid = asDid(new AtUri(rootUri).host);
+    const ownerDid = new AtUri(rootUri).did;
     const { allow } = validateRecord("app.bsky.feed.threadgate", gate);
     if (viewerDid === ownerDid || !allow) {
       return false;

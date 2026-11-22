@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 
@@ -19,7 +20,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
   const { uri, cid, pinned } = submission.value;
   const did = context.get(didContext);
-  if (!uri.startsWith(`at://${did}/`)) {
+  if (new AtUri(uri).host !== did) {
     throw data("他のアカウントの投稿はピン留めできません", { status: 403 });
   }
   await di.postCommand.pin(did, pinned === "true" ? { uri, cid } : undefined);
