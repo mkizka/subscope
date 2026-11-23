@@ -127,9 +127,15 @@ handleResolver.add("example.com", "did:plc:resolved123");
 ```typescript
 const ctx = {
   db: testInjector.resolve("db"),
+  afterCommit,
 };
 
-await recordRepository.save({ ctx, record });
+await indexRecordService.index({
+  ctx,
+  record,
+  origin: { type: "tapLive" },
+  priority: "high",
+});
 ```
 
 ## テストすべきケース

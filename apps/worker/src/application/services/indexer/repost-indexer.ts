@@ -1,14 +1,19 @@
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
+import type { Author } from "../../dto/author.js";
 import { feedItemFromRepost } from "../../dto/feed-item.js";
+import type { Origin } from "../../dto/origin.js";
 import type { Record } from "../../dto/record.js";
 import { parseRepost, type Repost } from "../../dto/repost.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { Notification } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
-import type { ICollectionIndexer } from "./collection-indexer.js";
+import {
+  type ICollectionIndexer,
+  isWithinPastWindow,
+} from "./collection-indexer.js";
 
 export class RepostIndexer implements ICollectionIndexer<Repost> {
   constructor(
@@ -20,8 +25,16 @@ export class RepostIndexer implements ICollectionIndexer<Repost> {
     return parseRepost(record);
   }
 
-  pastWindowDate(parsed: Repost) {
-    return parsed.createdAt;
+  shouldStore({
+    parsed,
+    author,
+    origin,
+  }: {
+    parsed: Repost;
+    author: Author;
+    origin: Origin;
+  }) {
+    return isWithinPastWindow(author, origin, parsed.createdAt);
   }
 
   async save({ ctx, parsed }: { ctx: TransactionContext; parsed: Repost }) {

@@ -1,13 +1,13 @@
 import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { accountFactory } from "../../domain/account.factory.js";
+import { accountFactory } from "../../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
-} from "../../shared/test-utils.js";
-import { recordFactory } from "../dto/record.factory.js";
+} from "../../../shared/test-utils.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("レコードの種類ごとの保存", () => {
   let services: TestServices;
