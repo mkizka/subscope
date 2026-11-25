@@ -2,18 +2,19 @@ import { AtUri } from "@atproto/syntax";
 import { type ITransactionManager } from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
+import { Origin } from "../../../domain/origin.js";
 import type { JobLogger } from "../../../shared/job.js";
 import {
   type IRecordFetcher,
   RecordFetchError,
 } from "../../interfaces/external/record-fetcher.js";
-import type { IndexRecordService } from "../../services/index-record-service.js";
+import type { RecordIndexer } from "../../services/indexer/record-indexer.js";
 
 export class FetchRecordUseCase {
   constructor(
     private readonly recordFetcher: IRecordFetcher,
     private readonly transactionManager: ITransactionManager,
-    private readonly indexRecordService: IndexRecordService,
+    private readonly recordIndexer: RecordIndexer,
   ) {}
 
   async execute({
@@ -27,19 +28,6 @@ export class FetchRecordUseCase {
     live: boolean;
     jobLogger: JobLogger;
   }): Promise<void> {
-    // 深さが2以上の場合は処理を中止
-    //
-    // 例:
-    //   引用投稿
-    //   -> 引用された投稿(0)
-    //   → さらに引用された投稿(1)
-    //   → さらにさらに引用された投稿(2なので中止)
-    if (depth >= 2) {
-      await jobLogger.log(
-        `Skipping fetch for ${uri} - depth limit reached (depth: ${depth})`,
-      );
-      return;
-    }
     try {
       await this.doFetchRecord(uri, depth, live);
     } catch (error) {
@@ -61,20 +49,12 @@ export class FetchRecordUseCase {
   ): Promise<void> {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
-    await this.transactionManager.transaction(async (ctx) => {
-      const shouldIndex = await this.indexRecordService.shouldIndex({
+    await this.transactionManager.transaction((ctx) =>
+      this.recordIndexer.index({
         ctx,
         record,
-      });
-      if (!shouldIndex) {
-        return;
-      }
-      await this.indexRecordService.upsert({
-        ctx,
-        record,
-        live,
-        depth: depth + 1,
-      });
-    });
+        origin: Origin.fromFetchJob({ live, depth }),
+      }),
+    );
   }
 }

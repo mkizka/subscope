@@ -129,7 +129,7 @@ const ctx = {
   db: testInjector.resolve("db"),
 };
 
-await postIndexer.upsert({ ctx, record, depth: 0 });
+await postIndexer.index({ ctx, record, origin: Origin.live() });
 ```
 
 ## テストすべきケース

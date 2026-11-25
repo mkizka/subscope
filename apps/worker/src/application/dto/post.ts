@@ -55,6 +55,7 @@ export type Post = {
   replyParent: StrongRef | null;
   langs: string[] | null;
   embed: PostEmbed | null;
+  mentionDids: Did[];
   createdAt: Date;
   indexedAt: Date;
 };
@@ -74,6 +75,16 @@ export function getEmbedRecordUri(post: Post): AtUri | null {
     return embed.uri;
   }
   return null;
+}
+
+export function postStatsTargets(post: Post): AtUri[] {
+  const { embed, replyParent } = post;
+  return [
+    ...(replyParent ? [replyParent.uri] : []),
+    ...(embed?.type === "record" || embed?.type === "recordWithMedia"
+      ? [embed.uri]
+      : []),
+  ];
 }
 
 const toStrongRef = (ref?: { uri: string; cid: string }) =>
@@ -153,6 +164,9 @@ export function parsePost(record: Record): Post {
     replyParent: toStrongRef(parsed.reply?.parent),
     langs: parsed.langs ?? [],
     embed: parsed.embed ? toEmbed(parsed.embed) : null,
+    mentionDids: (parsed.facets ?? [])
+      .flatMap((facet) => facet.features)
+      .flatMap((feature) => ("did" in feature ? [feature.did] : [])),
     createdAt: new Date(parsed.createdAt),
     indexedAt: record.indexedAt,
   };

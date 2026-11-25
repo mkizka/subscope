@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { Origin } from "../../../domain/origin.js";
 import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
 import { recordFactory } from "../../dto/record.factory.js";
 
@@ -23,10 +24,10 @@ describe("ListItemIndexer", () => {
     });
 
     // act
-    await listItemIndexer.upsert({
+    await listItemIndexer.index({
       ctx: { db, afterCommit },
       record,
-      live: false,
+      origin: Origin.live(),
     });
 
     // assert

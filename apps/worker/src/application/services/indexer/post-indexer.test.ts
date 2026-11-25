@@ -3,6 +3,7 @@ import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { Origin } from "../../../domain/origin.js";
 import {
   afterCommit,
   testRegistry,
@@ -30,7 +31,12 @@ describe("PostIndexer", () => {
     db = services.db;
   });
 
-  describe("upsert", () => {
+  const fetchPostJobs = () =>
+    jobScheduler
+      .getFetchRecordJobs()
+      .filter((job) => job.uri.collection === "app.bsky.feed.post");
+
+  describe("index", () => {
     test("投稿レコードを正しく保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
@@ -45,12 +51,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const post = await postRepo.find({ ctx, uri: record.uri });
@@ -93,19 +94,14 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
-      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
+      expect(fetchPostJobs()).toMatchObject([
         {
           uri: new AtUri(embedUri),
           depth: 0,
-          live: false,
+          live: true,
         },
       ]);
     });
@@ -124,15 +120,10 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
-      expect(jobScheduler.getFetchRecordJobs()).toEqual([]);
+      expect(fetchPostJobs()).toEqual([]);
     });
 
     test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {
@@ -149,12 +140,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const post = await postRepo.find({ ctx, uri: record.uri });
@@ -192,7 +178,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -230,7 +216,7 @@ describe("PostIndexer", () => {
         postRecord("mention", mentioned.did, true),
         postRecord("quote", quoted.did, false),
       ]) {
-        await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+        await postIndexer.index({ ctx, record, origin: Origin.live() });
       }
 
       // assert
@@ -278,7 +264,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(
@@ -291,7 +277,7 @@ describe("PostIndexer", () => {
     });
   });
 
-  describe("afterAction", () => {
+  describe("統計の集計", () => {
     test("投稿時にpost_statsとaccountの投稿数の集計がスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
@@ -306,13 +292,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
-      await postIndexer.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
@@ -350,13 +330,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
-      await postIndexer.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
@@ -391,13 +365,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
-      await postIndexer.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const uris = jobScheduler.getAggregatePostStatsUris();
@@ -431,13 +399,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
-      await postIndexer.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
@@ -447,7 +409,7 @@ describe("PostIndexer", () => {
       expect(uris).toContainEqual(new AtUri(nonExistentParentUri));
     });
 
-    test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがaccount_statsは更新する", async () => {
+    test("投稿が削除された場合、post_statsは更新しないがaccount_statsは更新する", () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
@@ -461,7 +423,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.afterAction({ action: "delete", ctx, record });
+      postIndexer.afterDelete({ ctx, record });
 
       // assert
       expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(

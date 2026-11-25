@@ -3,6 +3,7 @@ import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { Origin } from "../../../domain/origin.js";
 import {
   afterCommit,
   testRegistry,
@@ -32,7 +33,7 @@ describe("RepostIndexer", () => {
     db = services.db;
   });
 
-  describe("upsert", () => {
+  describe("index", () => {
     test("リポストレコードを正しく保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
@@ -53,12 +54,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
+      await repostIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const repost = await repostRepo.find({ ctx, uri: record.uri });
@@ -77,11 +73,15 @@ describe("RepostIndexer", () => {
         subjectUri: subjectUri,
       });
 
-      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
+      expect(
+        jobScheduler
+          .getFetchRecordJobs()
+          .filter((job) => job.uri.collection === "app.bsky.feed.post"),
+      ).toMatchObject([
         {
           uri: new AtUri(subjectUri),
           depth: 0,
-          live: false,
+          live: true,
         },
       ]);
     });
@@ -102,11 +102,10 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.upsert({
+      await repostIndexer.index({
         ctx: { db, afterCommit },
         record,
-        live: true,
-        depth: 0,
+        origin: Origin.live(),
       });
 
       // assert
@@ -122,8 +121,8 @@ describe("RepostIndexer", () => {
     });
   });
 
-  describe("afterAction", () => {
-    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", () => {
+  describe("統計の集計", () => {
+    test("リポストが削除された場合、対象投稿に対してrepost集計ジョブがスケジュールされる", () => {
       // arrange
       const { post } = postFactory();
       postRepo.add(post);
@@ -140,7 +139,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      repostIndexer.afterAction({ ctx: { db, afterCommit }, record });
+      repostIndexer.afterDelete({ ctx: { db, afterCommit }, record });
 
       // assert
       const uris = jobScheduler.getAggregatePostStatsUris();

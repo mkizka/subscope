@@ -1,9 +1,7 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-import type {
-  INotificationRepository,
-  Notification,
-} from "../../../application/interfaces/repositories/notification-repository.js";
+import type { Notification } from "../../../application/dto/notification.js";
+import type { INotificationRepository } from "../../../application/interfaces/repositories/notification-repository.js";
 
 export class InMemoryNotificationRepository implements INotificationRepository {
   private notifications: Map<string, Notification> = new Map();

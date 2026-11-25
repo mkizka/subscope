@@ -1,5 +1,4 @@
 import { asDid } from "@atproto/did";
-import { AtUri } from "@atproto/syntax";
 import { asHandle } from "@repo/common/utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -13,13 +12,11 @@ import {
 describe("IndexAccountService", () => {
   let indexAccountService: TestServices["indexAccountService"];
   let accountRepo: TestServices["accountRepository"];
-  let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     indexAccountService = services.indexAccountService;
     accountRepo = services.accountRepository;
-    jobScheduler = services.jobScheduler;
     db = services.db;
   });
 
@@ -35,7 +32,6 @@ describe("IndexAccountService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
-        live: false,
       });
 
       // assert
@@ -44,15 +40,6 @@ describe("IndexAccountService", () => {
         did: testDid,
         handle: testHandle,
       });
-
-      const profileUri = AtUri.make(testDid, "app.bsky.actor.profile", "self");
-      expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
-        expect.objectContaining({
-          uri: profileUri,
-          depth: 0,
-          live: false,
-        }),
-      );
     });
 
     test("handle指定あり、既存accountあり、既存accountのhandleなしの場合は、handleを更新する", async () => {
@@ -71,7 +58,6 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        live: false,
       });
 
       // assert
@@ -97,7 +83,6 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: existingHandle,
-        live: false,
       });
 
       // assert
@@ -124,7 +109,6 @@ describe("IndexAccountService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        live: false,
       });
 
       // assert
@@ -134,7 +118,7 @@ describe("IndexAccountService", () => {
       });
     });
 
-    test("handle指定なし、既存accountなしの場合は、accountを作成してresolvDidジョブを追加する", async () => {
+    test("handle指定なし、既存accountなしの場合は、handleなしでaccountを作成する", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const newDid = asDid("did:plc:new-no-handle");
@@ -143,7 +127,6 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: newDid,
-        live: false,
       });
 
       // assert
@@ -152,15 +135,9 @@ describe("IndexAccountService", () => {
         did: newDid,
         handle: null,
       });
-
-      expect(jobScheduler.getResolveDidJobs()).toContainEqual(
-        expect.objectContaining({
-          did: newDid,
-        }),
-      );
     });
 
-    test("handle指定なし、既存accountあり、既存accountのhandleなしの場合は、resolvDidジョブを追加する", async () => {
+    test("handle指定なし、既存accountあり、既存accountのhandleなしの場合は、handleなしのままにする", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
@@ -174,7 +151,6 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: existingDidNoHandle,
-        live: false,
       });
 
       // assert
@@ -185,12 +161,6 @@ describe("IndexAccountService", () => {
       expect(account).toMatchObject({
         handle: null,
       });
-
-      expect(jobScheduler.getResolveDidJobs()).toContainEqual(
-        expect.objectContaining({
-          did: existingDidNoHandle,
-        }),
-      );
     });
 
     test("handle指定なし、既存accountあり、既存accountのhandleありの場合は、何もしない", async () => {
@@ -208,7 +178,6 @@ describe("IndexAccountService", () => {
       await indexAccountService.upsert({
         ctx,
         did: existingDid,
-        live: false,
       });
 
       // assert
