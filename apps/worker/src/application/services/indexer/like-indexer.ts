@@ -1,10 +1,8 @@
-import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/interface";
 
+import { Like } from "../../../domain/like.js";
 import type { Origin } from "../../../domain/origin.js";
-import { parseLike } from "../../dto/like.js";
-import type { Record } from "../../dto/record.js";
-import { getSortAt } from "../../dto/sort-at.js";
+import type { Record } from "../../../domain/record.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
@@ -34,23 +32,22 @@ export class LikeIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const like = parseLike(record);
-    const subjectUri = new AtUri(like.subjectUri);
+    const like = Like.fromRecord(record);
     const window = {
       ctx,
       origin,
-      did: record.uri.did,
+      did: like.accountDid,
       createdAt: like.createdAt,
     };
-    const isLikerMember = await this.registrationQuery.isRegistered(
+    const likerIsMember = await this.registrationQuery.isRegistered(
       ctx,
       like.accountDid,
     );
-    const isAuthorMember = await this.registrationQuery.isRegistered(
+    const subjectAuthorIsMember = await this.registrationQuery.isRegistered(
       ctx,
-      subjectUri.host,
+      like.subjectAuthorDid,
     );
-    if (!isLikerMember && !isAuthorMember) {
+    if (!like.isStored({ likerIsMember, subjectAuthorIsMember })) {
       return;
     }
     const accepted = await this.pastRecordFilterService.accepts(window);
@@ -64,29 +61,22 @@ export class LikeIndexer implements IRecordIndexer {
     await this.notificationService.notify({
       ctx,
       origin,
-      notifications: () => [
-        {
-          recordUri: like.uri,
-          recipientDid: subjectUri.host,
-          authorDid: like.accountDid,
-          reason: "like",
-          reasonSubject: like.subjectUri,
-          sortAt: getSortAt(like),
-        },
-      ],
+      notifications: () => [like.notification],
     });
-    const fetchesSubject =
-      isLikerMember &&
-      subjectUri.collection === "app.bsky.feed.post" &&
-      (await this.pastRecordFilterService.isWithinWindow(window));
-    if (fetchesSubject) {
-      await this.relatedRecordService.request({ ctx, origin, uri: subjectUri });
+    const withinWindow =
+      await this.pastRecordFilterService.isWithinWindow(window);
+    if (like.fetchesSubject({ likerIsMember, withinWindow })) {
+      await this.relatedRecordService.request({
+        ctx,
+        origin,
+        uri: like.subject,
+      });
     }
-    this.statsService.recount({ ctx, posts: [subjectUri] });
+    this.statsService.recount({ ctx, posts: [like.subject] });
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const like = parseLike(record);
-    this.statsService.recount({ ctx, posts: [new AtUri(like.subjectUri)] });
+    const like = Like.fromRecord(record);
+    this.statsService.recount({ ctx, posts: [like.subject] });
   }
 }

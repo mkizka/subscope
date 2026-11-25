@@ -1,8 +1,8 @@
 import type { AfterCommitContext } from "@repo/common/interface";
 
+import { ListItem } from "../../../domain/list-item.js";
 import type { Origin } from "../../../domain/origin.js";
-import { parseListItem } from "../../dto/list-item.js";
-import type { Record } from "../../dto/record.js";
+import type { Record } from "../../../domain/record.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IListItemRepository } from "../../interfaces/repositories/list-item-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
@@ -28,17 +28,17 @@ export class ListItemIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const listItem = parseListItem(record);
+    const listItem = ListItem.fromRecord(record);
 
     await this.recordSaveService.save({ ctx, record, origin });
     await this.indexAccountService.upsert({ ctx, did: listItem.subjectDid });
     await this.listItemRepository.save({ ctx, listItem });
 
-    const isOwnerMember = await this.registrationQuery.isRegistered(
+    const ownerIsMember = await this.registrationQuery.isRegistered(
       ctx,
       listItem.accountDid,
     );
-    if (isOwnerMember) {
+    if (listItem.fetchesSubjectAccount({ ownerIsMember })) {
       await this.relatedRecordService.requestAccount({
         ctx,
         origin,

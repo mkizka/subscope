@@ -1,11 +1,8 @@
-import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/interface";
 
 import type { Origin } from "../../../domain/origin.js";
-import { feedItemFromRepost } from "../../dto/feed-item.js";
-import type { Record } from "../../dto/record.js";
-import { parseRepost } from "../../dto/repost.js";
-import { getSortAt } from "../../dto/sort-at.js";
+import type { Record } from "../../../domain/record.js";
+import { Repost } from "../../../domain/repost.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
@@ -35,12 +32,11 @@ export class RepostIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const repost = parseRepost(record);
-    const subjectUri = new AtUri(repost.subjectUri);
+    const repost = Repost.fromRecord(record);
     const accepted = await this.pastRecordFilterService.accepts({
       ctx,
       origin,
-      did: record.uri.did,
+      did: repost.accountDid,
       createdAt: repost.createdAt,
     });
     if (!accepted) {
@@ -49,31 +45,23 @@ export class RepostIndexer implements IRecordIndexer {
 
     await this.recordSaveService.save({ ctx, record, origin });
     await this.repostRepository.save({ ctx, repost });
-    await this.feedItemRepository.save({
-      ctx,
-      feedItem: feedItemFromRepost(repost),
-    });
+    await this.feedItemRepository.save({ ctx, feedItem: repost.feedItem });
 
     await this.notificationService.notify({
       ctx,
       origin,
-      notifications: () => [
-        {
-          recordUri: repost.uri,
-          recipientDid: subjectUri.host,
-          authorDid: repost.accountDid,
-          reason: "repost",
-          reasonSubject: repost.subjectUri,
-          sortAt: getSortAt(repost),
-        },
-      ],
+      notifications: () => [repost.notification],
     });
-    await this.relatedRecordService.request({ ctx, origin, uri: subjectUri });
-    this.statsService.recount({ ctx, posts: [subjectUri] });
+    await this.relatedRecordService.request({
+      ctx,
+      origin,
+      uri: repost.subject,
+    });
+    this.statsService.recount({ ctx, posts: [repost.subject] });
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const repost = parseRepost(record);
-    this.statsService.recount({ ctx, posts: [new AtUri(repost.subjectUri)] });
+    const repost = Repost.fromRecord(record);
+    this.statsService.recount({ ctx, posts: [repost.subject] });
   }
 }

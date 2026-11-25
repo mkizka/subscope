@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 
 import type { Origin } from "../../domain/origin.js";
+import { Tracking } from "../../domain/tracking.js";
 import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
 import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 
@@ -18,12 +19,15 @@ export class PastRecordFilterService {
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
-  async accepts(params: Params) {
-    return (
-      !params.origin.isPast ||
-      (await this.registrationQuery.isRegistered(params.ctx, params.did)) ||
-      (await this.isWithinWindow(params))
-    );
+  async accepts({ ctx, origin, did, createdAt }: Params) {
+    if (!origin.isPast) {
+      return true;
+    }
+    return Tracking.keepsPastRecord({
+      authorIsMember: await this.registrationQuery.isRegistered(ctx, did),
+      tracking: await this.trackingRepository.find({ ctx, did }),
+      createdAt,
+    });
   }
 
   async isWithinWindow({ ctx, origin, did, createdAt }: Params) {
@@ -31,6 +35,6 @@ export class PastRecordFilterService {
       return true;
     }
     const tracking = await this.trackingRepository.find({ ctx, did });
-    return !!tracking && tracking.covers(createdAt);
+    return Tracking.windowCovers(tracking, createdAt);
   }
 }

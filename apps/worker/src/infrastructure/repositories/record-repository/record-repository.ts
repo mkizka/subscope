@@ -3,8 +3,8 @@ import type { TransactionContext } from "@repo/common/interface";
 import { type RecordInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { Record } from "../../../application/dto/record.js";
 import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
+import type { Record } from "../../../domain/record.js";
 
 export class RecordRepository implements IRecordRepository {
   async find({

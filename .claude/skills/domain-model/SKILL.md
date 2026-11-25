@@ -5,42 +5,57 @@ description: worker・appview・webで型やクラスを新規作成・変更す
 
 # ドメインモデルにするかDTOにするか
 
-迷ったら単純な型にする。クラスにするのは、その概念に決まりがあるときだけ。
+どこに置くかと、どんな形にするかは、別々に決める。
 
-## ドメインモデルにする
+## どこに置くか
 
-次のどれかに当てはまるときだけ、`domain` 以下のクラスにする。
+| 置き場            | 置くもの                                                                 |
+| ----------------- | ------------------------------------------------------------------------ |
+| `domain`          | 仕様書や用語集に出てくる概念と、その決まり。リポジトリが保存・取得する物 |
+| `application/dto` | 層の境界でデータを運ぶだけの型。クエリサービスが返す型など               |
 
-- 状態を変える操作に、破ってはいけない決まりがある。決まりはクラスのメソッドの中で検査し、外から状態を直接書き換えられないようにする
-- 作るときの決まり(値の生成方法など)があり、ユースケースごとに書くと食い違うおそれがある
-- 仕様書や用語集に出てくる概念に、判定や計算の決まりがある。状態を変えない読むだけの判定でも、サービスやユースケースに散らさず、その概念のメソッドにする
+`domain` は `application` や `infrastructure` を参照しない。DTOは判断を持たない。読み取りでドメインモデルを返さない(docs/dev/repository-and-query.md)。
 
 例:
 
+- `apps/worker/src/domain/post.ts` の `Post`。レコードから何を残すか、誰に通知するか、どの引用先を取りに行くかを持つ
 - `apps/appview/src/domain/models/invite-code.ts` の `InviteCode`。`generate` でコードの形を決め、`markAsUsed` は期限切れや使用済みなら例外を投げる
-- 追跡(Tracking)。「追跡を始めた日時の1日前以降に作られたレコードは保存する」という判定は追跡の決まりなので、サービスの関数ではなく追跡のメソッドにする
+- `apps/appview/src/application/dto/invite-code-dto.ts` の `InviteCodeDto`。クエリサービスが返す
 
-## 単純な型(DTO)にする
+## どんな形にするか
 
-上に当てはまらなければ、`application/dto` 以下に `type` で書く。決まりがほとんどなく、読み書きするだけのものはこちら。
+`domain` の概念はクラスにする。
 
-- Tapのレコードなど外から来たデータを読み取っただけの型。検証と変換は `parseXxx` のような関数で行う
-  - 例: `apps/worker/src/application/dto/follow.ts` の `Follow` と `parseFollow`
-- 項目をそのまま書き換えるだけのsetterしか持たない型。メソッドが値の代入だけなら、クラスにしても守るものがない
-- クエリサービスが返す型。読み取りでドメインモデルを返さない(docs/dev/repository-and-query.md)
-  - 例: `apps/appview/src/application/dto/invite-code-dto.ts` の `InviteCodeDto`
+- コンストラクタはprivateにし、`fromRecord` や `create` などのstaticメソッドからだけ作る。検証を通らない値を作れないようにする
+- 判定や計算は、サービスやユースケースに散らさず、その概念のメソッドにする
+- 状態を変える操作に決まりがあれば、メソッドの中で検査し、外から状態を直接書き換えられないようにする
 
-DIDやハンドルなど1つの値の形式は、クラスで包まず `asDid` や `asHandle` のようなブランド型で守る。
+ほかの概念から作るだけで決まりを持たない値(`FeedItem` など)は、`type` でよい。DIDやハンドルなど1つの値の形式は、クラスで包まず `asDid` や `asHandle` のようなブランド型で守る。
 
-## リポジトリとの関係
+## DBに聞かないと分からない判定
 
-リポジトリ(find・save・delete)は、ドメインモデルでも単純な型でも使ってよい。単純な型のときは、取り出した値をスプレッド構文などで変えて保存する。
+ドメインはDBを知らない。アプリケーション層がDBに聞き、その結果をメソッドに渡して、判断だけをドメインに聞く。
 
-## 決まりに合っていない既存の型
+```ts
+const likerIsMember = await this.registrationQuery.isRegistered(
+  ctx,
+  like.accountDid,
+);
+const subjectAuthorIsMember = await this.registrationQuery.isRegistered(
+  ctx,
+  like.subjectAuthorDid,
+);
+if (!like.isStored({ likerIsMember, subjectAuthorIsMember })) {
+  return;
+}
+```
 
-次は今の基準ではドメインモデルにする理由がない。新しいコードで真似しない。
+アプリケーション層に残すのは、DBに聞く、順番に呼ぶ、保存する、の3つ。`&&` や `||` で書く業務の条件はドメインに置く。
+
+## 基準に合っていない既存の型
+
+次は今の基準に合っていない。新しいコードで真似しない。
 
 | 型                                                                 | 理由                                           |
 | ------------------------------------------------------------------ | ---------------------------------------------- |
-| `apps/worker/src/domain/account.ts` の `Account`                   | メソッドが値を代入するsetterだけ               |
 | `apps/appview/src/domain/models/registration.ts` の `Registration` | メソッドがなく、クエリサービスからも返している |

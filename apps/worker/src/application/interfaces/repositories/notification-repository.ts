@@ -1,6 +1,6 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Notification } from "../../dto/notification.js";
+import type { Notification } from "../../../domain/notification.js";
 
 export interface INotificationRepository {
   save: (params: {

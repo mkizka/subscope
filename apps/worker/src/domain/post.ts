@@ -9,7 +9,10 @@ import recordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
 import video from "@repo/client/app/bsky/embed/video";
 import { validateRecord } from "@repo/common/utils";
 
+import type { FeedItem } from "./feed-item.js";
+import type { Notification } from "./notification.js";
 import type { Record } from "./record.js";
+import { getSortAt } from "./sort-at.js";
 
 const validatePost = (record: Record) =>
   validateRecord("app.bsky.feed.post", record);
@@ -45,47 +48,6 @@ export type PostEmbed =
   | EmbedMedia
   | { type: "record"; uri: AtUri; cid: string }
   | { type: "recordWithMedia"; uri: AtUri; cid: string; media: EmbedMedia };
-
-export type Post = {
-  uri: AtUri;
-  cid: string;
-  accountDid: Did;
-  text: string;
-  replyRoot: StrongRef | null;
-  replyParent: StrongRef | null;
-  langs: string[] | null;
-  embed: PostEmbed | null;
-  mentionDids: Did[];
-  createdAt: Date;
-  indexedAt: Date;
-};
-
-/**
- * embedのURIがインデックス可能なコレクションの場合そのURIを返す。
- * アプリケーション層でPostのインデックス時にこのURIのレコードもインデックスする。
- */
-export function getEmbedRecordUri(post: Post): AtUri | null {
-  const { embed } = post;
-  if (
-    (embed?.type === "record" || embed?.type === "recordWithMedia") &&
-    ["app.bsky.feed.post", "app.bsky.feed.generator"].includes(
-      embed.uri.collection,
-    )
-  ) {
-    return embed.uri;
-  }
-  return null;
-}
-
-export function postStatsTargets(post: Post): AtUri[] {
-  const { embed, replyParent } = post;
-  return [
-    ...(replyParent ? [replyParent.uri] : []),
-    ...(embed?.type === "record" || embed?.type === "recordWithMedia"
-      ? [embed.uri]
-      : []),
-  ];
-}
 
 const toStrongRef = (ref?: { uri: string; cid: string }) =>
   ref ? { uri: new AtUri(ref.uri), cid: ref.cid } : null;
@@ -153,21 +115,104 @@ const toEmbed = (embed: RawEmbed): PostEmbed | null => {
   return toEmbedMedia(embed);
 };
 
-export function parsePost(record: Record): Post {
-  const parsed = validatePost(record);
-  return {
-    uri: new AtUri(record.uri.toString()),
-    cid: record.cid,
-    accountDid: record.uri.did,
-    text: parsed.text,
-    replyRoot: toStrongRef(parsed.reply?.root),
-    replyParent: toStrongRef(parsed.reply?.parent),
-    langs: parsed.langs ?? [],
-    embed: parsed.embed ? toEmbed(parsed.embed) : null,
-    mentionDids: (parsed.facets ?? [])
-      .flatMap((facet) => facet.features)
-      .flatMap((feature) => ("did" in feature ? [feature.did] : [])),
-    createdAt: new Date(parsed.createdAt),
-    indexedAt: record.indexedAt,
-  };
+export class Post {
+  private constructor(
+    readonly uri: AtUri,
+    readonly cid: string,
+    readonly accountDid: Did,
+    readonly text: string,
+    readonly replyRoot: StrongRef | null,
+    readonly replyParent: StrongRef | null,
+    readonly langs: string[],
+    readonly embed: PostEmbed | null,
+    readonly mentionDids: Did[],
+    readonly createdAt: Date,
+    readonly indexedAt: Date,
+  ) {}
+
+  static fromRecord(record: Record) {
+    const parsed = validatePost(record);
+    return new Post(
+      new AtUri(record.uri.toString()),
+      record.cid,
+      record.uri.did,
+      parsed.text,
+      toStrongRef(parsed.reply?.root),
+      toStrongRef(parsed.reply?.parent),
+      parsed.langs ?? [],
+      parsed.embed ? toEmbed(parsed.embed) : null,
+      (parsed.facets ?? [])
+        .flatMap((facet) => facet.features)
+        .flatMap((feature) => ("did" in feature ? [feature.did] : [])),
+      new Date(parsed.createdAt),
+      record.indexedAt,
+    );
+  }
+
+  get feedItem(): FeedItem {
+    return {
+      uri: this.uri.toString(),
+      cid: this.cid,
+      type: "post",
+      subjectUri: null,
+      accountDid: this.accountDid,
+      sortAt: getSortAt(this),
+    };
+  }
+
+  private get quotedUri() {
+    const { embed } = this;
+    return embed?.type === "record" || embed?.type === "recordWithMedia"
+      ? embed.uri
+      : null;
+  }
+
+  get fetchableEmbedUri() {
+    const uri = this.quotedUri;
+    return uri &&
+      ["app.bsky.feed.post", "app.bsky.feed.generator"].includes(uri.collection)
+      ? uri
+      : null;
+  }
+
+  get statsTargets() {
+    const { replyParent, quotedUri } = this;
+    return [
+      ...(replyParent ? [replyParent.uri] : []),
+      ...(quotedUri ? [quotedUri] : []),
+    ];
+  }
+
+  notifications(replyAncestorUris: AtUri[]): Notification[] {
+    const quoteUri = this.fetchableEmbedUri;
+    const base = {
+      recordUri: this.uri.toString(),
+      authorDid: this.accountDid,
+      sortAt: getSortAt(this),
+    };
+    return [
+      ...this.mentionDids.map((did) => ({
+        ...base,
+        recipientDid: did,
+        reason: "mention" as const,
+        reasonSubject: null,
+      })),
+      ...(quoteUri?.collection === "app.bsky.feed.post"
+        ? [
+            {
+              ...base,
+              recipientDid: quoteUri.hostname,
+              reason: "quote" as const,
+              reasonSubject: quoteUri.toString(),
+            },
+          ]
+        : []),
+      ...replyAncestorUris.map((uri) => ({
+        ...base,
+        recipientDid: uri.hostname,
+        reason: "reply" as const,
+        reasonSubject: uri.toString(),
+      })),
+    ];
+  }
 }

@@ -1,9 +1,8 @@
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
+import { Follow } from "../../../domain/follow.js";
 import type { Origin } from "../../../domain/origin.js";
-import { parseFollow } from "../../dto/follow.js";
-import type { Record } from "../../dto/record.js";
-import { getSortAt } from "../../dto/sort-at.js";
+import type { Record } from "../../../domain/record.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
@@ -34,8 +33,8 @@ export class FollowIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const follow = parseFollow(record);
-    const isFollowerMember = await this.registrationQuery.isRegistered(
+    const follow = Follow.fromRecord(record);
+    const followerIsMember = await this.registrationQuery.isRegistered(
       ctx,
       follow.accountDid,
     );
@@ -47,18 +46,9 @@ export class FollowIndexer implements IRecordIndexer {
     await this.notificationService.notify({
       ctx,
       origin,
-      notifications: () => [
-        {
-          recordUri: follow.uri,
-          recipientDid: follow.subjectDid,
-          authorDid: follow.accountDid,
-          reason: "follow",
-          reasonSubject: null,
-          sortAt: getSortAt(follow),
-        },
-      ],
+      notifications: () => [follow.notification],
     });
-    if (isFollowerMember) {
+    if (follow.changesTrackedAccounts({ followerIsMember })) {
       await this.relatedRecordService.requestAccount({
         ctx,
         origin,
@@ -81,12 +71,12 @@ export class FollowIndexer implements IRecordIndexer {
     ctx: AfterCommitContext;
     record: Record;
   }) {
-    const follow = parseFollow(record);
-    const isFollowerMember = await this.registrationQuery.isRegistered(
+    const follow = Follow.fromRecord(record);
+    const followerIsMember = await this.registrationQuery.isRegistered(
       ctx,
       follow.accountDid,
     );
-    if (isFollowerMember) {
+    if (follow.changesTrackedAccounts({ followerIsMember })) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );

@@ -2,7 +2,7 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Origin } from "../../../domain/origin.js";
-import type { Record } from "../../dto/record.js";
+import type { Record } from "../../../domain/record.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { RecordSaveService } from "../record-save-service.js";
 

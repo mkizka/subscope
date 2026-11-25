@@ -1,14 +1,8 @@
 import type { AfterCommitContext } from "@repo/common/interface";
 
 import type { Origin } from "../../../domain/origin.js";
-import { feedItemFromPost } from "../../dto/feed-item.js";
-import { postNotifications } from "../../dto/notification.js";
-import {
-  getEmbedRecordUri,
-  parsePost,
-  postStatsTargets,
-} from "../../dto/post.js";
-import type { Record } from "../../dto/record.js";
+import { Post } from "../../../domain/post.js";
+import type { Record } from "../../../domain/record.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
@@ -42,7 +36,7 @@ export class PostIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const post = parsePost(record);
+    const post = Post.fromRecord(record);
     const accepted = await this.pastRecordFilterService.accepts({
       ctx,
       origin,
@@ -55,17 +49,13 @@ export class PostIndexer implements IRecordIndexer {
 
     await this.recordSaveService.save({ ctx, record, origin });
     await this.postRepository.save({ ctx, post });
-    await this.feedItemRepository.save({
-      ctx,
-      feedItem: feedItemFromPost(post),
-    });
+    await this.feedItemRepository.save({ ctx, feedItem: post.feedItem });
 
     await this.notificationService.notify({
       ctx,
       origin,
       notifications: async () =>
-        postNotifications(
-          post,
+        post.notifications(
           post.replyParent
             ? await this.postQuery.findReplyAncestorUris(
                 ctx,
@@ -78,20 +68,20 @@ export class PostIndexer implements IRecordIndexer {
     await this.relatedRecordService.request({
       ctx,
       origin,
-      uri: getEmbedRecordUri(post),
+      uri: post.fetchableEmbedUri,
     });
     this.statsService.recount({
       ctx,
-      posts: [post.uri, ...postStatsTargets(post)],
+      posts: [post.uri, ...post.statsTargets],
       accounts: [post.accountDid],
     });
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const post = parsePost(record);
+    const post = Post.fromRecord(record);
     this.statsService.recount({
       ctx,
-      posts: postStatsTargets(post),
+      posts: post.statsTargets,
       accounts: [post.accountDid],
     });
   }

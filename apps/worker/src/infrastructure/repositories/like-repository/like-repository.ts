@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 
-import type { Like } from "../../../application/dto/like.js";
 import type { ILikeRepository } from "../../../application/interfaces/repositories/like-repository.js";
+import type { Like } from "../../../domain/like.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class LikeRepository implements ILikeRepository {
