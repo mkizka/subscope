@@ -1,6 +1,8 @@
 import type { ITransactionManager } from "@repo/common/interface";
 
+import { Origin } from "../../../domain/origin.js";
 import type { IndexAccountService } from "../../services/index-account-service.js";
+import type { RelatedRecordService } from "../../services/related-record-service.js";
 import type { ResolveDidService } from "../../services/resolve-did-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
@@ -8,6 +10,7 @@ export class UpsertIdentityUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly indexAccountService: IndexAccountService,
+    private readonly relatedRecordService: RelatedRecordService,
     private readonly resolveDidService: ResolveDidService,
   ) {}
 
@@ -22,15 +25,19 @@ export class UpsertIdentityUseCase {
     if (!handle) {
       return;
     }
-    await this.transactionManager.transaction((ctx) =>
-      this.indexAccountService.upsert({
+    await this.transactionManager.transaction(async (ctx) => {
+      await this.indexAccountService.upsert({
         ctx,
         did: command.did,
         handle,
         status: command.status,
-        live: true,
-      }),
-    );
+      });
+      await this.relatedRecordService.requestAccount({
+        ctx,
+        origin: Origin.live(),
+        did: command.did,
+      });
+    });
     if (handle === "handle.invalid") {
       await this.resolveDidService.resolve(command.did);
     }

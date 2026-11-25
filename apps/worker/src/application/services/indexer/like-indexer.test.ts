@@ -3,6 +3,7 @@ import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { Origin } from "../../../domain/origin.js";
 import {
   afterCommit,
   testRegistry,
@@ -27,7 +28,7 @@ describe("LikeIndexer", () => {
     db = services.db;
   });
 
-  describe("upsert", () => {
+  describe("index", () => {
     test("いいねレコードを正しく保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
@@ -47,7 +48,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
+      await likeIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const like = await likeRepo.find({ ctx, uri: record.uri });
@@ -99,25 +100,25 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({
+      await likeIndexer.index({
         ctx: { db, afterCommit },
         record,
-        live: true,
-        depth: 0,
+        origin: Origin.live(),
       });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(expected);
     });
-  });
 
-  describe("notify-9", () => {
     test.each([
-      { name: "バックフィルで受け取ったレコード", live: false, depth: 0 },
-      { name: "取得しに行ったレコード", live: true, depth: 1 },
+      { name: "バックフィルで受け取ったレコード", origin: Origin.backfill() },
+      {
+        name: "取得しに行ったレコード",
+        origin: Origin.fromFetchJob({ live: true, depth: 0 }),
+      },
     ])(
       "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルや取得しに行ったレコードでは作らない ($name)",
-      async ({ live, depth }) => {
+      async ({ origin }) => {
         // arrange
         const liker = accountFactory();
         const author = accountFactory();
@@ -135,12 +136,7 @@ describe("LikeIndexer", () => {
         });
 
         // act
-        await likeIndexer.upsert({
-          ctx: { db, afterCommit },
-          record,
-          live,
-          depth,
-        });
+        await likeIndexer.index({ ctx: { db, afterCommit }, record, origin });
 
         // assert
         expect(notificationRepo.findAll()).toEqual([]);
@@ -148,7 +144,7 @@ describe("LikeIndexer", () => {
     );
   });
 
-  describe("afterAction", () => {
+  describe("統計の集計", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
@@ -166,10 +162,9 @@ describe("LikeIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await likeIndexer.upsert({ ctx, record, live: false, depth: 0 });
 
       // act
-      likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
+      await likeIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const uris = jobScheduler.getAggregatePostStatsUris();
@@ -193,7 +188,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
+      likeIndexer.afterDelete({ ctx: { db, afterCommit }, record });
 
       // assert
       const uris = jobScheduler.getAggregatePostStatsUris();
@@ -218,7 +213,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
+      likeIndexer.afterDelete({ ctx: { db, afterCommit }, record });
 
       // assert
       const uris = jobScheduler.getAggregatePostStatsUris();

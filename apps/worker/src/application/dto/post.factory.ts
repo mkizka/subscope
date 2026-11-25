@@ -37,6 +37,7 @@ export function postFactory(params: PostParams = {}) {
     replyParent: toRef(params.replyParent),
     langs: params.langs ?? [],
     embed: params.embed ?? null,
+    mentionDids: params.mentionDids ?? [],
     createdAt: params.createdAt ?? fakeDate(),
     indexedAt: params.indexedAt ?? fakeDate(),
   };

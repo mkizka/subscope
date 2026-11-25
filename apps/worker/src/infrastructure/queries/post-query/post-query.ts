@@ -6,20 +6,23 @@ import { eq } from "drizzle-orm";
 import type { IPostQuery } from "../../../application/interfaces/queries/post-query.js";
 
 export class PostQuery implements IPostQuery {
-  async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
-    const result = await ctx.db
-      .select({ uri: schema.posts.uri })
-      .from(schema.posts)
-      .where(eq(schema.posts.uri, uri.toString()))
-      .limit(1);
-
-    return result.length > 0;
+  async findReplyAncestorUris(
+    ctx: TransactionContext,
+    parentUri: AtUri,
+    limit: number,
+  ): Promise<AtUri[]> {
+    const uris = [];
+    for (
+      let uri: AtUri | null = parentUri;
+      uri && uris.length < limit;
+      uri = await this.findReplyParentUri(ctx, uri)
+    ) {
+      uris.push(uri);
+    }
+    return uris;
   }
 
-  async findReplyParentUri(
-    ctx: TransactionContext,
-    uri: AtUri,
-  ): Promise<AtUri | null> {
+  private async findReplyParentUri(ctx: TransactionContext, uri: AtUri) {
     const [post] = await ctx.db
       .select({ replyParentUri: schema.posts.replyParentUri })
       .from(schema.posts)

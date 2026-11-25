@@ -2,7 +2,12 @@ import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
-import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import { Origin } from "../../../domain/origin.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
 import { recordFactory } from "../../dto/record.factory.js";
 
 describe("ProfileIndexer", () => {
@@ -16,9 +21,9 @@ describe("ProfileIndexer", () => {
     db = services.db;
   });
 
-  describe("upsert", () => {
+  describe("index", () => {
     test("プロフィールレコードを正しく保存する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const account = accountFactory();
       const avatarCid = fakeCid();
@@ -50,7 +55,7 @@ describe("ProfileIndexer", () => {
       });
 
       // act
-      await profileIndexer.upsert({ ctx, record });
+      await profileIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const profile = await profileRepo.find({ ctx, uri: record.uri });

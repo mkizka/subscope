@@ -1,137 +1,92 @@
-import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
+import type { AfterCommitContext } from "@repo/common/interface";
 
-import { type Like, parseLike } from "../../dto/like.js";
+import type { Origin } from "../../../domain/origin.js";
+import { parseLike } from "../../dto/like.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
-import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
-import type { ITrackingRepository } from "../../interfaces/repositories/tracking-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { NotificationService } from "../notification-service.js";
+import type { PastRecordFilterService } from "../past-record-filter-service.js";
+import type { RecordSaveService } from "../record-save-service.js";
+import type { RelatedRecordService } from "../related-record-service.js";
+import type { StatsService } from "../stats-service.js";
 
-export class LikeIndexer implements ICollectionIndexer {
+export class LikeIndexer implements IRecordIndexer {
   constructor(
     private readonly likeRepository: ILikeRepository,
-    private readonly jobScheduler: IJobScheduler,
     private readonly registrationQuery: IRegistrationQuery,
+    private readonly pastRecordFilterService: PastRecordFilterService,
+    private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
-    private readonly postQuery: IPostQuery,
-    private readonly trackingRepository: ITrackingRepository,
+    private readonly relatedRecordService: RelatedRecordService,
+    private readonly statsService: StatsService,
   ) {}
 
-  async shouldIndex({
+  async index({
     ctx,
     record,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
+    origin: Origin;
   }) {
     const like = parseLike(record);
-    return (
-      (await this.registrationQuery.isRegistered(ctx, like.accountDid)) ||
-      (await this.registrationQuery.isRegistered(
-        ctx,
-        new AtUri(like.subjectUri).host,
-      ))
-    );
-  }
-
-  async upsert({
-    ctx,
-    record,
-    live,
-    depth,
-  }: {
-    ctx: AfterCommitContext;
-    record: Record;
-    live: boolean;
-    depth: number;
-  }) {
-    const like = parseLike(record);
-    const recipientDid = new AtUri(like.subjectUri).host;
-    const isRecipientServerMember = await this.registrationQuery.isRegistered(
-      ctx,
-      recipientDid,
-    );
-    await this.likeRepository.save({ ctx, like });
-
-    if (
-      live &&
-      depth === 0 &&
-      recipientDid !== like.accountDid &&
-      isRecipientServerMember
-    ) {
-      await this.notificationService.create({
-        ctx,
-        notifications: [
-          {
-            recordUri: like.uri,
-            recipientDid,
-            authorDid: like.accountDid,
-            reason: "like",
-            reasonSubject: like.subjectUri,
-            sortAt: getSortAt(like),
-          },
-        ],
-      });
-    }
-
     const subjectUri = new AtUri(like.subjectUri);
-    const shouldFetch = await this.shouldFetchSubject({
+    const window = {
       ctx,
-      like,
-      subjectUri,
-      live,
-    });
-    if (shouldFetch) {
-      ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(subjectUri, { live, depth }),
-      );
-    }
-  }
-
-  private async shouldFetchSubject({
-    ctx,
-    like,
-    subjectUri,
-    live,
-  }: {
-    ctx: AfterCommitContext;
-    like: Like;
-    subjectUri: AtUri;
-    live: boolean;
-  }) {
-    if (subjectUri.collection !== "app.bsky.feed.post") {
-      return false;
-    }
-    const isMember = await this.registrationQuery.isRegistered(
+      origin,
+      did: record.uri.did,
+      createdAt: like.createdAt,
+    };
+    const isLikerMember = await this.registrationQuery.isRegistered(
       ctx,
       like.accountDid,
     );
-    if (!isMember) {
-      return false;
-    }
-    const subjectExists = await this.postQuery.exists(ctx, subjectUri);
-    if (subjectExists) {
-      return false;
-    }
-    if (live) {
-      return true;
-    }
-    const tracking = await this.trackingRepository.find({
+    const isAuthorMember = await this.registrationQuery.isRegistered(
       ctx,
-      did: asDid(like.accountDid),
+      subjectUri.host,
+    );
+    if (!isLikerMember && !isAuthorMember) {
+      return;
+    }
+    const accepted = await this.pastRecordFilterService.accepts(window);
+    if (!accepted) {
+      return;
+    }
+
+    await this.recordSaveService.save({ ctx, record, origin });
+    await this.likeRepository.save({ ctx, like });
+
+    await this.notificationService.notify({
+      ctx,
+      origin,
+      notifications: () => [
+        {
+          recordUri: like.uri,
+          recipientDid: subjectUri.host,
+          authorDid: like.accountDid,
+          reason: "like",
+          reasonSubject: like.subjectUri,
+          sortAt: getSortAt(like),
+        },
+      ],
     });
-    return !!tracking && tracking.covers(like.createdAt);
+    const fetchesSubject =
+      isLikerMember &&
+      subjectUri.collection === "app.bsky.feed.post" &&
+      (await this.pastRecordFilterService.isWithinWindow(window));
+    if (fetchesSubject) {
+      await this.relatedRecordService.request({ ctx, origin, uri: subjectUri });
+    }
+    this.statsService.recount({ ctx, posts: [subjectUri] });
   }
 
-  afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
+  afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = parseLike(record);
-    ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregatePostStats(new AtUri(like.subjectUri)),
-    );
+    this.statsService.recount({ ctx, posts: [new AtUri(like.subjectUri)] });
   }
 }

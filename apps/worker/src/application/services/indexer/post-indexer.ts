@@ -1,170 +1,98 @@
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
-import { validateRecord } from "@repo/common/utils";
+import type { AfterCommitContext } from "@repo/common/interface";
 
+import type { Origin } from "../../../domain/origin.js";
 import { feedItemFromPost } from "../../dto/feed-item.js";
-import { getEmbedRecordUri, parsePost, type Post } from "../../dto/post.js";
+import { postNotifications } from "../../dto/notification.js";
+import {
+  getEmbedRecordUri,
+  parsePost,
+  postStatsTargets,
+} from "../../dto/post.js";
 import type { Record } from "../../dto/record.js";
-import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
-import type { Notification } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { NotificationService } from "../notification-service.js";
+import type { PastRecordFilterService } from "../past-record-filter-service.js";
+import type { RecordSaveService } from "../record-save-service.js";
+import type { RelatedRecordService } from "../related-record-service.js";
+import type { StatsService } from "../stats-service.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
 
-export class PostIndexer implements ICollectionIndexer {
+export class PostIndexer implements IRecordIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
-    private readonly postQuery: IPostQuery,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly registrationQuery: IRegistrationQuery,
+    private readonly postQuery: IPostQuery,
+    private readonly pastRecordFilterService: PastRecordFilterService,
+    private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
-    private readonly jobScheduler: IJobScheduler,
+    private readonly relatedRecordService: RelatedRecordService,
+    private readonly statsService: StatsService,
   ) {}
 
-  async upsert({
+  async index({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) {
     const post = parsePost(record);
-    await this.postRepository.save({ ctx, post });
-
-    const feedItem = feedItemFromPost(post);
-    await this.feedItemRepository.save({ ctx, feedItem });
-
-    if (live && depth === 0) {
-      await this.createNotifications(ctx, record, post);
-    }
-
-    const embedUri = getEmbedRecordUri(post);
-    if (embedUri) {
-      const embedExists = await this.postQuery.exists(ctx, embedUri);
-      if (!embedExists) {
-        ctx.afterCommit(() =>
-          this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth }),
-        );
-      }
-    }
-  }
-
-  private async createNotifications(
-    ctx: AfterCommitContext,
-    record: Record,
-    post: Post,
-  ) {
-    const quoteUri = getEmbedRecordUri(post);
-    const mentionDids = (
-      validateRecord("app.bsky.feed.post", record).facets ?? []
-    )
-      .flatMap((facet) => facet.features)
-      .flatMap((feature) => ("did" in feature ? [feature.did] : []));
-    const replySubjects = [];
-    for (
-      let uri = post.replyParent?.uri ?? null;
-      uri && replySubjects.length < REPLY_NOTIFICATION_DEPTH;
-      uri = await this.postQuery.findReplyParentUri(ctx, uri)
-    ) {
-      replySubjects.push(uri);
-    }
-    const candidates = [
-      ...mentionDids.map((did) => ({
-        recipientDid: did,
-        reason: "mention" as const,
-        reasonSubject: null,
-      })),
-      quoteUri?.collection === "app.bsky.feed.post" && {
-        recipientDid: quoteUri.hostname,
-        reason: "quote" as const,
-        reasonSubject: quoteUri.toString(),
-      },
-      ...replySubjects.map((uri) => ({
-        recipientDid: uri.hostname,
-        reason: "reply" as const,
-        reasonSubject: uri.toString(),
-      })),
-    ];
-
-    const notifications = new Map<string, Notification>();
-    for (const candidate of candidates) {
-      if (
-        !candidate ||
-        candidate.recipientDid === post.accountDid ||
-        notifications.has(candidate.recipientDid)
-      ) {
-        continue;
-      }
-      const isRecipientRegistered = await this.registrationQuery.isRegistered(
-        ctx,
-        candidate.recipientDid,
-      );
-      if (!isRecipientRegistered) {
-        continue;
-      }
-      notifications.set(candidate.recipientDid, {
-        ...candidate,
-        recordUri: post.uri.toString(),
-        authorDid: post.accountDid,
-        sortAt: getSortAt(post),
-      });
-    }
-    await this.notificationService.create({
+    const accepted = await this.pastRecordFilterService.accepts({
       ctx,
-      notifications: [...notifications.values()],
+      origin,
+      did: post.accountDid,
+      createdAt: post.createdAt,
+    });
+    if (!accepted) {
+      return;
+    }
+
+    await this.recordSaveService.save({ ctx, record, origin });
+    await this.postRepository.save({ ctx, post });
+    await this.feedItemRepository.save({
+      ctx,
+      feedItem: feedItemFromPost(post),
+    });
+
+    await this.notificationService.notify({
+      ctx,
+      origin,
+      notifications: async () =>
+        postNotifications(
+          post,
+          post.replyParent
+            ? await this.postQuery.findReplyAncestorUris(
+                ctx,
+                post.replyParent.uri,
+                REPLY_NOTIFICATION_DEPTH,
+              )
+            : [],
+        ),
+    });
+    await this.relatedRecordService.request({
+      ctx,
+      origin,
+      uri: getEmbedRecordUri(post),
+    });
+    this.statsService.recount({
+      ctx,
+      posts: [post.uri, ...postStatsTargets(post)],
+      accounts: [post.accountDid],
     });
   }
 
-  afterAction({
-    ctx,
-    record,
-    action,
-  }: {
-    ctx: AfterCommitContext;
-    record: Record;
-    action: "upsert" | "delete";
-  }): Promise<void> {
+  afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const post = parsePost(record);
-
-    ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateAccountStats(post.accountDid),
-    );
-
-    // 削除時にafterActionが呼ばれる場合は投稿が存在しないのでupsertに限定
-    if (action === "upsert") {
-      // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
-      // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
-      //    → このとき、リポスト数が0なので1にする必要がある
-      ctx.afterCommit(() =>
-        this.jobScheduler.scheduleAggregatePostStats(post.uri),
-      );
-    }
-
-    const replyParent = post.replyParent;
-    if (replyParent) {
-      ctx.afterCommit(() =>
-        this.jobScheduler.scheduleAggregatePostStats(replyParent.uri),
-      );
-    }
-
-    if (
-      post.embed?.type === "record" ||
-      post.embed?.type === "recordWithMedia"
-    ) {
-      const embedUri = post.embed.uri;
-      ctx.afterCommit(() =>
-        this.jobScheduler.scheduleAggregatePostStats(embedUri),
-      );
-    }
-
-    return Promise.resolve();
+    this.statsService.recount({
+      ctx,
+      posts: postStatsTargets(post),
+      accounts: [post.accountDid],
+    });
   }
 }

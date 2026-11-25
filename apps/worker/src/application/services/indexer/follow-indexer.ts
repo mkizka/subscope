@@ -1,99 +1,99 @@
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
+import type { Origin } from "../../../domain/origin.js";
 import { parseFollow } from "../../dto/follow.js";
 import type { Record } from "../../dto/record.js";
 import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { IndexAccountService } from "../index-account-service.js";
 import type { NotificationService } from "../notification-service.js";
+import type { RecordSaveService } from "../record-save-service.js";
+import type { RelatedRecordService } from "../related-record-service.js";
+import type { StatsService } from "../stats-service.js";
 
-export class FollowIndexer implements ICollectionIndexer {
+export class FollowIndexer implements IRecordIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
-    private readonly jobScheduler: IJobScheduler,
-    private readonly indexAccountService: IndexAccountService,
     private readonly registrationQuery: IRegistrationQuery,
+    private readonly indexAccountService: IndexAccountService,
+    private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
+    private readonly relatedRecordService: RelatedRecordService,
+    private readonly statsService: StatsService,
+    private readonly jobScheduler: IJobScheduler,
   ) {}
 
-  async upsert({
+  async index({
     ctx,
     record,
-    live,
-    depth,
+    origin,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    live: boolean;
-    depth: number;
+    origin: Origin;
   }) {
     const follow = parseFollow(record);
-    const isFollowerServerMember = await this.registrationQuery.isRegistered(
+    const isFollowerMember = await this.registrationQuery.isRegistered(
       ctx,
       follow.accountDid,
     );
-    await this.indexAccountService.upsert({
-      ctx,
-      did: follow.subjectDid,
-      live,
-      fetchMissing: isFollowerServerMember,
-    });
+
+    await this.recordSaveService.save({ ctx, record, origin });
+    await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
     await this.followRepository.save({ ctx, follow });
 
-    if (isFollowerServerMember) {
+    await this.notificationService.notify({
+      ctx,
+      origin,
+      notifications: () => [
+        {
+          recordUri: follow.uri,
+          recipientDid: follow.subjectDid,
+          authorDid: follow.accountDid,
+          reason: "follow",
+          reasonSubject: null,
+          sortAt: getSortAt(follow),
+        },
+      ],
+    });
+    if (isFollowerMember) {
+      await this.relatedRecordService.requestAccount({
+        ctx,
+        origin,
+        did: follow.subjectDid,
+      });
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );
     }
-
-    const shouldNotify =
-      live &&
-      depth === 0 &&
-      follow.subjectDid !== follow.accountDid &&
-      (await this.registrationQuery.isRegistered(ctx, follow.subjectDid));
-    if (shouldNotify) {
-      await this.notificationService.create({
-        ctx,
-        notifications: [
-          {
-            recordUri: follow.uri,
-            recipientDid: follow.subjectDid,
-            authorDid: follow.accountDid,
-            reason: "follow",
-            reasonSubject: null,
-            sortAt: getSortAt(follow),
-          },
-        ],
-      });
-    }
+    this.statsService.recount({
+      ctx,
+      accounts: [follow.accountDid, follow.subjectDid],
+    });
   }
 
-  async afterAction({
+  async afterDelete({
     ctx,
     record,
-    action,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    action: "upsert" | "delete";
-  }): Promise<void> {
+  }) {
     const follow = parseFollow(record);
-    ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateAccountStats(follow.accountDid),
+    const isFollowerMember = await this.registrationQuery.isRegistered(
+      ctx,
+      follow.accountDid,
     );
-    ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateAccountStats(follow.subjectDid),
-    );
-
-    const shouldSyncSubject =
-      action === "delete" &&
-      (await this.registrationQuery.isRegistered(ctx, follow.accountDid));
-    if (shouldSyncSubject) {
+    if (isFollowerMember) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );
     }
+    this.statsService.recount({
+      ctx,
+      accounts: [follow.accountDid, follow.subjectDid],
+    });
   }
 }

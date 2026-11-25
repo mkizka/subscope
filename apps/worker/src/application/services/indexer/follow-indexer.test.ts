@@ -2,6 +2,7 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { Origin } from "../../../domain/origin.js";
 import {
   afterCommit,
   testRegistry,
@@ -28,7 +29,7 @@ describe("FollowIndexer", () => {
     ctx = { db, afterCommit };
   });
 
-  describe("upsert", () => {
+  describe("index", () => {
     test("フォローレコードを正しく保存する", async () => {
       // arrange
       const follower = accountFactory();
@@ -43,12 +44,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
+      await followIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       const follow = await followRepo.find({ ctx, uri: record.uri });
@@ -75,7 +71,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({ ctx, record, live: true, depth: 0 });
+      await followIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
@@ -90,7 +86,7 @@ describe("FollowIndexer", () => {
     });
   });
 
-  describe("afterAction", () => {
+  describe("統計の集計", () => {
     test("フォロー作成時にfollows/followers集計ジョブがスケジュールされる", async () => {
       // arrange
       const follower = accountFactory();
@@ -103,15 +99,9 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-        depth: 0,
-      });
 
       // act
-      await followIndexer.afterAction({ ctx, record, action: "upsert" });
+      await followIndexer.index({ ctx, record, origin: Origin.live() });
 
       // assert
       expect(jobScheduler.getAggregateAccountStatsDids()).toEqual([
