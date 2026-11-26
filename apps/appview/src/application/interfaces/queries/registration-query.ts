@@ -16,10 +16,10 @@ export interface IRegistrationQuery {
     q?: string;
   }) => Promise<{ did: Did; registeredFollowersCount: number }[]>;
   countFollowedAccounts: () => Promise<number>;
-  findRegisteredFollowers: (params: {
+  findMemberFollowers: (params: {
     subjectDid: Did;
     limit: number;
     cursor?: string;
   }) => Promise<{ did: Did; sortAt: Date }[]>;
-  countRegisteredFollowers: (subjectDid: Did) => Promise<number>;
+  countMemberFollowers: (subjectDid: Did) => Promise<number>;
 }

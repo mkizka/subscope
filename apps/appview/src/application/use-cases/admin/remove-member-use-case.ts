@@ -3,7 +3,7 @@ import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import {
-  NotRegisteredError,
+  NotMemberError,
   type UnregisterAccountService,
 } from "../../service/sync/unregister-account-service.js";
 
@@ -29,7 +29,7 @@ export class RemoveMemberUseCase {
   async execute(params: { did: Did }): Promise<void> {
     const account = await this.accountRepository.find(params.did);
     if (!account) {
-      throw new NotRegisteredError("Not registered with this server");
+      throw new NotMemberError("Not a member of this server");
     }
     if (account.isAdmin) {
       throw new CannotRemoveAdminError("Cannot remove an admin");

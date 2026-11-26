@@ -18,14 +18,14 @@ export class GetRegistrationStatusUseCase {
 
     if (!registration) {
       return {
-        $type: "me.subsco.sync.getRegistrationStatus#notRegistered",
-        isRegistered: false,
+        $type: "me.subsco.sync.getRegistrationStatus#notMember",
+        isMember: false,
       } as const;
     }
 
     return {
-      $type: "me.subsco.sync.getRegistrationStatus#registered",
-      isRegistered: true,
+      $type: "me.subsco.sync.getRegistrationStatus#member",
+      isMember: true,
     } as const;
   }
 }

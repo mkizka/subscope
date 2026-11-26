@@ -23,12 +23,12 @@ export class GetServerMemberFollowersUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
     const [items, total] = await Promise.all([
-      this.registrationQuery.findRegisteredFollowers({
+      this.registrationQuery.findMemberFollowers({
         subjectDid: params.accountDid,
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
-      this.registrationQuery.countRegisteredFollowers(params.accountDid),
+      this.registrationQuery.countMemberFollowers(params.accountDid),
     ]);
     const page = paginator.extractPage(items);
 

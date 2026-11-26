@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get the registered accounts that follow the given account.",
+      "description": "Get the members that follow the given account.",
       "parameters": {
         "type": "params",
         "required": ["actor"],

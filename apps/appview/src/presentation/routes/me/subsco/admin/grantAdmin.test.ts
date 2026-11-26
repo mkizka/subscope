@@ -34,7 +34,7 @@ describe("me.subsco.admin.grantAdmin", () => {
     expect(account?.isAdmin).toBe(true);
   });
 
-  test("grantAdmin-2: メンバーでなければ400とNotRegisteredを返す", async () => {
+  test("grantAdmin-2: メンバーでなければ400とNotMemberを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -49,7 +49,7 @@ describe("me.subsco.admin.grantAdmin", () => {
     // assert
     await expect(promise).rejects.toMatchObject({
       status: 400,
-      error: "NotRegistered",
+      error: "NotMember",
     });
   });
 });

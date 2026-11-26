@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import removeMember from "@repo/client/me/subsco/admin/removeMember";
 
-import { NotRegisteredError } from "../../../../../application/service/sync/unregister-account-service.js";
+import { NotMemberError } from "../../../../../application/service/sync/unregister-account-service.js";
 import {
   CannotRemoveAdminError,
   type RemoveMemberUseCase,
@@ -27,7 +27,7 @@ export class RemoveMember {
           return {};
         } catch (error) {
           if (
-            error instanceof NotRegisteredError ||
+            error instanceof NotMemberError ||
             error instanceof CannotRemoveAdminError
           ) {
             throw new LexServerError(400, {

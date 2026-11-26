@@ -58,8 +58,8 @@ describe("lexRouter", () => {
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
-      $type: "me.subsco.sync.getRegistrationStatus#notRegistered",
-      isRegistered: false,
+      $type: "me.subsco.sync.getRegistrationStatus#notMember",
+      isMember: false,
     });
   });
 
@@ -84,7 +84,7 @@ describe("lexRouter", () => {
     });
 
     expect(res.status).toBe(400);
-    expect(await res.json()).toMatchObject({ error: "NotRegistered" });
+    expect(await res.json()).toMatchObject({ error: "NotMember" });
   });
 
   test("getUnreadCountは未読数を返す", async () => {
