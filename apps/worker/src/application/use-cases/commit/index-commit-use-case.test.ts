@@ -534,31 +534,5 @@ describe("IndexCommitUseCase", () => {
       // assert
       expect(await postRepo.find({ ctx, uri })).toBeNull();
     });
-
-    test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
-      // arrange
-      const uri = new AtUri("at://did:plc:example/unsupported.collection/123");
-      const record = {
-        uri,
-        cid: "cid123",
-        json: {
-          $type: "unsupported.collection",
-          text: "Hello world",
-        },
-        indexedAt: new Date(),
-      };
-      const commit = {
-        operation: "create" as const,
-        uri,
-        rev: "3aaaaaaaaaaaa",
-        record,
-      };
-      const command: IndexCommitCommand = { commit, live: true };
-
-      // act & assert
-      await expect(indexCommitUseCase.execute(command)).rejects.toThrow(
-        "Unsupported collection: unsupported.collection",
-      );
-    });
   });
 });

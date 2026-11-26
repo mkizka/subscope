@@ -9,7 +9,7 @@ export type IndexCommitCommand = {
         operation: "create" | "update";
         uri: AtUri;
         rev: string;
-        record: Record;
+        record: Record | null;
       };
   live: boolean;
 };
