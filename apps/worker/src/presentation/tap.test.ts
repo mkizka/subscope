@@ -320,7 +320,7 @@ describe("Tapからのイベント受信", () => {
       .mockRejectedValueOnce(new Error("db down"));
 
     // act
-    send(recordEvent(1, account.did));
+    send(recordEvent({ id: 1, did: account.did }));
     await vi.waitFor(() => expect(save).toHaveBeenCalledOnce());
     await new Promise((resolve) => setTimeout(resolve, 200));
 
