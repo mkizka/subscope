@@ -19,10 +19,6 @@ export class Origin {
     return new Origin("fetch", live, depth + 1);
   }
 
-  get isFetched() {
-    return this.source === "fetch";
-  }
-
   get isPast() {
     return this.source === "tap" && !this.isLive;
   }
