@@ -9,11 +9,13 @@ import { Like } from "../like.js";
 import { ListItem } from "../list-item.js";
 import type { Origin } from "../origin.js";
 import { Post } from "../post.js";
+import { Profile } from "../profile.js";
 import { Repost } from "../repost.js";
 
 type DatedRecord = { accountDid: Did; createdAt: Date };
 
-type Saved = Post | Repost | Like | Follow | ListItem | { accountDid: Did };
+type Saved =
+  Post | Repost | Like | Follow | ListItem | Profile | { accountDid: Did };
 
 export class StoragePolicy {
   constructor(
@@ -32,7 +34,7 @@ export class StoragePolicy {
   }) {
     return (
       !origin.isPast ||
-      (await this.registrationQuery.isRegistered(ctx, record.accountDid)) ||
+      (await this.registrationQuery.isMember(ctx, record.accountDid)) ||
       (await this.isWithinWindow(ctx, origin, record))
     );
   }
@@ -46,14 +48,14 @@ export class StoragePolicy {
     origin: Origin;
     like: Like;
   }) {
-    const likerIsMember = await this.registrationQuery.isRegistered(
+    const likerIsMember = await this.registrationQuery.isMember(
       ctx,
       like.accountDid,
     );
     if (likerIsMember) {
       return true;
     }
-    const subjectAuthorIsMember = await this.registrationQuery.isRegistered(
+    const subjectAuthorIsMember = await this.registrationQuery.isMember(
       ctx,
       like.subjectAuthorDid,
     );
@@ -72,13 +74,16 @@ export class StoragePolicy {
     record: Saved;
   }): Promise<AtUri[]> {
     if (record instanceof Post) {
-      const replyUris = origin.isFromTap
-        ? [record.replyParent?.uri, record.replyRoot?.uri]
-        : [];
+      const replyUris = origin.isFetched
+        ? []
+        : [record.replyParent?.uri, record.replyRoot?.uri];
       return [record.fetchableEmbedUri, ...replyUris].filter((uri) => !!uri);
     }
     if (record instanceof Repost) {
       return [record.subject];
+    }
+    if (record instanceof Profile) {
+      return record.pinnedPost && !origin.isFetched ? [record.pinnedPost] : [];
     }
     if (record instanceof Like) {
       const fetchesLikedPost = await this.fetchesLikedPost({
@@ -99,7 +104,7 @@ export class StoragePolicy {
     record: Saved;
   }): Promise<Did[]> {
     if (record instanceof Follow || record instanceof ListItem) {
-      const authorIsMember = await this.registrationQuery.isRegistered(
+      const authorIsMember = await this.registrationQuery.isMember(
         ctx,
         record.accountDid,
       );
@@ -121,20 +126,20 @@ export class StoragePolicy {
   }) {
     return (
       like.likesPost &&
-      (await this.registrationQuery.isRegistered(ctx, like.accountDid)) &&
+      (await this.registrationQuery.isMember(ctx, like.accountDid)) &&
       (await this.isWithinWindow(ctx, origin, like))
     );
   }
 
   async isTracked(ctx: TransactionContext, did: Did) {
     return (
-      (await this.registrationQuery.isRegistered(ctx, did)) ||
+      (await this.registrationQuery.isMember(ctx, did)) ||
       (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did))
     );
   }
 
   tracksFollowee(ctx: TransactionContext, follow: Follow) {
-    return this.registrationQuery.isRegistered(ctx, follow.accountDid);
+    return this.registrationQuery.isMember(ctx, follow.accountDid);
   }
 
   private async isWithinWindow(

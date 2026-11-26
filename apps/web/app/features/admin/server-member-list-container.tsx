@@ -14,7 +14,7 @@ async function fetchServerMembers(cursor?: string): Promise<$OutputBody> {
     params.set("cursor", cursor);
   }
   const response = await fetch(
-    `/admin/api/registered-accounts?${params.toString()}`,
+    `/admin/api/server-members?${params.toString()}`,
   );
   if (!response.ok) {
     throw new Error("メンバーの取得に失敗しました");
@@ -24,7 +24,7 @@ async function fetchServerMembers(cursor?: string): Promise<$OutputBody> {
 }
 
 async function updateServerMember(method: "POST" | "DELETE", did: string) {
-  const response = await fetch("/admin/api/registered-accounts", {
+  const response = await fetch("/admin/api/server-members", {
     method,
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ did }),

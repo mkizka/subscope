@@ -105,6 +105,37 @@ describe("FetchRecordUseCase", () => {
     await expect(execute()).rejects.toThrow();
   });
 
+  test("fetchRecord-8: PDSから取得したプロフィールが指す固定投稿は取得しない", async () => {
+    // arrange
+    const profileUri = `at://${did}/app.bsky.actor.profile/self`;
+    pdsResponse = {
+      status: 200,
+      body: {
+        uri: profileUri,
+        cid: fakeCid(),
+        value: {
+          $type: "app.bsky.actor.profile",
+          pinnedPost: { uri, cid: fakeCid() },
+        },
+      },
+    };
+
+    // act
+    await fetchRecordUseCase.execute({
+      uri: profileUri,
+      depth: 0,
+      live: false,
+      jobLogger,
+    });
+
+    // assert
+    expect(
+      jobScheduler
+        .getFetchRecordJobs()
+        .filter((job) => job.uri.toString() === uri),
+    ).toEqual([]);
+  });
+
   test("index-22: PDSから取得した投稿の返信先と起点は取得しない", async () => {
     // arrange
     const parentUri = "at://did:plc:parent/app.bsky.feed.post/parent";

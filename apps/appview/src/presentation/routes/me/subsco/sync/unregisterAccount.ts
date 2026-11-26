@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import unregisterAccount from "@repo/client/me/subsco/sync/unregisterAccount";
 
-import { NotRegisteredError } from "../../../../../application/service/sync/unregister-account-service.js";
+import { NotMemberError } from "../../../../../application/service/sync/unregister-account-service.js";
 import type { UnregisterAccountUseCase } from "../../../../../application/use-cases/sync/unregister-account-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
@@ -28,7 +28,7 @@ export class UnregisterAccount {
             },
           };
         } catch (error) {
-          if (error instanceof NotRegisteredError) {
+          if (error instanceof NotMemberError) {
             throw new LexServerError(400, {
               error: error.name,
               message: error.message,

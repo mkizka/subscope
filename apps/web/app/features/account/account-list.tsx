@@ -14,7 +14,7 @@ export type Account = {
   displayName?: string;
   avatarUrl?: string;
   description?: string;
-  registeredFollowersCount?: number;
+  memberFollowersCount?: number;
   isAdmin?: boolean;
   backfillStatus?: BackfillStatus;
 };
@@ -74,11 +74,9 @@ export function AccountList<T extends Account>({
               {account.backfillStatus && (
                 <BackfillStatusBadge status={account.backfillStatus} />
               )}
-              {account.registeredFollowersCount !== undefined && (
-                <Link to={`/${profileId}/followers?filter=registered`}>
-                  <Badge>
-                    {account.registeredFollowersCount}人からフォロー
-                  </Badge>
+              {account.memberFollowersCount !== undefined && (
+                <Link to={`/${profileId}/followers?filter=member`}>
+                  <Badge>{account.memberFollowersCount}人からフォロー</Badge>
                 </Link>
               )}
             </div>

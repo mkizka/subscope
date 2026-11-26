@@ -13,7 +13,7 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
     this.registrations.clear();
   }
 
-  async isRegistered(
+  async isMember(
     _ctx: TransactionContext,
     accountDid: string,
   ): Promise<boolean> {

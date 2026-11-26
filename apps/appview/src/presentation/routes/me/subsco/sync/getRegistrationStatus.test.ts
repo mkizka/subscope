@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.sync.getRegistrationStatus", () => {
   const { ctx } = testSetup;
 
-  test("getRegistrationStatus-1: 閲覧者がメンバーならisRegisteredをtrueにする", async () => {
+  test("getRegistrationStatus-1: 閲覧者がメンバーならisMemberをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const serverMember = await accountFactory(ctx.db)
@@ -20,12 +20,12 @@ describe("me.subsco.sync.getRegistrationStatus", () => {
 
     // assert
     expect(result).toEqual({
-      $type: "me.subsco.sync.getRegistrationStatus#registered",
-      isRegistered: true,
+      $type: "me.subsco.sync.getRegistrationStatus#member",
+      isMember: true,
     });
   });
 
-  test("getRegistrationStatus-2: 閲覧者がメンバーでなければisRegisteredをfalseにする", async () => {
+  test("getRegistrationStatus-2: 閲覧者がメンバーでなければisMemberをfalseにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
@@ -36,8 +36,8 @@ describe("me.subsco.sync.getRegistrationStatus", () => {
 
     // assert
     expect(result).toEqual({
-      $type: "me.subsco.sync.getRegistrationStatus#notRegistered",
-      isRegistered: false,
+      $type: "me.subsco.sync.getRegistrationStatus#notMember",
+      isMember: false,
     });
   });
 });

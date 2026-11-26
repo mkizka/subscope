@@ -38,10 +38,10 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
-    const registeredFollower = await createServerMember();
-    const unregisteredFollower = await createAccount();
-    await follow(registeredFollower, account);
-    await follow(unregisteredFollower, account);
+    const memberFollower = await createServerMember();
+    const nonMemberFollower = await createAccount();
+    await follow(memberFollower, account);
+    await follow(nonMemberFollower, account);
 
     // act
     const res = await client.call(getServerMemberFollowers, {
@@ -49,7 +49,7 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     });
 
     // assert
-    expect(res.followers.map((a) => a.did)).toEqual([registeredFollower.did]);
+    expect(res.followers.map((a) => a.did)).toEqual([memberFollower.did]);
   });
 
   test("getServerMemberFollowers-2: 新しくフォローした順に並べ、ページ送りする", async () => {

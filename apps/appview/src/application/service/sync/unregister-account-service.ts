@@ -4,10 +4,10 @@ import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { IFollowQuery } from "../../interfaces/queries/follow-query.js";
 
-export class NotRegisteredError extends Error {
+export class NotMemberError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "NotRegistered";
+    this.name = "NotMember";
   }
 }
 
@@ -28,7 +28,7 @@ export class UnregisterAccountService {
     const existingRegistration =
       await this.registrationRepository.find(accountDid);
     if (!existingRegistration) {
-      throw new NotRegisteredError("Not registered with this server");
+      throw new NotMemberError("Not a member of this server");
     }
 
     await this.registrationRepository.delete({ ctx, accountDid });

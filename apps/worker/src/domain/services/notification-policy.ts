@@ -25,10 +25,7 @@ export class NotificationPolicy {
       if (recipientDid === authorDid || byRecipient.has(recipientDid)) {
         continue;
       }
-      const isMember = await this.registrationQuery.isRegistered(
-        ctx,
-        recipientDid,
-      );
+      const isMember = await this.registrationQuery.isMember(ctx, recipientDid);
       if (isMember) {
         byRecipient.set(recipientDid, candidate);
       }

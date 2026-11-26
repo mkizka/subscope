@@ -1,0 +1,82 @@
+{
+  "app/features/post/post-toolbar-container.tsx": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/features/thread/thread-view.stories.tsx": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/pages/client/follow-list-page.stories.tsx": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/pages/client/search-page.stories.tsx": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/pages/client/timeline-page.stories.tsx": {
+    "params/max-params": {
+      "count": 2
+    }
+  },
+  "app/server/application/accounts/get-follow-list-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/server/application/accounts/get-profile-page-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/server/application/list/get-list-page-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/server/application/list/update-list-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/server/application/search/search-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/server/application/thread/get-thread-use-case.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  },
+  "app/server/infrastructure/account/account-query.ts": {
+    "params/max-params": {
+      "count": 3
+    }
+  },
+  "app/server/infrastructure/list/list-command.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  },
+  "app/server/infrastructure/list/list-query.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "app/server/infrastructure/reaction/reaction-command.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  },
+  "app/server/infrastructure/thread/thread-query.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  }
+}

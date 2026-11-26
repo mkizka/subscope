@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
-import { NotRegisteredError } from "../../service/sync/unregister-account-service.js";
+import { NotMemberError } from "../../service/sync/unregister-account-service.js";
 
 export class CannotRevokeSelfError extends Error {
   constructor(message: string) {
@@ -23,7 +23,7 @@ export class RevokeAdminUseCase {
     }
     const account = await this.accountRepository.find(params.did);
     if (!account) {
-      throw new NotRegisteredError("Not registered with this server");
+      throw new NotMemberError("Not a member of this server");
     }
 
     account.demoteFromAdmin();

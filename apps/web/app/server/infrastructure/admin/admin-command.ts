@@ -33,7 +33,7 @@ export const adminCommandFactory = ({
             case "AccountNotFound":
               return "accountNotFound";
             case "AlreadyRegistered":
-              return "alreadyRegistered";
+              return "alreadyMember";
           }
         }
         throw e;

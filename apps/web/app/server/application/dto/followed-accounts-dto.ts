@@ -6,7 +6,7 @@ export type FollowedAccountsDto = {
     handle: string;
     displayName?: string;
     avatarUrl?: string;
-    registeredFollowersCount: number;
+    memberFollowersCount: number;
     backfillStatus?: BackfillStatus;
   }[];
 };

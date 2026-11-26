@@ -3,7 +3,7 @@ import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscop
 export interface IGetLoginStepUseCase {
   execute: (
     did: string | null,
-  ) => Promise<"setup" | "login" | "inviteCode" | "registered">;
+  ) => Promise<"setup" | "login" | "inviteCode" | "member">;
 }
 
 export const getLoginStepUseCaseFactory = ({
@@ -15,8 +15,6 @@ export const getLoginStepUseCaseFactory = ({
     if (!did) {
       return (await subscopeQuery.isInitialized()) ? "login" : "setup";
     }
-    return (await subscopeQuery.isRegistered(did))
-      ? "registered"
-      : "inviteCode";
+    return (await subscopeQuery.isMember(did)) ? "member" : "inviteCode";
   },
 });

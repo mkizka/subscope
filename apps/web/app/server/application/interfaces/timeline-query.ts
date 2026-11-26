@@ -1,7 +1,7 @@
 import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
 
 export interface ITimelineQuery {
-  isRegistered: (did: string) => Promise<boolean>;
+  isMember: (did: string) => Promise<boolean>;
   findPosts: (
     did: string,
     cursor?: string,

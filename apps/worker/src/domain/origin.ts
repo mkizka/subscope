@@ -23,8 +23,8 @@ export class Origin {
     return this.source === "tap" && !this.isLive;
   }
 
-  get isFromTap() {
-    return this.source === "tap";
+  get isFetched() {
+    return this.source === "fetch";
   }
 
   get notifies() {
