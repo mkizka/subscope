@@ -4,7 +4,17 @@
       "count": 1
     }
   },
+  "src/application/services/indexer/generator-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
   "src/application/services/indexer/like-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/list-indexer.ts": {
     "params/max-params": {
       "count": 1
     }
@@ -24,6 +34,11 @@
       "count": 1
     }
   },
+  "src/application/services/indexer/profile-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
   "src/application/services/indexer/record-indexer.ts": {
     "params/max-params": {
       "count": 1
@@ -35,11 +50,6 @@
     }
   },
   "src/application/services/notification-service.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/record-save-service.ts": {
     "params/max-params": {
       "count": 1
     }
@@ -109,7 +119,57 @@
       "count": 1
     }
   },
+  "src/domain/follow.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/generator.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/label.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/like.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/list-item.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/list.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
   "src/domain/origin.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/post.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/profile.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/repost.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/services/storage-policy.ts": {
     "params/max-params": {
       "count": 1
     }
