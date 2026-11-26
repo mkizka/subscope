@@ -140,7 +140,7 @@ describe("IndexCommitUseCase", () => {
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
-    const postOf = (did: string, live: boolean) => {
+    const postOf = (did: string) => {
       const uri = AtUri.make(did, "app.bsky.feed.post", "123");
       const record = {
         uri,
@@ -159,11 +159,11 @@ describe("IndexCommitUseCase", () => {
           rev: "3aaaaaaaaaaaa",
           record,
         },
-        live,
+        live: true,
       };
     };
 
-    const threadgateOf = (did: string, live: boolean) => {
+    const threadgateOf = (did: string) => {
       const uri = AtUri.make(did, "app.bsky.feed.threadgate", "123");
       const record = {
         uri,
@@ -182,7 +182,7 @@ describe("IndexCommitUseCase", () => {
           rev: "3aaaaaaaaaaaa",
           record,
         },
-        live,
+        live: true,
       };
     };
 
@@ -222,7 +222,7 @@ describe("IndexCommitUseCase", () => {
       const threadgate = gate("app.bsky.feed.threadgate", "123", "123");
       const postgate = gate("app.bsky.feed.postgate", "123", "123");
       const mismatched = gate("app.bsky.feed.threadgate", "456", "123");
-      await indexCommitUseCase.execute(postOf(account.did, true));
+      await indexCommitUseCase.execute(postOf(account.did));
 
       // act
       await indexCommitUseCase.execute(threadgate.command);
@@ -241,7 +241,7 @@ describe("IndexCommitUseCase", () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);
-      const threadgate = threadgateOf(account.did, true);
+      const threadgate = threadgateOf(account.did);
 
       // act
       await indexCommitUseCase.execute(threadgate);
@@ -250,21 +250,6 @@ describe("IndexCommitUseCase", () => {
       expect(
         await recordRepo.find({ ctx, uri: threadgate.commit.uri }),
       ).toBeNull();
-    });
-
-    test("index-26: 対象の投稿より先に届いたthreadgateとpostgateは、PDSから取り直して保存する", async () => {
-      // arrange
-      const account = accountFactory();
-      accountRepo.add(account);
-      const threadgate = threadgateOf(account.did, false);
-
-      // act
-      await indexCommitUseCase.execute(threadgate);
-
-      // assert
-      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
-        { uri: threadgate.commit.uri, live: false, depth: 0 },
-      ]);
     });
 
     test.each([

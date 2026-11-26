@@ -32,13 +32,6 @@ export class GateIndexer implements IRecordIndexer {
     }
     const postSaved = await this.deps.recordQuery.exists(ctx, gate.postUri);
     if (!postSaved) {
-      if (!origin.isFetched) {
-        await this.deps.relatedRecordService.request({
-          ctx,
-          origin,
-          uri: record.uri,
-        });
-      }
       return;
     }
     await this.deps.recordSaveService.save({ ctx, record });
