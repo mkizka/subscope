@@ -1,7 +1,0 @@
-{
-  "src/index.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  }
-}

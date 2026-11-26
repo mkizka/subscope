@@ -23,11 +23,15 @@ const start = async (...args: Parameters<typeof createPushReceiver>) => {
 };
 
 // web-push's own sender only speaks https, so build the request and fetch it
-const send = async (
-  subscription: webpush.PushSubscription,
-  payload: string,
-  details: webpush.VapidKeys & { subject: string } = vapidDetails,
-) => {
+const send = async ({
+  subscription,
+  payload,
+  details = vapidDetails,
+}: {
+  subscription: webpush.PushSubscription;
+  payload: string;
+  details?: webpush.VapidKeys & { subject: string };
+}) => {
   const request = webpush.generateRequestDetails(subscription, payload, {
     vapidDetails: details,
   });
@@ -47,10 +51,10 @@ describe("createPushReceiver", () => {
   test("decrypts a payload sent by web-push", async () => {
     const receiver = await start();
 
-    const response = await send(
-      receiver.subscription,
-      JSON.stringify({ title: "hello" }),
-    );
+    const response = await send({
+      subscription: receiver.subscription,
+      payload: JSON.stringify({ title: "hello" }),
+    });
 
     expect(response.status).toBe(201);
     expect(receiver.requests).toHaveLength(1);
@@ -61,7 +65,10 @@ describe("createPushReceiver", () => {
   test("decrypts a non-ASCII payload", async () => {
     const receiver = await start();
 
-    await send(receiver.subscription, "日本語の通知🔔");
+    await send({
+      subscription: receiver.subscription,
+      payload: "日本語の通知🔔",
+    });
 
     expect(receiver.requests[0]?.text).toBe("日本語の通知🔔");
   });
@@ -69,18 +76,21 @@ describe("createPushReceiver", () => {
   test("responds with the configured status", async () => {
     const receiver = await start({ status: 410 });
 
-    expect((await send(receiver.subscription, "gone")).status).toBe(410);
+    expect(
+      (await send({ subscription: receiver.subscription, payload: "gone" }))
+        .status,
+    ).toBe(410);
     expect(receiver.requests).toEqual([]);
 
     receiver.status = 201;
-    await send(receiver.subscription, "ok");
+    await send({ subscription: receiver.subscription, payload: "ok" });
     expect(receiver.requests).toHaveLength(1);
   });
 
   test("accepts a valid VAPID signature", async () => {
     const receiver = await start({ vapidPublicKey: vapid.publicKey });
 
-    await send(receiver.subscription, "signed");
+    await send({ subscription: receiver.subscription, payload: "signed" });
 
     expect(receiver.requests).toHaveLength(1);
   });
@@ -88,9 +98,13 @@ describe("createPushReceiver", () => {
   test("rejects a VAPID signature from another key", async () => {
     const receiver = await start({ vapidPublicKey: vapid.publicKey });
 
-    const response = await send(receiver.subscription, "forged", {
-      subject: vapidDetails.subject,
-      ...webpush.generateVAPIDKeys(),
+    const response = await send({
+      subscription: receiver.subscription,
+      payload: "forged",
+      details: {
+        subject: vapidDetails.subject,
+        ...webpush.generateVAPIDKeys(),
+      },
     });
 
     expect(response.status).toBe(401);

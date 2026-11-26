@@ -1,9 +1,4 @@
 {
-  "src/lib/infrastructure/did-resolver/did-resolver.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/lib/utils/logging.test.ts": {
     "params/max-params": {
       "count": 1

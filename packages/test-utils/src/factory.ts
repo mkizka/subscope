@@ -39,7 +39,7 @@ export const accountFactory = (db: Database) =>
         },
         vars: {},
       },
-      (props) => create(db, schema.accounts, props),
+      (props) => create({ db, table: schema.accounts, props }),
     )
     .traits({
       withProfile: (params: { displayName?: string }) => ({
@@ -80,7 +80,7 @@ export const recordFactory = (db: Database, collection: string) =>
           account: () => accountFactory(db).create(),
         },
       },
-      (props) => create(db, schema.records, props),
+      (props) => create({ db, table: schema.records, props }),
     )
     .props({
       uri: async ({ vars }) =>
@@ -115,7 +115,7 @@ export const postFactory = (db: Database) =>
           record: () => recordFactory(db, "app.bsky.feed.post").create(),
         },
       },
-      (props) => create(db, schema.posts, props),
+      (props) => create({ db, table: schema.posts, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -151,7 +151,7 @@ export const postStatsFactory = (db: Database) =>
           post: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.postStats, props),
+      (props) => create({ db, table: schema.postStats, props }),
     )
     .props({
       postUri: async ({ vars }) => (await vars.post).uri,
@@ -176,7 +176,7 @@ export const profileFactory = (db: Database) =>
           record: () => recordFactory(db, "app.bsky.actor.profile").create(),
         },
       },
-      (props) => create(db, schema.profiles, props),
+      (props) => create({ db, table: schema.profiles, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -201,7 +201,7 @@ export const followFactory = (db: Database) =>
           followee: () => accountFactory(db).create(),
         },
       },
-      (props) => create(db, schema.follows, props),
+      (props) => create({ db, table: schema.follows, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -228,7 +228,7 @@ export const likeFactory = (db: Database) =>
           subject: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.likes, props),
+      (props) => create({ db, table: schema.likes, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -252,7 +252,7 @@ export const accountStatsFactory = (db: Database) =>
           account: () => accountFactory(db).create(),
         },
       },
-      (props) => create(db, schema.accountStats, props),
+      (props) => create({ db, table: schema.accountStats, props }),
     )
     .props({
       accountDid: async ({ vars }) => (await vars.account).did,
@@ -276,7 +276,7 @@ export const repostFactory = (db: Database) =>
           subject: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.reposts, props),
+      (props) => create({ db, table: schema.reposts, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -303,7 +303,7 @@ export const postFeedItemFactory = (db: Database) =>
           post: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.feedItems, props),
+      (props) => create({ db, table: schema.feedItems, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.post).uri,
@@ -329,7 +329,7 @@ export const repostFeedItemFactory = (db: Database) =>
           repost: () => repostFactory(db).create(),
         },
       },
-      (props) => create(db, schema.feedItems, props),
+      (props) => create({ db, table: schema.feedItems, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.repost).uri,
@@ -353,7 +353,7 @@ export const registrationFactory = (db: Database) =>
           inviteCode: () => inviteCodeFactory(db).create(),
         },
       },
-      (props) => create(db, schema.registrations, props),
+      (props) => create({ db, table: schema.registrations, props }),
     )
     .props({
       accountDid: async ({ vars }) => (await vars.account).did,
@@ -377,7 +377,7 @@ export const postEmbedImageFactory = (db: Database) =>
           post: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.postEmbedImages, props),
+      (props) => create({ db, table: schema.postEmbedImages, props }),
     )
     .props({
       postUri: async ({ vars }) => (await vars.post).uri,
@@ -399,7 +399,7 @@ export const postEmbedVideoFactory = (db: Database) =>
           post: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.postEmbedVideos, props),
+      (props) => create({ db, table: schema.postEmbedVideos, props }),
     )
     .props({
       postUri: async ({ vars }) => (await vars.post).uri,
@@ -420,7 +420,7 @@ export const postEmbedExternalFactory = (db: Database) =>
           post: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.postEmbedExternals, props),
+      (props) => create({ db, table: schema.postEmbedExternals, props }),
     )
     .props({
       postUri: async ({ vars }) => (await vars.post).uri,
@@ -440,7 +440,7 @@ export const postEmbedRecordFactory = (db: Database) =>
           embeddedPost: () => postFactory(db).create(),
         },
       },
-      (props) => create(db, schema.postEmbedRecords, props),
+      (props) => create({ db, table: schema.postEmbedRecords, props }),
     )
     .props({
       postUri: async ({ vars }) => (await vars.post).uri,
@@ -467,7 +467,7 @@ export const generatorFactory = (db: Database) =>
           record: () => recordFactory(db, "app.bsky.feed.generator").create(),
         },
       },
-      (props) => create(db, schema.generators, props),
+      (props) => create({ db, table: schema.generators, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -494,7 +494,7 @@ export const listFactory = (db: Database) =>
           record: () => recordFactory(db, "app.bsky.graph.list").create(),
         },
       },
-      (props) => create(db, schema.lists, props),
+      (props) => create({ db, table: schema.lists, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -521,7 +521,7 @@ export const listItemFactory = (db: Database) =>
           subject: () => accountFactory(db).create(),
         },
       },
-      (props) => create(db, schema.listItems, props),
+      (props) => create({ db, table: schema.listItems, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
@@ -542,7 +542,7 @@ export const inviteCodeFactory = (db: Database) =>
       },
       vars: {},
     },
-    (props) => create(db, schema.inviteCodes, props),
+    (props) => create({ db, table: schema.inviteCodes, props }),
   );
 
 export const labelFactory = (db: Database) =>
@@ -562,7 +562,7 @@ export const labelFactory = (db: Database) =>
           account: () => accountFactory(db).create(),
         },
       },
-      (props) => create(db, schema.labels, props),
+      (props) => create({ db, table: schema.labels, props }),
     )
     .props({
       uri: async ({ vars }) => (await vars.account).did,
