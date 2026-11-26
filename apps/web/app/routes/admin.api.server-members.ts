@@ -8,7 +8,7 @@ import { didContext } from "@/app/context/did";
 import { addMemberSchema } from "@/app/features/admin/add-member-dialog-container";
 import { di } from "@/app/server/di";
 
-import type { Route } from "./+types/admin.api.registered-accounts";
+import type { Route } from "./+types/admin.api.server-members";
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const did = context.get(didContext);
@@ -30,7 +30,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 
 const ADD_MEMBER_ERRORS = {
   accountNotFound: "アカウントが見つかりません",
-  alreadyRegistered: "すでにメンバーです",
+  alreadyMember: "すでにメンバーです",
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {

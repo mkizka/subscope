@@ -1,7 +1,7 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import grantAdmin from "@repo/client/me/subsco/admin/grantAdmin";
 
-import { NotRegisteredError } from "../../../../../application/service/sync/unregister-account-service.js";
+import { NotMemberError } from "../../../../../application/service/sync/unregister-account-service.js";
 import type { GrantAdminUseCase } from "../../../../../application/use-cases/admin/grant-admin-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";
 
@@ -19,7 +19,7 @@ export class GrantAdmin {
           await this.grantAdminUseCase.execute({ did: input.body.did });
           return {};
         } catch (error) {
-          if (error instanceof NotRegisteredError) {
+          if (error instanceof NotMemberError) {
             throw new LexServerError(400, {
               error: error.name,
               message: error.message,

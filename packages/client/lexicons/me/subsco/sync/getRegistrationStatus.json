@@ -9,29 +9,29 @@
         "encoding": "application/json",
         "schema": {
           "type": "union",
-          "refs": ["#registered", "#notRegistered"]
+          "refs": ["#member", "#notMember"]
         }
       }
     },
-    "registered": {
+    "member": {
       "type": "object",
-      "required": ["isRegistered"],
+      "required": ["isMember"],
       "properties": {
-        "isRegistered": {
+        "isMember": {
           "type": "boolean",
           "const": true,
-          "description": "The user is registered"
+          "description": "The user is a member"
         }
       }
     },
-    "notRegistered": {
+    "notMember": {
       "type": "object",
-      "required": ["isRegistered"],
+      "required": ["isMember"],
       "properties": {
-        "isRegistered": {
+        "isMember": {
           "type": "boolean",
           "const": false,
-          "description": "The user is not registered"
+          "description": "The user is not a member"
         }
       }
     }

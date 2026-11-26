@@ -4,7 +4,7 @@ import getOperator from "@repo/client/me/subsco/server/getOperator";
 import getServerMembers from "@repo/client/me/subsco/server/getServerMembers";
 import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
 import getRegistrationStatus, {
-  registered,
+  member,
 } from "@repo/client/me/subsco/sync/getRegistrationStatus";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
@@ -33,9 +33,9 @@ export const subscopeQueryFactory = ({
       const { initialized } = await publicClient.call(getSetupStatus);
       return initialized;
     },
-    async isRegistered(did) {
+    async isMember(did) {
       const response = await (await restore(did)).call(getRegistrationStatus);
-      return registered.isTypeOf(response);
+      return member.isTypeOf(response);
     },
     async findOperator() {
       const { operator } = await publicClient.call(getOperator);
@@ -77,7 +77,7 @@ export const subscopeQueryFactory = ({
             handle: profile.handle,
             displayName: profile.displayName,
             avatarUrl: profile.avatar,
-            registeredFollowersCount,
+            memberFollowersCount: registeredFollowersCount,
           }),
         ),
       };

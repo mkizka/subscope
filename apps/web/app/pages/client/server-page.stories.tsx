@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 
 import { alice, bob, type Data, queryClient } from "@/.storybook/query-client";
-import type { loader as registeredLoader } from "@/app/routes/api.registered-accounts";
+import type { loader as serverMembersLoader } from "@/app/routes/api.server-members";
 import type { loader as trackedLoader } from "@/app/routes/api.tracked-accounts";
 
 import { ServerPage } from "./server-page";
@@ -24,7 +24,7 @@ export const Default: Story = {};
 export const MemberDetails: Story = {
   name: "server-s3: 「メンバー」タブでは、メンバーを自己紹介つきで一覧表示する",
   beforeEach: () => {
-    queryClient.setQueryData<Data<typeof registeredLoader>>(
+    queryClient.setQueryData<Data<typeof serverMembersLoader>>(
       ["clientServerMembers", ""],
       {
         serverMembers: [
@@ -56,7 +56,7 @@ export const FollowerCount: Story = {
     queryClient.setQueryData<Data<typeof trackedLoader>>(
       ["trackedAccounts", ""],
       {
-        accounts: [{ ...bob, registeredFollowersCount: 3 }],
+        accounts: [{ ...bob, memberFollowersCount: 3 }],
       },
     );
   },
@@ -85,7 +85,7 @@ export const NoSearchResult: Story = {
   name: "server-s8: 絞り込みに一致するアカウントがないときは「アカウントが見つかりません」と表示する",
   parameters: { path: "/server?q=zzzzzz" },
   beforeEach: () => {
-    queryClient.setQueryData<Data<typeof registeredLoader>>(
+    queryClient.setQueryData<Data<typeof serverMembersLoader>>(
       ["clientServerMembers", "zzzzzz"],
       { serverMembers: [] },
     );

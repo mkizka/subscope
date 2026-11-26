@@ -24,7 +24,7 @@
           "name": "AdminRequired"
         },
         {
-          "name": "NotRegistered"
+          "name": "NotMember"
         },
         {
           "name": "CannotRevokeSelf"

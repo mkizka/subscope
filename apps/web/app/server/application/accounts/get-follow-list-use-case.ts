@@ -10,7 +10,7 @@ export interface IGetFollowListUseCase {
     did: string,
     account: AtIdentifierString,
     kind: "follows" | "followers",
-    filter?: "registered" | "known",
+    filter?: "member" | "known",
     cursor?: string,
   ) => Promise<FollowListDto>;
 }
@@ -29,8 +29,8 @@ export const getFollowListUseCaseFactory = ({
       kind === "followers" && filter === "known"
         ? await accountQuery.findKnownFollowers(did, account, cursor)
         : await accountQuery.findFollowList(did, account, kind);
-    if (kind === "followers" && filter === "registered") {
-      const dids = await followQuery.findRegisteredFollowers(account);
+    if (kind === "followers" && filter === "member") {
+      const dids = await followQuery.findMemberFollowers(account);
       list = { ...list, accounts: await accountQuery.findProfiles(did, dids) };
     }
     const statuses = await backfillQuery.findTrackedStatuses(

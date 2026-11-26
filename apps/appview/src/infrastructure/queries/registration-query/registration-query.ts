@@ -120,7 +120,7 @@ export class RegistrationQuery implements IRegistrationQuery {
     return row?.total ?? 0;
   }
 
-  async findRegisteredFollowers(params: {
+  async findMemberFollowers(params: {
     subjectDid: Did;
     limit: number;
     cursor?: string;
@@ -146,7 +146,7 @@ export class RegistrationQuery implements IRegistrationQuery {
     return rows.map((row) => ({ ...row, did: asDid(row.did) }));
   }
 
-  async countRegisteredFollowers(subjectDid: Did): Promise<number> {
+  async countMemberFollowers(subjectDid: Did): Promise<number> {
     const { follows, registrations } = schema;
     const [row] = await this.db
       .select({ total: count() })

@@ -18,6 +18,8 @@
 | アカウントの状態             | active・deactivated・deleted・suspended・takendown のいずれか                                  | 退会済み                                       |
 | バックフィル                 | 追跡アカウントの過去のレコードをTapから受け取ること。画面では「同期」と呼ぶ                    | 取り込み                                       |
 
+コードでは、登録を register・registration、メンバーを member と書く。メンバーを registered と呼ばない。
+
 Tapに対しては「登録」ではなく「追加する」「外す」と書く。
 
 Blueskyの公式クライアントに合わせた画面の文言(検索の「ユーザー」タブなど)は、そのままにする。
