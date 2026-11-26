@@ -10,24 +10,29 @@ import type { RepoRevMiddleware } from "../../../../../presentation/middleware/r
 
 export class GetProfiles {
   constructor(
-    private getProfilesUseCase: GetProfilesUseCase,
-    private handleMiddleware: HandleMiddleware,
-    private authVerifierMiddleware: AuthVerifierMiddleware,
-    private repoRevMiddleware: RepoRevMiddleware,
+    private readonly deps: {
+      getProfilesUseCase: GetProfilesUseCase;
+      handleMiddleware: HandleMiddleware;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      repoRevMiddleware: RepoRevMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getProfiles, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
         const handleOrDids = params.actors.filter(
           (account) => isDid(account) || isHandle(account),
         );
         const dids =
-          await this.handleMiddleware.resolveHandleOrDids(handleOrDids);
-        const profiles = await this.getProfilesUseCase.execute(dids, viewerDid);
+          await this.deps.handleMiddleware.resolveHandleOrDids(handleOrDids);
+        const profiles = await this.deps.getProfilesUseCase.execute(
+          dids,
+          viewerDid,
+        );
         return {
-          headers: await this.repoRevMiddleware.headers(viewerDid),
+          headers: await this.deps.repoRevMiddleware.headers(viewerDid),
           body: { profiles },
         };
       },

@@ -8,21 +8,23 @@ import type { RepoRevMiddleware } from "../../../../../presentation/middleware/r
 
 export class GetAuthorFeed {
   constructor(
-    private getAuthorFeedUseCase: GetAuthorFeedUseCase,
-    private handleMiddleware: HandleMiddleware,
-    private authVerifierMiddleware: AuthVerifierMiddleware,
-    private repoRevMiddleware: RepoRevMiddleware,
+    private readonly deps: {
+      getAuthorFeedUseCase: GetAuthorFeedUseCase;
+      handleMiddleware: HandleMiddleware;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      repoRevMiddleware: RepoRevMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getAuthorFeed, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const accountDid = await this.handleMiddleware.resolveHandleOrDid(
+        const accountDid = await this.deps.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
 
-        const body = await this.getAuthorFeedUseCase.execute({
+        const body = await this.deps.getAuthorFeedUseCase.execute({
           accountDid,
           limit: params.limit,
           cursor: params.cursor ? new Date(params.cursor) : undefined,
@@ -31,7 +33,7 @@ export class GetAuthorFeed {
           viewerDid: viewerDid ?? undefined,
         });
         return {
-          headers: await this.repoRevMiddleware.headers(viewerDid),
+          headers: await this.deps.repoRevMiddleware.headers(viewerDid),
           body,
         };
       },
