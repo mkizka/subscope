@@ -257,7 +257,7 @@ describe("commit", () => {
         },
         live,
       });
-      return { replier, replyEvent };
+      return { owner, replier, replyEvent };
     };
 
     const findReply = async (did: string) => {
@@ -323,6 +323,21 @@ describe("commit", () => {
       expect(await findReply(replier.did)).toMatchObject({
         violatesThreadgate: false,
       });
+    });
+
+    test("notify-11: 返信制限に違反した返信では reply の通知を作らない", async () => {
+      // arrange
+      const { owner, replyEvent } = await setup({ allow: [] });
+
+      // act
+      await processCommit(replyEvent(true));
+
+      // assert
+      const notifications = await ctx.db
+        .select()
+        .from(schema.notifications)
+        .where(eq(schema.notifications.recipientDid, owner.did));
+      expect(notifications).toEqual([]);
     });
   });
 
