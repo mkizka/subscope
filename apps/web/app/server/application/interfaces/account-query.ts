@@ -15,19 +15,15 @@ export interface IAccountQuery {
   ) => Promise<ProfileViewDetailed>;
   findPosts: (
     did: string,
-    account: AtIdentifierString,
-    tab: ProfileTab,
-    cursor?: string,
+    params: { account: AtIdentifierString; tab: ProfileTab; cursor?: string },
   ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
   findFollowList: (
     did: string,
-    account: AtIdentifierString,
-    kind: "follows" | "followers",
+    params: { account: AtIdentifierString; kind: "follows" | "followers" },
   ) => Promise<FollowListDto>;
   findKnownFollowers: (
     did: string,
-    account: AtIdentifierString,
-    cursor?: string,
+    params: { account: AtIdentifierString; cursor?: string },
   ) => Promise<FollowListDto>;
   findProfiles: (did: string, dids: string[]) => Promise<AccountDto[]>;
   isAdmin: (did: string) => Promise<boolean>;

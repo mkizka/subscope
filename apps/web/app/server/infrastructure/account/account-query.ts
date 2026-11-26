@@ -64,7 +64,7 @@ export const accountQueryFactory = ({
       const agent = await restore(did);
       return agent.call(getProfile, { actor: account });
     },
-    async findPosts(did, account, tab, cursor) {
+    async findPosts(did, { account, tab, cursor }) {
       const agent = await restore(did);
       const { feed, cursor: next } =
         tab === "likes"
@@ -86,7 +86,7 @@ export const accountQueryFactory = ({
         cursor: next,
       };
     },
-    async findFollowList(did, account, kind) {
+    async findFollowList(did, { account, kind }) {
       const agent = await restore(did);
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
       const params = { actor: account, limit: 100 };
@@ -100,7 +100,7 @@ export const accountQueryFactory = ({
         accounts: accounts.map(toAccount),
       };
     },
-    async findKnownFollowers(did, account, cursor) {
+    async findKnownFollowers(did, { account, cursor }) {
       const agent = await restore(did);
       const res = await agent.call(getKnownFollowers, {
         actor: account,

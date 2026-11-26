@@ -24,12 +24,11 @@ export const loader = async ({
   const { searchParams } = new URL(request.url);
   const filter = searchParams.get("filter");
   return data(
-    await di.getFollowListUseCase.execute(
-      context.get(didContext),
-      handle,
+    await di.getFollowListUseCase.execute(context.get(didContext), {
+      account: handle,
       kind,
-      filter === "member" || filter === "known" ? filter : undefined,
-      searchParams.get("cursor") ?? undefined,
-    ),
+      filter: filter === "member" || filter === "known" ? filter : undefined,
+      cursor: searchParams.get("cursor") ?? undefined,
+    }),
   );
 };
