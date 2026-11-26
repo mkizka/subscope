@@ -28,9 +28,11 @@ const defined = <T>(value: T | undefined): value is T => value !== undefined;
 
 export class NotificationViews {
   constructor(
-    private readonly profileViews: ProfileViews,
-    private readonly postViews: PostViews,
-    private readonly generatorViews: GeneratorViews,
+    private readonly deps: {
+      profileViews: ProfileViews;
+      postViews: PostViews;
+      generatorViews: GeneratorViews;
+    },
   ) {}
 
   async group(
@@ -48,21 +50,25 @@ export class NotificationViews {
       Promise.all(
         items
           .slice(0, ITEMS_PER_GROUP)
-          .map((item) => this.profileViews.basic(asDid(item.authorDid), ctx)),
+          .map((item) =>
+            this.deps.profileViews.basic(asDid(item.authorDid), ctx),
+          ),
       ).then((views) => views.filter(defined)),
       subjectUri &&
         (isGenerator(subjectUri)
-          ? this.generatorViews.generatorView(subjectUri, ctx)
-          : this.postViews.postView(subjectUri, ctx)),
+          ? this.deps.generatorViews.generatorView(subjectUri, ctx)
+          : this.deps.postViews.postView(subjectUri, ctx)),
       head.reason === "like" || head.reason === "repost"
         ? undefined
-        : this.postViews.postView(head.recordUri, ctx),
+        : this.deps.postViews.postView(head.recordUri, ctx),
     ]);
-    const kind = this.kind(
+    const kind = this.kind({
       head,
-      accounts.map((account) => ({ actor: account.did })),
-      { subjectUri, subject, post },
-    );
+      items: accounts.map((account) => ({ actor: account.did })),
+      subjectUri,
+      subject,
+      post,
+    });
     if (accounts.length === 0 || !kind) {
       return undefined;
     }
@@ -86,16 +92,19 @@ export class NotificationViews {
     };
   }
 
-  private kind(
-    head: NotificationDto,
-    items: { actor: Did }[],
-    refs: {
-      subjectUri?: AtUriString;
-      subject?: { $type: string; uri: AtUriString };
-      post?: { uri: AtUriString };
-    },
-  ): Group["kind"] | undefined {
-    const { subjectUri, subject, post } = refs;
+  private kind({
+    head,
+    items,
+    subjectUri,
+    subject,
+    post,
+  }: {
+    head: NotificationDto;
+    items: { actor: Did }[];
+    subjectUri?: AtUriString;
+    subject?: { $type: string; uri: AtUriString };
+    post?: { uri: AtUriString };
+  }): Group["kind"] | undefined {
     switch (head.reason) {
       case "like":
         if (!subject) return undefined;
