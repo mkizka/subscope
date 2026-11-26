@@ -174,11 +174,6 @@
       "count": 1
     }
   },
-  "src/application/views/embed-views.ts": {
-    "params/max-params": {
-      "count": 5
-    }
-  },
   "src/application/views/notification-views.ts": {
     "params/max-params": {
       "count": 2

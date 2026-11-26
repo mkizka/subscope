@@ -29,6 +29,13 @@ import type { ViewContext } from "./view-context.js";
 
 const MAX_RECORD_DEPTH = 2;
 
+type EmbeddedRecordParams = {
+  uri: AtUri;
+  parentUri: string;
+  ctx: ViewContext;
+  depth: number;
+};
+
 const detachedView = (uri: string) =>
   ({
     $type: "app.bsky.embed.record#viewDetached",
@@ -38,12 +45,22 @@ const detachedView = (uri: string) =>
 
 export class EmbedViews {
   constructor(
-    private readonly profileViews: ProfileViews,
-    private readonly generatorViews: GeneratorViews,
-    private readonly assetUrlBuilder: IAssetUrlBuilder,
+    private readonly deps: {
+      profileViews: ProfileViews;
+      generatorViews: GeneratorViews;
+      assetUrlBuilder: IAssetUrlBuilder;
+    },
   ) {}
 
-  async embedView(post: PostDto, ctx: ViewContext, depth = 0) {
+  async embedView({
+    post,
+    ctx,
+    depth = 0,
+  }: {
+    post: PostDto;
+    ctx: ViewContext;
+    depth?: number;
+  }) {
     const media = this.mediaView(post);
     if (!post.embedRecordUri) {
       return media;
@@ -53,12 +70,12 @@ export class EmbedViews {
           $type: "app.bsky.embed.record#view" as const,
           record: detachedView(post.embedRecordUri),
         }
-      : await this.recordView(
-          new AtUri(post.embedRecordUri),
-          post.uri,
+      : await this.recordView({
+          uri: new AtUri(post.embedRecordUri),
+          parentUri: post.uri,
           ctx,
           depth,
-        );
+        });
     if (!media) {
       return record;
     }
@@ -86,14 +103,12 @@ export class EmbedViews {
   }
 
   private async recordView(
-    uri: AtUri,
-    parentUri: string,
-    ctx: ViewContext,
-    depth: number,
+    params: EmbeddedRecordParams,
   ): Promise<$Typed<AppBskyEmbedRecord.View>> {
+    const { uri } = params;
     return {
       $type: "app.bsky.embed.record#view",
-      record: (await this.embeddedRecord(uri, parentUri, ctx, depth)) ?? {
+      record: (await this.embeddedRecord(params)) ?? {
         $type: "app.bsky.embed.record#viewNotFound",
         uri: uri.toString(),
         notFound: true,
@@ -101,19 +116,19 @@ export class EmbedViews {
     };
   }
 
-  private async embeddedRecord(
-    uri: AtUri,
-    parentUri: string,
-    ctx: ViewContext,
-    depth: number,
-  ) {
+  private async embeddedRecord({
+    uri,
+    parentUri,
+    ctx,
+    depth,
+  }: EmbeddedRecordParams) {
     if (uri.collection === "app.bsky.feed.generator") {
-      return await this.generatorViews.generatorView(uri.toString(), ctx);
+      return await this.deps.generatorViews.generatorView(uri.toString(), ctx);
     }
     if (uri.collection === "app.bsky.feed.post" && depth < MAX_RECORD_DEPTH) {
       const [postgate, view] = await Promise.all([
         ctx.record(gateUri(uri.toString(), "app.bsky.feed.postgate")),
-        this.viewRecord(uri.toString(), ctx, depth + 1),
+        this.viewRecord({ uri: uri.toString(), ctx, depth: depth + 1 }),
       ]);
       const detached =
         postgate &&
@@ -129,20 +144,24 @@ export class EmbedViews {
     return undefined;
   }
 
-  private async viewRecord(
-    uri: string,
-    ctx: ViewContext,
-    depth: number,
-  ): Promise<$Typed<AppBskyEmbedRecord.ViewRecord> | undefined> {
+  private async viewRecord({
+    uri,
+    ctx,
+    depth,
+  }: {
+    uri: string;
+    ctx: ViewContext;
+    depth: number;
+  }): Promise<$Typed<AppBskyEmbedRecord.ViewRecord> | undefined> {
     const post = await ctx.post(uri);
     if (!post) {
       return undefined;
     }
     const [record, author, stats, embed, labels] = await Promise.all([
       ctx.record(uri),
-      this.profileViews.basic(post.accountDid, ctx),
+      this.deps.profileViews.basic(post.accountDid, ctx),
       ctx.stats(uri),
-      this.embedView(post, ctx, depth),
+      this.embedView({ post, ctx, depth }),
       ctx.labelsOf(uri),
     ]);
     if (!record || !author) {
@@ -176,7 +195,10 @@ export class EmbedViews {
         title: embed.title,
         description: embed.description,
         thumb: embed.thumbCid
-          ? this.assetUrlBuilder.getFeedThumbnailUrl(accountDid, embed.thumbCid)
+          ? this.deps.assetUrlBuilder.getFeedThumbnailUrl(
+              accountDid,
+              embed.thumbCid,
+            )
           : undefined,
       },
     };
@@ -189,8 +211,11 @@ export class EmbedViews {
     return {
       $type: "app.bsky.embed.video#view",
       cid: embed.cid,
-      playlist: this.assetUrlBuilder.getVideoPlaylistUrl(accountDid, embed.cid),
-      thumbnail: this.assetUrlBuilder.getVideoThumbnailUrl(
+      playlist: this.deps.assetUrlBuilder.getVideoPlaylistUrl(
+        accountDid,
+        embed.cid,
+      ),
+      thumbnail: this.deps.assetUrlBuilder.getVideoThumbnailUrl(
         accountDid,
         embed.cid,
       ),
@@ -208,8 +233,11 @@ export class EmbedViews {
       $type: "app.bsky.embed.images#view",
       images: images.map((image) => ({
         alt: image.alt,
-        thumb: this.assetUrlBuilder.getFeedThumbnailUrl(accountDid, image.cid),
-        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(
+        thumb: this.deps.assetUrlBuilder.getFeedThumbnailUrl(
+          accountDid,
+          image.cid,
+        ),
+        fullsize: this.deps.assetUrlBuilder.getFeedFullsizeUrl(
           accountDid,
           image.cid,
         ),
@@ -227,11 +255,11 @@ export class EmbedViews {
       items: images.map((image) => ({
         $type: "app.bsky.embed.gallery#viewImage" as const,
         alt: image.alt,
-        thumbnail: this.assetUrlBuilder.getFeedThumbnailUrl(
+        thumbnail: this.deps.assetUrlBuilder.getFeedThumbnailUrl(
           accountDid,
           image.cid,
         ),
-        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(
+        fullsize: this.deps.assetUrlBuilder.getFeedFullsizeUrl(
           accountDid,
           image.cid,
         ),
