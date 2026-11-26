@@ -6,7 +6,8 @@ const THUMBNAIL = "https://video.bsky.app/watch/**/thumbnail.jpg";
 const PLAYLIST = "https://video.bsky.app/watch/**/playlist.m3u8";
 
 async function postVideo(text: string) {
-  return createRecord("alice.test", "app.bsky.feed.post", {
+  return createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     embed: {
       $type: "app.bsky.embed.video",

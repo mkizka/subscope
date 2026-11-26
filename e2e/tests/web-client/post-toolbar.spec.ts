@@ -111,7 +111,8 @@ const composeAndSubmit = async (
   },
 ) => {
   const text = `${id}: 投稿`;
-  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+  const { uri } = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
@@ -176,7 +177,8 @@ test("postToolbar-e5: いいね・リポストのボタンは、結果を画面�
   request,
 }) => {
   const text = "postToolbar-e5: 投稿";
-  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+  const { uri } = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
@@ -226,7 +228,8 @@ test("postToolbar-e6: 削除は確認ダイアログを経て、再読み込み�
   request,
 }) => {
   const text = "postToolbar-e6: 投稿";
-  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+  const { uri } = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
@@ -255,7 +258,8 @@ test("postToolbar-e7: 返信すると、再読み込みなしで返信先の返�
   page,
 }) => {
   const text = "postToolbar-e7: 投稿";
-  await createRecord("alice.test", "app.bsky.feed.post", {
+  await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
@@ -284,7 +288,8 @@ test("postToolbar-e8: 「リンクをコピー」で、投稿のスレッドのU
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const text = "postToolbar-e8: 投稿";
-  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+  const { uri } = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
@@ -326,7 +331,8 @@ test("postToolbar-e9: 自分の投稿を「プロフィールにピン留め」�
   request,
 }) => {
   const text = "postToolbar-e9: 投稿";
-  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+  const { uri } = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
@@ -349,11 +355,13 @@ test("postToolbar-e10: 別の投稿がピン留め中でも、確認なしにピ
   request,
 }) => {
   const text = "postToolbar-e10: 投稿";
-  const first = await createRecord("alice.test", "app.bsky.feed.post", {
+  const first = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text: "postToolbar-e10: 先にピン留めする投稿",
     createdAt: new Date().toISOString(),
   });
-  const second = await createRecord("alice.test", "app.bsky.feed.post", {
+  const second = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });

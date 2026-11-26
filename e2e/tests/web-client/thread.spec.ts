@@ -6,7 +6,8 @@ import { createRecord } from "../../helpers/pds";
 const threadPath = (uri: string) => `/alice.test/post/${new AtUri(uri).rkey}`;
 
 const post = (text: string, parent?: { uri: string; cid: string }) =>
-  createRecord("alice.test", "app.bsky.feed.post", {
+  createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     reply: parent && { root: parent, parent },
     createdAt: new Date().toISOString(),

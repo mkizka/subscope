@@ -6,7 +6,7 @@
   },
   "helpers/pds.ts": {
     "params/max-params": {
-      "count": 4
+      "count": 3
     }
   },
   "tests/web-client/image-viewer.spec.ts": {

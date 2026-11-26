@@ -10,11 +10,13 @@ const openList = async (
   label: string,
   path: string,
 ) => {
-  const subject = await createRecord("bob.test", "app.bsky.feed.post", {
+  const subject = await createRecord("bob.test", {
+    $type: "app.bsky.feed.post",
     text: `${id}: ${label}される投稿`,
     createdAt: new Date().toISOString(),
   });
-  await createRecord("alice.test", collection, {
+  await createRecord("alice.test", {
+    $type: collection,
     subject,
     createdAt: new Date().toISOString(),
   });

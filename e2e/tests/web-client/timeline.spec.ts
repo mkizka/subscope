@@ -253,11 +253,13 @@ test.describe("タイムライン", () => {
   }) => {
     await follow("alice.test", "bob.test");
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {});
-    const parent = await createRecord("alice.test", "app.bsky.feed.post", {
+    const parent = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "timeline-e2: 親投稿",
       createdAt: new Date().toISOString(),
     });
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: "timeline-e2: 返信",
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
@@ -280,16 +282,19 @@ test.describe("タイムライン", () => {
   test("timeline-e5: 返信先とスレッドの起点がどちらも投稿者自身の投稿であるリプライは含める", async ({
     page,
   }) => {
-    const root = await createRecord("alice.test", "app.bsky.feed.post", {
+    const root = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "timeline-e5: 起点",
       createdAt: new Date().toISOString(),
     });
-    const parent = await createRecord("alice.test", "app.bsky.feed.post", {
+    const parent = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "timeline-e5: 1つ目の返信",
       reply: { root, parent: root },
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "timeline-e5: 2つ目の返信",
       reply: { root, parent },
       createdAt: new Date().toISOString(),
@@ -332,7 +337,8 @@ test.describe("ローカルタイムライン", () => {
     request,
   }) => {
     await follow("alice.test", "heidi.test");
-    await createRecord("heidi.test", "app.bsky.feed.post", {
+    await createRecord("heidi.test", {
+      $type: "app.bsky.feed.post",
       text: "localTimeline-e2: メンバーではない人の投稿",
       createdAt: new Date().toISOString(),
     });
