@@ -116,6 +116,8 @@ const toEmbed = (embed: RawEmbed): PostEmbed | null => {
 };
 
 export class Post {
+  static readonly replyNotificationDepth = 4;
+
   private constructor(
     readonly uri: AtUri,
     readonly cid: string,

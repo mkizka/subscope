@@ -4,27 +4,18 @@ import type {
   JobData,
 } from "@repo/common/interface";
 
-import type { BackfillStatus } from "../../../domain/account.js";
-import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IRepoStatusFetcher } from "../../interfaces/external/repo-status-fetcher.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
 import type { TrackingService } from "../../services/tracking-service.js";
-
-const IN_PROGRESS_STATES = ["pending", "desynchronized", "resyncing"];
-
-const toBackfillStatus = (tapState: string): BackfillStatus => {
-  if (tapState === "error") return "error";
-  if (IN_PROGRESS_STATES.includes(tapState)) return "inProgress";
-  return "completed";
-};
 
 export class CheckBackfillUseCase {
   constructor(
     private readonly tapClient: ITapClient,
     private readonly repoStatusFetcher: IRepoStatusFetcher,
     private readonly trackingService: TrackingService,
-    private readonly registrationQuery: IRegistrationQuery,
+    private readonly storagePolicy: StoragePolicy,
     private readonly accountRepository: IAccountRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly transactionManager: ITransactionManager,
@@ -32,12 +23,8 @@ export class CheckBackfillUseCase {
 
   async execute({ did, attempt }: JobData["checkBackfill"]) {
     const account = await this.transactionManager.transaction(async (ctx) => {
-      const isTrackedAccount =
-        (await this.registrationQuery.isRegistered(ctx, did)) ||
-        (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did));
-      return isTrackedAccount
-        ? this.accountRepository.find({ ctx, did })
-        : null;
+      const isTracked = await this.storagePolicy.isTracked(ctx, did);
+      return isTracked ? this.accountRepository.find({ ctx, did }) : null;
     });
     if (!account) {
       return;
@@ -47,18 +34,17 @@ export class CheckBackfillUseCase {
       tapState === "error" && (await this.repoStatusFetcher.isDeleted(did));
     if (isDeleted) {
       await this.trackingService.stop(did);
-      account.updateBackfillStatus("completed");
+      account.completeBackfill();
       await this.transactionManager.transaction((ctx) =>
         this.accountRepository.save({ ctx, account }),
       );
       return;
     }
-    const status = toBackfillStatus(tapState);
-    account.updateBackfillStatus(status);
+    account.applyTapState(tapState);
     await this.transactionManager.transaction((ctx) =>
       this.accountRepository.save({ ctx, account }),
     );
-    if (status !== "completed") {
+    if (account.needsBackfillRecheck) {
       await this.jobScheduler.scheduleCheckBackfill(did, attempt + 1);
     }
   }

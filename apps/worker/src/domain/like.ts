@@ -38,6 +38,10 @@ export class Like {
     return this.subject.host;
   }
 
+  get likesPost() {
+    return this.subject.collection === "app.bsky.feed.post";
+  }
+
   get notification(): Notification {
     return {
       recordUri: this.uri,

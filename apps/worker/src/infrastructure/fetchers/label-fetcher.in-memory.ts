@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 
 import type { ILabelFetcher } from "../../application/interfaces/external/label-fetcher.js";
-import type { LabelData } from "../../application/interfaces/repositories/label-repository.js";
+import type { LabelData } from "../../domain/label.js";
 
 export class InMemoryLabelFetcher implements ILabelFetcher {
   private labels: LabelData[] = [];

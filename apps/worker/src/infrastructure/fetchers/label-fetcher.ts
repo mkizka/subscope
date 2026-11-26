@@ -3,7 +3,7 @@ import { Client } from "@atproto/lex";
 import * as queryLabels from "@repo/client/com/atproto/label/queryLabels";
 
 import type { ILabelFetcher } from "../../application/interfaces/external/label-fetcher.js";
-import type { LabelData } from "../../application/interfaces/repositories/label-repository.js";
+import type { LabelData } from "../../domain/label.js";
 import type { Env } from "../../shared/env.js";
 
 export class LabelFetcher implements ILabelFetcher {

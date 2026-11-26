@@ -13,8 +13,6 @@ import type { RecordSaveService } from "../record-save-service.js";
 import type { RelatedRecordService } from "../related-record-service.js";
 import type { StatsService } from "../stats-service.js";
 
-const REPLY_NOTIFICATION_DEPTH = 4;
-
 export class PostIndexer implements IRecordIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
@@ -59,7 +57,7 @@ export class PostIndexer implements IRecordIndexer {
             ? await this.postQuery.findReplyAncestorUris(
                 ctx,
                 post.replyParent.uri,
-                REPLY_NOTIFICATION_DEPTH,
+                Post.replyNotificationDepth,
               )
             : [],
         ),

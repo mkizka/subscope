@@ -1,37 +1,9 @@
 import type { ITransactionManager, JobData } from "@repo/common/interface";
 
 import type { JobLogger } from "../../../shared/job.js";
-import type {
-  IWebPushSender,
-  PushPayload,
-} from "../../interfaces/external/web-push-sender.js";
-import type {
-  IPushNotificationQuery,
-  PushNotification,
-} from "../../interfaces/queries/push-notification-query.js";
+import type { IWebPushSender } from "../../interfaces/external/web-push-sender.js";
+import type { IPushNotificationQuery } from "../../interfaces/queries/push-notification-query.js";
 import type { IPushSubscriptionRepository } from "../../interfaces/repositories/push-subscription-repository.js";
-
-const TITLES = {
-  like: "さんがいいねしました",
-  repost: "さんがリポストしました",
-  follow: "さんにフォローされました",
-  reply: "さんが返信しました",
-  quote: "さんが引用しました",
-  mention: "さんがメンションしました",
-} satisfies Record<PushNotification["reason"], string>;
-
-const createPayload = (notification: PushNotification): PushPayload => {
-  const isLikeOrRepost =
-    notification.reason === "like" || notification.reason === "repost";
-  return {
-    title: `${notification.authorName}${TITLES[notification.reason]}`,
-    body: notification.postText ?? "",
-    // 同じタグの通知は端末上で置き換わるので、同じ投稿へのいいね・リポストは1件にまとまる
-    tag: isLikeOrRepost
-      ? `${notification.reason}:${notification.reasonSubject}`
-      : notification.recordUri,
-  };
-};
 
 export class SendPushNotificationUseCase {
   constructor(
@@ -61,7 +33,7 @@ export class SendPushNotificationUseCase {
     });
     if (!found || found.subscriptions.length === 0) return;
 
-    const payload = createPayload(found.notification);
+    const payload = found.notification.payload;
     const goneEndpoints: string[] = [];
     await Promise.all(
       found.subscriptions.map(async (subscription) => {

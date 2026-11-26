@@ -3,10 +3,8 @@ import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, eq } from "drizzle-orm";
 
-import type {
-  ILabelRepository,
-  LabelData,
-} from "../../../application/interfaces/repositories/label-repository.js";
+import type { ILabelRepository } from "../../../application/interfaces/repositories/label-repository.js";
+import type { Label } from "../../../domain/label.js";
 
 export class LabelRepository implements ILabelRepository {
   async save({
@@ -15,7 +13,7 @@ export class LabelRepository implements ILabelRepository {
     accountDid,
   }: {
     ctx: TransactionContext;
-    label: LabelData;
+    label: Label;
     accountDid: Did;
   }) {
     const data = {
@@ -38,7 +36,7 @@ export class LabelRepository implements ILabelRepository {
       });
   }
 
-  async delete({ ctx, label }: { ctx: TransactionContext; label: LabelData }) {
+  async delete({ ctx, label }: { ctx: TransactionContext; label: Label }) {
     await ctx.db
       .delete(schema.labels)
       .where(

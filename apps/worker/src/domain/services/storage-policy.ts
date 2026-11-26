@@ -55,11 +55,15 @@ export class StoragePolicy {
     const withinWindow = await this.isWithinWindow(ctx, origin, like);
     return {
       stores: likerIsMember || withinWindow,
-      fetchesSubject:
-        likerIsMember &&
-        withinWindow &&
-        like.subject.collection === "app.bsky.feed.post",
+      fetchesSubject: likerIsMember && withinWindow && like.likesPost,
     };
+  }
+
+  async isTracked(ctx: TransactionContext, did: Did) {
+    return (
+      (await this.registrationQuery.isRegistered(ctx, did)) ||
+      (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did))
+    );
   }
 
   tracksFollowee(ctx: TransactionContext, follow: Follow) {
