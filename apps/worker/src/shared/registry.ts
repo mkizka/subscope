@@ -85,8 +85,10 @@ import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit
 import { UpdateRepoRevUseCase } from "../application/use-cases/commit/update-repo-rev-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
+import type { IGateQuery } from "../domain/interfaces/gate-query.js";
 import type { IRegistrationQuery } from "../domain/interfaces/registration-query.js";
 import type { ITrackingRepository } from "../domain/interfaces/tracking-repository.js";
+import { GatePolicy } from "../domain/services/gate-policy.js";
 import { NotificationPolicy } from "../domain/services/notification-policy.js";
 import { StoragePolicy } from "../domain/services/storage-policy.js";
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
@@ -94,6 +96,7 @@ import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { AccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.js";
+import { GateQuery } from "../infrastructure/queries/gate-query/gate-query.js";
 import { PostQuery } from "../infrastructure/queries/post-query/post-query.js";
 import { PostStatsQuery } from "../infrastructure/queries/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/queries/profile-query/profile-query.js";
@@ -159,6 +162,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("profileQuery", asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("recordRepository", asClassArgs<IRecordRepository>()(RecordRepository))
     .service("recordQuery", asClassArgs<IRecordQuery>()(RecordQuery))
+    .service("gateQuery", ["recordRepository"], asClassArgs<IGateQuery>()(GateQuery))
     .service("repoRevRepository", asClassArgs<IRepoRevRepository>()(RepoRevRepository))
     .service("trackingRepository", asClassArgs<ITrackingRepository>()(TrackingRepository))
     .service("followRepository", asClassArgs<IFollowRepository>()(FollowRepository))
@@ -179,6 +183,7 @@ export const createWorkerRegistry = (env: Env) =>
     // domain(service)
     .service("storagePolicy", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicy))
     .service("notificationPolicy", ["registrationQuery"], asClassArgs(NotificationPolicy))
+    .service("gatePolicy", ["gateQuery"], asClassArgs(GatePolicy))
     // application(service)
     .service("notificationService", ["notificationRepository", "notificationPolicy", "jobScheduler"], asClassArgs(NotificationService))
     .service("statsService", ["jobScheduler"], asClassArgs(StatsService))
@@ -188,7 +193,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("indexAccountService", ["accountRepository"], asClassArgs(IndexAccountService))
     .service("resolveDidService", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidService))
     .service("recordSaveService", ["recordRepository", "indexAccountService"], asClassArgs(RecordSaveService))
-    .service("postIndexer", ["postRepository", "feedItemRepository", "postQuery", "storagePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(PostIndexer))
+    .service("postIndexer", ["postRepository", "feedItemRepository", "postQuery", "storagePolicy", "gatePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(PostIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository", "storagePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(RepostIndexer))
     .service("likeIndexer", ["likeRepository", "storagePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(LikeIndexer))
     .service("followIndexer", ["followRepository", "storagePolicy", "indexAccountService", "recordSaveService", "notificationService", "relatedRecordService", "statsService", "jobScheduler"], asClassArgs(FollowIndexer))

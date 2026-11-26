@@ -118,6 +118,8 @@ const toEmbed = (embed: RawEmbed): PostEmbed | null => {
 export class Post {
   static readonly replyNotificationDepth = 4;
 
+  private embeddingRulesViolated = false;
+
   private constructor(
     readonly uri: AtUri,
     readonly cid: string,
@@ -151,6 +153,14 @@ export class Post {
     );
   }
 
+  get violatesEmbeddingRules() {
+    return this.embeddingRulesViolated;
+  }
+
+  markEmbeddingRulesViolated() {
+    this.embeddingRulesViolated = true;
+  }
+
   get feedItem(): FeedItem {
     return {
       uri: this.uri.toString(),
@@ -177,6 +187,11 @@ export class Post {
       : null;
   }
 
+  get quotedPostUri() {
+    const uri = this.quotedUri;
+    return uri?.collection === "app.bsky.feed.post" ? uri : null;
+  }
+
   get statsTargets() {
     const { replyParent, quotedUri } = this;
     return [
@@ -186,7 +201,7 @@ export class Post {
   }
 
   notifications(replyAncestorUris: AtUri[]): Notification[] {
-    const quoteUri = this.fetchableEmbedUri;
+    const quoteUri = this.violatesEmbeddingRules ? null : this.quotedPostUri;
     const base = {
       recordUri: this.uri.toString(),
       authorDid: this.accountDid,
@@ -199,7 +214,7 @@ export class Post {
         reason: "mention" as const,
         reasonSubject: null,
       })),
-      ...(quoteUri?.collection === "app.bsky.feed.post"
+      ...(quoteUri
         ? [
             {
               ...base,

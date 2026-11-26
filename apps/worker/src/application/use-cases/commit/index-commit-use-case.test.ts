@@ -237,7 +237,7 @@ describe("IndexCommitUseCase", () => {
       expect(await recordRepo.find({ ctx, uri: mismatched.uri })).toBeNull();
     });
 
-    test("index-23: threadgateとpostgateは、対象の投稿を保存済みのときだけ保存する", async () => {
+    test("index-25: threadgateとpostgateは、対象の投稿を保存済みのときだけ保存する", async () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);
@@ -252,7 +252,7 @@ describe("IndexCommitUseCase", () => {
       ).toBeNull();
     });
 
-    test("index-24: 対象の投稿より先に届いたthreadgateとpostgateは、PDSから取り直して保存する", async () => {
+    test("index-26: 対象の投稿より先に届いたthreadgateとpostgateは、PDSから取り直して保存する", async () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);

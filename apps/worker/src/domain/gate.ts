@@ -3,20 +3,26 @@ import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "./record.js";
 
+const parseGate = (record: Record) =>
+  validateRecord(
+    record.uri.collection === "app.bsky.feed.threadgate"
+      ? "app.bsky.feed.threadgate"
+      : "app.bsky.feed.postgate",
+    record,
+  );
+
 export class Gate {
   private constructor(
     private readonly uri: AtUri,
-    readonly postUri: AtUri,
+    private readonly value: ReturnType<typeof parseGate>,
   ) {}
 
   static fromRecord(record: Record) {
-    const parsed = validateRecord(
-      record.uri.collection === "app.bsky.feed.threadgate"
-        ? "app.bsky.feed.threadgate"
-        : "app.bsky.feed.postgate",
-      record,
-    );
-    return new Gate(record.uri, new AtUri(parsed.post));
+    return new Gate(record.uri, parseGate(record));
+  }
+
+  get postUri() {
+    return new AtUri(this.value.post);
   }
 
   get attachesToOwnPost() {
@@ -24,6 +30,15 @@ export class Gate {
       this.postUri.host === this.uri.did &&
       this.postUri.collection === "app.bsky.feed.post" &&
       this.postUri.rkey === this.uri.rkey
+    );
+  }
+
+  get disablesEmbedding() {
+    return (
+      "embeddingRules" in this.value &&
+      !!this.value.embeddingRules?.some(
+        (rule) => rule.$type === "app.bsky.feed.postgate#disableRule",
+      )
     );
   }
 }
