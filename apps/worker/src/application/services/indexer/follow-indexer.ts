@@ -14,14 +14,16 @@ import type { StatsService } from "../stats-service.js";
 
 export class FollowIndexer implements IRecordIndexer {
   constructor(
-    private readonly followRepository: IFollowRepository,
-    private readonly storagePolicy: StoragePolicy,
-    private readonly indexAccountService: IndexAccountService,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly notificationService: NotificationService,
-    private readonly relatedRecordService: RelatedRecordService,
-    private readonly statsService: StatsService,
-    private readonly jobScheduler: IJobScheduler,
+    private readonly deps: {
+      followRepository: IFollowRepository;
+      storagePolicy: StoragePolicy;
+      indexAccountService: IndexAccountService;
+      recordSaveService: RecordSaveService;
+      notificationService: NotificationService;
+      relatedRecordService: RelatedRecordService;
+      statsService: StatsService;
+      jobScheduler: IJobScheduler;
+    },
   ) {}
 
   async index({
@@ -34,24 +36,31 @@ export class FollowIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const follow = Follow.fromRecord(record);
-    const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
+    const tracksFollowee = await this.deps.storagePolicy.tracksFollowee(
+      ctx,
+      follow,
+    );
 
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({ ctx, origin, record: follow });
-    await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
-    await this.followRepository.save({ ctx, follow });
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
+      ctx,
+      origin,
+      record: follow,
+    });
+    await this.deps.indexAccountService.upsert({ ctx, did: follow.subjectDid });
+    await this.deps.followRepository.save({ ctx, follow });
 
-    await this.notificationService.notify({
+    await this.deps.notificationService.notify({
       ctx,
       origin,
       notifications: () => [follow.notification],
     });
     if (tracksFollowee) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
+        this.deps.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );
     }
-    this.statsService.recount({
+    this.deps.statsService.recount({
       ctx,
       accounts: [follow.accountDid, follow.subjectDid],
     });
@@ -65,13 +74,16 @@ export class FollowIndexer implements IRecordIndexer {
     record: Record;
   }) {
     const follow = Follow.fromRecord(record);
-    const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
+    const tracksFollowee = await this.deps.storagePolicy.tracksFollowee(
+      ctx,
+      follow,
+    );
     if (tracksFollowee) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
+        this.deps.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );
     }
-    this.statsService.recount({
+    this.deps.statsService.recount({
       ctx,
       accounts: [follow.accountDid, follow.subjectDid],
     });
