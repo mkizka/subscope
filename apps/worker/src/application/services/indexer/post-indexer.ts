@@ -3,6 +3,7 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import type { Origin } from "../../../domain/origin.js";
 import { Post } from "../../../domain/post.js";
 import type { Record } from "../../../domain/record.js";
+import type { GatePolicy } from "../../../domain/services/gate-policy.js";
 import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
@@ -19,6 +20,7 @@ export class PostIndexer implements IRecordIndexer {
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postQuery: IPostQuery,
     private readonly storagePolicy: StoragePolicy,
+    private readonly gatePolicy: GatePolicy,
     private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
     private readonly relatedRecordService: RelatedRecordService,
@@ -42,6 +44,13 @@ export class PostIndexer implements IRecordIndexer {
     });
     if (!saves) {
       return;
+    }
+
+    const violatesEmbeddingRules = await this.gatePolicy.violatesEmbeddingRules(
+      { ctx, origin, post },
+    );
+    if (violatesEmbeddingRules) {
+      post.markEmbeddingRulesViolated();
     }
 
     await this.recordSaveService.save({ ctx, record });

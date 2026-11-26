@@ -24,6 +24,7 @@ export class PostRepository implements IPostRepository {
       replyParentUri: post.replyParent?.uri.toString(),
       replyParentCid: post.replyParent?.cid,
       langs: post.langs,
+      violatesEmbeddingRules: post.violatesEmbeddingRules,
       createdAt: sanitizeDate(post.createdAt),
     } satisfies PostInsert;
     await ctx.db

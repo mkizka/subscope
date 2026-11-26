@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ADD COLUMN "violates_embedding_rules" boolean DEFAULT false NOT NULL;

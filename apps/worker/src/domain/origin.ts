@@ -31,6 +31,10 @@ export class Origin {
     return this.source === "tap" && this.isLive;
   }
 
+  get judgesGateViolation() {
+    return this.notifies;
+  }
+
   get canFetchRelated() {
     return this.depth < MAX_FETCH_DEPTH;
   }

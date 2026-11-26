@@ -19,6 +19,7 @@ describe("PostIndexer", () => {
   let jobScheduler: TestServices["jobScheduler"];
   let registrationQuery: TestServices["registrationQuery"];
   let notificationRepo: TestServices["notificationRepository"];
+  let recordRepo: TestServices["recordRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
@@ -28,6 +29,7 @@ describe("PostIndexer", () => {
     jobScheduler = services.jobScheduler;
     registrationQuery = services.registrationQuery;
     notificationRepo = services.notificationRepository;
+    recordRepo = services.recordRepository;
     db = services.db;
   });
 
@@ -273,6 +275,92 @@ describe("PostIndexer", () => {
           reasonSubject: ancestor.uri.toString(),
         })),
       );
+    });
+  });
+
+  describe("引用禁止の違反", () => {
+    const quotedDid = accountFactory().did;
+    const quotedUri = `at://${quotedDid}/app.bsky.feed.post/quoted`;
+
+    const disableEmbedding = () =>
+      recordRepo.add(
+        recordFactory({
+          uri: `at://${quotedDid}/app.bsky.feed.postgate/quoted`,
+          json: {
+            $type: "app.bsky.feed.postgate",
+            post: quotedUri,
+            embeddingRules: [{ $type: "app.bsky.feed.postgate#disableRule" }],
+            createdAt: new Date().toISOString(),
+          },
+        }),
+      );
+
+    const quoteRecord = async (did: string) =>
+      recordFactory({
+        uri: `at://${did}/app.bsky.feed.post/quote`,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "quote",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: { uri: quotedUri, cid: await randomCid() },
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+    test("index-23: 引用を禁止した投稿への作者以外の引用は、引用禁止の違反として保存する", async () => {
+      const ctx = { db, afterCommit };
+      // arrange
+      disableEmbedding();
+      const records = [
+        await quoteRecord(accountFactory().did),
+        await quoteRecord(quotedDid),
+      ];
+
+      // act
+      for (const record of records) {
+        await postIndexer.index({ ctx, record, origin: Origin.live() });
+      }
+
+      // assert
+      const posts = await Promise.all(
+        records.map((record) => postRepo.find({ ctx, uri: record.uri })),
+      );
+      expect(posts.map((post) => post?.violatesEmbeddingRules)).toEqual([
+        true,
+        false,
+      ]);
+    });
+
+    test("index-24: 引用禁止の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+      const ctx = { db, afterCommit };
+      // arrange
+      disableEmbedding();
+      const author = accountFactory();
+      registrationQuery.add(author.did);
+      const record = await quoteRecord(author.did);
+
+      // act
+      await postIndexer.index({ ctx, record, origin: Origin.backfill() });
+
+      // assert
+      const post = await postRepo.find({ ctx, uri: record.uri });
+      expect(post?.violatesEmbeddingRules).toBe(false);
+    });
+
+    test("notify-10: 引用禁止に違反した引用では quote の通知を作らない", async () => {
+      const ctx = { db, afterCommit };
+      // arrange
+      registrationQuery.add(quotedDid);
+      disableEmbedding();
+      const record = await quoteRecord(accountFactory().did);
+
+      // act
+      await postIndexer.index({ ctx, record, origin: Origin.live() });
+
+      // assert
+      expect(notificationRepo.findAll()).toEqual([]);
     });
   });
 

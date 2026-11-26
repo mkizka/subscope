@@ -106,6 +106,7 @@ export const postFactory = (db: Database) =>
           replyParentUri: () => null as string | null,
           replyParentCid: () => null as string | null,
           langs: () => [],
+          violatesEmbeddingRules: () => false,
           createdAt: () => faker.date.recent(),
           indexedAt: () => faker.date.recent(),
         },
