@@ -36,7 +36,7 @@ export class PostViews {
         this.profileViews.basic(post.accountDid, ctx),
         ctx.stats(uri),
         ctx.viewerPostState(uri),
-        this.embedViews.embedView(post, ctx),
+        this.embedViews.embedView({ post, ctx }),
         ctx.record(gateUri(rootUri, "app.bsky.feed.threadgate")),
         ctx.record(gateUri(uri, "app.bsky.feed.postgate")),
         ctx.labelsOf(uri),

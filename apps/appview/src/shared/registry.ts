@@ -247,7 +247,7 @@ export const createAppRegistry = (env: Env) =>
     .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "accountStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
-    .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
+    .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClass(EmbedViews))
     .service("listViews", ["profileViews", "assetUrlBuilder"], asClassArgs(ListViews))
     .service("postViews", ["profileViews", "embedViews", "listViews"], asClassArgs(PostViews))
     .service("feedViews", ["postViews", "profileViews"], asClassArgs(FeedViews))
