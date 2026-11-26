@@ -3,8 +3,7 @@ export const PDS_URL = "http://localhost:2583";
 
 const xrpc = async <T>(
   nsid: string,
-  body: unknown,
-  accessJwt?: string,
+  { body, accessJwt }: { body: unknown; accessJwt?: string },
 ): Promise<T> => {
   const response = await fetch(`${PDS_URL}/xrpc/${nsid}`, {
     method: "POST",
@@ -27,13 +26,12 @@ export const createRecord = async (
 ) => {
   const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
     "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
+    { body: { identifier: handle, password: "password" } },
   );
-  return xrpc<{ uri: string; cid: string }>(
-    "com.atproto.repo.createRecord",
-    { repo: did, collection: record.$type, record },
+  return xrpc<{ uri: string; cid: string }>("com.atproto.repo.createRecord", {
+    body: { repo: did, collection: record.$type, record },
     accessJwt,
-  );
+  });
 };
 
 const PNG_BASE64 =
@@ -42,7 +40,7 @@ const PNG_BASE64 =
 export const uploadImage = async (handle: string) => {
   const { accessJwt } = await xrpc<{ accessJwt: string }>(
     "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
+    { body: { identifier: handle, password: "password" } },
   );
   const response = await fetch(`${PDS_URL}/xrpc/com.atproto.repo.uploadBlob`, {
     method: "POST",
@@ -68,32 +66,37 @@ export const resolveHandle = async (handle: string) => {
 
 export const putRecord = async (
   handle: string,
-  collection: string,
-  rkey: string,
-  record: Record<string, unknown>,
+  {
+    collection,
+    rkey,
+    record,
+  }: { collection: string; rkey: string; record: Record<string, unknown> },
 ) => {
   const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
     "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
+    { body: { identifier: handle, password: "password" } },
   );
-  return xrpc<{ uri: string; cid: string }>(
-    "com.atproto.repo.putRecord",
-    { repo: did, collection, rkey, record: { $type: collection, ...record } },
+  return xrpc<{ uri: string; cid: string }>("com.atproto.repo.putRecord", {
+    body: {
+      repo: did,
+      collection,
+      rkey,
+      record: { $type: collection, ...record },
+    },
     accessJwt,
-  );
+  });
 };
 
 export const deleteRecord = async (handle: string, uri: string) => {
   const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
     "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
+    { body: { identifier: handle, password: "password" } },
   );
   const { collection, rkey } = new AtUri(uri);
-  await xrpc(
-    "com.atproto.repo.deleteRecord",
-    { repo: did, collection, rkey },
+  await xrpc("com.atproto.repo.deleteRecord", {
+    body: { repo: did, collection, rkey },
     accessJwt,
-  );
+  });
 };
 
 export const follow = async (handle: string, subjectHandle: string) => {
@@ -119,7 +122,7 @@ export const follow = async (handle: string, subjectHandle: string) => {
 export const registerAccount = async (handle: string, inviteCode: string) => {
   const { accessJwt } = await xrpc<{ accessJwt: string }>(
     "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
+    { body: { identifier: handle, password: "password" } },
   );
   const lxm = "me.subsco.sync.registerAccount";
   const serviceAuth = await fetch(
@@ -144,12 +147,14 @@ export const registerAccount = async (handle: string, inviteCode: string) => {
 
 export const uploadBlob = async (
   handle: string,
-  body: Uint8Array<ArrayBuffer>,
-  contentType = "image/png",
+  {
+    body,
+    contentType = "image/png",
+  }: { body: Uint8Array<ArrayBuffer>; contentType?: string },
 ) => {
   const { accessJwt } = await xrpc<{ accessJwt: string }>(
     "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
+    { body: { identifier: handle, password: "password" } },
   );
   const response = await fetch(`${PDS_URL}/xrpc/com.atproto.repo.uploadBlob`, {
     method: "POST",

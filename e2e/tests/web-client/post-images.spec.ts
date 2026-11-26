@@ -10,7 +10,7 @@ test.describe("投稿画像", () => {
     const items = await Promise.all(
       Array.from({ length: 6 }, async (_, i) => ({
         $type: "app.bsky.embed.gallery#image",
-        image: await uploadBlob("alice.test", new Uint8Array([i])),
+        image: await uploadBlob("alice.test", { body: new Uint8Array([i]) }),
         alt: text,
         aspectRatio: { width: 1, height: 1 },
       })),

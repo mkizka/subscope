@@ -11,8 +11,12 @@ test.describe("通知", () => {
   test("notification-e2: フォローの通知に、相手の名前を表示する", async ({
     page,
   }) => {
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
+    await putRecord("bob.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Bob",
+      },
     });
     await follow("alice.test", "bob.test");
     await follow("bob.test", "alice.test");
@@ -40,11 +44,19 @@ test.describe("通知", () => {
       text,
       createdAt,
     });
-    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
-      displayName: "Alice",
+    await putRecord("alice.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Alice",
+      },
     });
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
+    await putRecord("bob.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Bob",
+      },
     });
     await follow("alice.test", "bob.test");
     const subject = { uri: post.uri, cid: post.cid };
@@ -88,8 +100,12 @@ test.describe("通知", () => {
       text: "notification-e3: 元の投稿",
       createdAt,
     });
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
+    await putRecord("bob.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Bob",
+      },
     });
     await follow("alice.test", "bob.test");
     const ref = { uri: post.uri, cid: post.cid };
@@ -150,8 +166,12 @@ test.describe("通知", () => {
   test("notification-e5: 未読の通知は背景色で区別し、開いた後に再表示すると既読にする", async ({
     page,
   }) => {
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
+    await putRecord("bob.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Bob",
+      },
     });
     await follow("alice.test", "bob.test");
     const { uri } = await createRecord("bob.test", {
@@ -193,8 +213,12 @@ test.describe("通知", () => {
       text: "notification-e4: 元の投稿",
       createdAt: new Date().toISOString(),
     });
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
+    await putRecord("bob.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Bob",
+      },
     });
     await follow("alice.test", "bob.test");
     const ref = { uri: post.uri, cid: post.cid };
