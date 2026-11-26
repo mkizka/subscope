@@ -14,7 +14,7 @@ export interface IRegistrationQuery {
     limit: number;
     cursor?: string;
     q?: string;
-  }) => Promise<{ did: Did; registeredFollowersCount: number }[]>;
+  }) => Promise<{ did: Did; memberFollowersCount: number }[]>;
   countFollowedAccounts: () => Promise<number>;
   findMemberFollowers: (params: {
     subjectDid: Did;

@@ -73,13 +73,13 @@ export class RegistrationQuery implements IRegistrationQuery {
     limit: number;
     cursor?: string;
     q?: string;
-  }): Promise<{ did: Did; registeredFollowersCount: number }[]> {
+  }): Promise<{ did: Did; memberFollowersCount: number }[]> {
     const { accounts, follows, registrations } = schema;
-    const registeredFollowersCount = countDistinct(registrations.accountDid);
+    const memberFollowersCount = countDistinct(registrations.accountDid);
     const cursor = params.cursor?.split("::");
 
     const rows = await this.db
-      .select({ did: accounts.did, registeredFollowersCount })
+      .select({ did: accounts.did, memberFollowersCount })
       .from(accounts)
       .innerJoin(follows, eq(follows.subjectDid, accounts.did))
       .innerJoin(
@@ -93,15 +93,15 @@ export class RegistrationQuery implements IRegistrationQuery {
       .having(
         cursor
           ? or(
-              lt(registeredFollowersCount, Number(cursor[0])),
+              lt(memberFollowersCount, Number(cursor[0])),
               and(
-                eq(registeredFollowersCount, Number(cursor[0])),
+                eq(memberFollowersCount, Number(cursor[0])),
                 gt(accounts.did, cursor[1] ?? ""),
               ),
             )
           : undefined,
       )
-      .orderBy(desc(registeredFollowersCount), asc(accounts.did))
+      .orderBy(desc(memberFollowersCount), asc(accounts.did))
       .limit(params.limit);
 
     return rows.map((row) => ({ ...row, did: asDid(row.did) }));
