@@ -74,7 +74,10 @@ export class StoragePolicy {
     record: Saved;
   }): Promise<AtUri[]> {
     if (record instanceof Post) {
-      return record.fetchableEmbedUri ? [record.fetchableEmbedUri] : [];
+      const replyUris = origin.isFetched
+        ? []
+        : [record.replyParent?.uri, record.replyRoot?.uri];
+      return [record.fetchableEmbedUri, ...replyUris].filter((uri) => !!uri);
     }
     if (record instanceof Repost) {
       return [record.subject];

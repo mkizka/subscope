@@ -12,6 +12,8 @@
 | listNotifications-4 | reasonsを指定すると、その種類の通知だけを返す    |
 | listNotifications-5 | seenAtに閲覧者の既読時刻を返す                   |
 
+スレッド主が隠したリプライの通知は、公式AppViewと違い、スレッド主の一覧にも含める。リプライを隠す機能は、なくても通知という基本機能は欠けないため見送る。
+
 ## app.bsky.notification.getGroupedNotifications
 
 閲覧者宛ての通知を、まとめた形で返す。認証が必要。公式アプリの通知画面はこのAPIだけを使う。
