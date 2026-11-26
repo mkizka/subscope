@@ -13,7 +13,10 @@ const post = (text: string, parent?: { uri: string; cid: string }) =>
     createdAt: new Date().toISOString(),
   });
 
-const openThread = async (page: Page, uri: string, text: string) => {
+const openThread = async (
+  page: Page,
+  { uri, text }: { uri: string; text: string },
+) => {
   await page.goto("/");
   await page.waitForURL("/");
   await expect(async () => {
@@ -53,7 +56,7 @@ test.describe("スレッド", () => {
     const target = await post("thread-e2: 投稿", parent);
     await post("thread-e2: 返信", target);
 
-    await openThread(page, target.uri, "thread-e2: 返信");
+    await openThread(page, { uri: target.uri, text: "thread-e2: 返信" });
 
     await expect(
       page.getByRole("region", { name: "スレッド" }).getByText(/^thread-e2: /),
@@ -71,7 +74,7 @@ test.describe("スレッド", () => {
     const text = "thread-e3: 投稿";
     const { uri } = await post(text);
 
-    await openThread(page, uri, text);
+    await openThread(page, { uri, text });
   });
 
   test("thread-e4: 見出しの戻るボタンを押すと、スレッドを開く前の画面に戻る", async ({
@@ -130,7 +133,7 @@ test.describe("スレッド", () => {
         if (msg.type() === "error") errors.push(msg.text());
       });
 
-      await openThread(page, uri, text);
+      await openThread(page, { uri, text });
 
       const time = page
         .getByRole("region", { name: "スレッド" })
@@ -153,7 +156,7 @@ test.describe("スレッド", () => {
   }) => {
     const target = await post("thread-e7: 投稿");
 
-    await openThread(page, target.uri, "thread-e7: 投稿");
+    await openThread(page, { uri: target.uri, text: "thread-e7: 投稿" });
     const thread = page.getByRole("region", { name: "スレッド" });
     await thread
       .getByRole("article", { name: "選んだ投稿" })
@@ -208,7 +211,7 @@ test.describe("スレッド", () => {
   }) => {
     const target = await post("thread-e9: 投稿");
 
-    await openThread(page, target.uri, "thread-e9: 投稿");
+    await openThread(page, { uri: target.uri, text: "thread-e9: 投稿" });
     const thread = page.getByRole("region", { name: "スレッド" });
     await thread.getByRole("button", { name: "返信を書く" }).click();
     const dialog = page.getByRole("dialog");
@@ -228,7 +231,7 @@ test.describe("スレッド", () => {
   test("thread-e10: 選んだ投稿を削除すると、ホームに戻る", async ({ page }) => {
     const target = await post("thread-e10: 投稿");
 
-    await openThread(page, target.uri, "thread-e10: 投稿");
+    await openThread(page, { uri: target.uri, text: "thread-e10: 投稿" });
     await page
       .getByRole("region", { name: "スレッド" })
       .getByRole("button", { name: "投稿のメニュー" })
@@ -250,7 +253,7 @@ test.describe("スレッド", () => {
     const target = await post("thread-e11: 投稿", parent);
     await post("thread-e11: 返信", target);
 
-    await openThread(page, target.uri, "thread-e11: 返信");
+    await openThread(page, { uri: target.uri, text: "thread-e11: 返信" });
     const thread = page.getByRole("region", { name: "スレッド" });
     const focused = thread.getByRole("article", { name: "選んだ投稿" });
     for (const text of ["thread-e11: 親", "thread-e11: 返信"]) {
@@ -288,7 +291,7 @@ test.describe("スレッド", () => {
     for (let i = 0; i < 12; i++) {
       await post(`thread-e14: 返信${i}`, root);
     }
-    await openThread(page, root.uri, "thread-e14: 返信11");
+    await openThread(page, { uri: root.uri, text: "thread-e14: 返信11" });
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 

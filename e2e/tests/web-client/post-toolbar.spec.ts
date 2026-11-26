@@ -17,20 +17,24 @@ const toggleReaction = async (
     { data: { identifier: "alice.test", password: "password" } },
   );
   const { did, accessJwt } = await session.json();
-  const createRecord = (collection: string, record: object, rkey?: string) =>
+  const createRecord = (data: {
+    collection: string;
+    rkey?: string;
+    record: object;
+  }) =>
     request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
       headers: { Authorization: `Bearer ${accessJwt}` },
-      data: { repo: did, collection, rkey, record },
+      data: { repo: did, ...data },
     });
-  await createRecord(
-    "app.bsky.actor.profile",
-    { displayName: "Alice" },
-    "self",
-  );
+  await createRecord({
+    collection: "app.bsky.actor.profile",
+    rkey: "self",
+    record: { displayName: "Alice" },
+  });
   const text = `${id}: 投稿`;
-  const created = await createRecord("app.bsky.feed.post", {
-    text,
-    createdAt: new Date().toISOString(),
+  const created = await createRecord({
+    collection: "app.bsky.feed.post",
+    record: { text, createdAt: new Date().toISOString() },
   });
   const { uri }: { uri: string } = await created.json();
   const hasRecord = async () => {

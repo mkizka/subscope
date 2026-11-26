@@ -2,7 +2,10 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { createRecord, uploadImage } from "../../helpers/pds";
 
-const openViewer = async (page: Page, text: string, alt: string) => {
+const openViewer = async (
+  page: Page,
+  { text, alt }: { text: string; alt: string },
+) => {
   await createRecord("alice.test", {
     $type: "app.bsky.feed.post",
     text,
@@ -27,11 +30,10 @@ test.describe("画像の拡大表示", () => {
   test("imageViewer-e1: ブラウザの戻るで閉じ、元の画面にとどまる", async ({
     page,
   }) => {
-    const viewer = await openViewer(
-      page,
-      "imageViewer-e1: 投稿",
-      "imageViewer-e1: 画像",
-    );
+    const viewer = await openViewer(page, {
+      text: "imageViewer-e1: 投稿",
+      alt: "imageViewer-e1: 画像",
+    });
 
     await page.goBack();
     await expect(viewer).toBeHidden();
