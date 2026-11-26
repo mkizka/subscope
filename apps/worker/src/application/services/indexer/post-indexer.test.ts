@@ -198,7 +198,15 @@ describe("PostIndexer", () => {
       registrationQuery.add(quoted.did);
       const author = accountFactory();
       const cid = await randomCid();
-      const postRecord = (rkey: string, did: string, withMention: boolean) => {
+      const postRecord = ({
+        rkey,
+        did,
+        withMention,
+      }: {
+        rkey: string;
+        did: string;
+        withMention: boolean;
+      }) => {
         const subject = { uri: `at://${did}/app.bsky.feed.post/subject`, cid };
         return recordFactory({
           uri: AtUri.make(author.did, "app.bsky.feed.post", rkey).toString(),
@@ -215,8 +223,8 @@ describe("PostIndexer", () => {
 
       // act
       for (const record of [
-        postRecord("mention", mentioned.did, true),
-        postRecord("quote", quoted.did, false),
+        postRecord({ rkey: "mention", did: mentioned.did, withMention: true }),
+        postRecord({ rkey: "quote", did: quoted.did, withMention: false }),
       ]) {
         await postIndexer.index({ ctx, record, origin: Origin.live() });
       }

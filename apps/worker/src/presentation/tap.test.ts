@@ -35,11 +35,17 @@ const services = await createWorkerRegistry(testEnv)
 
 const cid = "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm";
 
-const recordEvent = (id: number, did: string, record: object = {}) => ({
+const recordEvent = ({
+  id,
+  ...record
+}: {
+  id: number;
+  did: string;
+  [key: string]: unknown;
+}) => ({
   id,
   type: "record",
   record: {
-    did,
     rev: "3l3qo2vutsw2b",
     collection: "app.bsky.feed.post",
     rkey: "3l3qo2vuowo2b",
@@ -109,7 +115,7 @@ describe("Tapからのイベント受信", () => {
       .create();
 
     // act
-    send(recordEvent(1, account.did), {
+    send(recordEvent({ id: 1, did: account.did }), {
       id: 2,
       type: "identity",
       identity: {
@@ -138,7 +144,13 @@ describe("Tapからのイベント受信", () => {
       .create();
 
     // act
-    send(recordEvent(1, account.did, { collection: "com.example.unknown" }));
+    send(
+      recordEvent({
+        id: 1,
+        did: account.did,
+        collection: "com.example.unknown",
+      }),
+    );
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([1]));
@@ -156,7 +168,10 @@ describe("Tapからのイベント受信", () => {
     );
 
     // act
-    send(recordEvent(1, account.did), recordEvent(2, account.did));
+    send(
+      recordEvent({ id: 1, did: account.did }),
+      recordEvent({ id: 2, did: account.did }),
+    );
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([2]));
@@ -171,7 +186,9 @@ describe("Tapからのイベント受信", () => {
 
     // act
     send(
-      recordEvent(1, account.did, {
+      recordEvent({
+        id: 1,
+        did: account.did,
         record: { $type: "app.bsky.feed.post", text: "no createdAt" },
       }),
     );
@@ -193,7 +210,10 @@ describe("Tapからのイベント受信", () => {
       .mockImplementationOnce(() => blocker.promise);
 
     // act
-    send(recordEvent(1, account.did), recordEvent(2, account.did));
+    send(
+      recordEvent({ id: 1, did: account.did }),
+      recordEvent({ id: 2, did: account.did }),
+    );
     await vi.waitFor(() => expect(transaction).toHaveBeenCalledOnce());
     await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -217,7 +237,7 @@ describe("Tapからのイベント受信", () => {
     const account = await accountFactory(ctx.db).create();
 
     // act
-    send(recordEvent(1, account.did, { rev: "3aaaaaaaaaaaa" }));
+    send(recordEvent({ id: 1, did: account.did, rev: "3aaaaaaaaaaaa" }));
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([1]));
@@ -232,11 +252,15 @@ describe("Tapからのイベント受信", () => {
 
     // act
     send(
-      recordEvent(1, unsupported.did, {
+      recordEvent({
+        id: 1,
+        did: unsupported.did,
         rev: "3aaaaaaaaaaaa",
         collection: "com.example.unknown",
       }),
-      recordEvent(2, invalid.did, {
+      recordEvent({
+        id: 2,
+        did: invalid.did,
         rev: "3bbbbbbbbbbbb",
         record: { $type: "app.bsky.feed.post", text: "no createdAt" },
       }),
@@ -258,7 +282,7 @@ describe("Tapからのイベント受信", () => {
       .where(eq(schema.accounts.did, account.did));
 
     // act
-    send(recordEvent(1, account.did, { rev: "3aaaaaaaaaaaa" }));
+    send(recordEvent({ id: 1, did: account.did, rev: "3aaaaaaaaaaaa" }));
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([1]));
@@ -276,7 +300,7 @@ describe("Tapからのイベント受信", () => {
       .mockRejectedValueOnce(new Error("db down"));
 
     // act
-    send(recordEvent(1, account.did, { rev: "3aaaaaaaaaaaa" }));
+    send(recordEvent({ id: 1, did: account.did, rev: "3aaaaaaaaaaaa" }));
     await vi.waitFor(() => expect(transaction).toHaveBeenCalledOnce());
     await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -296,7 +320,7 @@ describe("Tapからのイベント受信", () => {
       .mockRejectedValueOnce(new Error("db down"));
 
     // act
-    send(recordEvent(1, account.did));
+    send(recordEvent({ id: 1, did: account.did }));
     await vi.waitFor(() => expect(save).toHaveBeenCalledOnce());
     await new Promise((resolve) => setTimeout(resolve, 200));
 

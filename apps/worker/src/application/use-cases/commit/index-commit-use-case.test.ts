@@ -190,7 +190,15 @@ describe("IndexCommitUseCase", () => {
       // arrange
       const account = accountFactory();
       accountRepo.add(account);
-      const gate = (collection: string, rkey: string, postRkey: string) => {
+      const gate = ({
+        collection,
+        rkey,
+        postRkey,
+      }: {
+        collection: string;
+        rkey: string;
+        postRkey: string;
+      }) => {
         const uri = AtUri.make(account.did, collection, rkey);
         const record = {
           uri,
@@ -219,9 +227,21 @@ describe("IndexCommitUseCase", () => {
           },
         };
       };
-      const threadgate = gate("app.bsky.feed.threadgate", "123", "123");
-      const postgate = gate("app.bsky.feed.postgate", "123", "123");
-      const mismatched = gate("app.bsky.feed.threadgate", "456", "123");
+      const threadgate = gate({
+        collection: "app.bsky.feed.threadgate",
+        rkey: "123",
+        postRkey: "123",
+      });
+      const postgate = gate({
+        collection: "app.bsky.feed.postgate",
+        rkey: "123",
+        postRkey: "123",
+      });
+      const mismatched = gate({
+        collection: "app.bsky.feed.threadgate",
+        rkey: "456",
+        postRkey: "123",
+      });
       await indexCommitUseCase.execute(postOf(account.did));
 
       // act

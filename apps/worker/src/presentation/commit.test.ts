@@ -45,17 +45,12 @@ describe("commit", () => {
     await services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
   };
 
-  const postEvent = (
-    did: string,
-    action: "create" | "update",
-    rev: string,
-    text: string,
-  ): RecordEvent => ({
+  const postEvent = (did: string, text: string): RecordEvent => ({
     id: 1,
     type: "record",
-    action,
+    action: "create",
     did: asDid(did),
-    rev,
+    rev: "3aaaaaaaaaaaa",
     collection: "app.bsky.feed.post",
     rkey: "123",
     cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
@@ -143,7 +138,7 @@ describe("commit", () => {
           cid: await randomCid(),
         };
         const event: RecordEvent = {
-          ...postEvent(author.did, "create", "3aaaaaaaaaaaa", "past"),
+          ...postEvent(author.did, "past"),
           collection: `app.bsky.feed.${collection}`,
           record: {
             $type: `app.bsky.feed.${collection}`,
@@ -244,7 +239,7 @@ describe("commit", () => {
         .create();
       const ref = { uri: root.uri, cid: root.cid };
       const replyEvent = (live: boolean): RecordEvent => ({
-        ...postEvent(replier.did, "create", "3aaaaaaaaaaaa", "reply"),
+        ...postEvent(replier.did, "reply"),
         record: {
           $type: "app.bsky.feed.post",
           text: "reply",
@@ -360,7 +355,7 @@ describe("commit", () => {
       ],
     };
     const embedPostEvent = (rkey: string, embed: LexValue): RecordEvent => ({
-      ...postEvent(account.did, "create", "3aaaaaaaaaaaa", "gallery"),
+      ...postEvent(account.did, "gallery"),
       rkey,
       record: {
         $type: "app.bsky.feed.post",
@@ -430,7 +425,7 @@ describe("commit", () => {
       presentation: "gif",
     };
     const embedPostEvent = (rkey: string, embed: LexValue): RecordEvent => ({
-      ...postEvent(account.did, "create", "3aaaaaaaaaaaa", "video"),
+      ...postEvent(account.did, "video"),
       rkey,
       record: {
         $type: "app.bsky.feed.post",
