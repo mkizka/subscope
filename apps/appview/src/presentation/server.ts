@@ -10,13 +10,22 @@ export class AppViewServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
 
-  constructor(
-    loggerManager: ILoggerManager,
-    lexRouter: RequestHandler,
-    healthRouter: Router,
-    wellKnownRouter: Router,
-    private readonly env: Pick<Env, "NODE_ENV" | "PORT">,
-  ) {
+  private readonly env: Pick<Env, "NODE_ENV" | "PORT">;
+
+  constructor({
+    loggerManager,
+    lexRouter,
+    healthRouter,
+    wellKnownRouter,
+    env,
+  }: {
+    loggerManager: ILoggerManager;
+    lexRouter: RequestHandler;
+    healthRouter: Router;
+    wellKnownRouter: Router;
+    env: Pick<Env, "NODE_ENV" | "PORT">;
+  }) {
+    this.env = env;
     this.logger = loggerManager.createLogger("AppViewServer");
     this.app = express();
     this.app.use(

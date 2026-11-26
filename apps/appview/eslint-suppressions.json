@@ -1,9 +1,4 @@
 {
-  "src/application/service/feed/post-thread-service.ts": {
-    "params/max-params": {
-      "count": 3
-    }
-  },
   "src/application/service/sync/create-registration-service.ts": {
     "params/max-params": {
       "count": 1
@@ -80,11 +75,6 @@
     }
   },
   "src/application/use-cases/feed/get-local-timeline-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/feed/get-post-thread-v2-use-case.ts": {
     "params/max-params": {
       "count": 1
     }
@@ -174,11 +164,6 @@
       "count": 1
     }
   },
-  "src/domain/models/at-uri.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/actor/getProfile.ts": {
     "params/max-params": {
       "count": 1
@@ -245,16 +230,6 @@
     }
   },
   "src/presentation/routes/app/bsky/unspecced/getPostThreadV2.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/lex.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/server.ts": {
     "params/max-params": {
       "count": 1
     }

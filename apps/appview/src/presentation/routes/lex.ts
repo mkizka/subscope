@@ -51,109 +51,58 @@ import type { GetTrackingStatuses } from "./me/subsco/sync/getTrackingStatuses.j
 import type { RegisterAccount } from "./me/subsco/sync/registerAccount.js";
 import type { UnregisterAccount } from "./me/subsco/sync/unregisterAccount.js";
 
-export const lexRouterFactory = (
-  getPostThread: GetPostThread,
-  searchPosts: SearchPosts,
-  getActorLikes: GetActorLikes,
-  getAuthorFeed: GetAuthorFeed,
-  getTimeline: GetTimeline,
-  getListFeed: GetListFeed,
-  getFollows: GetFollows,
-  getFollowers: GetFollowers,
-  getKnownFollowers: GetKnownFollowers,
-  getList: GetList,
-  getLists: GetLists,
-  getListsWithMembership: GetListsWithMembership,
-  getUnreadCount: GetUnreadCount,
-  listNotifications: ListNotifications,
-  getGroupedNotifications: GetGroupedNotifications,
-  updateSeen: UpdateSeen,
-  getRegistrationStatus: GetRegistrationStatus,
-  getTrackingStatuses: GetTrackingStatuses,
-  registerAccount: RegisterAccount,
-  unregisterAccount: UnregisterAccount,
-  removeMember: RemoveMember,
-  createInviteCode: CreateInviteCode,
-  deleteInviteCode: DeleteInviteCode,
-  getInviteCodes: GetInviteCodes,
-  grantAdmin: GrantAdmin,
-  addMember: AddMember,
-  revokeAdmin: RevokeAdmin,
-  registerAdmin: RegisterAdmin,
-  verifyAccess: VerifyAccess,
-  getLocalTimeline: GetLocalTimeline,
-  getServerMembers: GetServerMembers,
-  getSetupStatus: GetSetupStatus,
-  getOperator: GetOperator,
-  getFollowedAccounts: GetFollowedAccounts,
-  getServerMemberFollowers: GetServerMemberFollowers,
-  getPreferences: GetPreferences,
-  getProfile: GetProfile,
-  getProfiles: GetProfiles,
-  searchActors: SearchActors,
-  searchActorsTypeahead: SearchActorsTypeahead,
-  listServerMembers: ListServerMembers,
-  getLikes: GetLikes,
-  getRepostedBy: GetRepostedBy,
-  getQuotes: GetQuotes,
-  getFeedGenerators: GetFeedGenerators,
-  getPosts: GetPosts,
-  getPostThreadV2: GetPostThreadV2,
-  searchPostsV2: SearchPostsV2,
-): RequestHandler => {
-  const handlers = [
-    getPostThread,
-    searchPosts,
-    getActorLikes,
-    getAuthorFeed,
-    getTimeline,
-    getListFeed,
-    getFollows,
-    getFollowers,
-    getKnownFollowers,
-    getList,
-    getLists,
-    getListsWithMembership,
-    getUnreadCount,
-    listNotifications,
-    getGroupedNotifications,
-    updateSeen,
-    getRegistrationStatus,
-    getTrackingStatuses,
-    registerAccount,
-    unregisterAccount,
-    removeMember,
-    createInviteCode,
-    deleteInviteCode,
-    getInviteCodes,
-    grantAdmin,
-    addMember,
-    revokeAdmin,
-    registerAdmin,
-    verifyAccess,
-    getLocalTimeline,
-    getServerMembers,
-    getSetupStatus,
-    getOperator,
-    getFollowedAccounts,
-    getServerMemberFollowers,
-    getPreferences,
-    getProfile,
-    getProfiles,
-    searchActors,
-    searchActorsTypeahead,
-    listServerMembers,
-    getLikes,
-    getRepostedBy,
-    getQuotes,
-    getFeedGenerators,
-    getPosts,
-    getPostThreadV2,
-    searchPostsV2,
-  ];
-
+export const lexRouterFactory = (handlers: {
+  getPostThread: GetPostThread;
+  searchPosts: SearchPosts;
+  getActorLikes: GetActorLikes;
+  getAuthorFeed: GetAuthorFeed;
+  getTimeline: GetTimeline;
+  getListFeed: GetListFeed;
+  getFollows: GetFollows;
+  getFollowers: GetFollowers;
+  getKnownFollowers: GetKnownFollowers;
+  getList: GetList;
+  getLists: GetLists;
+  getListsWithMembership: GetListsWithMembership;
+  getUnreadCount: GetUnreadCount;
+  listNotifications: ListNotifications;
+  getGroupedNotifications: GetGroupedNotifications;
+  updateSeen: UpdateSeen;
+  getRegistrationStatus: GetRegistrationStatus;
+  getTrackingStatuses: GetTrackingStatuses;
+  registerAccount: RegisterAccount;
+  unregisterAccount: UnregisterAccount;
+  removeMember: RemoveMember;
+  createInviteCode: CreateInviteCode;
+  deleteInviteCode: DeleteInviteCode;
+  getInviteCodes: GetInviteCodes;
+  grantAdmin: GrantAdmin;
+  addMember: AddMember;
+  revokeAdmin: RevokeAdmin;
+  registerAdmin: RegisterAdmin;
+  verifyAccess: VerifyAccess;
+  getLocalTimeline: GetLocalTimeline;
+  getServerMembers: GetServerMembers;
+  getSetupStatus: GetSetupStatus;
+  getOperator: GetOperator;
+  getFollowedAccounts: GetFollowedAccounts;
+  getServerMemberFollowers: GetServerMemberFollowers;
+  getPreferences: GetPreferences;
+  getProfile: GetProfile;
+  getProfiles: GetProfiles;
+  searchActors: SearchActors;
+  searchActorsTypeahead: SearchActorsTypeahead;
+  listServerMembers: ListServerMembers;
+  getLikes: GetLikes;
+  getRepostedBy: GetRepostedBy;
+  getQuotes: GetQuotes;
+  getFeedGenerators: GetFeedGenerators;
+  getPosts: GetPosts;
+  getPostThreadV2: GetPostThreadV2;
+  searchPostsV2: SearchPostsV2;
+}): RequestHandler => {
   const router = new LexRouter();
-  for (const handler of handlers) {
+  for (const handler of Object.values(handlers)) {
     handler.handle(router);
   }
   return toRequestListener(router.fetch);

@@ -18,7 +18,15 @@ export class ResolvedAtUri {
     }
   }
 
-  static make(did: string, collection: string, rkey?: string): ResolvedAtUri {
+  static make({
+    did,
+    collection,
+    rkey,
+  }: {
+    did: string;
+    collection: string;
+    rkey?: string;
+  }): ResolvedAtUri {
     return new ResolvedAtUri(AtUri.make(did, collection, rkey));
   }
 

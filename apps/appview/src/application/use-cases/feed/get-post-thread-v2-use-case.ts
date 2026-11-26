@@ -58,7 +58,7 @@ export class GetPostThreadV2UseCase {
       threadViewPost.matches(p);
       p = p.parent, depth--
     ) {
-      items.unshift(this.toItem(p, depth, 0));
+      items.unshift(this.toItem({ node: p, depth, moreReplies: 0 }));
     }
     const visit = (node: ThreadViewPost, depth: number) => {
       const replies = (node.replies ?? []).filter((r) =>
@@ -68,18 +68,22 @@ export class GetPostThreadV2UseCase {
         (node.post.replyCount ?? 0) - replies.length,
         0,
       );
-      items.push(this.toItem(node, depth, moreReplies));
+      items.push(this.toItem({ node, depth, moreReplies }));
       for (const reply of replies) visit(reply, depth + 1);
     };
     visit(anchor, 0);
     return items;
   }
 
-  private toItem(
-    node: ThreadViewPost,
-    depth: number,
-    moreReplies: number,
-  ): ThreadItem {
+  private toItem({
+    node,
+    depth,
+    moreReplies,
+  }: {
+    node: ThreadViewPost;
+    depth: number;
+    moreReplies: number;
+  }): ThreadItem {
     return {
       uri: node.post.uri,
       depth,
