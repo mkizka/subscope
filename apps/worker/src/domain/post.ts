@@ -233,7 +233,7 @@ export class Post {
             },
           ]
         : []),
-      ...replyAncestorUris.map((uri) => ({
+      ...(this.violatesThreadgate ? [] : replyAncestorUris).map((uri) => ({
         ...base,
         recipientDid: uri.hostname,
         reason: "reply" as const,
