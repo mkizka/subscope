@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Tracking } from "../../../domain/tracking.js";
+import type { Tracking } from "../tracking.js";
 
 export interface ITrackingRepository {
   save: (params: {

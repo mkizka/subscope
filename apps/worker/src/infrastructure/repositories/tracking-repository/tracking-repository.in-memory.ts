@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { ITrackingRepository } from "../../../application/interfaces/repositories/tracking-repository.js";
+import type { ITrackingRepository } from "../../../domain/interfaces/tracking-repository.js";
 import type { Tracking } from "../../../domain/tracking.js";
 
 export class InMemoryTrackingRepository implements ITrackingRepository {

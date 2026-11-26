@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 
-import type { LabelData } from "../repositories/label-repository.js";
+import type { LabelData } from "../../../domain/label.js";
 
 export interface ILabelFetcher {
   fetchByAccount: (did: Did) => Promise<LabelData[]>;

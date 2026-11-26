@@ -11,7 +11,7 @@ import {
 } from "@repo/common/test";
 import { testSetup } from "@repo/test-utils";
 
-import type { LabelData } from "../application/interfaces/repositories/label-repository.js";
+import type { LabelData } from "../domain/label.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
 import { InMemoryRepoStatusFetcher } from "../infrastructure/repo-status-fetcher/repo-status-fetcher.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";

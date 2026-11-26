@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Follow } from "../../../application/dto/follow.js";
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
+import type { Follow } from "../../../domain/follow.js";
 
 export class InMemoryFollowRepository implements IFollowRepository {
   private follows: Map<string, Follow> = new Map();

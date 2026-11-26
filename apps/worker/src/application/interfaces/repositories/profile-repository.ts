@@ -1,6 +1,6 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Profile } from "../../dto/profile.js";
+import type { Profile } from "../../../domain/profile.js";
 
 export interface IProfileRepository {
   save: (params: {

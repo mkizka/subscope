@@ -4,13 +4,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { Origin } from "../../../domain/origin.js";
+import { postFactory } from "../../../domain/post.factory.js";
+import { recordFactory } from "../../../domain/record.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
-import { postFactory } from "../../dto/post.factory.js";
-import { recordFactory } from "../../dto/record.factory.js";
 
 describe("RepostIndexer", () => {
   let repostIndexer: TestServices["repostIndexer"];

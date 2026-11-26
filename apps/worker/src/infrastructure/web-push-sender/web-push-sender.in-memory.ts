@@ -1,8 +1,8 @@
 import type {
   IWebPushSender,
-  PushPayload,
   PushSubscription,
 } from "../../application/interfaces/external/web-push-sender.js";
+import type { PushPayload } from "../../domain/push-notification.js";
 
 export class InMemoryWebPushSender implements IWebPushSender {
   private sent: { endpoint: string; payload: PushPayload }[] = [];

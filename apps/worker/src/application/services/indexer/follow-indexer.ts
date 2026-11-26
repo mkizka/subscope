@@ -1,10 +1,9 @@
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
+import { Follow } from "../../../domain/follow.js";
 import type { Origin } from "../../../domain/origin.js";
-import { parseFollow } from "../../dto/follow.js";
-import type { Record } from "../../dto/record.js";
-import { getSortAt } from "../../dto/sort-at.js";
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
+import type { Record } from "../../../domain/record.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { IndexAccountService } from "../index-account-service.js";
@@ -16,7 +15,7 @@ import type { StatsService } from "../stats-service.js";
 export class FollowIndexer implements IRecordIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
-    private readonly registrationQuery: IRegistrationQuery,
+    private readonly storagePolicy: StoragePolicy,
     private readonly indexAccountService: IndexAccountService,
     private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
@@ -34,36 +33,20 @@ export class FollowIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const follow = parseFollow(record);
-    const isFollowerMember = await this.registrationQuery.isRegistered(
-      ctx,
-      follow.accountDid,
-    );
+    const follow = Follow.fromRecord(record);
+    const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
 
-    await this.recordSaveService.save({ ctx, record, origin });
+    await this.recordSaveService.save({ ctx, record });
+    await this.relatedRecordService.requestFor({ ctx, origin, record: follow });
     await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
     await this.followRepository.save({ ctx, follow });
 
     await this.notificationService.notify({
       ctx,
       origin,
-      notifications: () => [
-        {
-          recordUri: follow.uri,
-          recipientDid: follow.subjectDid,
-          authorDid: follow.accountDid,
-          reason: "follow",
-          reasonSubject: null,
-          sortAt: getSortAt(follow),
-        },
-      ],
+      notifications: () => [follow.notification],
     });
-    if (isFollowerMember) {
-      await this.relatedRecordService.requestAccount({
-        ctx,
-        origin,
-        did: follow.subjectDid,
-      });
+    if (tracksFollowee) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );
@@ -81,12 +64,9 @@ export class FollowIndexer implements IRecordIndexer {
     ctx: AfterCommitContext;
     record: Record;
   }) {
-    const follow = parseFollow(record);
-    const isFollowerMember = await this.registrationQuery.isRegistered(
-      ctx,
-      follow.accountDid,
-    );
-    if (isFollowerMember) {
+    const follow = Follow.fromRecord(record);
+    const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
+    if (tracksFollowee) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );

@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Record } from "../../dto/record.js";
+import type { Record } from "../../../domain/record.js";
 
 export interface IRecordRepository {
   find: (params: {

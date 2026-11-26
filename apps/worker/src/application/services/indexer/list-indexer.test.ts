@@ -2,8 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { Origin } from "../../../domain/origin.js";
+import { recordFactory } from "../../../domain/record.factory.js";
 import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
-import { recordFactory } from "../../dto/record.factory.js";
 
 describe("ListIndexer", () => {
   test("リストレコードを正しく保存する", async () => {

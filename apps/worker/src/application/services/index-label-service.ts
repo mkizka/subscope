@@ -1,12 +1,8 @@
-import { isDid } from "@atproto/did";
-import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
+import { Label, type LabelData } from "../../domain/label.js";
 import type { IAccountQuery } from "../interfaces/queries/account-query.js";
-import type {
-  ILabelRepository,
-  LabelData,
-} from "../interfaces/repositories/label-repository.js";
+import type { ILabelRepository } from "../interfaces/repositories/label-repository.js";
 
 export class IndexLabelService {
   constructor(
@@ -14,15 +10,20 @@ export class IndexLabelService {
     private readonly accountQuery: IAccountQuery,
   ) {}
 
-  async index({ ctx, label }: { ctx: TransactionContext; label: LabelData }) {
-    if (label.neg) {
+  async index({
+    ctx,
+    label: data,
+  }: {
+    ctx: TransactionContext;
+    label: LabelData;
+  }) {
+    const label = Label.from(data);
+    if (label.isNegation) {
       await this.labelRepository.delete({ ctx, label });
       return;
     }
-    const did = label.uri.startsWith("at://")
-      ? new AtUri(label.uri).host
-      : label.uri;
-    if (!isDid(did)) {
+    const did = label.subjectDid;
+    if (!did) {
       return;
     }
     const accountExists = await this.accountQuery.exists({ ctx, did });

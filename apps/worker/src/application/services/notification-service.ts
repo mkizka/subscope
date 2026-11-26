@@ -2,15 +2,15 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
+import type { Notification } from "../../domain/notification.js";
 import type { Origin } from "../../domain/origin.js";
-import type { Notification } from "../dto/notification.js";
-import type { IRegistrationQuery } from "../interfaces/queries/registration-query.js";
+import type { NotificationPolicy } from "../../domain/services/notification-policy.js";
 import type { INotificationRepository } from "../interfaces/repositories/notification-repository.js";
 
 export class NotificationService {
   constructor(
     private readonly notificationRepository: INotificationRepository,
-    private readonly registrationQuery: IRegistrationQuery,
+    private readonly notificationPolicy: NotificationPolicy,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
@@ -23,26 +23,14 @@ export class NotificationService {
     origin: Origin;
     notifications: () => Notification[] | Promise<Notification[]>;
   }) {
-    if (!origin.notifies) {
-      return;
-    }
-    const byRecipient = new Map<string, Notification>();
-    for (const notification of await notifications()) {
-      const { recipientDid, authorDid } = notification;
-      if (recipientDid === authorDid || byRecipient.has(recipientDid)) {
-        continue;
-      }
-      const isMember = await this.registrationQuery.isRegistered(
-        ctx,
-        recipientDid,
-      );
-      if (isMember) {
-        byRecipient.set(recipientDid, notification);
-      }
-    }
+    const deliverable = await this.notificationPolicy.selectDeliverable({
+      ctx,
+      origin,
+      candidates: notifications,
+    });
     const created = await this.notificationRepository.save({
       ctx,
-      notifications: [...byRecipient.values()],
+      notifications: deliverable,
     });
     for (const { recordUri, recipientDid } of created) {
       ctx.afterCommit(() =>
