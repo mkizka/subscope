@@ -41,7 +41,6 @@ export const testEnv = {
   TAP_URL: "http://localhost:2480",
   RELAY_URL: "https://relay1.us-east.bsky.network",
   MODERATION_URL: "https://mod.bsky.app",
-  TAP_CONCURRENCY: 64,
   DATABASE_POOL_MAX: 32,
   VAPID_PUBLIC_KEY: undefined,
   VAPID_PRIVATE_KEY: undefined,

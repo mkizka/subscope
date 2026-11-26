@@ -49,7 +49,7 @@ export class TapSubscriber {
     private readonly indexCommitUseCase: IndexCommitUseCase,
     private readonly updateRepoRevUseCase: UpdateRepoRevUseCase,
     private readonly upsertIdentityUseCase: UpsertIdentityUseCase,
-    private readonly env: Pick<Env, "TAP_URL" | "TAP_CONCURRENCY">,
+    private readonly env: Pick<Env, "TAP_URL">,
   ) {
     this.logger = loggerManager.createLogger("TapSubscriber");
   }
@@ -82,23 +82,11 @@ export class TapSubscriber {
   }
 
   async start() {
-    const inFlight = new Set<Promise<void>>();
     const channel = new Tap(this.env.TAP_URL).channel(
       {
         onEvent: async (event, { ack }) => {
-          if (inFlight.size >= this.env.TAP_CONCURRENCY) {
-            await Promise.race(inFlight);
-          }
-          const task = this.handleEvent(event)
-            .then(ack)
-            .catch((err: unknown) => {
-              this.logger.error(
-                { err, id: event.id },
-                "Failed to process event",
-              );
-            })
-            .finally(() => inFlight.delete(task));
-          inFlight.add(task);
+          await this.handleEvent(event);
+          await ack();
         },
         onError: (err) => this.logger.error({ err }, "Tap error occurred"),
       },
