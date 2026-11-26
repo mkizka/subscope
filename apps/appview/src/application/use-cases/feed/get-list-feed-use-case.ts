@@ -9,9 +9,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetListFeedUseCase {
   constructor(
-    private readonly timelineQuery: ITimelineQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly feedViews: FeedViews,
+    private readonly deps: {
+      timelineQuery: ITimelineQuery;
+      viewContextFactory: ViewContextFactory;
+      feedViews: FeedViews;
+    },
   ) {}
 
   async execute(params: {
@@ -25,16 +27,18 @@ export class GetListFeedUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feedItems = await this.timelineQuery.findListFeedItems({
+    const feedItems = await this.deps.timelineQuery.findListFeedItems({
       listUri: params.listUri,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
     });
     const page = paginator.extractPage(feedItems);
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const feed = await Promise.all(
-      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
+      page.items.map((item) => this.deps.feedViews.feedViewPost(item, ctx)),
     );
 
     return {

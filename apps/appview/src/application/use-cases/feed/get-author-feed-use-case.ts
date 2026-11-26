@@ -22,10 +22,12 @@ type GetAuthorFeedParams = {
 
 export class GetAuthorFeedUseCase {
   constructor(
-    private readonly authorFeedQuery: IAuthorFeedQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly feedViews: FeedViews,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      authorFeedQuery: IAuthorFeedQuery;
+      viewContextFactory: ViewContextFactory;
+      feedViews: FeedViews;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(
@@ -43,10 +45,12 @@ export class GetAuthorFeedUseCase {
     });
     const page = paginator.extractPage(feedItems);
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const pinned =
       params.includePins && !params.cursor
-        ? await this.profileViews.pinnedPost(params.accountDid, ctx)
+        ? await this.deps.profileViews.pinnedPost(params.accountDid, ctx)
         : undefined;
     const pinnedUri =
       pinned && new AtUri(pinned.uri).host === params.accountDid
@@ -68,7 +72,7 @@ export class GetAuthorFeedUseCase {
       : page.items;
     const feed = await Promise.all(
       items.map(async (item) => {
-        const view = await this.feedViews.feedViewPost(item, ctx);
+        const view = await this.deps.feedViews.feedViewPost(item, ctx);
         return view && item.uri === pinnedUri && item.type === "post"
           ? {
               ...view,
@@ -92,15 +96,15 @@ export class GetAuthorFeedUseCase {
   ): Promise<FeedItemDto[]> {
     switch (filter) {
       case "posts_no_replies":
-        return this.authorFeedQuery.findFeedItemsWithoutReplies(params);
+        return this.deps.authorFeedQuery.findFeedItemsWithoutReplies(params);
       case "posts_with_media":
-        return this.authorFeedQuery.findFeedItemsWithMedia(params);
+        return this.deps.authorFeedQuery.findFeedItemsWithMedia(params);
       case "posts_with_video":
-        return this.authorFeedQuery.findFeedItemsWithVideo(params);
+        return this.deps.authorFeedQuery.findFeedItemsWithVideo(params);
       case "posts_and_author_threads":
-        return this.authorFeedQuery.findFeedItemsWithAuthorThreads(params);
+        return this.deps.authorFeedQuery.findFeedItemsWithAuthorThreads(params);
       default:
-        return this.authorFeedQuery.findFeedItems(params);
+        return this.deps.authorFeedQuery.findFeedItems(params);
     }
   }
 }

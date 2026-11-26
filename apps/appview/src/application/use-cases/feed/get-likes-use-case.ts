@@ -9,9 +9,11 @@ import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 export class GetLikesUseCase {
   constructor(
-    private readonly likeQuery: ILikeQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      likeQuery: ILikeQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(
@@ -23,18 +25,21 @@ export class GetLikesUseCase {
       getCursor: (like) => like.sortAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.likeQuery.findSubjectLikes({
+      await this.deps.likeQuery.findSubjectLikes({
         subjectUri: params.uri,
         limit: paginator.queryLimit,
         cursor: params.cursor ? new Date(params.cursor) : undefined,
       }),
     );
 
-    const ctx = this.viewContextFactory.create(viewer);
+    const ctx = this.deps.viewContextFactory.create(viewer);
     const likes = await Promise.all(
       page.items.map(
         async (like): Promise<AppBskyFeedGetLikes.Like | undefined> => {
-          const account = await this.profileViews.view(like.accountDid, ctx);
+          const account = await this.deps.profileViews.view(
+            like.accountDid,
+            ctx,
+          );
           return (
             account && {
               $type: "app.bsky.feed.getLikes#like",
