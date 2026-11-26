@@ -8,10 +8,12 @@ import type { IFollowQuery } from "@/app/server/application/interfaces/follow-qu
 export interface IGetFollowListUseCase {
   execute: (
     did: string,
-    account: AtIdentifierString,
-    kind: "follows" | "followers",
-    filter?: "member" | "known",
-    cursor?: string,
+    params: {
+      account: AtIdentifierString;
+      kind: "follows" | "followers";
+      filter?: "member" | "known";
+      cursor?: string;
+    },
   ) => Promise<FollowListDto>;
 }
 
@@ -24,11 +26,11 @@ export const getFollowListUseCaseFactory = ({
   backfillQuery: IBackfillQuery;
   followQuery: IFollowQuery;
 }): IGetFollowListUseCase => ({
-  async execute(did, account, kind, filter, cursor) {
+  async execute(did, { account, kind, filter, cursor }) {
     let list =
       kind === "followers" && filter === "known"
-        ? await accountQuery.findKnownFollowers(did, account, cursor)
-        : await accountQuery.findFollowList(did, account, kind);
+        ? await accountQuery.findKnownFollowers(did, { account, cursor })
+        : await accountQuery.findFollowList(did, { account, kind });
     if (kind === "followers" && filter === "member") {
       const dids = await followQuery.findMemberFollowers(account);
       list = { ...list, accounts: await accountQuery.findProfiles(did, dids) };

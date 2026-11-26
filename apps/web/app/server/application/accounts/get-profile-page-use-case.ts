@@ -10,9 +10,7 @@ import type { IBackfillQuery } from "@/app/server/application/interfaces/backfil
 export interface IGetProfilePageUseCase {
   execute: (
     did: string,
-    account: AtIdentifierString,
-    tab: ProfileTab,
-    cursor?: string,
+    params: { account: AtIdentifierString; tab: ProfileTab; cursor?: string },
   ) => Promise<{
     profile: ProfileViewDetailed;
     isSelf: boolean;
@@ -30,10 +28,10 @@ export const getProfilePageUseCaseFactory = ({
   accountQuery: IAccountQuery;
   backfillQuery: IBackfillQuery;
 }): IGetProfilePageUseCase => ({
-  async execute(did, account, tab, cursor) {
+  async execute(did, { account, tab, cursor }) {
     const [profile, { posts, cursor: next }] = await Promise.all([
       accountQuery.findProfile(did, account),
-      accountQuery.findPosts(did, account, tab, cursor),
+      accountQuery.findPosts(did, { account, tab, cursor }),
     ]);
     const statuses = await backfillQuery.findTrackedStatuses([profile.did]);
     const tracked = statuses[profile.did];

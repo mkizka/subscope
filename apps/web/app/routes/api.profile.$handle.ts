@@ -28,11 +28,10 @@ export const loader = async ({
   }
   const searchParams = new URL(request.url).searchParams;
   return data(
-    await di.getProfilePageUseCase.execute(
-      context.get(didContext),
-      params.handle,
-      toTab(searchParams.get("tab")),
-      searchParams.get("cursor") ?? undefined,
-    ),
+    await di.getProfilePageUseCase.execute(context.get(didContext), {
+      account: params.handle,
+      tab: toTab(searchParams.get("tab")),
+      cursor: searchParams.get("cursor") ?? undefined,
+    }),
   );
 };
