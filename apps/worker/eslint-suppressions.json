@@ -109,31 +109,6 @@
       "count": 1
     }
   },
-  "src/domain/follow.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/generator.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/label.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/like.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/list-item.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/domain/list.ts": {
     "params/max-params": {
       "count": 1

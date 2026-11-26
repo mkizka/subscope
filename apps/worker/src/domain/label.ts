@@ -12,26 +12,42 @@ export type LabelData = {
 };
 
 export class Label {
-  private constructor(
-    readonly src: string,
-    readonly uri: string,
-    readonly val: string,
-    readonly cid: string | undefined,
-    readonly cts: string,
-    readonly exp: string | undefined,
-    readonly isNegation: boolean,
-  ) {}
+  readonly src: string;
+  readonly uri: string;
+  readonly val: string;
+  readonly cid: string | undefined;
+  readonly cts: string;
+  readonly exp: string | undefined;
+  readonly isNegation: boolean;
+
+  private constructor(params: {
+    src: string;
+    uri: string;
+    val: string;
+    cid: string | undefined;
+    cts: string;
+    exp: string | undefined;
+    isNegation: boolean;
+  }) {
+    this.src = params.src;
+    this.uri = params.uri;
+    this.val = params.val;
+    this.cid = params.cid;
+    this.cts = params.cts;
+    this.exp = params.exp;
+    this.isNegation = params.isNegation;
+  }
 
   static from(data: LabelData) {
-    return new Label(
-      data.src,
-      data.uri,
-      data.val,
-      data.cid,
-      data.cts,
-      data.exp,
-      !!data.neg,
-    );
+    return new Label({
+      src: data.src,
+      uri: data.uri,
+      val: data.val,
+      cid: data.cid,
+      cts: data.cts,
+      exp: data.exp,
+      isNegation: !!data.neg,
+    });
   }
 
   get subjectDid(): Did | null {
