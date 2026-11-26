@@ -11,10 +11,12 @@ import type { RelatedRecordService } from "../related-record-service.js";
 
 export class ListItemIndexer implements IRecordIndexer {
   constructor(
-    private readonly listItemRepository: IListItemRepository,
-    private readonly indexAccountService: IndexAccountService,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly relatedRecordService: RelatedRecordService,
+    private readonly deps: {
+      listItemRepository: IListItemRepository;
+      indexAccountService: IndexAccountService;
+      recordSaveService: RecordSaveService;
+      relatedRecordService: RelatedRecordService;
+    },
   ) {}
 
   async index({
@@ -28,13 +30,16 @@ export class ListItemIndexer implements IRecordIndexer {
   }) {
     const listItem = ListItem.fromRecord(record);
 
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
       ctx,
       origin,
       record: listItem,
     });
-    await this.indexAccountService.upsert({ ctx, did: listItem.subjectDid });
-    await this.listItemRepository.save({ ctx, listItem });
+    await this.deps.indexAccountService.upsert({
+      ctx,
+      did: listItem.subjectDid,
+    });
+    await this.deps.listItemRepository.save({ ctx, listItem });
   }
 }

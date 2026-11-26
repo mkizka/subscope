@@ -13,12 +13,14 @@ import type { StatsService } from "../stats-service.js";
 
 export class LikeIndexer implements IRecordIndexer {
   constructor(
-    private readonly likeRepository: ILikeRepository,
-    private readonly storagePolicy: StoragePolicy,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly notificationService: NotificationService,
-    private readonly relatedRecordService: RelatedRecordService,
-    private readonly statsService: StatsService,
+    private readonly deps: {
+      likeRepository: ILikeRepository;
+      storagePolicy: StoragePolicy;
+      recordSaveService: RecordSaveService;
+      notificationService: NotificationService;
+      relatedRecordService: RelatedRecordService;
+      statsService: StatsService;
+    },
   ) {}
 
   async index({
@@ -31,7 +33,7 @@ export class LikeIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const like = Like.fromRecord(record);
-    const saves = await this.storagePolicy.savesLike({
+    const saves = await this.deps.storagePolicy.savesLike({
       ctx,
       origin,
       like,
@@ -40,20 +42,24 @@ export class LikeIndexer implements IRecordIndexer {
       return;
     }
 
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({ ctx, origin, record: like });
-    await this.likeRepository.save({ ctx, like });
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
+      ctx,
+      origin,
+      record: like,
+    });
+    await this.deps.likeRepository.save({ ctx, like });
 
-    await this.notificationService.notify({
+    await this.deps.notificationService.notify({
       ctx,
       origin,
       notifications: () => [like.notification],
     });
-    this.statsService.recount({ ctx, posts: [like.subject] });
+    this.deps.statsService.recount({ ctx, posts: [like.subject] });
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = Like.fromRecord(record);
-    this.statsService.recount({ ctx, posts: [like.subject] });
+    this.deps.statsService.recount({ ctx, posts: [like.subject] });
   }
 }

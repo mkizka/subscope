@@ -1,29 +1,4 @@
 {
-  "src/application/services/indexer/follow-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/generator-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/like-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/list-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/list-item-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/services/indexer/post-indexer.ts": {
     "params/max-params": {
       "count": 1
