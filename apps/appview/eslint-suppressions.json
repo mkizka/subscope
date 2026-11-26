@@ -224,11 +224,6 @@
       "count": 1
     }
   },
-  "src/presentation/routes/app/bsky/feed/getAuthorFeed.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/feed/getAuthorFeed.ts": {
     "params/max-params": {
       "count": 1
@@ -240,16 +235,6 @@
     }
   },
   "src/presentation/routes/app/bsky/feed/getPostThread.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/getPosts.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/getTimeline.test.ts": {
     "params/max-params": {
       "count": 1
     }
@@ -294,11 +279,6 @@
       "count": 1
     }
   },
-  "src/presentation/routes/app/bsky/unspecced/getPostThreadV2.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/unspecced/getPostThreadV2.ts": {
     "params/max-params": {
       "count": 1
@@ -315,11 +295,6 @@
     }
   },
   "src/presentation/routes/me/subsco/graph/getServerMemberFollowers.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/me/subsco/server/getLocalTimeline.test.ts": {
     "params/max-params": {
       "count": 1
     }

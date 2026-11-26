@@ -27,8 +27,10 @@ describe("me.subsco.server.getLocalTimeline", () => {
 
   const createPost = async (
     account: Account,
-    createdAt = new Date(),
-    replyTo?: { uri: string; cid: string },
+    {
+      createdAt = new Date(),
+      replyTo,
+    }: { createdAt?: Date; replyTo?: { uri: string; cid: string } } = {},
   ) => {
     const post = await postFactory(ctx.db)
       .use((t) => (replyTo ? t.asReplyTo(replyTo) : {}))
@@ -51,8 +53,12 @@ describe("me.subsco.server.getLocalTimeline", () => {
     const { client } = await setupApiTest();
     const alice = await createMember();
     const bob = await createMember();
-    const recent = await createPost(bob, new Date("2024-01-03T00:00:00Z"));
-    const subject = await createPost(bob, new Date("2024-01-01T00:00:00Z"));
+    const recent = await createPost(bob, {
+      createdAt: new Date("2024-01-03T00:00:00Z"),
+    });
+    const subject = await createPost(bob, {
+      createdAt: new Date("2024-01-01T00:00:00Z"),
+    });
     const repost = await repostFactory(ctx.db)
       .vars({
         record: () =>
@@ -100,7 +106,7 @@ describe("me.subsco.server.getLocalTimeline", () => {
     const { client } = await setupApiTest();
     const member = await createMember();
     const parent = await createPost(member);
-    await createPost(member, new Date(), parent);
+    await createPost(member, { replyTo: parent });
 
     // act
     const res = await client.call(getLocalTimeline);

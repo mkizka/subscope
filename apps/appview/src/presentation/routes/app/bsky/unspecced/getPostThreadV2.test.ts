@@ -25,11 +25,15 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
             .vars({ account: () => author })
             .create(),
       });
-    const createReply = (
-      parent: { uri: string; cid: string },
-      root: { uri: string; cid: string },
-      index: number,
-    ) => {
+    const createReply = ({
+      parent,
+      root,
+      index,
+    }: {
+      parent: { uri: string; cid: string };
+      root: { uri: string; cid: string };
+      index: number;
+    }) => {
       const at = new Date(Date.UTC(2026, 0, 1, 0, 0, index));
       return createPost()
         .use((t) => t.asReplyTo(parent, root))
@@ -117,7 +121,9 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
     const anchor = await createPost().create();
     const replies = [];
     for (let i = 0; i < count; i++) {
-      replies.push(await createReply(anchor, anchor, i).create());
+      replies.push(
+        await createReply({ parent: anchor, root: anchor, index: i }).create(),
+      );
     }
     const [firstReply] = replies;
     if (!firstReply) throw new Error("count must be 1 or more");
@@ -147,7 +153,13 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
     const { createReply, anchor, firstReply } = await setupReplies(1);
     const nested = [];
     for (let i = 0; i < 3; i++) {
-      nested.push(await createReply(firstReply, anchor, i).create());
+      nested.push(
+        await createReply({
+          parent: firstReply,
+          root: anchor,
+          index: i,
+        }).create(),
+      );
     }
 
     // act
