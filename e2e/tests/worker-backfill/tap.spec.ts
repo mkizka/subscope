@@ -9,15 +9,18 @@ test("tap-10: 登録されたアカウントは、Tapに追加済みでも外し
   test.setTimeout(120_000);
   await follow("alice.test", "erin.test");
   await follow("alice.test", "ivan.test");
-  const subject = await createRecord("erin.test", "app.bsky.feed.post", {
+  const subject = await createRecord("erin.test", {
+    $type: "app.bsky.feed.post",
     text: "tap-10: メンバー以外の投稿",
     createdAt: new Date().toISOString(),
   });
-  await createRecord("ivan.test", "app.bsky.feed.like", {
+  await createRecord("ivan.test", {
+    $type: "app.bsky.feed.like",
     subject,
     createdAt: new Date().toISOString(),
   });
-  const delivered = await createRecord("ivan.test", "app.bsky.feed.post", {
+  const delivered = await createRecord("ivan.test", {
+    $type: "app.bsky.feed.post",
     text: "tap-10: いいねのあとの投稿",
     createdAt: new Date().toISOString(),
   });

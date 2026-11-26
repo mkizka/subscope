@@ -108,7 +108,8 @@ test.describe("レイアウト（モバイル）", () => {
     page,
   }) => {
     const q = `cache1-${Date.now()}`;
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: q,
       createdAt: new Date().toISOString(),
     });

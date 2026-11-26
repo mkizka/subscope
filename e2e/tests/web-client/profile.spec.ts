@@ -21,7 +21,8 @@ test.describe("プロフィール", () => {
       description: "profile-1の自己紹介",
       banner: await uploadImage("alice.test"),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       createdAt: new Date().toISOString(),
     });
@@ -86,16 +87,19 @@ test.describe("プロフィール", () => {
   test("profile-e3: 「投稿」タブは他人へのリプライを除いた投稿を、「リプライ」タブはリプライを含めた投稿を表示する", async ({
     page,
   }) => {
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: `profile-7の投稿 ${Date.now()}`,
       createdAt: new Date().toISOString(),
     });
-    const parent = await createRecord("bob.test", "app.bsky.feed.post", {
+    const parent = await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: `profile-7の親 ${Date.now()}`,
       createdAt: new Date().toISOString(),
     });
     const reply = `profile-7のリプライ ${Date.now()}`;
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: reply,
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
@@ -119,11 +123,13 @@ test.describe("プロフィール", () => {
   }) => {
     await follow("alice.test", "bob.test");
     const text = `profile-8の投稿 ${Date.now()}`;
-    const subject = await createRecord("alice.test", "app.bsky.feed.post", {
+    const subject = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       createdAt: new Date().toISOString(),
     });
-    await createRecord("bob.test", "app.bsky.feed.like", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.like",
       subject,
       createdAt: new Date().toISOString(),
     });
@@ -143,7 +149,8 @@ test.describe("プロフィール", () => {
   }) => {
     const image = `profile-10の画像付き ${Date.now()}`;
     const text = `profile-10のテキストのみ ${Date.now()}`;
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: image,
       embed: {
         $type: "app.bsky.embed.images",
@@ -151,7 +158,8 @@ test.describe("プロフィール", () => {
       },
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       createdAt: new Date().toISOString(),
     });
@@ -171,7 +179,8 @@ test.describe("プロフィール", () => {
   }) => {
     const video = `profile-e11の動画付き ${Date.now()}`;
     const text = `profile-e11のテキストのみ ${Date.now()}`;
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: video,
       embed: {
         $type: "app.bsky.embed.video",
@@ -185,7 +194,8 @@ test.describe("プロフィール", () => {
       },
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       createdAt: new Date().toISOString(),
     });
@@ -207,7 +217,8 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     const text = `profile-12の投稿 ${Date.now()}`;
-    const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+    const { uri } = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       createdAt: new Date().toISOString(),
     });
@@ -234,11 +245,13 @@ test.describe("プロフィール", () => {
   test("profile-e8: 「投稿」タブは自分の投稿への自分のリプライを含め、タイムラインと同じく線で繋げる", async ({
     page,
   }) => {
-    const root = await createRecord("alice.test", "app.bsky.feed.post", {
+    const root = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "profile-16: 起点",
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "profile-16: 返信",
       reply: { root, parent: root },
       createdAt: new Date().toISOString(),
@@ -264,11 +277,13 @@ test.describe("プロフィール", () => {
   test("profile-e12: 「投稿」タブの1ページ目は、ピン留めした投稿を「ピン留め」の表示付きで先頭に出し、元の位置には出さない", async ({
     page,
   }) => {
-    const pinned = await createRecord("alice.test", "app.bsky.feed.post", {
+    const pinned = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "profile-e12: ピン留め",
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "profile-e12: 新しい投稿",
       createdAt: new Date().toISOString(),
     });
@@ -299,11 +314,13 @@ test.describe("プロフィール", () => {
   }) => {
     const parentText = `profile-17の親 ${Date.now()}`;
     const reply = `profile-17のリプライ ${Date.now()}`;
-    const parent = await createRecord("bob.test", "app.bsky.feed.post", {
+    const parent = await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: parentText,
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: reply,
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
@@ -326,7 +343,8 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     for (let i = 1; i <= 25; i++) {
-      await createRecord("alice.test", "app.bsky.feed.post", {
+      await createRecord("alice.test", {
+        $type: "app.bsky.feed.post",
         text: `profile-23: 投稿${i}`,
         createdAt: new Date().toISOString(),
       });
