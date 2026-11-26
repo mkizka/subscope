@@ -35,7 +35,7 @@ export class StoragePolicy {
     return (
       !origin.isPast ||
       (await this.registrationQuery.isMember(ctx, record.accountDid)) ||
-      (await this.isWithinWindow(ctx, origin, record))
+      (await this.isWithinWindow({ ctx, origin, record }))
     );
   }
 
@@ -60,7 +60,8 @@ export class StoragePolicy {
       like.subjectAuthorDid,
     );
     return (
-      subjectAuthorIsMember && (await this.isWithinWindow(ctx, origin, like))
+      subjectAuthorIsMember &&
+      (await this.isWithinWindow({ ctx, origin, record: like }))
     );
   }
 
@@ -127,7 +128,7 @@ export class StoragePolicy {
     return (
       like.likesPost &&
       (await this.registrationQuery.isMember(ctx, like.accountDid)) &&
-      (await this.isWithinWindow(ctx, origin, like))
+      (await this.isWithinWindow({ ctx, origin, record: like }))
     );
   }
 
@@ -142,11 +143,15 @@ export class StoragePolicy {
     return this.registrationQuery.isMember(ctx, follow.accountDid);
   }
 
-  private async isWithinWindow(
-    ctx: TransactionContext,
-    origin: Origin,
-    record: DatedRecord,
-  ) {
+  private async isWithinWindow({
+    ctx,
+    origin,
+    record,
+  }: {
+    ctx: TransactionContext;
+    origin: Origin;
+    record: DatedRecord;
+  }) {
     if (!origin.isPast) {
       return true;
     }

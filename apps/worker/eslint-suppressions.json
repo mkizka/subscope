@@ -109,36 +109,6 @@
       "count": 1
     }
   },
-  "src/domain/list.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/origin.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/post.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/profile.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/repost.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/domain/services/storage-policy.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/infrastructure/queries/post-query/post-query.in-memory.ts": {
     "params/max-params": {
       "count": 1

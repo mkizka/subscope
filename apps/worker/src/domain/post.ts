@@ -121,37 +121,61 @@ export class Post {
   private embeddingRulesViolated = false;
   private threadgateViolated = false;
 
-  private constructor(
-    readonly uri: AtUri,
-    readonly cid: string,
-    readonly accountDid: Did,
-    readonly text: string,
-    readonly replyRoot: StrongRef | null,
-    readonly replyParent: StrongRef | null,
-    readonly langs: string[],
-    readonly embed: PostEmbed | null,
-    readonly mentionDids: Did[],
-    readonly createdAt: Date,
-    readonly indexedAt: Date,
-  ) {}
+  readonly uri: AtUri;
+  readonly cid: string;
+  readonly accountDid: Did;
+  readonly text: string;
+  readonly replyRoot: StrongRef | null;
+  readonly replyParent: StrongRef | null;
+  readonly langs: string[];
+  readonly embed: PostEmbed | null;
+  readonly mentionDids: Did[];
+  readonly createdAt: Date;
+  readonly indexedAt: Date;
+
+  private constructor(params: {
+    uri: AtUri;
+    cid: string;
+    accountDid: Did;
+    text: string;
+    replyRoot: StrongRef | null;
+    replyParent: StrongRef | null;
+    langs: string[];
+    embed: PostEmbed | null;
+    mentionDids: Did[];
+    createdAt: Date;
+    indexedAt: Date;
+  }) {
+    this.uri = params.uri;
+    this.cid = params.cid;
+    this.accountDid = params.accountDid;
+    this.text = params.text;
+    this.replyRoot = params.replyRoot;
+    this.replyParent = params.replyParent;
+    this.langs = params.langs;
+    this.embed = params.embed;
+    this.mentionDids = params.mentionDids;
+    this.createdAt = params.createdAt;
+    this.indexedAt = params.indexedAt;
+  }
 
   static fromRecord(record: Record) {
     const parsed = validatePost(record);
-    return new Post(
-      new AtUri(record.uri.toString()),
-      record.cid,
-      record.uri.did,
-      parsed.text,
-      toStrongRef(parsed.reply?.root),
-      toStrongRef(parsed.reply?.parent),
-      parsed.langs ?? [],
-      parsed.embed ? toEmbed(parsed.embed) : null,
-      (parsed.facets ?? [])
+    return new Post({
+      uri: new AtUri(record.uri.toString()),
+      cid: record.cid,
+      accountDid: record.uri.did,
+      text: parsed.text,
+      replyRoot: toStrongRef(parsed.reply?.root),
+      replyParent: toStrongRef(parsed.reply?.parent),
+      langs: parsed.langs ?? [],
+      embed: parsed.embed ? toEmbed(parsed.embed) : null,
+      mentionDids: (parsed.facets ?? [])
         .flatMap((facet) => facet.features)
         .flatMap((feature) => ("did" in feature ? [feature.did] : [])),
-      new Date(parsed.createdAt),
-      record.indexedAt,
-    );
+      createdAt: new Date(parsed.createdAt),
+      indexedAt: record.indexedAt,
+    });
   }
 
   get violatesEmbeddingRules() {
