@@ -17,8 +17,10 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
 const pinPost = async (
   db: Parameters<typeof recordFactory>[0],
-  account: { did: string },
-  post: { uri: string; cid: string },
+  {
+    account,
+    post,
+  }: { account: { did: string }; post: { uri: string; cid: string } },
 ) => {
   const record = await recordFactory(db, "app.bsky.actor.profile")
     .vars({ accountDid: () => account.did })
@@ -236,7 +238,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
       .create();
     const pinned = await createPost(author);
     const newer = await createPost(author);
-    await pinPost(ctx.db, author, pinned);
+    await pinPost(ctx.db, { account: author, post: pinned });
 
     // act
     const res = await client.call(getAuthorFeed, {
@@ -272,14 +274,14 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     const other = await postFactory(ctx.db).create();
     const own = await createPost(author);
     const bobPost = await createPost(bob);
-    await pinPost(ctx.db, bob, other);
+    await pinPost(ctx.db, { account: bob, post: other });
 
     // act
     const notOwn = await client.call(getAuthorFeed, {
       actor: "bob.test",
       includePins: true,
     });
-    await pinPost(ctx.db, author, own);
+    await pinPost(ctx.db, { account: author, post: own });
     const paged = await client.call(getAuthorFeed, {
       actor: "alice.test",
       includePins: true,

@@ -21,8 +21,10 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
 const pinPost = async (
   db: Parameters<typeof recordFactory>[0],
-  account: { did: string },
-  post: { uri: string; cid: string },
+  {
+    account,
+    post,
+  }: { account: { did: string }; post: { uri: string; cid: string } },
 ) => {
   const record = await recordFactory(db, "app.bsky.actor.profile")
     .vars({ accountDid: () => account.did })
@@ -210,7 +212,7 @@ describe("app.bsky.feed.getPosts", () => {
     const viewer = await accountFactory(ctx.db).create();
     const pinned = await createPost();
     const other = await createPost();
-    await pinPost(ctx.db, viewer, pinned);
+    await pinPost(ctx.db, { account: viewer, post: pinned });
     loginAs(viewer.did);
 
     // act

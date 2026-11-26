@@ -40,8 +40,10 @@ describe("app.bsky.feed.getTimeline", () => {
 
   const createPost = async (
     account: Account,
-    createdAt = new Date(),
-    replyTo?: [parent: ReplyTo, root?: ReplyTo],
+    {
+      createdAt = new Date(),
+      replyTo,
+    }: { createdAt?: Date; replyTo?: [parent: ReplyTo, root?: ReplyTo] } = {},
   ) => {
     const post = await postFactory(ctx.db)
       .use((t) => (replyTo ? t.asReplyTo(...replyTo) : {}))
@@ -141,9 +143,15 @@ describe("app.bsky.feed.getTimeline", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
-    const oldPost = await createPost(viewer, new Date("2024-01-01"));
-    const middlePost = await createPost(viewer, new Date("2024-01-02"));
-    const newPost = await createPost(viewer, new Date("2024-01-03"));
+    const oldPost = await createPost(viewer, {
+      createdAt: new Date("2024-01-01"),
+    });
+    const middlePost = await createPost(viewer, {
+      createdAt: new Date("2024-01-02"),
+    });
+    const newPost = await createPost(viewer, {
+      createdAt: new Date("2024-01-03"),
+    });
     loginAs(viewer.did);
 
     // act
@@ -188,9 +196,17 @@ describe("app.bsky.feed.getTimeline", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
-    const root = await createPost(viewer, new Date("2024-01-01"));
-    const parent = await createPost(viewer, new Date("2024-01-02"), [root]);
-    await createPost(viewer, new Date("2024-01-03"), [parent, root]);
+    const root = await createPost(viewer, {
+      createdAt: new Date("2024-01-01"),
+    });
+    const parent = await createPost(viewer, {
+      createdAt: new Date("2024-01-02"),
+      replyTo: [root],
+    });
+    await createPost(viewer, {
+      createdAt: new Date("2024-01-03"),
+      replyTo: [parent, root],
+    });
     loginAs(viewer.did);
 
     // act
@@ -215,7 +231,7 @@ describe("app.bsky.feed.getTimeline", () => {
       uri: `at://${viewer.did}/app.bsky.feed.post/missing`,
       cid: "bafyreimissing",
     };
-    await createPost(viewer, new Date(), [missing]);
+    await createPost(viewer, { replyTo: [missing] });
     loginAs(viewer.did);
 
     // act
