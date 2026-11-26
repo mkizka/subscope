@@ -283,37 +283,7 @@ export class ViewContext {
 }
 
 export class ViewContextFactory {
-  private readonly repos: Repositories;
-
-  constructor(
-    profileQuery: IProfileQuery,
-    labelQuery: ILabelQuery,
-    followQuery: IFollowQuery,
-    postQuery: IPostQuery,
-    recordQuery: IRecordQuery,
-    postStatsQuery: IPostStatsQuery,
-    likeQuery: ILikeQuery,
-    repostQuery: IRepostQuery,
-    generatorQuery: IGeneratorQuery,
-    accountStatsQuery: IAccountStatsQuery,
-    listQuery: IListQuery,
-    listItemQuery: IListItemQuery,
-  ) {
-    this.repos = {
-      profileQuery,
-      labelQuery,
-      followQuery,
-      postQuery,
-      recordQuery,
-      postStatsQuery,
-      likeQuery,
-      repostQuery,
-      generatorQuery,
-      accountStatsQuery,
-      listQuery,
-      listItemQuery,
-    };
-  }
+  constructor(private readonly repos: Repositories) {}
 
   create(viewer: Viewer = {}) {
     return new ViewContext(this.repos, viewer);

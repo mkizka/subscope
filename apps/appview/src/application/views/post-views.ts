@@ -16,9 +16,11 @@ import type { ViewContext } from "./view-context.js";
 
 export class PostViews {
   constructor(
-    private readonly profileViews: ProfileViews,
-    private readonly embedViews: EmbedViews,
-    private readonly listViews: ListViews,
+    private readonly deps: {
+      profileViews: ProfileViews;
+      embedViews: EmbedViews;
+      listViews: ListViews;
+    },
   ) {}
 
   async postView(
@@ -33,10 +35,10 @@ export class PostViews {
     const [record, author, stats, viewer, embed, gate, postgate, labels] =
       await Promise.all([
         ctx.record(uri),
-        this.profileViews.basic(post.accountDid, ctx),
+        this.deps.profileViews.basic(post.accountDid, ctx),
         ctx.stats(uri),
         ctx.viewerPostState(uri),
-        this.embedViews.embedView({ post, ctx }),
+        this.deps.embedViews.embedView({ post, ctx }),
         ctx.record(gateUri(rootUri, "app.bsky.feed.threadgate")),
         ctx.record(gateUri(uri, "app.bsky.feed.postgate")),
         ctx.labelsOf(uri),
@@ -46,10 +48,10 @@ export class PostViews {
     }
     const [replyDisabled, threadgate, pinnedPost] = await Promise.all([
       post.violatesThreadgate ||
-        (gate && this.replyDisabled(rootUri, gate, ctx)),
+        (gate && this.replyDisabled({ rootUri, gate, ctx })),
       gate && rootUri === uri ? this.threadgateView(gate, ctx) : undefined,
       ctx.viewer.viewerDid
-        ? this.profileViews.pinnedPost(ctx.viewer.viewerDid, ctx)
+        ? this.deps.profileViews.pinnedPost(ctx.viewer.viewerDid, ctx)
         : undefined,
     ]);
     return {
@@ -69,7 +71,12 @@ export class PostViews {
         pinned: pinnedPost?.uri === uri,
         replyDisabled,
         embeddingDisabled:
-          postgate && this.embeddingDisabled(post.accountDid, postgate, ctx),
+          postgate &&
+          this.embeddingDisabled({
+            authorDid: post.accountDid,
+            postgate,
+            ctx,
+          }),
       },
       threadgate,
       labels: [...toLabelViews(labels), ...toSelfLabelViews(record)],
@@ -85,7 +92,7 @@ export class PostViews {
     const lists = await Promise.all(
       (allow ?? [])
         .filter((rule) => listRule.isTypeOf(rule))
-        .map((rule) => this.listViews.basic(rule.list, ctx)),
+        .map((rule) => this.deps.listViews.basic(rule.list, ctx)),
     );
     return {
       uri: asAtUriString(gate.uri),
@@ -95,11 +102,15 @@ export class PostViews {
     };
   }
 
-  private embeddingDisabled(
-    authorDid: string,
-    postgate: RecordDto,
-    ctx: ViewContext,
-  ) {
+  private embeddingDisabled({
+    authorDid,
+    postgate,
+    ctx,
+  }: {
+    authorDid: string;
+    postgate: RecordDto;
+    ctx: ViewContext;
+  }) {
     const viewerDid = ctx.viewer.viewerDid;
     if (!viewerDid) {
       return undefined;
@@ -116,11 +127,15 @@ export class PostViews {
     );
   }
 
-  private async replyDisabled(
-    rootUri: string,
-    gate: RecordDto,
-    ctx: ViewContext,
-  ) {
+  private async replyDisabled({
+    rootUri,
+    gate,
+    ctx,
+  }: {
+    rootUri: string;
+    gate: RecordDto;
+    ctx: ViewContext;
+  }) {
     const viewerDid = ctx.viewer.viewerDid;
     if (!viewerDid) {
       return undefined;
