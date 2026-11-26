@@ -8,9 +8,11 @@ import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 export class GetQuotesUseCase {
   constructor(
-    private readonly postQuery: IPostQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly postViews: PostViews,
+    private readonly deps: {
+      postQuery: IPostQuery;
+      viewContextFactory: ViewContextFactory;
+      postViews: PostViews;
+    },
   ) {}
 
   async execute(
@@ -22,17 +24,17 @@ export class GetQuotesUseCase {
       getCursor: (post) => post.sortAt.toISOString(),
     });
     const paginationResult = paginator.extractPage(
-      await this.postQuery.findQuotes({
+      await this.deps.postQuery.findQuotes({
         uri: params.uri,
         limit: paginator.queryLimit,
         cursor: params.cursor ? new Date(params.cursor) : undefined,
       }),
     );
 
-    const ctx = this.viewContextFactory.create(viewer);
+    const ctx = this.deps.viewContextFactory.create(viewer);
     const posts = await Promise.all(
       paginationResult.items.map((post) =>
-        this.postViews.postView(post.uri, ctx),
+        this.deps.postViews.postView(post.uri, ctx),
       ),
     );
 

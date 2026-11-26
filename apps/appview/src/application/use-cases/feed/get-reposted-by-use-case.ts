@@ -8,9 +8,11 @@ import type { ViewContextFactory, Viewer } from "../../views/view-context.js";
 
 export class GetRepostedByUseCase {
   constructor(
-    private readonly repostQuery: IRepostQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      repostQuery: IRepostQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(
@@ -22,17 +24,17 @@ export class GetRepostedByUseCase {
       getCursor: (repost) => repost.sortAt.toISOString(),
     });
     const paginationResult = paginator.extractPage(
-      await this.repostQuery.findBySubject({
+      await this.deps.repostQuery.findBySubject({
         subjectUri: params.uri,
         limit: paginator.queryLimit,
         cursor: params.cursor ? new Date(params.cursor) : undefined,
       }),
     );
 
-    const ctx = this.viewContextFactory.create(viewer);
+    const ctx = this.deps.viewContextFactory.create(viewer);
     const repostedBy = await Promise.all(
       paginationResult.items.map((repost) =>
-        this.profileViews.view(repost.accountDid, ctx),
+        this.deps.profileViews.view(repost.accountDid, ctx),
       ),
     );
 

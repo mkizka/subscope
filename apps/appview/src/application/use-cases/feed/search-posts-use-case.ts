@@ -16,9 +16,11 @@ type SearchPostsParams = {
 
 export class SearchPostsUseCase {
   constructor(
-    private readonly postQuery: IPostQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly postViews: PostViews,
+    private readonly deps: {
+      postQuery: IPostQuery;
+      viewContextFactory: ViewContextFactory;
+      postViews: PostViews;
+    },
   ) {}
 
   async execute(
@@ -37,7 +39,7 @@ export class SearchPostsUseCase {
       limit: params.limit,
       getCursor: (post) => post.sortAt.toISOString(),
     });
-    const posts = await this.postQuery.search({
+    const posts = await this.deps.postQuery.search({
       terms,
       authorDids: params.authorDids,
       replies: params.replies,
@@ -46,10 +48,10 @@ export class SearchPostsUseCase {
     });
     const paginationResult = paginator.extractPage(posts);
 
-    const ctx = this.viewContextFactory.create(viewer);
+    const ctx = this.deps.viewContextFactory.create(viewer);
     const postViews = await Promise.all(
       paginationResult.items.map((post) =>
-        this.postViews.postView(post.uri, ctx),
+        this.deps.postViews.postView(post.uri, ctx),
       ),
     );
 

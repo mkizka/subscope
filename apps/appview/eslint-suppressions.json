@@ -19,26 +19,6 @@
       "count": 1
     }
   },
-  "src/application/use-cases/feed/get-quotes-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/feed/get-reposted-by-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/feed/get-timeline-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/feed/search-posts-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/use-cases/graph/get-followers-use-case.ts": {
     "params/max-params": {
       "count": 1
