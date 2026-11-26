@@ -7,11 +7,15 @@ import type { loader as searchLoader } from "@/app/routes/api.search";
 
 import { SearchPage } from "./search-page";
 
-const search = (
-  tab: "accounts" | "posts",
-  q: string,
-  result: Partial<Data<typeof searchLoader>> = {},
-) =>
+const search = ({
+  tab,
+  q,
+  result = {},
+}: {
+  tab: "accounts" | "posts";
+  q: string;
+  result?: Partial<Data<typeof searchLoader>>;
+}) =>
   queryClient.setQueryData<Data<typeof searchLoader>>(["search", tab, q], {
     accounts: [],
     posts: [],
@@ -31,12 +35,20 @@ const pendingSearch = (tab: "accounts" | "posts", q: string) => {
 const meta = {
   beforeEach: () => {
     localStorage.removeItem("search-history");
-    search("accounts", "alice", {
-      accounts: [{ ...alice, description: "Blueskyを使っています。" }],
+    search({
+      tab: "accounts",
+      q: "alice",
+      result: {
+        accounts: [{ ...alice, description: "Blueskyを使っています。" }],
+      },
     });
-    search("accounts", "nobody");
-    search("posts", "alice", { posts: TimelineFeedStories.args.posts });
-    search("posts", "nobody");
+    search({ tab: "accounts", q: "nobody" });
+    search({
+      tab: "posts",
+      q: "alice",
+      result: { posts: TimelineFeedStories.args.posts },
+    });
+    search({ tab: "posts", q: "nobody" });
   },
   component: SearchPage,
   parameters: {
@@ -119,7 +131,7 @@ export const Loading: Story = {
 const seedHistory = (words: string[]) => () => {
   localStorage.setItem("search-history", JSON.stringify(words));
   for (const word of words) {
-    search("posts", word);
+    search({ tab: "posts", q: word });
   }
 };
 

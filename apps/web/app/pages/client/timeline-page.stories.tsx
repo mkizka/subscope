@@ -625,7 +625,10 @@ const addImages = async (dialogElement: HTMLElement, count: number) => {
   );
 };
 
-const writeAlt = async (dialogElement: HTMLElement, n: number, alt: string) => {
+const writeAlt = async (
+  dialogElement: HTMLElement,
+  { n, alt }: { n: number; alt: string },
+) => {
   const dialog = within(dialogElement);
   await userEvent.click(
     dialog.getByRole("button", { name: `画像${n}のALTを編集` }),
@@ -754,7 +757,7 @@ export const PostFormAltBadge: Story = {
       dialog.getByRole("button", { name: `画像${n}のALTを編集` });
     await expect(badge(1)).toHaveTextContent("+ ALT");
 
-    await writeAlt(dialogElement, 1, "postForm-s9");
+    await writeAlt(dialogElement, { n: 1, alt: "postForm-s9" });
 
     await expect(badge(1)).toHaveTextContent(/^ALT$/);
     await expect(badge(2)).toHaveTextContent("+ ALT");
@@ -986,7 +989,15 @@ const setPosts = (posts: Post[], cursor?: string) =>
     infinite<typeof timelineLoader>({ posts, cursor }),
   );
 
-const link = (text: string, label: string, feature: Partial<TextLink>) => {
+const link = ({
+  text,
+  label,
+  feature,
+}: {
+  text: string;
+  label: string;
+  feature: Partial<TextLink>;
+}) => {
   const encoder = new TextEncoder();
   const byteStart = encoder.encode(text.slice(0, text.indexOf(label))).length;
   return {
@@ -1028,8 +1039,10 @@ export const ExternalLink: Story = {
     const label = "example.com/timeline...";
     setPosts([
       post("link", {
-        ...link(`日本語のあと ${label} 後ろ`, label, {
-          uri: "https://example.com/timeline/full",
+        ...link({
+          text: `日本語のあと ${label} 後ろ`,
+          label,
+          feature: { uri: "https://example.com/timeline/full" },
         }),
       }),
     ]);
@@ -1051,8 +1064,10 @@ export const Mention: Story = {
   beforeEach: () => {
     setPosts([
       post("mention", {
-        ...link("こんにちは @bob.bsky.social さん", "@bob.bsky.social", {
-          did: "did:plc:bob",
+        ...link({
+          text: "こんにちは @bob.bsky.social さん",
+          label: "@bob.bsky.social",
+          feature: { did: "did:plc:bob" },
         }),
       }),
     ]);
@@ -1173,7 +1188,11 @@ export const Hashtag: Story = {
   beforeEach: () => {
     setPosts([
       post("tag", {
-        ...link("こんにちは #タグ です", "#タグ", { tag: "タグ" }),
+        ...link({
+          text: "こんにちは #タグ です",
+          label: "#タグ",
+          feature: { tag: "タグ" },
+        }),
       }),
     ]);
   },
