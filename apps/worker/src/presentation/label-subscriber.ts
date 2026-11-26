@@ -10,17 +10,19 @@ export class LabelSubscriber {
   private readonly subscription;
 
   constructor(
-    private readonly metricReporter: IMetricReporter,
-    private readonly indexLabelUseCase: IndexLabelUseCase,
-    private readonly labelCursorStore: ILabelCursorStore,
-    private readonly env: Pick<Env, "MODERATION_URL">,
+    private readonly deps: {
+      metricReporter: IMetricReporter;
+      indexLabelUseCase: IndexLabelUseCase;
+      labelCursorStore: ILabelCursorStore;
+      env: Pick<Env, "MODERATION_URL">;
+    },
   ) {
     this.subscription = new Subscription({
-      service: env.MODERATION_URL,
+      service: deps.env.MODERATION_URL,
       method: subscribeLabels.$nsid,
       getParams: async () => {
-        const cursor = await this.labelCursorStore.getCursor(
-          this.env.MODERATION_URL,
+        const cursor = await this.deps.labelCursorStore.getCursor(
+          this.deps.env.MODERATION_URL,
         );
         return cursor === undefined ? {} : { cursor };
       },
@@ -31,12 +33,12 @@ export class LabelSubscriber {
   async start() {
     for await (const message of this.subscription) {
       if (subscribeLabels.labels.$isTypeOf(message)) {
-        this.metricReporter.increment("worker_events_label_total");
+        this.deps.metricReporter.increment("worker_events_label_total");
         for (const label of message.labels) {
-          await this.indexLabelUseCase.execute(label);
+          await this.deps.indexLabelUseCase.execute(label);
         }
-        await this.labelCursorStore.setCursor(
-          this.env.MODERATION_URL,
+        await this.deps.labelCursorStore.setCursor(
+          this.deps.env.MODERATION_URL,
           message.seq,
         );
       }

@@ -38,25 +38,29 @@ const backoffStrategy: BackoffStrategy = (attemptsMade) => {
 export class SyncWorker {
   private readonly workers: Worker[];
 
-  constructor(
-    resolveDidUseCase: ResolveDidUseCase,
-    fetchRecordUseCase: FetchRecordUseCase,
-    aggregatePostStatsUseCase: AggregatePostStatsUseCase,
-    aggregateAccountStatsUseCase: AggregateAccountStatsUseCase,
-    syncTapRepoUseCase: SyncTapRepoUseCase,
-    checkBackfillUseCase: CheckBackfillUseCase,
-    sendPushNotificationUseCase: SendPushNotificationUseCase,
-    env: Pick<Env, "REDIS_URL">,
-  ) {
-    const createWorker = <T extends keyof JobData>(
-      name: T,
-      process: Processor<JobData[T], void>,
-      options?: Omit<WorkerOptions, "connection" | "autorun">,
-    ) => {
+  constructor(deps: {
+    resolveDidUseCase: ResolveDidUseCase;
+    fetchRecordUseCase: FetchRecordUseCase;
+    aggregatePostStatsUseCase: AggregatePostStatsUseCase;
+    aggregateAccountStatsUseCase: AggregateAccountStatsUseCase;
+    syncTapRepoUseCase: SyncTapRepoUseCase;
+    checkBackfillUseCase: CheckBackfillUseCase;
+    sendPushNotificationUseCase: SendPushNotificationUseCase;
+    env: Pick<Env, "REDIS_URL">;
+  }) {
+    const createWorker = <T extends keyof JobData>({
+      name,
+      process,
+      options,
+    }: {
+      name: T;
+      process: Processor<JobData[T], void>;
+      options?: Omit<WorkerOptions, "connection" | "autorun">;
+    }) => {
       return new Worker<JobData[T]>(name, process, {
         autorun: false,
         connection: {
-          url: env.REDIS_URL,
+          url: deps.env.REDIS_URL,
         },
         settings: {
           backoffStrategy,
@@ -65,67 +69,76 @@ export class SyncWorker {
       });
     };
     this.workers = [
-      createWorker(
-        "resolveDid",
-        async (job) => {
-          await resolveDidUseCase.execute(job.data);
+      createWorker({
+        name: "resolveDid",
+        process: async (job) => {
+          await deps.resolveDidUseCase.execute(job.data);
         },
-        {
+        options: {
           concurrency: 8,
           limiter: {
             max: 4, // plc.directoryの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
-      ),
-      createWorker(
-        "fetchRecord",
-        async (job) => {
-          await fetchRecordUseCase.execute({
+      }),
+      createWorker({
+        name: "fetchRecord",
+        process: async (job) => {
+          await deps.fetchRecordUseCase.execute({
             uri: job.data.uri,
             depth: job.data.depth,
             live: job.data.live,
             jobLogger: createJobLogger(job),
           });
         },
-        {
+        options: {
           concurrency: 20,
           limiter: {
             max: 10, // PDSの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
-      ),
-      createWorker("aggregatePostStats", async () => {
-        await aggregatePostStatsUseCase.execute();
       }),
-      createWorker(
-        "aggregateAccountStats",
-        async (job) => {
+      createWorker({
+        name: "aggregatePostStats",
+        process: async () => {
+          await deps.aggregatePostStatsUseCase.execute();
+        },
+      }),
+      createWorker({
+        name: "aggregateAccountStats",
+        process: async (job) => {
           const command = aggregateAccountStatsCommandFactory({
             data: job.data,
             jobLogger: createJobLogger(job),
           });
-          await aggregateAccountStatsUseCase.execute(command);
+          await deps.aggregateAccountStatsUseCase.execute(command);
         },
-        { concurrency: 16 },
-      ),
-      createWorker("syncTapRepo", async (job) => {
-        await syncTapRepoUseCase.execute(job.data);
+        options: { concurrency: 16 },
       }),
-      createWorker("checkBackfill", async (job) => {
-        await checkBackfillUseCase.execute(job.data);
+      createWorker({
+        name: "syncTapRepo",
+        process: async (job) => {
+          await deps.syncTapRepoUseCase.execute(job.data);
+        },
       }),
-      createWorker(
-        "sendPushNotification",
-        async (job) => {
-          await sendPushNotificationUseCase.execute({
+      createWorker({
+        name: "checkBackfill",
+        process: async (job) => {
+          await deps.checkBackfillUseCase.execute(job.data);
+        },
+      }),
+      createWorker({
+        name: "sendPushNotification",
+        process: async (job) => {
+          await deps.sendPushNotificationUseCase.execute({
             ...job.data,
             jobLogger: createJobLogger(job),
           });
         },
-        { concurrency: 16 },
-      ),
+        options: { concurrency: 16 },
+      }),
     ];
   }
 

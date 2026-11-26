@@ -17,37 +17,41 @@ export class WorkerServer {
   private server?: Server;
 
   constructor(
-    loggerManager: ILoggerManager,
-    private readonly syncWorker: SyncWorker,
-    private readonly tapSubscriber: TapSubscriber,
-    private readonly labelSubscriber: LabelSubscriber,
-    private readonly jobQueue: IJobQueue,
-    private readonly scheduleBackfillChecksUseCase: ScheduleBackfillChecksUseCase,
-    healthRouter: Router,
-    private readonly env: Pick<Env, "NODE_ENV" | "PORT">,
+    private readonly deps: {
+      loggerManager: ILoggerManager;
+      syncWorker: SyncWorker;
+      tapSubscriber: TapSubscriber;
+      labelSubscriber: LabelSubscriber;
+      jobQueue: IJobQueue;
+      scheduleBackfillChecksUseCase: ScheduleBackfillChecksUseCase;
+      healthRouter: Router;
+      env: Pick<Env, "NODE_ENV" | "PORT">;
+    },
   ) {
-    this.logger = loggerManager.createLogger("WorkerServer");
+    this.logger = deps.loggerManager.createLogger("WorkerServer");
     this.app = express();
     this.app.use(
-      loggingMiddleware(this.logger, env.NODE_ENV === "development"),
+      loggingMiddleware(this.logger, deps.env.NODE_ENV === "development"),
     );
     this.app.use(promBundle({ includeMethod: true }));
-    this.app.use(healthRouter);
+    this.app.use(deps.healthRouter);
   }
 
   start() {
-    this.server = this.app.listen(this.env.PORT, async () => {
-      this.logger.info(`Worker server listening on port ${this.env.PORT}`);
-      this.tapSubscriber.start().catch((err: unknown) => {
+    this.server = this.app.listen(this.deps.env.PORT, async () => {
+      this.logger.info(`Worker server listening on port ${this.deps.env.PORT}`);
+      this.deps.tapSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Tap subscriber threw");
       });
-      this.labelSubscriber.start().catch((err: unknown) => {
+      this.deps.labelSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Label subscriber threw");
       });
-      this.scheduleBackfillChecksUseCase.execute().catch((err: unknown) => {
-        this.logger.error({ err }, "Failed to schedule backfill checks");
-      });
-      await this.syncWorker.start();
+      this.deps.scheduleBackfillChecksUseCase
+        .execute()
+        .catch((err: unknown) => {
+          this.logger.error({ err }, "Failed to schedule backfill checks");
+        });
+      await this.deps.syncWorker.start();
     });
     setInterval(() => void this.logQueueCounts(), 60 * 1000).unref();
 
@@ -58,7 +62,7 @@ export class WorkerServer {
   private async logQueueCounts() {
     try {
       const entries = await Promise.all(
-        this.jobQueue
+        this.deps.jobQueue
           .getQueues()
           .map(async (queue) => [
             queue.name,
@@ -86,7 +90,7 @@ export class WorkerServer {
 
   private async stopWorkers() {
     try {
-      await this.syncWorker.stop();
+      await this.deps.syncWorker.stop();
       this.logger.info("Workers stopped successfully");
     } catch (error) {
       this.logger.error({ error }, "Error stopping workers");
