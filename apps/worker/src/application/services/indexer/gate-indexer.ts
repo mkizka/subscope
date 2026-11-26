@@ -10,9 +10,11 @@ import type { RelatedRecordService } from "../related-record-service.js";
 
 export class GateIndexer implements IRecordIndexer {
   constructor(
-    private readonly recordQuery: IRecordQuery,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly relatedRecordService: RelatedRecordService,
+    private readonly deps: {
+      recordQuery: IRecordQuery;
+      recordSaveService: RecordSaveService;
+      relatedRecordService: RelatedRecordService;
+    },
   ) {}
 
   async index({
@@ -28,10 +30,10 @@ export class GateIndexer implements IRecordIndexer {
     if (!gate.attachesToOwnPost) {
       return;
     }
-    const postSaved = await this.recordQuery.exists(ctx, gate.postUri);
+    const postSaved = await this.deps.recordQuery.exists(ctx, gate.postUri);
     if (!postSaved) {
       if (!origin.isFetched) {
-        await this.relatedRecordService.request({
+        await this.deps.relatedRecordService.request({
           ctx,
           origin,
           uri: record.uri,
@@ -39,8 +41,8 @@ export class GateIndexer implements IRecordIndexer {
       }
       return;
     }
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
       ctx,
       origin,
       record: { accountDid: record.uri.did },
