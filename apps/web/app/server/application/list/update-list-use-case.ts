@@ -9,5 +9,5 @@ export const updateListUseCaseFactory = ({
 }: {
   listCommand: IListCommand;
 }): IUpdateListUseCase => ({
-  execute: (did, rkey, input) => listCommand.update(did, rkey, input),
+  execute: (did, params) => listCommand.update(did, params),
 });
