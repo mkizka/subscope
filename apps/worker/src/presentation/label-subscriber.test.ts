@@ -38,15 +38,15 @@ describe("モデレーションサービスからのラベル受信", () => {
         resolve([socket, new URL(req.url ?? "", moderationUrl)]),
       ),
     );
-    const subscriber = new LabelSubscriber(
-      new MetricReporter(),
-      new IndexLabelUseCase(
+    const subscriber = new LabelSubscriber({
+      metricReporter: new MetricReporter(),
+      indexLabelUseCase: new IndexLabelUseCase(
         new IndexLabelService(new LabelRepository(), new AccountQuery()),
         new TransactionManager(ctx.db),
       ),
       labelCursorStore,
-      { MODERATION_URL: moderationUrl },
-    );
+      env: { MODERATION_URL: moderationUrl },
+    });
     void subscriber.start();
     return connection;
   };

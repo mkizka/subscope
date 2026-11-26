@@ -42,18 +42,20 @@ export class TapSubscriber {
   private readonly logger;
 
   constructor(
-    loggerManager: ILoggerManager,
-    private readonly metricReporter: IMetricReporter,
-    private readonly indexCommitUseCase: IndexCommitUseCase,
-    private readonly upsertIdentityUseCase: UpsertIdentityUseCase,
-    private readonly env: Pick<Env, "TAP_URL">,
+    private readonly deps: {
+      loggerManager: ILoggerManager;
+      metricReporter: IMetricReporter;
+      indexCommitUseCase: IndexCommitUseCase;
+      upsertIdentityUseCase: UpsertIdentityUseCase;
+      env: Pick<Env, "TAP_URL">;
+    },
   ) {
-    this.logger = loggerManager.createLogger("TapSubscriber");
+    this.logger = deps.loggerManager.createLogger("TapSubscriber");
   }
 
   private async handleIdentityEvent(event: IdentityEvent) {
-    this.metricReporter.increment("worker_events_identity_total");
-    await this.upsertIdentityUseCase.execute({
+    this.deps.metricReporter.increment("worker_events_identity_total");
+    await this.deps.upsertIdentityUseCase.execute({
       did: event.did,
       handle: event.handle,
       status: event.status,
@@ -63,14 +65,14 @@ export class TapSubscriber {
   async start() {
     const indexer = new SimpleIndexer()
       .record((event) =>
-        this.indexCommitUseCase.execute(indexCommitCommandFactory(event)),
+        this.deps.indexCommitUseCase.execute(indexCommitCommandFactory(event)),
       )
       .identity((event) => this.handleIdentityEvent(event))
       .error((err) => this.logger.error({ err }, "Tap error occurred"));
-    const channel = new Tap(this.env.TAP_URL).channel(indexer, {
+    const channel = new Tap(this.deps.env.TAP_URL).channel(indexer, {
       heartbeatIntervalMs: 60_000,
     });
-    this.logger.info(`Tap connection starting at ${this.env.TAP_URL}`);
+    this.logger.info(`Tap connection starting at ${this.deps.env.TAP_URL}`);
     await channel.start();
   }
 }

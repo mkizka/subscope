@@ -215,9 +215,9 @@ export const createWorkerRegistry = (env: Env) =>
     .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "trackingService", "storagePolicy", "accountRepository", "jobScheduler", "transactionManager"], asClass(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClass(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClass(SendPushNotificationUseCase))
-    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClassArgs(SyncWorker))
+    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClass(SyncWorker))
     // presentation
     .service("healthRouter", ["env"], healthRouterFactory)
-    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClassArgs(TapSubscriber))
-    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "env"], asClassArgs(LabelSubscriber))
-    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClassArgs(WorkerServer));
+    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClass(TapSubscriber))
+    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "env"], asClass(LabelSubscriber))
+    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClass(WorkerServer));

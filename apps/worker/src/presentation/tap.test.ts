@@ -76,13 +76,13 @@ describe("Tapからのイベント受信", () => {
     const connection = new Promise<WebSocket>((resolve) =>
       server.once("connection", resolve),
     );
-    const subscriber = new TapSubscriber(
-      services.loggerManager,
-      services.metricReporter,
-      services.indexCommitUseCase,
-      services.upsertIdentityUseCase,
-      { TAP_URL: `http://localhost:${address.port}` },
-    );
+    const subscriber = new TapSubscriber({
+      loggerManager: services.loggerManager,
+      metricReporter: services.metricReporter,
+      indexCommitUseCase: services.indexCommitUseCase,
+      upsertIdentityUseCase: services.upsertIdentityUseCase,
+      env: { TAP_URL: `http://localhost:${address.port}` },
+    });
     void subscriber.start();
     socket = await connection;
     socket.on("message", (data) => {
