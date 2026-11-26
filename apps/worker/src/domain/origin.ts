@@ -1,22 +1,30 @@
 const MAX_FETCH_DEPTH = 2;
 
 export class Origin {
-  private constructor(
-    private readonly source: "tap" | "fetch",
-    private readonly isLive: boolean,
-    private readonly depth: number,
-  ) {}
+  private readonly source: "tap" | "fetch";
+  private readonly isLive: boolean;
+  private readonly depth: number;
+
+  private constructor(params: {
+    source: "tap" | "fetch";
+    isLive: boolean;
+    depth: number;
+  }) {
+    this.source = params.source;
+    this.isLive = params.isLive;
+    this.depth = params.depth;
+  }
 
   static live() {
-    return new Origin("tap", true, 0);
+    return new Origin({ source: "tap", isLive: true, depth: 0 });
   }
 
   static backfill() {
-    return new Origin("tap", false, 0);
+    return new Origin({ source: "tap", isLive: false, depth: 0 });
   }
 
   static fromFetchJob({ live, depth }: { live: boolean; depth: number }) {
-    return new Origin("fetch", live, depth + 1);
+    return new Origin({ source: "fetch", isLive: live, depth: depth + 1 });
   }
 
   get isPast() {
