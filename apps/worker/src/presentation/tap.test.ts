@@ -61,7 +61,7 @@ describe("Tapからのイベント受信", () => {
   let socket: WebSocket;
   let acks: number[];
 
-  const connect = async (tapConcurrency = 64) => {
+  const connect = async () => {
     acks = [];
     server = new WebSocketServer({ port: 0 });
     await once(server, "listening");
@@ -76,10 +76,7 @@ describe("Tapからのイベント受信", () => {
       services.indexCommitUseCase,
       services.updateRepoRevUseCase,
       services.upsertIdentityUseCase,
-      {
-        TAP_URL: `http://localhost:${address.port}`,
-        TAP_CONCURRENCY: tapConcurrency,
-      },
+      { TAP_URL: `http://localhost:${address.port}` },
     );
     void subscriber.start();
     socket = await connection;
@@ -185,9 +182,9 @@ describe("Tapからのイベント受信", () => {
     expect(await findPosts(account.did)).toEqual([]);
   });
 
-  test("channel-5: 処理中のイベントがTAP_CONCURRENCY件に達したら、空くまで次のイベントを読まない", async () => {
+  test("channel-5: イベントは1件ずつ処理し、処理を終えるまで次のイベントを読まない", async () => {
     // arrange
-    await connect(1);
+    await connect();
     const account = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
       .create();

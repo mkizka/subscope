@@ -1,7 +1,7 @@
 import { lexToJson } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import type { RecordEvent, TapEvent } from "@atproto/tap";
-import { Tap } from "@atproto/tap";
+import type { IdentityEvent, RecordEvent } from "@atproto/tap";
+import { SimpleIndexer, Tap } from "@atproto/tap";
 import type { ILoggerManager, IMetricReporter } from "@repo/common/interface";
 import { isSupportedCollection } from "@repo/common/utils";
 
@@ -49,23 +49,23 @@ export class TapSubscriber {
     private readonly indexCommitUseCase: IndexCommitUseCase,
     private readonly updateRepoRevUseCase: UpdateRepoRevUseCase,
     private readonly upsertIdentityUseCase: UpsertIdentityUseCase,
-    private readonly env: Pick<Env, "TAP_URL" | "TAP_CONCURRENCY">,
+    private readonly env: Pick<Env, "TAP_URL">,
   ) {
     this.logger = loggerManager.createLogger("TapSubscriber");
   }
 
-  private async handleEvent(event: TapEvent) {
-    if (event.type === "identity") {
-      this.metricReporter.increment("worker_events_identity_total");
-      await this.upsertIdentityUseCase.execute({
-        did: event.did,
-        handle: event.handle,
-        status: event.status,
-      });
-      return;
-    }
+  private async handleRecordEvent(event: RecordEvent) {
     await this.indexRecordEvent(event);
     await this.updateRepoRevUseCase.execute({ did: event.did, rev: event.rev });
+  }
+
+  private async handleIdentityEvent(event: IdentityEvent) {
+    this.metricReporter.increment("worker_events_identity_total");
+    await this.upsertIdentityUseCase.execute({
+      did: event.did,
+      handle: event.handle,
+      status: event.status,
+    });
   }
 
   private async indexRecordEvent(event: RecordEvent) {
@@ -82,28 +82,13 @@ export class TapSubscriber {
   }
 
   async start() {
-    const inFlight = new Set<Promise<void>>();
-    const channel = new Tap(this.env.TAP_URL).channel(
-      {
-        onEvent: async (event, { ack }) => {
-          if (inFlight.size >= this.env.TAP_CONCURRENCY) {
-            await Promise.race(inFlight);
-          }
-          const task = this.handleEvent(event)
-            .then(ack)
-            .catch((err: unknown) => {
-              this.logger.error(
-                { err, id: event.id },
-                "Failed to process event",
-              );
-            })
-            .finally(() => inFlight.delete(task));
-          inFlight.add(task);
-        },
-        onError: (err) => this.logger.error({ err }, "Tap error occurred"),
-      },
-      { heartbeatIntervalMs: 60_000 },
-    );
+    const indexer = new SimpleIndexer()
+      .record((event) => this.handleRecordEvent(event))
+      .identity((event) => this.handleIdentityEvent(event))
+      .error((err) => this.logger.error({ err }, "Tap error occurred"));
+    const channel = new Tap(this.env.TAP_URL).channel(indexer, {
+      heartbeatIntervalMs: 60_000,
+    });
     this.logger.info(`Tap connection starting at ${this.env.TAP_URL}`);
     await channel.start();
   }
