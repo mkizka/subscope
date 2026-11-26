@@ -7,11 +7,15 @@ import type { InMemoryPostRepository } from "../../repositories/post-repository/
 export class InMemoryPostQuery implements IPostQuery {
   constructor(private readonly postRepository: InMemoryPostRepository) {}
 
-  async findReplyAncestorUris(
-    ctx: TransactionContext,
-    parentUri: AtUri,
-    limit: number,
-  ): Promise<AtUri[]> {
+  async findReplyAncestorUris({
+    ctx,
+    parentUri,
+    limit,
+  }: {
+    ctx: TransactionContext;
+    parentUri: AtUri;
+    limit: number;
+  }): Promise<AtUri[]> {
     const uris = [];
     for (
       let uri: AtUri | null = parentUri;

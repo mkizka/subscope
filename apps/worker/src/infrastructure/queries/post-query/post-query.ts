@@ -6,11 +6,15 @@ import { eq } from "drizzle-orm";
 import type { IPostQuery } from "../../../application/interfaces/queries/post-query.js";
 
 export class PostQuery implements IPostQuery {
-  async findReplyAncestorUris(
-    ctx: TransactionContext,
-    parentUri: AtUri,
-    limit: number,
-  ): Promise<AtUri[]> {
+  async findReplyAncestorUris({
+    ctx,
+    parentUri,
+    limit,
+  }: {
+    ctx: TransactionContext;
+    parentUri: AtUri;
+    limit: number;
+  }): Promise<AtUri[]> {
     const uris = [];
     for (
       let uri: AtUri | null = parentUri;
