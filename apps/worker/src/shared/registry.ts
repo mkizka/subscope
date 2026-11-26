@@ -82,7 +82,6 @@ import { ScheduleBackfillChecksUseCase } from "../application/use-cases/async/sc
 import { SendPushNotificationUseCase } from "../application/use-cases/async/send-push-notification-use-case.js";
 import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
-import { UpdateRepoRevUseCase } from "../application/use-cases/commit/update-repo-rev-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import type { IGateQuery } from "../domain/interfaces/gate-query.js";
@@ -207,8 +206,7 @@ export const createWorkerRegistry = (env: Env) =>
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "relatedRecordService", "resolveDidService"], asClassArgs(UpsertIdentityUseCase))
-    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "recordIndexer"], asClassArgs(IndexCommitUseCase))
-    .service("updateRepoRevUseCase", ["transactionManager", "repoRevRepository"], asClassArgs(UpdateRepoRevUseCase))
+    .service("indexCommitUseCase", ["loggerManager", "metricReporter", "transactionManager", "recordIndexer", "repoRevRepository"], asClassArgs(IndexCommitUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "recordIndexer"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClassArgs(AggregateAccountStatsUseCase))
@@ -220,6 +218,6 @@ export const createWorkerRegistry = (env: Env) =>
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["env"], healthRouterFactory)
-    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "updateRepoRevUseCase", "upsertIdentityUseCase", "env"], asClassArgs(TapSubscriber))
+    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClassArgs(TapSubscriber))
     .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "env"], asClassArgs(LabelSubscriber))
     .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClassArgs(WorkerServer));

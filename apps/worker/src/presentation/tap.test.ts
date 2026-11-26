@@ -74,7 +74,6 @@ describe("Tapからのイベント受信", () => {
       services.loggerManager,
       services.metricReporter,
       services.indexCommitUseCase,
-      services.updateRepoRevUseCase,
       services.upsertIdentityUseCase,
       { TAP_URL: `http://localhost:${address.port}` },
     );
@@ -284,5 +283,25 @@ describe("Tapからのイベント受信", () => {
     // assert
     expect(acks).toEqual([]);
     expect(await findRev(account.did)).toBeNull();
+  });
+
+  test("repoRev-5: revを記録できなかったイベントのレコードは保存しない", async () => {
+    // arrange
+    await connect();
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const save = vi
+      .spyOn(services.repoRevRepository, "save")
+      .mockRejectedValueOnce(new Error("db down"));
+
+    // act
+    send(recordEvent(1, account.did));
+    await vi.waitFor(() => expect(save).toHaveBeenCalledOnce());
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // assert
+    expect(acks).toEqual([]);
+    expect(await findPosts(account.did)).toEqual([]);
   });
 });
