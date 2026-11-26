@@ -7,19 +7,21 @@ import type { HandleMiddleware } from "../../../../../presentation/middleware/ha
 
 export class GetListsWithMembership {
   constructor(
-    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
-    private readonly getListsWithMembershipUseCase: GetListsWithMembershipUseCase,
-    private readonly handleMiddleware: HandleMiddleware,
+    private readonly deps: {
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      getListsWithMembershipUseCase: GetListsWithMembershipUseCase;
+      handleMiddleware: HandleMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getListsWithMembership, {
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials, params }) => {
-        const subjectDid = await this.handleMiddleware.resolveHandleOrDid(
+        const subjectDid = await this.deps.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
-        const result = await this.getListsWithMembershipUseCase.execute({
+        const result = await this.deps.getListsWithMembershipUseCase.execute({
           viewerDid: credentials.did,
           subjectDid,
           limit: params.limit,

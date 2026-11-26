@@ -7,19 +7,21 @@ import type { HandleMiddleware } from "../../../../../presentation/middleware/ha
 
 export class GetKnownFollowers {
   constructor(
-    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
-    private readonly getKnownFollowersUseCase: GetKnownFollowersUseCase,
-    private readonly handleMiddleware: HandleMiddleware,
+    private readonly deps: {
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      getKnownFollowersUseCase: GetKnownFollowersUseCase;
+      handleMiddleware: HandleMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getKnownFollowers, {
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials, params }) => {
-        const subjectDid = await this.handleMiddleware.resolveHandleOrDid(
+        const subjectDid = await this.deps.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
-        const result = await this.getKnownFollowersUseCase.execute({
+        const result = await this.deps.getKnownFollowersUseCase.execute({
           viewerDid: credentials.did,
           subjectDid,
           limit: params.limit,
