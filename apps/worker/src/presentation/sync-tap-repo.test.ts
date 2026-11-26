@@ -70,7 +70,7 @@ describe("Tapへの登録", () => {
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).toContain(followee.did);
+    expect(tapClient.getAddedDids()).toContain(followee.did);
   });
 
   test("tap-2: メンバー以外のフォローではTapに追加しない", async () => {
@@ -84,7 +84,7 @@ describe("Tapへの登録", () => {
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
+    expect(tapClient.getAddedDids()).not.toContain(followee.did);
   });
 
   test("tap-3: メンバーがフォローを外したアカウントは、追跡アカウントでなくなればTapから外す", async () => {
@@ -102,7 +102,7 @@ describe("Tapへの登録", () => {
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
+    expect(tapClient.getAddedDids()).not.toContain(followee.did);
   });
 
   test("tap-4: 他のメンバーがフォローしているアカウントはTapから外さない", async () => {
@@ -124,7 +124,7 @@ describe("Tapへの登録", () => {
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).toContain(followee.did);
+    expect(tapClient.getAddedDids()).toContain(followee.did);
   });
 
   test("tap-5: メンバー以外がフォローを外してもTapから外さない", async () => {
@@ -144,7 +144,7 @@ describe("Tapへの登録", () => {
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).toContain(followee.did);
+    expect(tapClient.getAddedDids()).toContain(followee.did);
   });
 
   test("tap-6: メンバーはフォローを外されてもTapから外さない", async () => {
@@ -168,7 +168,7 @@ describe("Tapへの登録", () => {
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).toContain(followedServerMember.did);
+    expect(tapClient.getAddedDids()).toContain(followedServerMember.did);
   });
 });
 
@@ -346,7 +346,7 @@ describe("バックフィルの状態の確認", () => {
 
     // assert
     expect(await findBackfillStatus(did)).toBe("completed");
-    expect(tapClient.getRegisteredDids()).toEqual([]);
+    expect(tapClient.getAddedDids()).toEqual([]);
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
   });
 
