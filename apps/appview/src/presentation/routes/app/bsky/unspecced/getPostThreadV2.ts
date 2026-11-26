@@ -8,19 +8,21 @@ import type { AuthVerifierMiddleware } from "../../../../../presentation/middlew
 
 export class GetPostThreadV2 {
   constructor(
-    private readonly getPostThreadV2UseCase: GetPostThreadV2UseCase,
-    private readonly atUriService: AtUriService,
-    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
+    private readonly deps: {
+      getPostThreadV2UseCase: GetPostThreadV2UseCase;
+      atUriService: AtUriService;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getPostThreadV2, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const uri = await this.atUriService.resolveHostname(
+        const uri = await this.deps.atUriService.resolveHostname(
           new AtUri(params.anchor),
         );
-        const body = await this.getPostThreadV2UseCase.execute({
+        const body = await this.deps.getPostThreadV2UseCase.execute({
           uri,
           above: params.above,
           below: params.below,

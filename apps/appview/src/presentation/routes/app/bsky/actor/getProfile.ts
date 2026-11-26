@@ -13,15 +13,17 @@ import type { RepoRevMiddleware } from "../../../../../presentation/middleware/r
 
 export class GetProfile {
   constructor(
-    private getProfileUseCase: GetProfileUseCase,
-    private handleMiddleware: HandleMiddleware,
-    private authVerifierMiddleware: AuthVerifierMiddleware,
-    private repoRevMiddleware: RepoRevMiddleware,
+    private readonly deps: {
+      getProfileUseCase: GetProfileUseCase;
+      handleMiddleware: HandleMiddleware;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      repoRevMiddleware: RepoRevMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getProfile, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
         if (!isDid(params.actor) && !isHandle(params.actor)) {
           throw new LexServerError(400, {
@@ -30,11 +32,11 @@ export class GetProfile {
           });
         }
 
-        const did = await this.handleMiddleware.resolveHandleOrDid(
+        const did = await this.deps.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
 
-        const profile = await this.getProfileUseCase
+        const profile = await this.deps.getProfileUseCase
           .execute(did, viewerDid)
           .catch((error: unknown) => {
             if (error instanceof AccountHiddenError) {
@@ -53,7 +55,7 @@ export class GetProfile {
         }
 
         return {
-          headers: await this.repoRevMiddleware.headers(viewerDid),
+          headers: await this.deps.repoRevMiddleware.headers(viewerDid),
           body: profile,
         };
       },

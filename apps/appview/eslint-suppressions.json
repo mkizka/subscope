@@ -1,24 +1,4 @@
 {
-  "src/presentation/routes/app/bsky/actor/getProfile.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/actor/getProfiles.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/getActorLikes.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/getAuthorFeed.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/feed/getListFeed.ts": {
     "params/max-params": {
       "count": 1
@@ -60,11 +40,6 @@
     }
   },
   "src/presentation/routes/app/bsky/graph/getListsWithMembership.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/unspecced/getPostThreadV2.ts": {
     "params/max-params": {
       "count": 1
     }
