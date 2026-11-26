@@ -32,11 +32,15 @@ describe("ラベラーの指定", () => {
       })
       .create();
 
-  const createLabel = (
-    post: { uri: string; accountDid: string },
-    src: string,
-    val: string,
-  ) =>
+  const createLabel = ({
+    post,
+    src,
+    val,
+  }: {
+    post: { uri: string; accountDid: string };
+    src: string;
+    val: string;
+  }) =>
     labelFactory(ctx.db)
       .props({
         src: () => src,
@@ -58,8 +62,8 @@ describe("ラベラーの指定", () => {
   test("labelers-1: labelsには、指定されたラベラーのラベルだけを含める", async () => {
     // arrange
     const post = await createPost();
-    await createLabel(post, labelerA, "spam");
-    await createLabel(post, labelerB, "porn");
+    await createLabel({ post, src: labelerA, val: "spam" });
+    await createLabel({ post, src: labelerB, val: "porn" });
 
     // act
     const res = await fetchPosts(post.uri, labelerA);
@@ -75,8 +79,8 @@ describe("ラベラーの指定", () => {
     async (header) => {
       // arrange
       const post = await createPost();
-      await createLabel(post, labelerA, "spam");
-      await createLabel(post, labelerB, "porn");
+      await createLabel({ post, src: labelerA, val: "spam" });
+      await createLabel({ post, src: labelerB, val: "porn" });
 
       // act
       const res = await fetchPosts(post.uri, header);
@@ -104,7 +108,7 @@ describe("ラベラーの指定", () => {
   test("labelers-4: テイクダウンは、指定されていないラベラーのラベルでも適用する", async () => {
     // arrange
     const post = await createPost();
-    await createLabel(post, labelerB, "!takedown");
+    await createLabel({ post, src: labelerB, val: "!takedown" });
 
     // act
     const res = await fetchPosts(post.uri, labelerA);
