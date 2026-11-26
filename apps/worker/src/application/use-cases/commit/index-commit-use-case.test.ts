@@ -72,6 +72,44 @@ describe("IndexCommitUseCase", () => {
       expect(savedPost?.text).toBe("Hello world");
     });
 
+    test("index-18: 保存した返信の返信先と起点の投稿は、保存していなければPDSから取得する", async () => {
+      // arrange
+      const account = accountFactory();
+      accountRepo.add(account);
+      registrationQuery.add(account.did);
+      const parentUri = "at://did:plc:parent/app.bsky.feed.post/parent";
+      const rootUri = "at://did:plc:root/app.bsky.feed.post/root";
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/reply`);
+      const record = {
+        uri,
+        cid: "cid123",
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "reply",
+          reply: {
+            parent: { uri: parentUri, cid: fakeCid() },
+            root: { uri: rootUri, cid: fakeCid() },
+          },
+          createdAt: new Date().toISOString(),
+        },
+        indexedAt: new Date(),
+      };
+      const commit = {
+        operation: "create" as const,
+        uri,
+        rev: "3aaaaaaaaaaaa",
+        record,
+      };
+
+      // act
+      await indexCommitUseCase.execute({ commit, live: true });
+
+      // assert
+      expect(
+        jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString()),
+      ).toEqual(expect.arrayContaining([parentUri, rootUri]));
+    });
+
     test("index-10: 保存済みのアカウントは、ハンドルと状態が変わらなければ更新しない", async () => {
       // arrange
       const account = accountFactory();
