@@ -383,6 +383,24 @@ describe("app.bsky.feed.getPosts", () => {
     ]);
   });
 
+  test("threadgate-7: 返信制限に違反した返信は、すべての閲覧者のreplyDisabledをtrueにする", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const root = await createPost();
+    const reply = await postFactory(ctx.db)
+      .use((t) => t.asReplyTo(root))
+      .props({ violatesThreadgate: () => true })
+      .create();
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(reply.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.viewer?.replyDisabled).toBe(true);
+  });
+
   test("postgate-1: 引用を禁止した投稿は、投稿者以外の閲覧者のembeddingDisabledをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();

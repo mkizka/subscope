@@ -45,7 +45,8 @@ export class PostViews {
       return undefined;
     }
     const [replyDisabled, threadgate, pinnedPost] = await Promise.all([
-      gate && this.replyDisabled(rootUri, gate, ctx),
+      post.violatesThreadgate ||
+        (gate && this.replyDisabled(rootUri, gate, ctx)),
       gate && rootUri === uri ? this.threadgateView(gate, ctx) : undefined,
       ctx.viewer.viewerDid
         ? this.profileViews.pinnedPost(ctx.viewer.viewerDid, ctx)
