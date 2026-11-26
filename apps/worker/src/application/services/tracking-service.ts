@@ -12,38 +12,40 @@ import type { IndexLabelService } from "./index-label-service.js";
 
 export class TrackingService {
   constructor(
-    private readonly tapClient: ITapClient,
-    private readonly trackingRepository: ITrackingRepository,
-    private readonly labelFetcher: ILabelFetcher,
-    private readonly indexLabelService: IndexLabelService,
-    private readonly jobScheduler: IJobScheduler,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      tapClient: ITapClient;
+      trackingRepository: ITrackingRepository;
+      labelFetcher: ILabelFetcher;
+      indexLabelService: IndexLabelService;
+      jobScheduler: IJobScheduler;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async start(did: Did) {
-    await this.transactionManager.transaction(async (ctx) => {
-      const tracking = await this.trackingRepository.find({ ctx, did });
+    await this.deps.transactionManager.transaction(async (ctx) => {
+      const tracking = await this.deps.trackingRepository.find({ ctx, did });
       if (!tracking) {
-        await this.trackingRepository.save({
+        await this.deps.trackingRepository.save({
           ctx,
           tracking: Tracking.start(did),
         });
       }
     });
-    await this.tapClient.addRepo(did);
-    await this.jobScheduler.scheduleCheckBackfill(did, 0);
-    const labels = await this.labelFetcher.fetchByAccount(did);
-    await this.transactionManager.transaction(async (ctx) => {
+    await this.deps.tapClient.addRepo(did);
+    await this.deps.jobScheduler.scheduleCheckBackfill(did, 0);
+    const labels = await this.deps.labelFetcher.fetchByAccount(did);
+    await this.deps.transactionManager.transaction(async (ctx) => {
       for (const label of labels) {
-        await this.indexLabelService.index({ ctx, label });
+        await this.deps.indexLabelService.index({ ctx, label });
       }
     });
   }
 
   async stop(did: Did) {
-    await this.transactionManager.transaction((ctx) =>
-      this.trackingRepository.delete({ ctx, did }),
+    await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.trackingRepository.delete({ ctx, did }),
     );
-    await this.tapClient.removeRepo(did);
+    await this.deps.tapClient.removeRepo(did);
   }
 }

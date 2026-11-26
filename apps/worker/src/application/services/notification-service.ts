@@ -9,9 +9,11 @@ import type { INotificationRepository } from "../interfaces/repositories/notific
 
 export class NotificationService {
   constructor(
-    private readonly notificationRepository: INotificationRepository,
-    private readonly notificationPolicy: NotificationPolicy,
-    private readonly jobScheduler: IJobScheduler,
+    private readonly deps: {
+      notificationRepository: INotificationRepository;
+      notificationPolicy: NotificationPolicy;
+      jobScheduler: IJobScheduler;
+    },
   ) {}
 
   async notify({
@@ -23,18 +25,18 @@ export class NotificationService {
     origin: Origin;
     notifications: () => Notification[] | Promise<Notification[]>;
   }) {
-    const deliverable = await this.notificationPolicy.selectDeliverable({
+    const deliverable = await this.deps.notificationPolicy.selectDeliverable({
       ctx,
       origin,
       candidates: notifications,
     });
-    const created = await this.notificationRepository.save({
+    const created = await this.deps.notificationRepository.save({
       ctx,
       notifications: deliverable,
     });
     for (const { recordUri, recipientDid } of created) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleSendPushNotification(
+        this.deps.jobScheduler.scheduleSendPushNotification(
           new AtUri(recordUri),
           asDid(recipientDid),
         ),

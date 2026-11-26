@@ -11,15 +11,17 @@ import type { IAccountRepository } from "../interfaces/repositories/account-repo
 
 export class ResolveDidService {
   constructor(
-    private readonly didResolver: IDidResolver,
-    private readonly handleResolver: IHandleResolver,
-    private readonly accountRepository: IAccountRepository,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      didResolver: IDidResolver;
+      handleResolver: IHandleResolver;
+      accountRepository: IAccountRepository;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async resolve(did: Did) {
-    const existingAccount = await this.transactionManager.transaction((ctx) =>
-      this.accountRepository.find({ ctx, did }),
+    const existingAccount = await this.deps.transactionManager.transaction(
+      (ctx) => this.deps.accountRepository.find({ ctx, did }),
     );
     if (existingAccount && !existingAccount.needsHandleResolution) {
       return;
@@ -27,18 +29,18 @@ export class ResolveDidService {
 
     let handle;
     try {
-      ({ handle } = await this.didResolver.resolve(did));
+      ({ handle } = await this.deps.didResolver.resolve(did));
     } catch (error) {
       if (error instanceof DidNotFoundError) return;
       throw error;
     }
-    const resolvedDid = await this.handleResolver.resolve(handle);
+    const resolvedDid = await this.deps.handleResolver.resolve(handle);
 
     const account = existingAccount ?? Account.create({ did });
     account.applyResolvedHandle({ handle, resolvedDid });
 
-    await this.transactionManager.transaction((ctx) =>
-      this.accountRepository.save({ ctx, account }),
+    await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.accountRepository.save({ ctx, account }),
     );
   }
 }
