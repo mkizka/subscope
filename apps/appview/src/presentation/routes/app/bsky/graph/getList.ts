@@ -8,19 +8,21 @@ import type { AuthVerifierMiddleware } from "../../../../../presentation/middlew
 
 export class GetList {
   constructor(
-    private getListUseCase: GetListUseCase,
-    private atUriService: AtUriService,
-    private authVerifierMiddleware: AuthVerifierMiddleware,
+    private readonly deps: {
+      getListUseCase: GetListUseCase;
+      atUriService: AtUriService;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getList, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const listUri = await this.atUriService.resolveHostname(
+        const listUri = await this.deps.atUriService.resolveHostname(
           new AtUri(params.list),
         );
-        const result = await this.getListUseCase.execute({
+        const result = await this.deps.getListUseCase.execute({
           listUri: listUri.getValue(),
           viewerDid,
           limit: params.limit,

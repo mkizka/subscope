@@ -7,20 +7,22 @@ import type { HandleMiddleware } from "../../../../../presentation/middleware/ha
 
 export class GetFollowers {
   constructor(
-    private getFollowersUseCase: GetFollowersUseCase,
-    private handleMiddleware: HandleMiddleware,
-    private authVerifierMiddleware: AuthVerifierMiddleware,
+    private readonly deps: {
+      getFollowersUseCase: GetFollowersUseCase;
+      handleMiddleware: HandleMiddleware;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getFollowers, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const accountDid = await this.handleMiddleware.resolveHandleOrDid(
+        const accountDid = await this.deps.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
 
-        const result = await this.getFollowersUseCase.execute({
+        const result = await this.deps.getFollowersUseCase.execute({
           accountDid,
           viewerDid,
           limit: params.limit,
