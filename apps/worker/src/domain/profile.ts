@@ -1,5 +1,6 @@
 import type { Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
+import { AtUri } from "@atproto/syntax";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "./record.js";
@@ -15,6 +16,7 @@ export class Profile {
     readonly displayName: string | undefined,
     readonly createdAt: Date | null,
     readonly indexedAt: Date,
+    readonly pinnedPostUri: string | null,
   ) {}
 
   static fromRecord(record: Record) {
@@ -29,6 +31,11 @@ export class Profile {
       parsed.displayName,
       parsed.createdAt ? new Date(parsed.createdAt) : null,
       record.indexedAt,
+      parsed.pinnedPost?.uri ?? null,
     );
+  }
+
+  get pinnedPost() {
+    return this.pinnedPostUri ? new AtUri(this.pinnedPostUri) : null;
   }
 }

@@ -20,10 +20,10 @@ export class GetFollowedAccountsUseCase {
   }): Promise<MeSubscoServerGetFollowedAccounts.$OutputBody> {
     const paginator = createCursorPaginator<{
       did: Did;
-      registeredFollowersCount: number;
+      memberFollowersCount: number;
     }>({
       limit: params.limit,
-      getCursor: (item) => `${item.registeredFollowersCount}::${item.did}`,
+      getCursor: (item) => `${item.memberFollowersCount}::${item.did}`,
     });
     const [items, total] = await Promise.all([
       this.registrationQuery.findFollowedAccounts({
@@ -49,7 +49,7 @@ export class GetFollowedAccountsUseCase {
           ? [
               {
                 profile,
-                registeredFollowersCount: item.registeredFollowersCount,
+                memberFollowersCount: item.memberFollowersCount,
               },
             ]
           : [];

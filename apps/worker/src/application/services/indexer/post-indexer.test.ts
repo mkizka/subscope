@@ -309,7 +309,7 @@ describe("PostIndexer", () => {
         },
       });
 
-    test("index-22: 引用を禁止した投稿への作者以外の引用は、引用禁止の違反として保存する", async () => {
+    test("index-23: 引用を禁止した投稿への作者以外の引用は、引用禁止の違反として保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
       disableEmbedding();
@@ -333,7 +333,7 @@ describe("PostIndexer", () => {
       ]);
     });
 
-    test("index-23: 引用禁止の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+    test("index-24: 引用禁止の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
       const ctx = { db, afterCommit };
       // arrange
       disableEmbedding();
