@@ -42,7 +42,11 @@ export class FeedViews {
     ctx: ViewContext,
   ): Promise<$Typed<AppBskyFeedDefs.ReplyRef> | undefined> {
     const post = await ctx.post(uri);
-    if (!post?.replyRootUri || !post.replyParentUri) {
+    if (
+      !post?.replyRootUri ||
+      !post.replyParentUri ||
+      post.violatesThreadgate
+    ) {
       return undefined;
     }
     const [root, parent] = await Promise.all([

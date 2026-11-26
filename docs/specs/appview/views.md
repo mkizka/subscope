@@ -53,16 +53,22 @@
 
 スレッドの起点の投稿者がthreadgateで決めた「返信できる人」を、投稿のビューに反映する。
 
-| ID           | 仕様                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------- |
-| threadgate-1 | 起点の投稿のビューにthreadgateを含める                                                             |
-| threadgate-2 | 返信を許されていない閲覧者には、replyDisabledをtrueにする                                          |
-| threadgate-3 | 起点の投稿者と、メンション・フォロー・フォロワーの規則に合う閲覧者には、replyDisabledをfalseにする |
-| threadgate-4 | 規則が無いthreadgateでは、replyDisabledをfalseにする                                               |
-| threadgate-5 | リストの規則のリストに入っている閲覧者には、replyDisabledをfalseにする                             |
-| threadgate-6 | リストの規則のリストのうちインデックスしたものを、threadgateのlistsに含める                        |
+| ID            | 仕様                                                                                               |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| threadgate-1  | 起点の投稿のビューにthreadgateを含める                                                             |
+| threadgate-2  | 返信を許されていない閲覧者には、replyDisabledをtrueにする                                          |
+| threadgate-3  | 起点の投稿者と、メンション・フォロー・フォロワーの規則に合う閲覧者には、replyDisabledをfalseにする |
+| threadgate-4  | 規則が無いthreadgateでは、replyDisabledをfalseにする                                               |
+| threadgate-5  | リストの規則のリストに入っている閲覧者には、replyDisabledをfalseにする                             |
+| threadgate-6  | リストの規則のリストのうちインデックスしたものを、threadgateのlistsに含める                        |
+| threadgate-7  | 返信制限に違反した返信は、すべての閲覧者のreplyDisabledをtrueにする                                |
+| threadgate-8  | 返信制限に違反した返信は、スレッドのリプライに含めない                                             |
+| threadgate-9  | 返信制限に違反した返信をスレッドの中心にしたときは、親投稿とリプライを含めない                     |
+| threadgate-10 | 返信制限に違反した返信のfeedViewPostには、replyを含めない                                          |
 
 リストに入っているかは、インデックスしたリストの項目で判定する。
+
+返信制限に違反した返信は、制限を無視するクライアントから送られた返信で、保存した時点で判定する。公式AppViewと同じく、スレッドの表示から外して返信の制限に効き目を持たせる。
 
 ## 引用制限
 

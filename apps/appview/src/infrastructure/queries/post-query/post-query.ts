@@ -64,6 +64,7 @@ const toPostDto = (post: SelectPost): PostDto => ({
   },
   embedRecordUri: post.embedRecord?.uri ?? null,
   violatesEmbeddingRules: post.violatesEmbeddingRules,
+  violatesThreadgate: post.violatesThreadgate,
   replyRootUri: post.replyRootUri,
   replyParentUri: post.replyParentUri,
   indexedAt: post.indexedAt,
@@ -95,7 +96,10 @@ export class PostQuery implements IPostQuery {
 
   async findReplies(uri: AtUri, limit?: number): Promise<PostDto[]> {
     const posts = await this.db.query.posts.findMany({
-      where: eq(schema.posts.replyParentUri, uri.toString()),
+      where: and(
+        eq(schema.posts.replyParentUri, uri.toString()),
+        eq(schema.posts.violatesThreadgate, false),
+      ),
       orderBy: asc(schema.posts.sortAt),
       limit,
       with: withEmbeds,
