@@ -9,11 +9,13 @@ import { Like } from "../like.js";
 import { ListItem } from "../list-item.js";
 import type { Origin } from "../origin.js";
 import { Post } from "../post.js";
+import { Profile } from "../profile.js";
 import { Repost } from "../repost.js";
 
 type DatedRecord = { accountDid: Did; createdAt: Date };
 
-type Saved = Post | Repost | Like | Follow | ListItem | { accountDid: Did };
+type Saved =
+  Post | Repost | Like | Follow | ListItem | Profile | { accountDid: Did };
 
 export class StoragePolicy {
   constructor(
@@ -76,6 +78,9 @@ export class StoragePolicy {
     }
     if (record instanceof Repost) {
       return [record.subject];
+    }
+    if (record instanceof Profile) {
+      return record.pinnedPost && !origin.isFetched ? [record.pinnedPost] : [];
     }
     if (record instanceof Like) {
       const fetchesLikedPost = await this.fetchesLikedPost({
