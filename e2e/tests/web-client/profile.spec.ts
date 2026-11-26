@@ -16,10 +16,14 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     const text = `profile-1の投稿 ${Date.now()}`;
-    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
-      displayName: "Alice",
-      description: "profile-1の自己紹介",
-      banner: await uploadImage("alice.test"),
+    await putRecord("alice.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Alice",
+        description: "profile-1の自己紹介",
+        banner: await uploadImage("alice.test"),
+      },
     });
     await createRecord("alice.test", {
       $type: "app.bsky.feed.post",
@@ -184,11 +188,10 @@ test.describe("プロフィール", () => {
       text: video,
       embed: {
         $type: "app.bsky.embed.video",
-        video: await uploadBlob(
-          "alice.test",
-          new Uint8Array([0, 0, 0, 24]),
-          "video/mp4",
-        ),
+        video: await uploadBlob("alice.test", {
+          body: new Uint8Array([0, 0, 0, 24]),
+          contentType: "video/mp4",
+        }),
         alt: video,
         aspectRatio: { width: 16, height: 9 },
       },
@@ -287,9 +290,13 @@ test.describe("プロフィール", () => {
       text: "profile-e12: 新しい投稿",
       createdAt: new Date().toISOString(),
     });
-    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
-      displayName: "Alice",
-      pinnedPost: pinned,
+    await putRecord("alice.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Alice",
+        pinnedPost: pinned,
+      },
     });
     await page.goto("/alice.test");
     const main = page.getByRole("main");

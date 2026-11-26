@@ -39,8 +39,12 @@ const likeAlicePost = async (text: string) => {
     text,
     createdAt,
   });
-  await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-    displayName: "Bob",
+  await putRecord("bob.test", {
+    collection: "app.bsky.actor.profile",
+    rkey: "self",
+    record: {
+      displayName: "Bob",
+    },
   });
   await follow("alice.test", "bob.test");
   await createRecord("bob.test", {

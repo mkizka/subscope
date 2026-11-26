@@ -39,7 +39,7 @@ test.describe("ログイン", () => {
   test("login-e3: メンバーでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
     page,
   }) => {
-    await login(page, "bob.test", "/login");
+    await login(page, { handle: "bob.test", url: "/login" });
 
     await expect(page.getByLabel("招待コード")).toBeVisible();
   });
@@ -47,7 +47,7 @@ test.describe("ログイン", () => {
   test("login-e4: 無効な招待コードを入力すると「招待コードが無効または期限切れです」と出す", async ({
     page,
   }) => {
-    await login(page, "bob.test", "/login");
+    await login(page, { handle: "bob.test", url: "/login" });
 
     await page.getByLabel("招待コード").fill("invalid-code");
     await page.getByRole("button", { name: "登録する" }).click();
@@ -67,7 +67,7 @@ test.describe("ログイン", () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
     await adminPage.close();
-    await login(page, "bob.test", "/login");
+    await login(page, { handle: "bob.test", url: "/login" });
 
     await page.getByLabel("招待コード").fill(code);
     await page.getByRole("button", { name: "登録する" }).click();
@@ -87,7 +87,7 @@ test.describe("ログイン", () => {
     const { code } = (await response.json()) as { code: string };
     await adminPage.close();
 
-    await register(page, "carol.test", code);
+    await register(page, { handle: "carol.test", code });
 
     await page.waitForURL("/");
     await expect(page.getByRole("navigation")).toBeVisible();
@@ -96,7 +96,7 @@ test.describe("ログイン", () => {
   test("login-e7: 「新規登録」タブで無効な招待コードを入力してログインすると、招待コードの入力画面に戻って「招待コードが無効または期限切れです」と出す", async ({
     page,
   }) => {
-    await register(page, "erin.test", "invalid-code");
+    await register(page, { handle: "erin.test", code: "invalid-code" });
 
     await page.waitForURL("/login?error=invalid_invite_code");
     await expect(page.getByRole("alert")).toHaveText(

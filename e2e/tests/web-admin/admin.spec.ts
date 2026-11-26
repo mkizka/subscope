@@ -32,7 +32,7 @@ test.describe("管理画面へのアクセス", () => {
       storageState: { cookies: [], origins: [] },
     });
     const memberPage = await context.newPage();
-    await login(memberPage, "heidi.test");
+    await login(memberPage, { handle: "heidi.test" });
 
     await memberPage.goto("/admin/server-members");
 

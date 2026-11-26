@@ -1,14 +1,4 @@
 {
-  "helpers/login.ts": {
-    "params/max-params": {
-      "count": 2
-    }
-  },
-  "helpers/pds.ts": {
-    "params/max-params": {
-      "count": 3
-    }
-  },
   "tests/web-client/image-viewer.spec.ts": {
     "params/max-params": {
       "count": 1

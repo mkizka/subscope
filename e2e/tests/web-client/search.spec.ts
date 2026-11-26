@@ -21,9 +21,13 @@ const searchPosts = async (page: Page, q: string, text: string) => {
 
 test.describe("検索", () => {
   test.beforeEach(async () => {
-    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
-      displayName: "Alice",
-      description: "Blueskyを使っています",
+    await putRecord("alice.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Alice",
+        description: "Blueskyを使っています",
+      },
     });
   });
 
