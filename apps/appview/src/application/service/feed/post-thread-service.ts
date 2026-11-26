@@ -24,9 +24,11 @@ export class PostNotFoundError extends Error {
 
 export class PostThreadService {
   constructor(
-    private readonly postQuery: IPostQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly postViews: PostViews,
+    private readonly deps: {
+      postQuery: IPostQuery;
+      viewContextFactory: ViewContextFactory;
+      postViews: PostViews;
+    },
   ) {}
 
   async build(params: {
@@ -37,7 +39,7 @@ export class PostThreadService {
     viewerDid?: Did;
   }): Promise<AppBskyFeedGetPostThread.$OutputBody> {
     // 1. ターゲット投稿を取得
-    const [targetPost] = await this.postQuery.findByUris([
+    const [targetPost] = await this.deps.postQuery.findByUris([
       params.uri.getValue(),
     ]);
     if (!targetPost) {
@@ -91,11 +93,14 @@ export class PostThreadService {
     const { targetPost, parentHeight, replyDepth, replyLimits } = params;
 
     const parentPosts = await this.collectParentChain(targetPost, parentHeight);
-    const replyTree = await this.collectReplyTree(
-      targetPost,
-      replyDepth,
-      replyLimits,
-    );
+    const replyTree = new Map<string, PostDto[]>();
+    await this.collectReplyTree({
+      post: targetPost,
+      remainingDepth: replyDepth,
+      limits: replyLimits,
+      structure: replyTree,
+      isAnchor: true,
+    });
 
     const allPostUris = this.aggregateAllUris({
       targetPost,
@@ -110,9 +115,9 @@ export class PostThreadService {
     uris: Set<string>,
     viewerDid?: Did,
   ): Promise<Map<string, PostView>> {
-    const ctx = this.viewContextFactory.create({ viewerDid });
+    const ctx = this.deps.viewContextFactory.create({ viewerDid });
     const views = await Promise.all(
-      Array.from(uris, (uri) => this.postViews.postView(uri, ctx)),
+      Array.from(uris, (uri) => this.deps.postViews.postView(uri, ctx)),
     );
     return new Map(
       views
@@ -137,12 +142,12 @@ export class PostThreadService {
     replyTree: Map<string, PostDto[]>;
   }): ThreadViewPost {
     const parentThread = this.buildParentThread(parentPosts, postViewMap);
-    const replyThreads = this.buildReplyThreads(
-      targetPost,
-      replyDepth,
+    const replyThreads = this.buildReplyThreads({
+      post: targetPost,
+      remainingDepth: replyDepth,
       postViewMap,
       replyTree,
-    );
+    });
 
     return {
       $type: "app.bsky.feed.defs#threadViewPost",
@@ -160,7 +165,7 @@ export class PostThreadService {
       return [];
     }
 
-    const [parentPost] = await this.postQuery.findByUris([
+    const [parentPost] = await this.deps.postQuery.findByUris([
       new AtUri(post.replyParentUri),
     ]);
     if (!parentPost) {
@@ -177,18 +182,24 @@ export class PostThreadService {
 
   // 各リプライについてリプライのuriをキーとし、リプライへのリプライの配列を値とするMapを返す
   // buildReplyThreadsでリプライスレッドを再構築する際に使用する
-  private async collectReplyTree(
-    post: PostDto,
-    remainingDepth: number,
-    limits: { direct?: number; nested: number },
-    structure: Map<string, PostDto[]> = new Map(),
-    isAnchor = true,
-  ): Promise<Map<string, PostDto[]>> {
+  private async collectReplyTree({
+    post,
+    remainingDepth,
+    limits,
+    structure,
+    isAnchor,
+  }: {
+    post: PostDto;
+    remainingDepth: number;
+    limits: { direct?: number; nested: number };
+    structure: Map<string, PostDto[]>;
+    isAnchor: boolean;
+  }): Promise<void> {
     if (remainingDepth <= 0) {
-      return structure;
+      return;
     }
 
-    const directReplies = await this.postQuery.findReplies(
+    const directReplies = await this.deps.postQuery.findReplies(
       new AtUri(post.uri),
       isAnchor ? limits.direct : limits.nested,
     );
@@ -196,17 +207,15 @@ export class PostThreadService {
 
     await Promise.all(
       directReplies.map((reply) =>
-        this.collectReplyTree(
-          reply,
-          remainingDepth - 1,
+        this.collectReplyTree({
+          post: reply,
+          remainingDepth: remainingDepth - 1,
           limits,
           structure,
-          false,
-        ),
+          isAnchor: false,
+        }),
       ),
     );
-
-    return structure;
   }
 
   private aggregateAllUris({
@@ -262,12 +271,17 @@ export class PostThreadService {
     );
   }
 
-  private buildReplyThreads(
-    post: PostDto,
-    remainingDepth: number,
-    postViewMap: Map<string, PostView>,
-    replyTree: Map<string, PostDto[]>,
-  ): ThreadViewPost[] {
+  private buildReplyThreads({
+    post,
+    remainingDepth,
+    postViewMap,
+    replyTree,
+  }: {
+    post: PostDto;
+    remainingDepth: number;
+    postViewMap: Map<string, PostView>;
+    replyTree: Map<string, PostDto[]>;
+  }): ThreadViewPost[] {
     if (remainingDepth <= 0) {
       return [];
     }
@@ -279,12 +293,12 @@ export class PostThreadService {
         const postView = postViewMap.get(reply.uri);
         if (!postView) return null;
 
-        const nestedReplies = this.buildReplyThreads(
-          reply,
-          remainingDepth - 1,
+        const nestedReplies = this.buildReplyThreads({
+          post: reply,
+          remainingDepth: remainingDepth - 1,
           postViewMap,
           replyTree,
-        );
+        });
 
         return {
           $type: "app.bsky.feed.defs#threadViewPost" as const,

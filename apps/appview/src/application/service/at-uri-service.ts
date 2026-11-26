@@ -18,7 +18,11 @@ export class AtUriService {
     }
 
     const handle = await this.handleResolver.resolve(uri.hostname);
-    return ResolvedAtUri.make(handle, uri.collection, uri.rkey);
+    return ResolvedAtUri.make({
+      did: handle,
+      collection: uri.collection,
+      rkey: uri.rkey,
+    });
   }
 }
 
