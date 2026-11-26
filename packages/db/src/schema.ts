@@ -110,6 +110,7 @@ export const posts = pgTable(
     replyParentCid: varchar({ length: 256 }),
     langs: jsonb().$type<string[]>(),
     violatesEmbeddingRules: boolean().notNull().default(false),
+    violatesThreadgate: boolean().notNull().default(false),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().notNull(),
     sortAt: timestamp()

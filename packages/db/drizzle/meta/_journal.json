@@ -260,6 +260,13 @@
       "when": 1795707124773,
       "tag": "0036_add-posts-violates_embedding_rules",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795708593032,
+      "tag": "0037_add-posts-violates_threadgate",
+      "breakpoints": true
     }
   ]
 }

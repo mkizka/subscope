@@ -119,6 +119,7 @@ export class Post {
   static readonly replyNotificationDepth = 4;
 
   private embeddingRulesViolated = false;
+  private threadgateViolated = false;
 
   private constructor(
     readonly uri: AtUri,
@@ -159,6 +160,14 @@ export class Post {
 
   markEmbeddingRulesViolated() {
     this.embeddingRulesViolated = true;
+  }
+
+  get violatesThreadgate() {
+    return this.threadgateViolated;
+  }
+
+  markThreadgateViolated() {
+    this.threadgateViolated = true;
   }
 
   get feedItem(): FeedItem {

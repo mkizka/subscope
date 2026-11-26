@@ -33,6 +33,10 @@ export class Gate {
     );
   }
 
+  get replyRules() {
+    return "allow" in this.value ? this.value.allow : undefined;
+  }
+
   get disablesEmbedding() {
     return (
       "embeddingRules" in this.value &&
