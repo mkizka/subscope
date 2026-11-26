@@ -21,11 +21,15 @@ const setupJobTest = async () => {
 
 let count = 0;
 
-const likeEvent = async (
-  did: string,
-  post: { uri: string; cid: string },
-  action: "create" | "update" = "create",
-): Promise<RecordEvent> => ({
+const likeEvent = async ({
+  did,
+  post,
+  action = "create",
+}: {
+  did: string;
+  post: { uri: string; cid: string };
+  action?: "create" | "update";
+}): Promise<RecordEvent> => ({
   id: 1,
   type: "record",
   action,
@@ -82,7 +86,7 @@ describe("プッシュ通知の送信(通知作成時)", () => {
     await subscribe(liker.did);
 
     // act
-    await indexCommit(await likeEvent(liker.did, post));
+    await indexCommit(await likeEvent({ did: liker.did, post }));
     await runSendPushNotificationJobs();
 
     // assert
@@ -96,8 +100,10 @@ describe("プッシュ通知の送信(通知作成時)", () => {
     const liker = await accountFactory(ctx.db).create();
 
     // act
-    await indexCommit(await likeEvent(liker.did, post));
-    await indexCommit(await likeEvent(liker.did, post, "update"));
+    await indexCommit(await likeEvent({ did: liker.did, post }));
+    await indexCommit(
+      await likeEvent({ did: liker.did, post, action: "update" }),
+    );
 
     // assert
     expect(jobScheduler.getSendPushNotificationJobs()).toMatchObject([

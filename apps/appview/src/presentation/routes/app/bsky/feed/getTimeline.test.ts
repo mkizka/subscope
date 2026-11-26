@@ -227,7 +227,9 @@ describe("app.bsky.feed.getTimeline", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createAccount();
-    const root = await createPost(viewer, new Date("2024-01-01"));
+    const root = await createPost(viewer, {
+      createdAt: new Date("2024-01-01"),
+    });
     const reply = await postFactory(ctx.db)
       .use((t) => t.asReplyTo(root))
       .vars({

@@ -22,11 +22,10 @@ export const loader = async ({
       ? "members"
       : "posts";
   return data(
-    await di.getListPageUseCase.execute(
-      context.get(didContext),
-      params.handle,
-      params.rkey,
+    await di.getListPageUseCase.execute(context.get(didContext), {
+      account: params.handle,
+      rkey: params.rkey,
       tab,
-    ),
+    }),
   );
 };
