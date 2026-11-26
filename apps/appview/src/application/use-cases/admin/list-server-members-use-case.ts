@@ -16,10 +16,12 @@ type ListServerMembersParams = {
 
 export class ListServerMembersUseCase {
   constructor(
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
-    private readonly accountRepository: IAccountRepository,
-    private readonly registrationQuery: IRegistrationQuery,
+    private readonly deps: {
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+      accountRepository: IAccountRepository;
+      registrationQuery: IRegistrationQuery;
+    },
   ) {}
 
   async execute(
@@ -30,21 +32,21 @@ export class ListServerMembersUseCase {
       getCursor: (sub) => sub.createdAt.toISOString(),
     });
     const [registrations, total] = await Promise.all([
-      this.registrationQuery.findMany({
+      this.deps.registrationQuery.findMany({
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
-      this.registrationQuery.count(),
+      this.deps.registrationQuery.count(),
     ]);
     const paginationResult = paginator.extractPage(registrations);
 
-    const ctx = this.viewContextFactory.create({ includeTakedowns: true });
+    const ctx = this.deps.viewContextFactory.create({ includeTakedowns: true });
     const serverMembers = await Promise.all(
       paginationResult.items.map(async (sub) => {
         const did = asDid(sub.accountDid);
         const [profile, account] = await Promise.all([
-          this.profileViews.view(did, ctx),
-          this.accountRepository.find(did),
+          this.deps.profileViews.view(did, ctx),
+          this.deps.accountRepository.find(did),
         ]);
         return (
           profile && {

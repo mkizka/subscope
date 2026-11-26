@@ -19,21 +19,6 @@
       "count": 1
     }
   },
-  "src/application/use-cases/admin/list-server-members-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/admin/register-admin-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/admin/remove-member-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/use-cases/feed/get-actor-likes-use-case.ts": {
     "params/max-params": {
       "count": 1
