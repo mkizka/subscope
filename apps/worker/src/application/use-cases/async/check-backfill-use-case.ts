@@ -12,40 +12,47 @@ import type { TrackingService } from "../../services/tracking-service.js";
 
 export class CheckBackfillUseCase {
   constructor(
-    private readonly tapClient: ITapClient,
-    private readonly repoStatusFetcher: IRepoStatusFetcher,
-    private readonly trackingService: TrackingService,
-    private readonly storagePolicy: StoragePolicy,
-    private readonly accountRepository: IAccountRepository,
-    private readonly jobScheduler: IJobScheduler,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      tapClient: ITapClient;
+      repoStatusFetcher: IRepoStatusFetcher;
+      trackingService: TrackingService;
+      storagePolicy: StoragePolicy;
+      accountRepository: IAccountRepository;
+      jobScheduler: IJobScheduler;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async execute({ did, attempt }: JobData["checkBackfill"]) {
-    const account = await this.transactionManager.transaction(async (ctx) => {
-      const isTracked = await this.storagePolicy.isTracked(ctx, did);
-      return isTracked ? this.accountRepository.find({ ctx, did }) : null;
-    });
+    const account = await this.deps.transactionManager.transaction(
+      async (ctx) => {
+        const isTracked = await this.deps.storagePolicy.isTracked(ctx, did);
+        return isTracked
+          ? this.deps.accountRepository.find({ ctx, did })
+          : null;
+      },
+    );
     if (!account) {
       return;
     }
-    const tapState = await this.tapClient.getRepoState(did);
+    const tapState = await this.deps.tapClient.getRepoState(did);
     const isDeleted =
-      tapState === "error" && (await this.repoStatusFetcher.isDeleted(did));
+      tapState === "error" &&
+      (await this.deps.repoStatusFetcher.isDeleted(did));
     if (isDeleted) {
-      await this.trackingService.stop(did);
+      await this.deps.trackingService.stop(did);
       account.completeBackfill();
-      await this.transactionManager.transaction((ctx) =>
-        this.accountRepository.save({ ctx, account }),
+      await this.deps.transactionManager.transaction((ctx) =>
+        this.deps.accountRepository.save({ ctx, account }),
       );
       return;
     }
     account.applyTapState(tapState);
-    await this.transactionManager.transaction((ctx) =>
-      this.accountRepository.save({ ctx, account }),
+    await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.accountRepository.save({ ctx, account }),
     );
     if (account.needsBackfillRecheck) {
-      await this.jobScheduler.scheduleCheckBackfill(did, attempt + 1);
+      await this.deps.jobScheduler.scheduleCheckBackfill(did, attempt + 1);
     }
   }
 }
