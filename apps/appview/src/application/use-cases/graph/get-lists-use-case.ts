@@ -9,9 +9,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetListsUseCase {
   constructor(
-    private readonly listQuery: IListQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly listViews: ListViews,
+    private readonly deps: {
+      listQuery: IListQuery;
+      viewContextFactory: ViewContextFactory;
+      listViews: ListViews;
+    },
   ) {}
 
   async execute(params: {
@@ -25,7 +27,7 @@ export class GetListsUseCase {
       getCursor: (list) => list.createdAt.toISOString(),
     });
 
-    const lists = await this.listQuery.findByAccount({
+    const lists = await this.deps.listQuery.findByAccount({
       accountDid: params.accountDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
@@ -35,9 +37,9 @@ export class GetListsUseCase {
     });
     const page = paginator.extractPage(lists);
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.deps.viewContextFactory.create();
     const views = await Promise.all(
-      page.items.map((list) => this.listViews.view(list.uri, ctx)),
+      page.items.map((list) => this.deps.listViews.view(list.uri, ctx)),
     );
     return {
       cursor: page.cursor,
