@@ -7,26 +7,31 @@ const BATCH_SIZE = 1000;
 
 export class AggregatePostStatsUseCase {
   constructor(
-    private readonly postStatsQuery: IPostStatsQuery,
-    private readonly postStatsRepository: IPostStatsRepository,
-    private readonly jobQueue: IJobQueue,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      postStatsQuery: IPostStatsQuery;
+      postStatsRepository: IPostStatsRepository;
+      jobQueue: IJobQueue;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async execute() {
     for (;;) {
-      const uris = await this.jobQueue.popBatchItems(
+      const uris = await this.deps.jobQueue.popBatchItems(
         "aggregatePostStats",
         BATCH_SIZE,
       );
       if (uris.length === 0) return;
       try {
-        await this.transactionManager.transaction(async (ctx) => {
-          const stats = await this.postStatsQuery.countStats({ ctx, uris });
-          await this.postStatsRepository.save({ ctx, stats });
+        await this.deps.transactionManager.transaction(async (ctx) => {
+          const stats = await this.deps.postStatsQuery.countStats({
+            ctx,
+            uris,
+          });
+          await this.deps.postStatsRepository.save({ ctx, stats });
         });
       } catch (error) {
-        await this.jobQueue.addBatchItems({
+        await this.deps.jobQueue.addBatchItems({
           queueName: "aggregatePostStats",
           items: uris,
         });

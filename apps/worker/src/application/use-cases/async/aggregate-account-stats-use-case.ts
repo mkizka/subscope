@@ -7,25 +7,27 @@ import type { AggregateAccountStatsCommand } from "./aggregate-account-stats-com
 
 export class AggregateAccountStatsUseCase {
   constructor(
-    private readonly accountStatsQuery: IAccountStatsQuery,
-    private readonly accountStatsRepository: IAccountStatsRepository,
-    private readonly accountQuery: IAccountQuery,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      accountStatsQuery: IAccountStatsQuery;
+      accountStatsRepository: IAccountStatsRepository;
+      accountQuery: IAccountQuery;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async execute(command: AggregateAccountStatsCommand) {
-    const accountExists = await this.transactionManager.transaction(
+    const accountExists = await this.deps.transactionManager.transaction(
       async (ctx) => {
-        const exists = await this.accountQuery.exists({
+        const exists = await this.deps.accountQuery.exists({
           ctx,
           did: command.did,
         });
         if (!exists) return false;
-        const stats = await this.accountStatsQuery.countStats({
+        const stats = await this.deps.accountStatsQuery.countStats({
           ctx,
           accountDid: command.did,
         });
-        await this.accountStatsRepository.save({ ctx, stats });
+        await this.deps.accountStatsRepository.save({ ctx, stats });
         return true;
       },
     );

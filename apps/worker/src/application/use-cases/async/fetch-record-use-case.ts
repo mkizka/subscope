@@ -12,9 +12,11 @@ import type { RecordIndexer } from "../../services/indexer/record-indexer.js";
 
 export class FetchRecordUseCase {
   constructor(
-    private readonly recordFetcher: IRecordFetcher,
-    private readonly transactionManager: ITransactionManager,
-    private readonly recordIndexer: RecordIndexer,
+    private readonly deps: {
+      recordFetcher: IRecordFetcher;
+      transactionManager: ITransactionManager;
+      recordIndexer: RecordIndexer;
+    },
   ) {}
 
   async execute({
@@ -29,7 +31,7 @@ export class FetchRecordUseCase {
     jobLogger: JobLogger;
   }): Promise<void> {
     try {
-      await this.doFetchRecord(uri, depth, live);
+      await this.doFetchRecord({ uri, depth, live });
     } catch (error) {
       if (
         error instanceof RecordFetchError ||
@@ -42,15 +44,19 @@ export class FetchRecordUseCase {
     }
   }
 
-  private async doFetchRecord(
-    uri: string,
-    depth: number,
-    live: boolean,
-  ): Promise<void> {
+  private async doFetchRecord({
+    uri,
+    depth,
+    live,
+  }: {
+    uri: string;
+    depth: number;
+    live: boolean;
+  }): Promise<void> {
     const atUri = new AtUri(uri);
-    const record = await this.recordFetcher.fetch(atUri);
-    await this.transactionManager.transaction((ctx) =>
-      this.recordIndexer.index({
+    const record = await this.deps.recordFetcher.fetch(atUri);
+    await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.recordIndexer.index({
         ctx,
         record,
         origin: Origin.fromFetchJob({ live, depth }),

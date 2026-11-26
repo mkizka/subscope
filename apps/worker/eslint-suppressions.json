@@ -1,24 +1,4 @@
 {
-  "src/application/use-cases/async/aggregate-account-stats-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/async/aggregate-post-stats-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/async/check-backfill-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/async/fetch-record-use-case.ts": {
-    "params/max-params": {
-      "count": 2
-    }
-  },
   "src/application/use-cases/async/schedule-backfill-checks-use-case.ts": {
     "params/max-params": {
       "count": 1
