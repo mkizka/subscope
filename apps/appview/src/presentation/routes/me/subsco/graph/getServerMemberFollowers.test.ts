@@ -22,7 +22,15 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
 
   type Account = Awaited<ReturnType<typeof createAccount>>;
 
-  const follow = (follower: Account, followee: Account, date?: Date) =>
+  const follow = ({
+    follower,
+    followee,
+    date,
+  }: {
+    follower: Account;
+    followee: Account;
+    date?: Date;
+  }) =>
     followFactory(ctx.db)
       .vars({
         record: () =>
@@ -40,8 +48,8 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     const account = await createAccount();
     const memberFollower = await createServerMember();
     const nonMemberFollower = await createAccount();
-    await follow(memberFollower, account);
-    await follow(nonMemberFollower, account);
+    await follow({ follower: memberFollower, followee: account });
+    await follow({ follower: nonMemberFollower, followee: account });
 
     // act
     const res = await client.call(getServerMemberFollowers, {
@@ -59,9 +67,21 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     const oldFollower = await createServerMember();
     const middleFollower = await createServerMember();
     const newFollower = await createServerMember();
-    await follow(oldFollower, account, new Date("2024-01-01"));
-    await follow(middleFollower, account, new Date("2024-01-02"));
-    await follow(newFollower, account, new Date("2024-01-03"));
+    await follow({
+      follower: oldFollower,
+      followee: account,
+      date: new Date("2024-01-01"),
+    });
+    await follow({
+      follower: middleFollower,
+      followee: account,
+      date: new Date("2024-01-02"),
+    });
+    await follow({
+      follower: newFollower,
+      followee: account,
+      date: new Date("2024-01-03"),
+    });
 
     // act
     const firstPage = await client.call(getServerMemberFollowers, {
@@ -86,9 +106,9 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
-    await follow(await createServerMember(), account);
-    await follow(await createServerMember(), account);
-    await follow(await createAccount(), account);
+    await follow({ follower: await createServerMember(), followee: account });
+    await follow({ follower: await createServerMember(), followee: account });
+    await follow({ follower: await createAccount(), followee: account });
 
     // act
     const res = await client.call(getServerMemberFollowers, {

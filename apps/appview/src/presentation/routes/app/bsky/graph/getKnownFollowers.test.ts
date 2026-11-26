@@ -20,11 +20,15 @@ describe("app.bsky.graph.getKnownFollowers", () => {
 
   type Account = Awaited<ReturnType<typeof createAccount>>;
 
-  const createFollow = (
-    account: Account,
-    followee: Account,
+  const createFollow = ({
+    account,
+    followee,
     date = new Date(),
-  ) =>
+  }: {
+    account: Account;
+    followee: Account;
+    date?: Date;
+  }) =>
     followFactory(ctx.db)
       .vars({
         record: () =>
@@ -58,10 +62,10 @@ describe("app.bsky.graph.getKnownFollowers", () => {
     const known = await createAccount();
     const unknown = await createAccount();
     const followedOnly = await createAccount();
-    await createFollow(viewer, known);
-    await createFollow(viewer, followedOnly);
-    await createFollow(known, subject);
-    await createFollow(unknown, subject);
+    await createFollow({ account: viewer, followee: known });
+    await createFollow({ account: viewer, followee: followedOnly });
+    await createFollow({ account: known, followee: subject });
+    await createFollow({ account: unknown, followee: subject });
     loginAs(viewer.did);
 
     // act
@@ -83,8 +87,8 @@ describe("app.bsky.graph.getKnownFollowers", () => {
     const subject = await createAccount();
     const create = async (date: Date) => {
       const other = await createAccount();
-      await createFollow(viewer, other, date);
-      await createFollow(other, subject);
+      await createFollow({ account: viewer, followee: other, date: date });
+      await createFollow({ account: other, followee: subject });
       return other;
     };
     const oldAccount = await create(new Date("2024-01-01"));

@@ -23,7 +23,15 @@ describe("app.bsky.actor.getProfile", () => {
 
   type Account = Awaited<ReturnType<typeof createAccount>>;
 
-  const createFollow = (account: Account, followee: Account, date: Date) =>
+  const createFollow = ({
+    account,
+    followee,
+    date,
+  }: {
+    account: Account;
+    followee: Account;
+    date: Date;
+  }) =>
     followFactory(ctx.db)
       .vars({
         record: () =>
@@ -41,8 +49,16 @@ describe("app.bsky.actor.getProfile", () => {
     const known: Account[] = [];
     for (let i = 0; i < count; i++) {
       const other = await createAccount();
-      await createFollow(viewer, other, new Date(2025, 0, i + 1));
-      await createFollow(other, subject, new Date());
+      await createFollow({
+        account: viewer,
+        followee: other,
+        date: new Date(2025, 0, i + 1),
+      });
+      await createFollow({
+        account: other,
+        followee: subject,
+        date: new Date(),
+      });
       known.push(other);
     }
     return { viewer, subject, known };

@@ -199,17 +199,7 @@
       "count": 1
     }
   },
-  "src/presentation/routes/app/bsky/actor/getProfile.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/actor/getProfile.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/actor/getProfiles.test.ts": {
     "params/max-params": {
       "count": 1
     }
@@ -259,11 +249,6 @@
       "count": 1
     }
   },
-  "src/presentation/routes/app/bsky/graph/getKnownFollowers.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/graph/getKnownFollowers.ts": {
     "params/max-params": {
       "count": 1
@@ -284,17 +269,7 @@
       "count": 1
     }
   },
-  "src/presentation/routes/labelers.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/lex.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/me/subsco/graph/getServerMemberFollowers.test.ts": {
     "params/max-params": {
       "count": 1
     }
