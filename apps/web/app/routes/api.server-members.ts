@@ -3,7 +3,7 @@ import { data } from "react-router";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
 
-import type { Route } from "./+types/api.registered-accounts";
+import type { Route } from "./+types/api.server-members";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 

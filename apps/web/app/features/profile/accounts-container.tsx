@@ -7,10 +7,12 @@ import { Input } from "@/app/components/ui/input";
 import { Tabs } from "@/app/components/ui/tabs";
 import { type Account, AccountList } from "@/app/features/account/account-list";
 import { fetchJson } from "@/app/lib/fetch-json";
-import type { loader as registeredLoader } from "@/app/routes/api.registered-accounts";
+import type { loader as serverMembersLoader } from "@/app/routes/api.server-members";
 import type { loader as trackedLoader } from "@/app/routes/api.tracked-accounts";
 
-type RegisteredResponse = Awaited<ReturnType<typeof registeredLoader>>["data"];
+type ServerMembersResponse = Awaited<
+  ReturnType<typeof serverMembersLoader>
+>["data"];
 type TrackedResponse = Awaited<ReturnType<typeof trackedLoader>>["data"];
 
 export function AccountsContainer() {
@@ -18,11 +20,11 @@ export function AccountsContainer() {
   const q = params.get("q") ?? "";
   const [tracked, setTracked] = useState(false);
 
-  const registeredQuery = useQuery({
+  const serverMembersQuery = useQuery({
     queryKey: ["clientServerMembers", q],
     queryFn: () =>
-      fetchJson<RegisteredResponse>(
-        `/api/registered-accounts?${new URLSearchParams({ q })}`,
+      fetchJson<ServerMembersResponse>(
+        `/api/server-members?${new URLSearchParams({ q })}`,
       ),
     placeholderData: keepPreviousData,
     throwOnError: true,
@@ -36,12 +38,12 @@ export function AccountsContainer() {
     placeholderData: keepPreviousData,
     throwOnError: true,
   });
-  const registered = registeredQuery.data;
+  const serverMembers = serverMembersQuery.data;
   const trackedData = trackedQuery.data;
 
   const accounts: Account[] | undefined = tracked
     ? trackedData?.accounts
-    : registered?.serverMembers;
+    : serverMembers?.serverMembers;
 
   return (
     <>

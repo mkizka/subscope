@@ -17,7 +17,7 @@ const emptyMessages = {
   follows: "フォローしているアカウントはありません",
   followers: "フォロワーはいません",
 };
-const filters = ["registered", "known"] as const;
+const filters = ["member", "known"] as const;
 
 type Props = {
   handle: string;
@@ -76,9 +76,9 @@ export function FollowListContainer({ handle, kind }: Props) {
               selected: filter === "known",
             },
             {
-              to: "?filter=registered",
+              to: "?filter=member",
               label: "メンバー",
-              selected: filter === "registered",
+              selected: filter === "member",
             },
           ]}
         />
