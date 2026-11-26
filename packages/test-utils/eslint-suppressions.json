@@ -1,0 +1,7 @@
+{
+  "src/create.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  }
+}
