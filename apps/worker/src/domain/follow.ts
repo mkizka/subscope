@@ -6,25 +6,39 @@ import type { Record } from "./record.js";
 import { getSortAt } from "./sort-at.js";
 
 export class Follow {
-  private constructor(
-    readonly uri: string,
-    readonly cid: string,
-    readonly accountDid: Did,
-    readonly subjectDid: Did,
-    readonly createdAt: Date,
-    readonly indexedAt: Date,
-  ) {}
+  readonly uri: string;
+  readonly cid: string;
+  readonly accountDid: Did;
+  readonly subjectDid: Did;
+  readonly createdAt: Date;
+  readonly indexedAt: Date;
+
+  private constructor(params: {
+    uri: string;
+    cid: string;
+    accountDid: Did;
+    subjectDid: Did;
+    createdAt: Date;
+    indexedAt: Date;
+  }) {
+    this.uri = params.uri;
+    this.cid = params.cid;
+    this.accountDid = params.accountDid;
+    this.subjectDid = params.subjectDid;
+    this.createdAt = params.createdAt;
+    this.indexedAt = params.indexedAt;
+  }
 
   static fromRecord(record: Record) {
     const parsed = validateRecord("app.bsky.graph.follow", record);
-    return new Follow(
-      record.uri.toString(),
-      record.cid,
-      record.uri.did,
-      parsed.subject,
-      new Date(parsed.createdAt),
-      record.indexedAt,
-    );
+    return new Follow({
+      uri: record.uri.toString(),
+      cid: record.cid,
+      accountDid: record.uri.did,
+      subjectDid: parsed.subject,
+      createdAt: new Date(parsed.createdAt),
+      indexedAt: record.indexedAt,
+    });
   }
 
   get notification(): Notification {
