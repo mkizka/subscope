@@ -7,8 +7,7 @@ import type { ITimelineQuery } from "@/app/server/application/interfaces/timelin
 export interface ISearchUseCase {
   execute: (
     did: string,
-    q: string,
-    tab: "accounts" | "posts",
+    params: { q: string; tab: "accounts" | "posts" },
   ) => Promise<{ accounts: AccountDto[]; posts: TimelinePostDto[] }>;
 }
 
@@ -21,7 +20,7 @@ export const searchUseCaseFactory = ({
   backfillQuery: IBackfillQuery;
   timelineQuery: ITimelineQuery;
 }): ISearchUseCase => ({
-  async execute(did, q, tab) {
+  async execute(did, { q, tab }) {
     if (tab === "posts") {
       return { accounts: [], posts: await timelineQuery.searchPosts(did, q) };
     }

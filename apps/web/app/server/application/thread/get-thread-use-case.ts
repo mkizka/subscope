@@ -10,12 +10,7 @@ export interface IGetThreadUseCase {
 }
 
 export interface IGetReactorsUseCase {
-  execute: (
-    did: string,
-    uri: AtUriString,
-    kind: "liked-by" | "reposted-by",
-    cursor?: string,
-  ) => ReturnType<IThreadQuery["findReactors"]>;
+  execute: IThreadQuery["findReactors"];
 }
 
 export const getReactorsUseCaseFactory = ({
@@ -23,16 +18,11 @@ export const getReactorsUseCaseFactory = ({
 }: {
   threadQuery: IThreadQuery;
 }): IGetReactorsUseCase => ({
-  execute: (did, uri, kind, cursor) =>
-    threadQuery.findReactors(did, uri, kind, cursor),
+  execute: (did, params) => threadQuery.findReactors(did, params),
 });
 
 export interface IGetQuotesUseCase {
-  execute: (
-    did: string,
-    uri: AtUriString,
-    cursor?: string,
-  ) => ReturnType<IThreadQuery["findQuotes"]>;
+  execute: IThreadQuery["findQuotes"];
 }
 
 export const getQuotesUseCaseFactory = ({
@@ -40,7 +30,7 @@ export const getQuotesUseCaseFactory = ({
 }: {
   threadQuery: IThreadQuery;
 }): IGetQuotesUseCase => ({
-  execute: (did, uri, cursor) => threadQuery.findQuotes(did, uri, cursor),
+  execute: (did, params) => threadQuery.findQuotes(did, params),
 });
 
 export const getThreadUseCaseFactory = ({

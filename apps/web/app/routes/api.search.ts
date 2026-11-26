@@ -18,7 +18,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
     submission.status === "success" ? submission.value : {};
   return data(
     q
-      ? await di.searchUseCase.execute(context.get(didContext), q, tab)
+      ? await di.searchUseCase.execute(context.get(didContext), { q, tab })
       : { accounts: [], posts: [] },
   );
 };
