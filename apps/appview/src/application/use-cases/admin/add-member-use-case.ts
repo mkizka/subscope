@@ -21,24 +21,26 @@ export class AccountNotFoundError extends Error {
 
 export class AddMemberUseCase {
   constructor(
-    private readonly atprotoHandleResolver: IHandleResolver,
-    private readonly didResolver: IDidResolver,
-    private readonly transactionManager: ITransactionManager,
-    private readonly accountRepository: IAccountRepository,
-    private readonly validateRegistrationService: ValidateRegistrationService,
-    private readonly createRegistrationService: CreateRegistrationService,
+    private readonly deps: {
+      atprotoHandleResolver: IHandleResolver;
+      didResolver: IDidResolver;
+      transactionManager: ITransactionManager;
+      accountRepository: IAccountRepository;
+      validateRegistrationService: ValidateRegistrationService;
+      createRegistrationService: CreateRegistrationService;
+    },
   ) {}
 
   private async resolveDid(actor: string): Promise<Did> {
     const did =
       isHandle(actor) && !isDid(actor)
-        ? await this.atprotoHandleResolver.resolve(actor)
+        ? await this.deps.atprotoHandleResolver.resolve(actor)
         : actor;
     if (!isDid(did)) {
       throw new AccountNotFoundError(`Account not found: ${actor}`);
     }
     try {
-      await this.didResolver.resolve(did);
+      await this.deps.didResolver.resolve(did);
     } catch (error) {
       if (error instanceof DidResolutionError) {
         throw new AccountNotFoundError(`Account not found: ${actor}`);
@@ -51,14 +53,14 @@ export class AddMemberUseCase {
   async execute({ actor }: { actor: string }): Promise<void> {
     const accountDid = await this.resolveDid(actor);
     const existingAccount =
-      await this.validateRegistrationService.validate(accountDid);
+      await this.deps.validateRegistrationService.validate(accountDid);
 
-    await this.transactionManager.transaction(async (ctx) => {
+    await this.deps.transactionManager.transaction(async (ctx) => {
       if (!existingAccount) {
         const account = Account.create({ did: accountDid });
-        await this.accountRepository.save({ ctx, account });
+        await this.deps.accountRepository.save({ ctx, account });
       }
-      await this.createRegistrationService.create({ ctx, accountDid });
+      await this.deps.createRegistrationService.create({ ctx, accountDid });
     });
   }
 }

@@ -7,21 +7,25 @@ import { NotMemberError } from "../../service/sync/unregister-account-service.js
 
 export class GrantAdminUseCase {
   constructor(
-    private readonly transactionManager: ITransactionManager,
-    private readonly accountRepository: IAccountRepository,
-    private readonly registrationRepository: IRegistrationRepository,
+    private readonly deps: {
+      transactionManager: ITransactionManager;
+      accountRepository: IAccountRepository;
+      registrationRepository: IRegistrationRepository;
+    },
   ) {}
 
   async execute(params: { did: Did }): Promise<void> {
-    const registration = await this.registrationRepository.find(params.did);
-    const account = await this.accountRepository.find(params.did);
+    const registration = await this.deps.registrationRepository.find(
+      params.did,
+    );
+    const account = await this.deps.accountRepository.find(params.did);
     if (!registration || !account) {
       throw new NotMemberError("Not a member of this server");
     }
 
     account.promoteToAdmin();
-    await this.transactionManager.transaction((ctx) =>
-      this.accountRepository.save({ ctx, account }),
+    await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.accountRepository.save({ ctx, account }),
     );
   }
 }

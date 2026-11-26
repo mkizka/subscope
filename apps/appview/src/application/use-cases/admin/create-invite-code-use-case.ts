@@ -7,21 +7,23 @@ import type { Env } from "../../../shared/env.js";
 
 export class CreateInviteCodeUseCase {
   constructor(
-    private readonly transactionManager: ITransactionManager,
-    private readonly inviteCodeRepository: IInviteCodeRepository,
-    private readonly env: Pick<Env, "PUBLIC_URL">,
+    private readonly deps: {
+      transactionManager: ITransactionManager;
+      inviteCodeRepository: IInviteCodeRepository;
+      env: Pick<Env, "PUBLIC_URL">;
+    },
   ) {}
 
   async execute(params: {
     daysToExpire: number;
   }): Promise<{ code: string; expiresAt: DatetimeString }> {
     const inviteCode = InviteCode.generate(
-      this.env.PUBLIC_URL,
+      this.deps.env.PUBLIC_URL,
       params.daysToExpire,
     );
 
-    await this.transactionManager.transaction((ctx) =>
-      this.inviteCodeRepository.save({ inviteCode, ctx }),
+    await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.inviteCodeRepository.save({ inviteCode, ctx }),
     );
 
     return {

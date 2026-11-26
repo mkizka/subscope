@@ -19,26 +19,6 @@
       "count": 1
     }
   },
-  "src/application/use-cases/admin/add-member-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/admin/create-invite-code-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/admin/get-invite-codes-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/admin/grant-admin-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/use-cases/admin/list-server-members-use-case.ts": {
     "params/max-params": {
       "count": 1
