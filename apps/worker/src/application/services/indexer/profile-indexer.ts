@@ -10,9 +10,11 @@ import type { RelatedRecordService } from "../related-record-service.js";
 
 export class ProfileIndexer implements IRecordIndexer {
   constructor(
-    private readonly profileRepository: IProfileRepository,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly relatedRecordService: RelatedRecordService,
+    private readonly deps: {
+      profileRepository: IProfileRepository;
+      recordSaveService: RecordSaveService;
+      relatedRecordService: RelatedRecordService;
+    },
   ) {}
 
   async index({
@@ -25,12 +27,12 @@ export class ProfileIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const profile = Profile.fromRecord(record);
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
       ctx,
       origin,
       record: profile,
     });
-    await this.profileRepository.save({ ctx, profile });
+    await this.deps.profileRepository.save({ ctx, profile });
   }
 }

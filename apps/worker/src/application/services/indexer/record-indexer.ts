@@ -24,30 +24,32 @@ export class RecordIndexer {
   private readonly indexers: { [key in SupportedCollection]: IRecordIndexer };
 
   constructor(
-    private readonly recordRepository: IRecordRepository,
-    postIndexer: PostIndexer,
-    profileIndexer: ProfileIndexer,
-    followIndexer: FollowIndexer,
-    generatorIndexer: GeneratorIndexer,
-    likeIndexer: LikeIndexer,
-    repostIndexer: RepostIndexer,
-    listIndexer: ListIndexer,
-    listItemIndexer: ListItemIndexer,
-    gateIndexer: GateIndexer,
-    linkIndexer: LinkIndexer,
+    private readonly deps: {
+      recordRepository: IRecordRepository;
+      postIndexer: PostIndexer;
+      profileIndexer: ProfileIndexer;
+      followIndexer: FollowIndexer;
+      generatorIndexer: GeneratorIndexer;
+      likeIndexer: LikeIndexer;
+      repostIndexer: RepostIndexer;
+      listIndexer: ListIndexer;
+      listItemIndexer: ListItemIndexer;
+      gateIndexer: GateIndexer;
+      linkIndexer: LinkIndexer;
+    },
   ) {
     this.indexers = {
-      "app.bsky.feed.post": postIndexer,
-      "app.bsky.feed.generator": generatorIndexer,
-      "app.bsky.feed.repost": repostIndexer,
-      "app.bsky.actor.profile": profileIndexer,
-      "app.bsky.actor.link": linkIndexer,
-      "app.bsky.graph.follow": followIndexer,
-      "app.bsky.feed.like": likeIndexer,
-      "app.bsky.graph.list": listIndexer,
-      "app.bsky.graph.listitem": listItemIndexer,
-      "app.bsky.feed.threadgate": gateIndexer,
-      "app.bsky.feed.postgate": gateIndexer,
+      "app.bsky.feed.post": deps.postIndexer,
+      "app.bsky.feed.generator": deps.generatorIndexer,
+      "app.bsky.feed.repost": deps.repostIndexer,
+      "app.bsky.actor.profile": deps.profileIndexer,
+      "app.bsky.actor.link": deps.linkIndexer,
+      "app.bsky.graph.follow": deps.followIndexer,
+      "app.bsky.feed.like": deps.likeIndexer,
+      "app.bsky.graph.list": deps.listIndexer,
+      "app.bsky.graph.listitem": deps.listItemIndexer,
+      "app.bsky.feed.threadgate": deps.gateIndexer,
+      "app.bsky.feed.postgate": deps.gateIndexer,
     };
   }
 
@@ -71,11 +73,11 @@ export class RecordIndexer {
   }
 
   async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {
-    const record = await this.recordRepository.find({ ctx, uri });
+    const record = await this.deps.recordRepository.find({ ctx, uri });
     if (!record) {
       return;
     }
-    await this.recordRepository.delete({ ctx, uri });
+    await this.deps.recordRepository.delete({ ctx, uri });
     if (isSupportedCollection(uri.collection)) {
       await this.indexers[uri.collection].afterDelete?.({ ctx, record });
     }

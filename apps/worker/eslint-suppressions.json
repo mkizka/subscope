@@ -1,24 +1,4 @@
 {
-  "src/application/services/indexer/post-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/profile-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/record-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/indexer/repost-indexer.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/services/notification-service.ts": {
     "params/max-params": {
       "count": 1

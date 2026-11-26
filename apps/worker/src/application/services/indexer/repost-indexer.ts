@@ -14,13 +14,15 @@ import type { StatsService } from "../stats-service.js";
 
 export class RepostIndexer implements IRecordIndexer {
   constructor(
-    private readonly repostRepository: IRepostRepository,
-    private readonly feedItemRepository: IFeedItemRepository,
-    private readonly storagePolicy: StoragePolicy,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly notificationService: NotificationService,
-    private readonly relatedRecordService: RelatedRecordService,
-    private readonly statsService: StatsService,
+    private readonly deps: {
+      repostRepository: IRepostRepository;
+      feedItemRepository: IFeedItemRepository;
+      storagePolicy: StoragePolicy;
+      recordSaveService: RecordSaveService;
+      notificationService: NotificationService;
+      relatedRecordService: RelatedRecordService;
+      statsService: StatsService;
+    },
   ) {}
 
   async index({
@@ -33,7 +35,7 @@ export class RepostIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const repost = Repost.fromRecord(record);
-    const saves = await this.storagePolicy.savesFeedRecord({
+    const saves = await this.deps.storagePolicy.savesFeedRecord({
       ctx,
       origin,
       record: repost,
@@ -42,21 +44,25 @@ export class RepostIndexer implements IRecordIndexer {
       return;
     }
 
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({ ctx, origin, record: repost });
-    await this.repostRepository.save({ ctx, repost });
-    await this.feedItemRepository.save({ ctx, feedItem: repost.feedItem });
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
+      ctx,
+      origin,
+      record: repost,
+    });
+    await this.deps.repostRepository.save({ ctx, repost });
+    await this.deps.feedItemRepository.save({ ctx, feedItem: repost.feedItem });
 
-    await this.notificationService.notify({
+    await this.deps.notificationService.notify({
       ctx,
       origin,
       notifications: () => [repost.notification],
     });
-    this.statsService.recount({ ctx, posts: [repost.subject] });
+    this.deps.statsService.recount({ ctx, posts: [repost.subject] });
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const repost = Repost.fromRecord(record);
-    this.statsService.recount({ ctx, posts: [repost.subject] });
+    this.deps.statsService.recount({ ctx, posts: [repost.subject] });
   }
 }

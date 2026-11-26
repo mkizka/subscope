@@ -16,15 +16,17 @@ import type { StatsService } from "../stats-service.js";
 
 export class PostIndexer implements IRecordIndexer {
   constructor(
-    private readonly postRepository: IPostRepository,
-    private readonly feedItemRepository: IFeedItemRepository,
-    private readonly postQuery: IPostQuery,
-    private readonly storagePolicy: StoragePolicy,
-    private readonly gatePolicy: GatePolicy,
-    private readonly recordSaveService: RecordSaveService,
-    private readonly notificationService: NotificationService,
-    private readonly relatedRecordService: RelatedRecordService,
-    private readonly statsService: StatsService,
+    private readonly deps: {
+      postRepository: IPostRepository;
+      feedItemRepository: IFeedItemRepository;
+      postQuery: IPostQuery;
+      storagePolicy: StoragePolicy;
+      gatePolicy: GatePolicy;
+      recordSaveService: RecordSaveService;
+      notificationService: NotificationService;
+      relatedRecordService: RelatedRecordService;
+      statsService: StatsService;
+    },
   ) {}
 
   async index({
@@ -37,7 +39,7 @@ export class PostIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const post = Post.fromRecord(record);
-    const saves = await this.storagePolicy.savesFeedRecord({
+    const saves = await this.deps.storagePolicy.savesFeedRecord({
       ctx,
       origin,
       record: post,
@@ -46,13 +48,12 @@ export class PostIndexer implements IRecordIndexer {
       return;
     }
 
-    const violatesEmbeddingRules = await this.gatePolicy.violatesEmbeddingRules(
-      { ctx, origin, post },
-    );
+    const violatesEmbeddingRules =
+      await this.deps.gatePolicy.violatesEmbeddingRules({ ctx, origin, post });
     if (violatesEmbeddingRules) {
       post.markEmbeddingRulesViolated();
     }
-    const violatesThreadgate = await this.gatePolicy.violatesThreadgate({
+    const violatesThreadgate = await this.deps.gatePolicy.violatesThreadgate({
       ctx,
       origin,
       post,
@@ -61,18 +62,22 @@ export class PostIndexer implements IRecordIndexer {
       post.markThreadgateViolated();
     }
 
-    await this.recordSaveService.save({ ctx, record });
-    await this.relatedRecordService.requestFor({ ctx, origin, record: post });
-    await this.postRepository.save({ ctx, post });
-    await this.feedItemRepository.save({ ctx, feedItem: post.feedItem });
+    await this.deps.recordSaveService.save({ ctx, record });
+    await this.deps.relatedRecordService.requestFor({
+      ctx,
+      origin,
+      record: post,
+    });
+    await this.deps.postRepository.save({ ctx, post });
+    await this.deps.feedItemRepository.save({ ctx, feedItem: post.feedItem });
 
-    await this.notificationService.notify({
+    await this.deps.notificationService.notify({
       ctx,
       origin,
       notifications: async () =>
         post.notifications(
           post.replyParent
-            ? await this.postQuery.findReplyAncestorUris({
+            ? await this.deps.postQuery.findReplyAncestorUris({
                 ctx,
                 parentUri: post.replyParent.uri,
                 limit: Post.replyNotificationDepth,
@@ -80,7 +85,7 @@ export class PostIndexer implements IRecordIndexer {
             : [],
         ),
     });
-    this.statsService.recount({
+    this.deps.statsService.recount({
       ctx,
       posts: [post.uri, ...post.statsTargets],
       accounts: [post.accountDid],
@@ -89,7 +94,7 @@ export class PostIndexer implements IRecordIndexer {
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const post = Post.fromRecord(record);
-    this.statsService.recount({
+    this.deps.statsService.recount({
       ctx,
       posts: post.statsTargets,
       accounts: [post.accountDid],
