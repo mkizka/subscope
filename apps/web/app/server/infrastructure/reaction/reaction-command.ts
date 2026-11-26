@@ -18,7 +18,7 @@ export const reactionCommandFactory = ({
     return agent;
   };
   return {
-    async create(did, type, subject) {
+    async create(did, { type, subject }) {
       const agent = await restore(did);
       const { uri } = await agent.create(schemas[type], {
         subject: { uri: asAtUriString(subject.uri), cid: subject.cid },
@@ -26,7 +26,7 @@ export const reactionCommandFactory = ({
       });
       return uri;
     },
-    async delete(did, type, uri) {
+    async delete(did, { type, uri }) {
       const agent = await restore(did);
       await agent.delete(schemas[type], { rkey: new AtUri(uri).rkey });
     },

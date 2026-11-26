@@ -19,9 +19,14 @@ export const toggleReactionUseCaseFactory = ({
 }): IToggleReactionUseCase => ({
   async execute(did, { type, uri, cid, recordUri }) {
     if (recordUri) {
-      await reactionCommand.delete(did, type, recordUri);
+      await reactionCommand.delete(did, { type, uri: recordUri });
       return { uri: null };
     }
-    return { uri: await reactionCommand.create(did, type, { uri, cid }) };
+    return {
+      uri: await reactionCommand.create(did, {
+        type,
+        subject: { uri, cid },
+      }),
+    };
   },
 });

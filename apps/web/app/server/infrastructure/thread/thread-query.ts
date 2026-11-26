@@ -33,7 +33,7 @@ export const threadQueryFactory = ({
     return { agent, uri: thread.post.uri };
   };
   return {
-    async findReactors(did, uri, kind, cursor) {
+    async findReactors(did, { uri, kind, cursor }) {
       const { agent, uri: postUri } = await restorePost(did, uri);
       const toAccount = ({
         did,
@@ -58,7 +58,7 @@ export const threadQueryFactory = ({
       const res = await agent.call(getRepostedBy, { uri: postUri, cursor });
       return { accounts: res.repostedBy.map(toAccount), cursor: res.cursor };
     },
-    async findQuotes(did, uri, cursor) {
+    async findQuotes(did, { uri, cursor }) {
       const { agent, uri: postUri } = await restorePost(did, uri);
       const { posts, cursor: next } = await agent.call(getQuotes, {
         uri: postUri,

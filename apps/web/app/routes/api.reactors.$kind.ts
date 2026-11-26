@@ -21,16 +21,15 @@ export const loader = async ({
   const searchParams = new URL(request.url).searchParams;
   const accounts = await Promise.resolve()
     .then(() =>
-      di.getReactorsUseCase.execute(
-        context.get(didContext),
-        AtUri.make(
+      di.getReactorsUseCase.execute(context.get(didContext), {
+        uri: AtUri.make(
           searchParams.get("handle") ?? "",
           "app.bsky.feed.post",
           searchParams.get("rkey") ?? "",
         ).toString(),
         kind,
-        searchParams.get("cursor") ?? undefined,
-      ),
+        cursor: searchParams.get("cursor") ?? undefined,
+      }),
     )
     .catch(() => null);
   if (!accounts) {

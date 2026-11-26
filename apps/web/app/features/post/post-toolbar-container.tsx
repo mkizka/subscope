@@ -34,9 +34,11 @@ type Props = TimelinePost & { deleteRedirectTo?: "/" };
 
 function useReaction(
   type: z.infer<typeof reactionSchema>["type"],
-  post: Props,
-  viewerUri?: string,
-  count = 0,
+  {
+    post,
+    viewerUri,
+    count = 0,
+  }: { post: Props; viewerUri?: string; count?: number },
 ) {
   const fetcher = useFetcher<typeof action>();
   const recordUri = fetcher.data ? fetcher.data.uri : viewerUri;
@@ -60,13 +62,16 @@ function useReaction(
 }
 
 export function PostToolbarContainer(props: Props) {
-  const like = useReaction("like", props, props.viewerLike, props.likeCount);
-  const repost = useReaction(
-    "repost",
-    props,
-    props.viewerRepost,
-    props.repostCount,
-  );
+  const like = useReaction("like", {
+    post: props,
+    viewerUri: props.viewerLike,
+    count: props.likeCount,
+  });
+  const repost = useReaction("repost", {
+    post: props,
+    viewerUri: props.viewerRepost,
+    count: props.repostCount,
+  });
   const openCompose = useCompose();
   const me = useMe();
   const deleter = useFetcher<typeof deletePostAction>();

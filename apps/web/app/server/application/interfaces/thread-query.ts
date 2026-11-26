@@ -14,13 +14,14 @@ export interface IThreadQuery {
   } | null>;
   findReactors: (
     did: string,
-    uri: AtUriString,
-    kind: "liked-by" | "reposted-by",
-    cursor?: string,
+    params: {
+      uri: AtUriString;
+      kind: "liked-by" | "reposted-by";
+      cursor?: string;
+    },
   ) => Promise<{ accounts: AccountDto[]; cursor?: string }>;
   findQuotes: (
     did: string,
-    uri: AtUriString,
-    cursor?: string,
+    params: { uri: AtUriString; cursor?: string },
   ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
 }
