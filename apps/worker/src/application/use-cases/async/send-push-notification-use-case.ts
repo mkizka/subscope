@@ -7,10 +7,12 @@ import type { IPushSubscriptionRepository } from "../../interfaces/repositories/
 
 export class SendPushNotificationUseCase {
   constructor(
-    private readonly pushNotificationQuery: IPushNotificationQuery,
-    private readonly pushSubscriptionRepository: IPushSubscriptionRepository,
-    private readonly webPushSender: IWebPushSender,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      pushNotificationQuery: IPushNotificationQuery;
+      pushSubscriptionRepository: IPushSubscriptionRepository;
+      webPushSender: IWebPushSender;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async execute({
@@ -18,19 +20,22 @@ export class SendPushNotificationUseCase {
     recipientDid,
     jobLogger,
   }: JobData["sendPushNotification"] & { jobLogger: JobLogger }) {
-    const found = await this.transactionManager.transaction(async (ctx) => {
-      const notification = await this.pushNotificationQuery.find({
-        ctx,
-        recordUri,
-        recipientDid,
-      });
-      if (!notification) return null;
-      const subscriptions = await this.pushNotificationQuery.findSubscriptions({
-        ctx,
-        accountDid: recipientDid,
-      });
-      return { notification, subscriptions };
-    });
+    const found = await this.deps.transactionManager.transaction(
+      async (ctx) => {
+        const notification = await this.deps.pushNotificationQuery.find({
+          ctx,
+          recordUri,
+          recipientDid,
+        });
+        if (!notification) return null;
+        const subscriptions =
+          await this.deps.pushNotificationQuery.findSubscriptions({
+            ctx,
+            accountDid: recipientDid,
+          });
+        return { notification, subscriptions };
+      },
+    );
     if (!found || found.subscriptions.length === 0) return;
 
     const payload = found.notification.payload;
@@ -38,7 +43,10 @@ export class SendPushNotificationUseCase {
     await Promise.all(
       found.subscriptions.map(async (subscription) => {
         try {
-          const result = await this.webPushSender.send(subscription, payload);
+          const result = await this.deps.webPushSender.send(
+            subscription,
+            payload,
+          );
           if (result === "gone") goneEndpoints.push(subscription.endpoint);
         } catch (e) {
           await jobLogger.log(
@@ -48,9 +56,9 @@ export class SendPushNotificationUseCase {
       }),
     );
     if (goneEndpoints.length === 0) return;
-    await this.transactionManager.transaction(async (ctx) => {
+    await this.deps.transactionManager.transaction(async (ctx) => {
       for (const endpoint of goneEndpoints) {
-        await this.pushSubscriptionRepository.delete({ ctx, endpoint });
+        await this.deps.pushSubscriptionRepository.delete({ ctx, endpoint });
       }
     });
   }

@@ -18,20 +18,22 @@ export class IndexCommitUseCase {
   private readonly logger;
 
   constructor(
-    loggerManager: ILoggerManager,
-    private readonly metricReporter: IMetricReporter,
-    private readonly transactionManager: ITransactionManager,
-    private readonly recordIndexer: RecordIndexer,
-    private readonly repoRevRepository: IRepoRevRepository,
+    private readonly deps: {
+      loggerManager: ILoggerManager;
+      metricReporter: IMetricReporter;
+      transactionManager: ITransactionManager;
+      recordIndexer: RecordIndexer;
+      repoRevRepository: IRepoRevRepository;
+    },
   ) {
-    this.logger = loggerManager.createLogger("IndexCommitUseCase");
+    this.logger = deps.loggerManager.createLogger("IndexCommitUseCase");
   }
 
   async execute(command: IndexCommitCommand) {
     const { uri, rev } = command.commit;
-    await this.transactionManager.transaction(async (ctx) => {
+    await this.deps.transactionManager.transaction(async (ctx) => {
       await this.indexCommit(ctx, command);
-      await this.repoRevRepository.save({ ctx, did: uri.did, rev });
+      await this.deps.repoRevRepository.save({ ctx, did: uri.did, rev });
     });
   }
 
@@ -41,11 +43,11 @@ export class IndexCommitUseCase {
   ) {
     const { collection } = commit.uri;
     if (!isSupportedCollection(collection)) return;
-    this.metricReporter.increment("worker_events_commit_total", {
+    this.deps.metricReporter.increment("worker_events_commit_total", {
       collection,
     });
     if (commit.operation === "delete") {
-      await this.recordIndexer.delete({ ctx, uri: commit.uri });
+      await this.deps.recordIndexer.delete({ ctx, uri: commit.uri });
       return;
     }
     if (!commit.record) {
@@ -56,7 +58,7 @@ export class IndexCommitUseCase {
       return;
     }
     try {
-      await this.recordIndexer.index({
+      await this.deps.recordIndexer.index({
         ctx,
         record: commit.record,
         origin: live ? Origin.live() : Origin.backfill(),
