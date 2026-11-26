@@ -15,7 +15,7 @@ export function meta() {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const agent = await getAgent(request);
   const step = await di.getLoginStepUseCase.execute(agent?.assertDid ?? null);
-  if (step === "registered") {
+  if (step === "member") {
     throw redirect("/");
   }
   const url = new URL(request.url);

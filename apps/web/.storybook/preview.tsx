@@ -7,8 +7,8 @@ import { createRoutesStub } from "react-router";
 
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
-import type { loader as serverMembersLoader } from "@/app/routes/api.registered-accounts";
 import type { loader as serverInfoLoader } from "@/app/routes/api.server-info";
+import type { loader as serverMembersLoader } from "@/app/routes/api.server-members";
 import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
 
 import { alice, bob, type Data, queryClient } from "./query-client";
@@ -39,12 +39,12 @@ const preview: Preview = {
       ["trackedAccounts", ""],
       {
         accounts: [
-          { ...bob, registeredFollowersCount: 3 },
-          { ...alice, registeredFollowersCount: 1 },
+          { ...bob, memberFollowersCount: 3 },
+          { ...alice, memberFollowersCount: 1 },
           {
             did: "did:plc:carol",
             handle: "handle.invalid",
-            registeredFollowersCount: 0,
+            memberFollowersCount: 0,
           },
         ],
       },

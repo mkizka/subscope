@@ -41,7 +41,7 @@ export function AddMemberDialogContainer() {
       event.preventDefault();
       void fetcher.submit(formData, {
         method: "PUT",
-        action: "/admin/api/registered-accounts",
+        action: "/admin/api/server-members",
       });
     },
   });

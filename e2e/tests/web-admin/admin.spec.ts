@@ -34,7 +34,7 @@ test.describe("管理画面へのアクセス", () => {
     const memberPage = await context.newPage();
     await login(memberPage, "heidi.test");
 
-    await memberPage.goto("/admin/registered-accounts");
+    await memberPage.goto("/admin/server-members");
 
     await expect(memberPage.getByText("403")).toBeVisible();
     await context.close();
@@ -107,7 +107,7 @@ test.describe("メンバー", () => {
     await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
-    await page.goto("/admin/registered-accounts");
+    await page.goto("/admin/server-members");
 
     const row = page
       .getByRole("main")
@@ -127,7 +127,7 @@ test.describe("メンバー", () => {
     await registerAccount("bob.test", code);
     const bobDid = await resolveHandle("bob.test");
 
-    await page.goto("/admin/registered-accounts");
+    await page.goto("/admin/server-members");
 
     const row = page
       .getByRole("main")
@@ -156,7 +156,7 @@ test.describe("メンバー", () => {
     await registerAccount("dave.test", await createInviteCode());
     const daveDid = await resolveHandle("dave.test");
 
-    await page.goto("/admin/registered-accounts");
+    await page.goto("/admin/server-members");
 
     const row = page
       .getByRole("main")
@@ -179,7 +179,7 @@ test.describe("メンバー", () => {
   }) => {
     const graceDid = await resolveHandle("grace.test");
 
-    await page.goto("/admin/registered-accounts");
+    await page.goto("/admin/server-members");
     await page.getByRole("button", { name: "メンバーを追加" }).click();
     const dialog = page.getByRole("dialog", { name: "メンバーを追加" });
     await dialog.getByLabel("ハンドルまたはDID").fill("grace.test");
@@ -194,7 +194,7 @@ test.describe("メンバー", () => {
   test("adminAccounts-e8: メンバーに追加できないときは、ダイアログを閉じずに理由（見つからない・すでにメンバー）を出す", async ({
     page,
   }) => {
-    await page.goto("/admin/registered-accounts");
+    await page.goto("/admin/server-members");
     await page.getByRole("button", { name: "メンバーを追加" }).click();
     const dialog = page.getByRole("dialog", { name: "メンバーを追加" });
     await dialog.getByLabel("ハンドルまたはDID").fill("alice.test");

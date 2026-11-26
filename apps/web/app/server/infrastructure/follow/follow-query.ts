@@ -11,7 +11,7 @@ export const followQueryFactory = ({
 }): IFollowQuery => {
   const publicClient = new Client(env.APPVIEW_URL);
   return {
-    async findRegisteredFollowers(subject) {
+    async findMemberFollowers(subject) {
       const { followers } = await publicClient.call(getServerMemberFollowers, {
         actor: subject,
         limit: 100,

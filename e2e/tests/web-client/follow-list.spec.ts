@@ -68,14 +68,14 @@ test.describe("フォロー・フォロワー", () => {
     ).toBeVisible();
   });
 
-  test("followList-e5: 「メンバー」タブ（`?filter=registered`）は、フォロワーのうちメンバーだけを表示する", async ({
+  test("followList-e5: 「メンバー」タブ（`?filter=member`）は、フォロワーのうちメンバーだけを表示する", async ({
     page,
   }) => {
     await page.goto("/bob.test/followers");
 
     await page.getByRole("tab", { name: /^メンバー/ }).click();
 
-    await expect(page).toHaveURL("/bob.test/followers?filter=registered");
+    await expect(page).toHaveURL("/bob.test/followers?filter=member");
     const alice = page
       .getByRole("main")
       .getByRole("listitem")
@@ -102,7 +102,7 @@ test.describe("フォロー・フォロワー", () => {
 
     await link.click();
 
-    await expect(page).toHaveURL(/\/followers\?filter=registered$/);
+    await expect(page).toHaveURL(/\/followers\?filter=member$/);
   });
 
   test("followList-e7: 見出しは「{名前}のフォロー」「{名前}のフォロワー」とし、戻るボタンでプロフィールに移動する", async ({

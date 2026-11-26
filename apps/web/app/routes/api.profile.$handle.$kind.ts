@@ -28,7 +28,7 @@ export const loader = async ({
       context.get(didContext),
       handle,
       kind,
-      filter === "registered" || filter === "known" ? filter : undefined,
+      filter === "member" || filter === "known" ? filter : undefined,
       searchParams.get("cursor") ?? undefined,
     ),
   );
