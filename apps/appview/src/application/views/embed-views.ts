@@ -29,6 +29,13 @@ import type { ViewContext } from "./view-context.js";
 
 const MAX_RECORD_DEPTH = 2;
 
+const detachedView = (uri: string) =>
+  ({
+    $type: "app.bsky.embed.record#viewDetached",
+    uri: asAtUriString(uri),
+    detached: true,
+  }) satisfies $Typed<AppBskyEmbedRecord.ViewDetached>;
+
 export class EmbedViews {
   constructor(
     private readonly profileViews: ProfileViews,
@@ -41,12 +48,17 @@ export class EmbedViews {
     if (!post.embedRecordUri) {
       return media;
     }
-    const record = await this.recordView(
-      new AtUri(post.embedRecordUri),
-      post.uri,
-      ctx,
-      depth,
-    );
+    const record = post.violatesEmbeddingRules
+      ? {
+          $type: "app.bsky.embed.record#view" as const,
+          record: detachedView(post.embedRecordUri),
+        }
+      : await this.recordView(
+          new AtUri(post.embedRecordUri),
+          post.uri,
+          ctx,
+          depth,
+        );
     if (!media) {
       return record;
     }
@@ -110,11 +122,7 @@ export class EmbedViews {
           postgate,
         ).detachedEmbeddingUris?.includes(asAtUriString(parentUri));
       if (detached) {
-        return {
-          $type: "app.bsky.embed.record#viewDetached" as const,
-          uri: uri.toString(),
-          detached: true as const,
-        } satisfies $Typed<AppBskyEmbedRecord.ViewDetached>;
+        return detachedView(uri.toString());
       }
       return view;
     }
