@@ -15,9 +15,11 @@ type GetLocalTimelineParams = {
 
 export class GetLocalTimelineUseCase {
   constructor(
-    private readonly timelineQuery: ITimelineQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly feedViews: FeedViews,
+    private readonly deps: {
+      timelineQuery: ITimelineQuery;
+      viewContextFactory: ViewContextFactory;
+      feedViews: FeedViews;
+    },
   ) {}
 
   async execute({
@@ -30,15 +32,15 @@ export class GetLocalTimelineUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feedItems = await this.timelineQuery.findLocalFeedItems({
+    const feedItems = await this.deps.timelineQuery.findLocalFeedItems({
       limit: paginator.queryLimit,
       cursor: cursor ? new Date(cursor) : undefined,
     });
     const page = paginator.extractPage(feedItems);
 
-    const ctx = this.viewContextFactory.create({ viewerDid });
+    const ctx = this.deps.viewContextFactory.create({ viewerDid });
     const feed = await Promise.all(
-      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
+      page.items.map((item) => this.deps.feedViews.feedViewPost(item, ctx)),
     );
 
     return {

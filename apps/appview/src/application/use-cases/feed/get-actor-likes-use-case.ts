@@ -9,9 +9,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetActorLikesUseCase {
   constructor(
-    private readonly likeQuery: ILikeQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly feedViews: FeedViews,
+    private readonly deps: {
+      likeQuery: ILikeQuery;
+      viewContextFactory: ViewContextFactory;
+      feedViews: FeedViews;
+    },
   ) {}
 
   async execute(params: {
@@ -25,16 +27,18 @@ export class GetActorLikesUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feedItems = await this.likeQuery.findAccountLikeFeedItems({
+    const feedItems = await this.deps.likeQuery.findAccountLikeFeedItems({
       accountDid: params.accountDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
     });
     const page = paginator.extractPage(feedItems);
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const feed = await Promise.all(
-      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
+      page.items.map((item) => this.deps.feedViews.feedViewPost(item, ctx)),
     );
 
     return {
