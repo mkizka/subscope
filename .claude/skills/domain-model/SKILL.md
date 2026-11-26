@@ -38,7 +38,7 @@ description: worker・appview・webで型やクラスを新規作成・変更す
 
 ```ts
 // domain/services/storage-policy.ts
-async storesFeedRecord({ ctx, origin, record }) {
+async savesFeedRecord({ ctx, origin, record }) {
   return (
     !origin.isPast ||
     (await this.registrationQuery.isRegistered(ctx, record.accountDid)) ||

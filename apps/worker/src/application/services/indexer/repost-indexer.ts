@@ -33,12 +33,12 @@ export class RepostIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const repost = Repost.fromRecord(record);
-    const stores = await this.storagePolicy.storesFeedRecord({
+    const saves = await this.storagePolicy.savesFeedRecord({
       ctx,
       origin,
       record: repost,
     });
-    if (!stores) {
+    if (!saves) {
       return;
     }
 

@@ -16,7 +16,7 @@ export class StoragePolicy {
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
-  async storesFeedRecord({
+  async savesFeedRecord({
     ctx,
     origin,
     record,
@@ -32,7 +32,7 @@ export class StoragePolicy {
     );
   }
 
-  async storesLike({
+  async savesLike({
     ctx,
     origin,
     like,

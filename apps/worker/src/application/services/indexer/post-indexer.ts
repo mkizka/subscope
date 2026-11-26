@@ -35,12 +35,12 @@ export class PostIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const post = Post.fromRecord(record);
-    const stores = await this.storagePolicy.storesFeedRecord({
+    const saves = await this.storagePolicy.savesFeedRecord({
       ctx,
       origin,
       record: post,
     });
-    if (!stores) {
+    if (!saves) {
       return;
     }
 
