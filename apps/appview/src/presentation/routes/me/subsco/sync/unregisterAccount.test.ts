@@ -72,7 +72,7 @@ describe("me.subsco.sync.unregisterAccount", () => {
     expect(savedInviteCode?.usedAt).toEqual(usedAt);
   });
 
-  test("unregisterAccount-3: 登録していなければ400とNotRegisteredを返す", async () => {
+  test("unregisterAccount-3: メンバーでなければ400とNotMemberを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();
@@ -84,7 +84,7 @@ describe("me.subsco.sync.unregisterAccount", () => {
     // assert
     await expect(promise).rejects.toMatchObject({
       status: 400,
-      error: "NotRegistered",
+      error: "NotMember",
     });
   });
 });

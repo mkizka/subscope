@@ -3,7 +3,7 @@ import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
-import { NotRegisteredError } from "../../service/sync/unregister-account-service.js";
+import { NotMemberError } from "../../service/sync/unregister-account-service.js";
 
 export class GrantAdminUseCase {
   constructor(
@@ -16,7 +16,7 @@ export class GrantAdminUseCase {
     const registration = await this.registrationRepository.find(params.did);
     const account = await this.accountRepository.find(params.did);
     if (!registration || !account) {
-      throw new NotRegisteredError("Not registered with this server");
+      throw new NotMemberError("Not a member of this server");
     }
 
     account.promoteToAdmin();

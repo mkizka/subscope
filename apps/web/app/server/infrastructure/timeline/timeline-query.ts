@@ -24,7 +24,7 @@ import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
 import { link, mention, tag } from "@repo/client/app/bsky/richtext/facet";
 import getLocalTimeline from "@repo/client/me/subsco/server/getLocalTimeline";
 import getRegistrationStatus, {
-  registered,
+  member,
 } from "@repo/client/me/subsco/sync/getRegistrationStatus";
 
 import type {
@@ -47,7 +47,7 @@ export const timelineQueryFactory = ({
   return {
     async isMember(did) {
       const agent = await restore(did);
-      return registered.isTypeOf(await agent.call(getRegistrationStatus));
+      return member.isTypeOf(await agent.call(getRegistrationStatus));
     },
     async findPosts(did, cursor) {
       const agent = await restore(did);

@@ -50,7 +50,7 @@ describe("me.subsco.admin.revokeAdmin", () => {
     });
   });
 
-  test("revokeAdmin-3: メンバーでなければ400とNotRegisteredを返す", async () => {
+  test("revokeAdmin-3: メンバーでなければ400とNotMemberを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -66,7 +66,7 @@ describe("me.subsco.admin.revokeAdmin", () => {
     // assert
     await expect(promise).rejects.toMatchObject({
       status: 400,
-      error: "NotRegistered",
+      error: "NotMember",
     });
   });
 });

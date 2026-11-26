@@ -24,8 +24,8 @@
       },
       "errors": [
         {
-          "name": "NotRegistered",
-          "description": "The user is not registered with this server"
+          "name": "NotMember",
+          "description": "The user is not a member of this server"
         }
       ]
     }
