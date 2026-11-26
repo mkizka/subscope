@@ -6,7 +6,7 @@ import type { Record } from "./record.js";
 export class Gate {
   private constructor(
     private readonly uri: AtUri,
-    private readonly postUri: AtUri,
+    readonly postUri: AtUri,
   ) {}
 
   static fromRecord(record: Record) {

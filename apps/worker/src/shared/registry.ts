@@ -191,7 +191,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("profileIndexer", ["profileRepository", "recordSaveService", "relatedRecordService"], asClassArgs(ProfileIndexer))
     .service("generatorIndexer", ["generatorRepository", "recordSaveService", "relatedRecordService"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository", "recordSaveService", "relatedRecordService"], asClassArgs(ListIndexer))
-    .service("gateIndexer", ["recordSaveService", "relatedRecordService"], asClassArgs(GateIndexer))
+    .service("gateIndexer", ["recordQuery", "recordSaveService", "relatedRecordService"], asClassArgs(GateIndexer))
     .service("linkIndexer", ["recordSaveService", "relatedRecordService"], asClassArgs(LinkIndexer))
     .service("recordIndexer", ["recordRepository", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(RecordIndexer))
     // application(use-case)
