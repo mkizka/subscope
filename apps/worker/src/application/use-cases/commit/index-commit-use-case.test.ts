@@ -140,6 +140,52 @@ describe("IndexCommitUseCase", () => {
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
+    const postOf = (did: string) => {
+      const uri = AtUri.make(did, "app.bsky.feed.post", "123");
+      const record = {
+        uri,
+        cid: "cid123",
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Hello world",
+          createdAt: new Date().toISOString(),
+        },
+        indexedAt: new Date(),
+      };
+      return {
+        commit: {
+          operation: "create" as const,
+          uri,
+          rev: "3aaaaaaaaaaaa",
+          record,
+        },
+        live: true,
+      };
+    };
+
+    const threadgateOf = (did: string) => {
+      const uri = AtUri.make(did, "app.bsky.feed.threadgate", "123");
+      const record = {
+        uri,
+        cid: "cid123",
+        json: {
+          $type: "app.bsky.feed.threadgate",
+          post: AtUri.make(did, "app.bsky.feed.post", "123").toString(),
+          createdAt: new Date().toISOString(),
+        },
+        indexedAt: new Date(),
+      };
+      return {
+        commit: {
+          operation: "create" as const,
+          uri,
+          rev: "3aaaaaaaaaaaa",
+          record,
+        },
+        live: true,
+      };
+    };
+
     test("index-9: threadgateとpostgateは、同じアカウントの同じrkeyの投稿に付くものだけ保存する", async () => {
       // arrange
       const account = accountFactory();
@@ -176,6 +222,7 @@ describe("IndexCommitUseCase", () => {
       const threadgate = gate("app.bsky.feed.threadgate", "123", "123");
       const postgate = gate("app.bsky.feed.postgate", "123", "123");
       const mismatched = gate("app.bsky.feed.threadgate", "456", "123");
+      await indexCommitUseCase.execute(postOf(account.did));
 
       // act
       await indexCommitUseCase.execute(threadgate.command);
@@ -188,6 +235,21 @@ describe("IndexCommitUseCase", () => {
       ).not.toBeNull();
       expect(await recordRepo.find({ ctx, uri: postgate.uri })).not.toBeNull();
       expect(await recordRepo.find({ ctx, uri: mismatched.uri })).toBeNull();
+    });
+
+    test("index-25: threadgateとpostgateは、対象の投稿を保存済みのときだけ保存する", async () => {
+      // arrange
+      const account = accountFactory();
+      accountRepo.add(account);
+      const threadgate = threadgateOf(account.did);
+
+      // act
+      await indexCommitUseCase.execute(threadgate);
+
+      // assert
+      expect(
+        await recordRepo.find({ ctx, uri: threadgate.commit.uri }),
+      ).toBeNull();
     });
 
     test.each([

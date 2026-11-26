@@ -21,12 +21,15 @@ export class Gate {
     return new Gate(record.uri, parseGate(record));
   }
 
+  get postUri() {
+    return new AtUri(this.value.post);
+  }
+
   get attachesToOwnPost() {
-    const postUri = new AtUri(this.value.post);
     return (
-      postUri.host === this.uri.did &&
-      postUri.collection === "app.bsky.feed.post" &&
-      postUri.rkey === this.uri.rkey
+      this.postUri.host === this.uri.did &&
+      this.postUri.collection === "app.bsky.feed.post" &&
+      this.postUri.rkey === this.uri.rkey
     );
   }
 
