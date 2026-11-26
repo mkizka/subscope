@@ -1,4 +1,9 @@
-import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
+import {
+  asClass,
+  asClassArgs,
+  asFunctionArgs,
+  createRegistry,
+} from "@gyaku/di";
 import {
   connectionPoolFactory,
   databaseFactory,
@@ -200,7 +205,7 @@ export const createAppRegistry = (env: Env) =>
     .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
     .service("didCache", ["env", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
-    .service("didResolver", ["env", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
+    .service("didResolver", ["env", "loggerManager", "didCache", "metricReporter"], asClass<IDidResolver>()(DidResolver))
     .service("jobQueue", ["env"], asClassArgs<IJobQueue>()(JobQueue))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))

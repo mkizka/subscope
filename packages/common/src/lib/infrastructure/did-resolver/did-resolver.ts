@@ -30,13 +30,20 @@ class Resolver extends AtprotoDidResolver {
 export class DidResolver implements IDidResolver {
   private readonly resolver: Resolver;
   private readonly logger: Logger;
+  private readonly metricReporter: IMetricReporter;
 
-  constructor(
-    env: { PLC_URL: string },
-    loggerManager: ILoggerManager,
-    didCache: DidCache,
-    private readonly metricReporter: IMetricReporter,
-  ) {
+  constructor({
+    env,
+    loggerManager,
+    didCache,
+    metricReporter,
+  }: {
+    env: { PLC_URL: string };
+    loggerManager: ILoggerManager;
+    didCache: DidCache;
+    metricReporter: IMetricReporter;
+  }) {
+    this.metricReporter = metricReporter;
     const fetch =
       new URL(env.PLC_URL).protocol === "http:" ? globalThis.fetch : undefined;
     this.resolver = new Resolver(

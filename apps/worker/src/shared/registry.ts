@@ -144,7 +144,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
     .service("metricReporter", asClassArgs(MetricReporter))
     .service("didCache", ["env", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
-    .service("didResolver", ["env", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
+    .service("didResolver", ["env", "loggerManager", "didCache", "metricReporter"], asClass<IDidResolver>()(DidResolver))
     .service("jobQueue", ["env"], asClassArgs<IJobQueue>()(JobQueue))
     .service("handleResolver", ["env"], asClassArgs<IHandleResolver>()(HandleResolver))
     .service("labelCursorStore", ["env"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
