@@ -31,7 +31,7 @@ export class LikeIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const like = Like.fromRecord(record);
-    const { stores, fetchesSubject } = await this.storagePolicy.decideLike({
+    const stores = await this.storagePolicy.storesLike({
       ctx,
       origin,
       like,
@@ -48,7 +48,12 @@ export class LikeIndexer implements IRecordIndexer {
       origin,
       notifications: () => [like.notification],
     });
-    if (fetchesSubject) {
+    const fetchesLikedPost = await this.storagePolicy.fetchesLikedPost({
+      ctx,
+      origin,
+      like,
+    });
+    if (fetchesLikedPost) {
       await this.relatedRecordService.request({
         ctx,
         origin,

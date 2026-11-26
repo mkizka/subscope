@@ -32,7 +32,7 @@ export class StoragePolicy {
     );
   }
 
-  async decideLike({
+  async storesLike({
     ctx,
     origin,
     like,
@@ -45,18 +45,32 @@ export class StoragePolicy {
       ctx,
       like.accountDid,
     );
+    if (likerIsMember) {
+      return true;
+    }
     const subjectAuthorIsMember = await this.registrationQuery.isRegistered(
       ctx,
       like.subjectAuthorDid,
     );
-    if (!likerIsMember && !subjectAuthorIsMember) {
-      return { stores: false, fetchesSubject: false };
-    }
-    const withinWindow = await this.isWithinWindow(ctx, origin, like);
-    return {
-      stores: likerIsMember || withinWindow,
-      fetchesSubject: likerIsMember && withinWindow && like.likesPost,
-    };
+    return (
+      subjectAuthorIsMember && (await this.isWithinWindow(ctx, origin, like))
+    );
+  }
+
+  async fetchesLikedPost({
+    ctx,
+    origin,
+    like,
+  }: {
+    ctx: TransactionContext;
+    origin: Origin;
+    like: Like;
+  }) {
+    return (
+      like.likesPost &&
+      (await this.registrationQuery.isRegistered(ctx, like.accountDid)) &&
+      (await this.isWithinWindow(ctx, origin, like))
+    );
   }
 
   async isTracked(ctx: TransactionContext, did: Did) {
