@@ -442,6 +442,32 @@ describe("app.bsky.feed.getPosts", () => {
       },
     ]);
   });
+  test("postgate-3: 引用禁止に違反した引用は、viewDetachedにする", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const quoted = await createPost();
+    const quote = await postFactory(ctx.db)
+      .props({ violatesEmbeddingRules: () => true })
+      .create();
+    await postEmbedRecordFactory(ctx.db)
+      .vars({ post: () => quote, embeddedPost: () => quoted })
+      .create();
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(quote.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.embed).toMatchObject({
+      $type: "app.bsky.embed.record#view",
+      record: {
+        $type: "app.bsky.embed.record#viewDetached",
+        uri: quoted.uri,
+        detached: true,
+      },
+    });
+  });
   test("embed-1: 画像のギャラリーは、引用に添えたものも含めてgalleryのビューで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
