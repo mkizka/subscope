@@ -13,9 +13,11 @@ type SearchActorsTypeaheadParams = {
 
 export class SearchActorsTypeaheadUseCase {
   constructor(
-    private readonly profileQuery: IProfileQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      profileQuery: IProfileQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(
@@ -27,17 +29,17 @@ export class SearchActorsTypeaheadUseCase {
       };
     }
 
-    const profiles = await this.profileQuery.search({
+    const profiles = await this.deps.profileQuery.search({
       query: params.query,
       limit: params.limit,
     });
 
-    const ctx = this.viewContextFactory.create({
+    const ctx = this.deps.viewContextFactory.create({
       viewerDid: params.viewerDid,
     });
     const accounts = await Promise.all(
       profiles.map((profile) =>
-        this.profileViews.basic(profile.accountDid, ctx),
+        this.deps.profileViews.basic(profile.accountDid, ctx),
       ),
     );
 

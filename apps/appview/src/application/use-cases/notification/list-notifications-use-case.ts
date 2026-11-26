@@ -14,10 +14,12 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class ListNotificationsUseCase {
   constructor(
-    private readonly notificationQuery: INotificationQuery,
-    private readonly registrationRepository: IRegistrationRepository,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      notificationQuery: INotificationQuery;
+      registrationRepository: IRegistrationRepository;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(params: {
@@ -30,7 +32,7 @@ export class ListNotificationsUseCase {
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),
     });
-    const items = await this.notificationQuery.findNotifications({
+    const items = await this.deps.notificationQuery.findNotifications({
       recipientDid: params.viewerDid,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
@@ -38,14 +40,16 @@ export class ListNotificationsUseCase {
     });
     const page = paginator.extractPage(items);
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const [authors, registration] = await Promise.all([
       Promise.all(
         page.items.map((item) =>
-          this.profileViews.view(asDid(item.authorDid), ctx),
+          this.deps.profileViews.view(asDid(item.authorDid), ctx),
         ),
       ),
-      this.registrationRepository.find(params.viewerDid),
+      this.deps.registrationRepository.find(params.viewerDid),
     ]);
 
     return {

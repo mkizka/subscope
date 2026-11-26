@@ -16,9 +16,11 @@ type SearchActorsParams = {
 
 export class SearchActorsUseCase {
   constructor(
-    private readonly profileQuery: IProfileQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      profileQuery: IProfileQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(
@@ -35,19 +37,19 @@ export class SearchActorsUseCase {
       limit: params.limit,
       getCursor: (profile) => profile.indexedAt.toISOString(),
     });
-    const profiles = await this.profileQuery.search({
+    const profiles = await this.deps.profileQuery.search({
       query: params.query,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
     });
     const result = paginator.extractPage(profiles);
 
-    const ctx = this.viewContextFactory.create({
+    const ctx = this.deps.viewContextFactory.create({
       viewerDid: params.viewerDid,
     });
     const accounts = await Promise.all(
       result.items.map((profile) =>
-        this.profileViews.view(profile.accountDid, ctx),
+        this.deps.profileViews.view(profile.accountDid, ctx),
       ),
     );
 
