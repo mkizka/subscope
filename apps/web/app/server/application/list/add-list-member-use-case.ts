@@ -19,6 +19,6 @@ export const addListMemberUseCaseFactory = ({
 }): IAddListMemberUseCase => ({
   async execute(did, { listUri, handle }) {
     const profile = await accountQuery.findProfile(did, handle);
-    await listCommand.addMember(did, listUri, profile.did);
+    await listCommand.addMember(did, { listUri, subject: profile.did });
   },
 });
