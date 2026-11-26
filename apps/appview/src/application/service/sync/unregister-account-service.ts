@@ -13,9 +13,11 @@ export class NotMemberError extends Error {
 
 export class UnregisterAccountService {
   constructor(
-    private readonly registrationRepository: IRegistrationRepository,
-    private readonly followQuery: IFollowQuery,
-    private readonly jobScheduler: IJobScheduler,
+    private readonly deps: {
+      registrationRepository: IRegistrationRepository;
+      followQuery: IFollowQuery;
+      jobScheduler: IJobScheduler;
+    },
   ) {}
 
   async unregister({
@@ -26,17 +28,18 @@ export class UnregisterAccountService {
     accountDid: Did;
   }): Promise<void> {
     const existingRegistration =
-      await this.registrationRepository.find(accountDid);
+      await this.deps.registrationRepository.find(accountDid);
     if (!existingRegistration) {
       throw new NotMemberError("Not a member of this server");
     }
 
-    await this.registrationRepository.delete({ ctx, accountDid });
+    await this.deps.registrationRepository.delete({ ctx, accountDid });
 
-    const followeeDids = await this.followQuery.findFolloweeDids(accountDid);
+    const followeeDids =
+      await this.deps.followQuery.findFolloweeDids(accountDid);
     ctx.afterCommit(async () => {
       for (const did of [accountDid, ...followeeDids]) {
-        await this.jobScheduler.scheduleSyncTapRepo(did);
+        await this.deps.jobScheduler.scheduleSyncTapRepo(did);
       }
     });
   }

@@ -16,10 +16,12 @@ type GetServerMembersParams = {
 
 export class GetServerMembersUseCase {
   constructor(
-    private readonly registrationQuery: IRegistrationQuery,
-    private readonly accountRepository: IAccountRepository,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      registrationQuery: IRegistrationQuery;
+      accountRepository: IAccountRepository;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(
@@ -30,17 +32,17 @@ export class GetServerMembersUseCase {
       getCursor: (sub) => sub.createdAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.registrationQuery.findMany({
+      await this.deps.registrationQuery.findMany({
         limit: paginator.queryLimit,
         cursor: params.cursor,
         q: params.q,
       }),
     );
     const dids = page.items.map((sub) => asDid(sub.accountDid));
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.deps.viewContextFactory.create();
     const [profiles, accounts] = await Promise.all([
-      Promise.all(dids.map((did) => this.profileViews.view(did, ctx))),
-      Promise.all(dids.map((did) => this.accountRepository.find(did))),
+      Promise.all(dids.map((did) => this.deps.profileViews.view(did, ctx))),
+      Promise.all(dids.map((did) => this.deps.accountRepository.find(did))),
     ]);
     const adminDids = new Set(
       accounts

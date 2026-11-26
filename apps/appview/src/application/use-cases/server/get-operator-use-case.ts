@@ -6,19 +6,21 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetOperatorUseCase {
   constructor(
-    private readonly registrationQuery: IRegistrationQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      registrationQuery: IRegistrationQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(): Promise<MeSubscoServerGetOperator.$OutputBody> {
-    const did = await this.registrationQuery.findFirstAdminDid();
+    const did = await this.deps.registrationQuery.findFirstAdminDid();
     if (!did) {
       return {};
     }
-    const operator = await this.profileViews.view(
+    const operator = await this.deps.profileViews.view(
       did,
-      this.viewContextFactory.create(),
+      this.deps.viewContextFactory.create(),
     );
     return { operator };
   }
