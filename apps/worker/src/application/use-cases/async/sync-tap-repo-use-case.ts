@@ -6,22 +6,24 @@ import type { TrackingService } from "../../services/tracking-service.js";
 
 export class SyncTapRepoUseCase {
   constructor(
-    private readonly trackingService: TrackingService,
-    private readonly storagePolicy: StoragePolicy,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      trackingService: TrackingService;
+      storagePolicy: StoragePolicy;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async execute({ did, refetch }: { did: Did; refetch?: boolean }) {
     if (refetch) {
-      await this.trackingService.stop(did);
+      await this.deps.trackingService.stop(did);
     }
-    const shouldTrack = await this.transactionManager.transaction((ctx) =>
-      this.storagePolicy.isTracked(ctx, did),
+    const shouldTrack = await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.storagePolicy.isTracked(ctx, did),
     );
     if (shouldTrack) {
-      await this.trackingService.start(did);
+      await this.deps.trackingService.start(did);
     } else {
-      await this.trackingService.stop(did);
+      await this.deps.trackingService.stop(did);
     }
   }
 }

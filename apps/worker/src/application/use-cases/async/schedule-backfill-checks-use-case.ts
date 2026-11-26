@@ -7,17 +7,19 @@ import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 
 export class ScheduleBackfillChecksUseCase {
   constructor(
-    private readonly accountQuery: IAccountQuery,
-    private readonly jobScheduler: IJobScheduler,
-    private readonly transactionManager: ITransactionManager,
+    private readonly deps: {
+      accountQuery: IAccountQuery;
+      jobScheduler: IJobScheduler;
+      transactionManager: ITransactionManager;
+    },
   ) {}
 
   async execute() {
-    const dids = await this.transactionManager.transaction((ctx) =>
-      this.accountQuery.findTrackedDidsWithoutBackfillStatus(ctx),
+    const dids = await this.deps.transactionManager.transaction((ctx) =>
+      this.deps.accountQuery.findTrackedDidsWithoutBackfillStatus(ctx),
     );
     for (const did of dids) {
-      await this.jobScheduler.scheduleCheckBackfill(did, 0);
+      await this.deps.jobScheduler.scheduleCheckBackfill(did, 0);
     }
   }
 }

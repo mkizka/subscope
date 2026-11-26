@@ -1,29 +1,4 @@
 {
-  "src/application/use-cases/async/schedule-backfill-checks-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/async/send-push-notification-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/async/sync-tap-repo-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/commit/index-commit-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/identity/upsert-identity-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/label-subscriber.ts": {
     "params/max-params": {
       "count": 1
