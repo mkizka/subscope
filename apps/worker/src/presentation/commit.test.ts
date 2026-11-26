@@ -294,7 +294,7 @@ describe("commit", () => {
       name: string;
       violates: boolean;
     })[])(
-      "index-25: スレッドの起点の投稿の返信制限で許されていない返信は、返信制限の違反として保存する($name)",
+      "index-26: スレッドの起点の投稿の返信制限で許されていない返信は、返信制限の違反として保存する($name)",
       async ({ violates, ...params }) => {
         // arrange
         const { replier, replyEvent } = await setup(params);
@@ -309,7 +309,7 @@ describe("commit", () => {
       },
     );
 
-    test("index-26: 返信制限の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+    test("index-27: 返信制限の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
       // arrange
       const { replier, replyEvent } = await setup({ allow: [] });
       await registrationFactory(ctx.db)

@@ -63,6 +63,7 @@ const toPostDto = (post: SelectPost): PostDto => ({
     thumbCid: post.embedExternal.thumbCid,
   },
   embedRecordUri: post.embedRecord?.uri ?? null,
+  violatesEmbeddingRules: post.violatesEmbeddingRules,
   replyRootUri: post.replyRootUri,
   replyParentUri: post.replyParentUri,
   indexedAt: post.indexedAt,

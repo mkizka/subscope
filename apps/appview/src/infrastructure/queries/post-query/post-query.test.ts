@@ -45,6 +45,7 @@ describe("PostQuery", () => {
           embedVideo: null,
           embedExternal: null,
           embedRecordUri: null,
+          violatesEmbeddingRules: false,
           replyRootUri: null,
           replyParentUri: null,
           indexedAt: post.indexedAt,

@@ -29,6 +29,7 @@ export type PostDto = {
   embedVideo: PostEmbedVideoDto | null;
   embedExternal: PostEmbedExternalDto | null;
   embedRecordUri: string | null;
+  violatesEmbeddingRules: boolean;
   replyRootUri: string | null;
   replyParentUri: string | null;
   indexedAt: Date;
