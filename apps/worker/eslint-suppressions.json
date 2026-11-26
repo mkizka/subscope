@@ -1,24 +1,4 @@
 {
-  "src/application/services/notification-service.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/related-record-service.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/resolve-did-service.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/services/tracking-service.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/use-cases/async/aggregate-account-stats-use-case.ts": {
     "params/max-params": {
       "count": 1

@@ -10,11 +10,13 @@ import type { IAccountRepository } from "../interfaces/repositories/account-repo
 
 export class RelatedRecordService {
   constructor(
-    private readonly recordQuery: IRecordQuery,
-    private readonly profileQuery: IProfileQuery,
-    private readonly accountRepository: IAccountRepository,
-    private readonly jobScheduler: IJobScheduler,
-    private readonly storagePolicy: StoragePolicy,
+    private readonly deps: {
+      recordQuery: IRecordQuery;
+      profileQuery: IProfileQuery;
+      accountRepository: IAccountRepository;
+      jobScheduler: IJobScheduler;
+      storagePolicy: StoragePolicy;
+    },
   ) {}
 
   async requestFor({
@@ -26,11 +28,11 @@ export class RelatedRecordService {
     origin: Origin;
     record: Parameters<StoragePolicy["recordsToFetch"]>[0]["record"];
   }) {
-    const dids = await this.storagePolicy.accountsToFetch({ ctx, record });
+    const dids = await this.deps.storagePolicy.accountsToFetch({ ctx, record });
     for (const did of dids) {
       await this.requestAccount({ ctx, origin, did });
     }
-    const uris = await this.storagePolicy.recordsToFetch({
+    const uris = await this.deps.storagePolicy.recordsToFetch({
       ctx,
       origin,
       record,
@@ -52,12 +54,12 @@ export class RelatedRecordService {
     if (!uri || !origin.canFetchRelated) {
       return;
     }
-    const saved = await this.recordQuery.exists(ctx, uri);
+    const saved = await this.deps.recordQuery.exists(ctx, uri);
     if (saved) {
       return;
     }
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleFetchRecord(uri, origin.jobOptions),
+      this.deps.jobScheduler.scheduleFetchRecord(uri, origin.jobOptions),
     );
   }
 
@@ -71,17 +73,23 @@ export class RelatedRecordService {
     did: Did;
   }) {
     const { live } = origin.jobOptions;
-    const account = await this.accountRepository.find({ ctx, did });
+    const account = await this.deps.accountRepository.find({ ctx, did });
     if (!account?.handle) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleResolveDid(did, { live }),
+        this.deps.jobScheduler.scheduleResolveDid(did, { live }),
       );
     }
-    const hasProfile = await this.profileQuery.exists({ ctx, accountDid: did });
+    const hasProfile = await this.deps.profileQuery.exists({
+      ctx,
+      accountDid: did,
+    });
     if (!hasProfile) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(profileUri, { live, depth: 0 }),
+        this.deps.jobScheduler.scheduleFetchRecord(profileUri, {
+          live,
+          depth: 0,
+        }),
       );
     }
   }
