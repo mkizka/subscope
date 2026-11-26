@@ -26,8 +26,4 @@ export class ListItem {
       record.indexedAt,
     );
   }
-
-  fetchesSubjectAccount({ ownerIsMember }: { ownerIsMember: boolean }) {
-    return ownerIsMember;
-  }
 }

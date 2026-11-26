@@ -3,7 +3,7 @@ import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 import { Follow } from "../../../domain/follow.js";
 import type { Origin } from "../../../domain/origin.js";
 import type { Record } from "../../../domain/record.js";
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { IndexAccountService } from "../index-account-service.js";
@@ -15,7 +15,7 @@ import type { StatsService } from "../stats-service.js";
 export class FollowIndexer implements IRecordIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
-    private readonly registrationQuery: IRegistrationQuery,
+    private readonly storagePolicy: StoragePolicy,
     private readonly indexAccountService: IndexAccountService,
     private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
@@ -34,10 +34,7 @@ export class FollowIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const follow = Follow.fromRecord(record);
-    const followerIsMember = await this.registrationQuery.isRegistered(
-      ctx,
-      follow.accountDid,
-    );
+    const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
 
     await this.recordSaveService.save({ ctx, record, origin });
     await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
@@ -48,7 +45,7 @@ export class FollowIndexer implements IRecordIndexer {
       origin,
       notifications: () => [follow.notification],
     });
-    if (follow.changesTrackedAccounts({ followerIsMember })) {
+    if (tracksFollowee) {
       await this.relatedRecordService.requestAccount({
         ctx,
         origin,
@@ -72,11 +69,8 @@ export class FollowIndexer implements IRecordIndexer {
     record: Record;
   }) {
     const follow = Follow.fromRecord(record);
-    const followerIsMember = await this.registrationQuery.isRegistered(
-      ctx,
-      follow.accountDid,
-    );
-    if (follow.changesTrackedAccounts({ followerIsMember })) {
+    const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
+    if (tracksFollowee) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );

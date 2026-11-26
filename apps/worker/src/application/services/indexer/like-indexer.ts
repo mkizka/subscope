@@ -3,11 +3,10 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import { Like } from "../../../domain/like.js";
 import type { Origin } from "../../../domain/origin.js";
 import type { Record } from "../../../domain/record.js";
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { NotificationService } from "../notification-service.js";
-import type { PastRecordFilterService } from "../past-record-filter-service.js";
 import type { RecordSaveService } from "../record-save-service.js";
 import type { RelatedRecordService } from "../related-record-service.js";
 import type { StatsService } from "../stats-service.js";
@@ -15,8 +14,7 @@ import type { StatsService } from "../stats-service.js";
 export class LikeIndexer implements IRecordIndexer {
   constructor(
     private readonly likeRepository: ILikeRepository,
-    private readonly registrationQuery: IRegistrationQuery,
-    private readonly pastRecordFilterService: PastRecordFilterService,
+    private readonly storagePolicy: StoragePolicy,
     private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
     private readonly relatedRecordService: RelatedRecordService,
@@ -33,25 +31,12 @@ export class LikeIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const like = Like.fromRecord(record);
-    const window = {
+    const { stores, fetchesSubject } = await this.storagePolicy.decideLike({
       ctx,
       origin,
-      did: like.accountDid,
-      createdAt: like.createdAt,
-    };
-    const likerIsMember = await this.registrationQuery.isRegistered(
-      ctx,
-      like.accountDid,
-    );
-    const subjectAuthorIsMember = await this.registrationQuery.isRegistered(
-      ctx,
-      like.subjectAuthorDid,
-    );
-    if (!like.isStored({ likerIsMember, subjectAuthorIsMember })) {
-      return;
-    }
-    const accepted = await this.pastRecordFilterService.accepts(window);
-    if (!accepted) {
+      like,
+    });
+    if (!stores) {
       return;
     }
 
@@ -63,9 +48,7 @@ export class LikeIndexer implements IRecordIndexer {
       origin,
       notifications: () => [like.notification],
     });
-    const withinWindow =
-      await this.pastRecordFilterService.isWithinWindow(window);
-    if (like.fetchesSubject({ likerIsMember, withinWindow })) {
+    if (fetchesSubject) {
       await this.relatedRecordService.request({
         ctx,
         origin,

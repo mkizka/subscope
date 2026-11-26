@@ -14,7 +14,7 @@ description: worker・appview・webで型やクラスを新規作成・変更す
 | `domain`          | 仕様書や用語集に出てくる概念と、その決まり。リポジトリが保存・取得する物 |
 | `application/dto` | 層の境界でデータを運ぶだけの型。クエリサービスが返す型など               |
 
-`domain` は `application` や `infrastructure` を参照しない。DTOは判断を持たない。読み取りでドメインモデルを返さない(docs/dev/repository-and-query.md)。
+`domain` は `application` や `infrastructure` を参照しない。ドメインサービスが使うリポジトリやクエリのインターフェースは `domain/interfaces` に置く。DTOは判断を持たない。読み取りでドメインモデルを返さない(docs/dev/repository-and-query.md)。
 
 例:
 
@@ -34,23 +34,22 @@ description: worker・appview・webで型やクラスを新規作成・変更す
 
 ## DBに聞かないと分からない判定
 
-ドメインはDBを知らない。アプリケーション層がDBに聞き、その結果をメソッドに渡して、判断だけをドメインに聞く。
+1つの概念に収まらない決まりや、DBに聞かないと判断できない決まりは、`domain/services` のドメインサービスに置く。ドメインサービスは状態を持たず、`domain/interfaces` のインターフェース越しにDBへ聞く。
 
 ```ts
-const likerIsMember = await this.registrationQuery.isRegistered(
-  ctx,
-  like.accountDid,
-);
-const subjectAuthorIsMember = await this.registrationQuery.isRegistered(
-  ctx,
-  like.subjectAuthorDid,
-);
-if (!like.isStored({ likerIsMember, subjectAuthorIsMember })) {
-  return;
+// domain/services/storage-policy.ts
+async storesFeedRecord({ ctx, origin, record }) {
+  return (
+    !origin.isPast ||
+    (await this.registrationQuery.isRegistered(ctx, record.accountDid)) ||
+    (await this.isWithinWindow(ctx, origin, record))
+  );
 }
 ```
 
-アプリケーション層に残すのは、DBに聞く、順番に呼ぶ、保存する、の3つ。`&&` や `||` で書く業務の条件はドメインに置く。
+アプリケーション層は、ドメインサービスに聞いた結果で分岐するだけにする。メンバーかどうかなどを自分でDBに聞いて条件を組み立てない。
+
+例: `apps/worker/src/domain/services/storage-policy.ts` の `StoragePolicy`(何を保存し、何を取りに行くか)、`notification-policy.ts` の `NotificationPolicy`(誰に通知するか)
 
 ## 基準に合っていない既存の型
 

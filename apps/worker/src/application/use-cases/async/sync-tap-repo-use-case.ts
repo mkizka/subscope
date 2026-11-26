@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { ITransactionManager } from "@repo/common/interface";
 
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
+import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
 import type { TrackingService } from "../../services/tracking-service.js";
 
 export class SyncTapRepoUseCase {

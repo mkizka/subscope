@@ -5,9 +5,9 @@ import type {
 } from "@repo/common/interface";
 
 import type { BackfillStatus } from "../../../domain/account.js";
+import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
 import type { IRepoStatusFetcher } from "../../interfaces/external/repo-status-fetcher.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
-import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
 import type { TrackingService } from "../../services/tracking-service.js";
 

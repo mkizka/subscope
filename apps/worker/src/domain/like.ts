@@ -48,28 +48,4 @@ export class Like {
       sortAt: getSortAt(this),
     };
   }
-
-  isStored({
-    likerIsMember,
-    subjectAuthorIsMember,
-  }: {
-    likerIsMember: boolean;
-    subjectAuthorIsMember: boolean;
-  }) {
-    return likerIsMember || subjectAuthorIsMember;
-  }
-
-  fetchesSubject({
-    likerIsMember,
-    withinWindow,
-  }: {
-    likerIsMember: boolean;
-    withinWindow: boolean;
-  }) {
-    return (
-      likerIsMember &&
-      this.subject.collection === "app.bsky.feed.post" &&
-      withinWindow
-    );
-  }
 }

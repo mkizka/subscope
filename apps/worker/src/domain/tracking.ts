@@ -19,20 +19,4 @@ export class Tracking {
   covers(date: Date) {
     return date.getTime() >= this.trackedAt.getTime() - PAST_RECORD_WINDOW_MS;
   }
-
-  static keepsPastRecord({
-    authorIsMember,
-    tracking,
-    createdAt,
-  }: {
-    authorIsMember: boolean;
-    tracking: Tracking | null;
-    createdAt: Date;
-  }) {
-    return authorIsMember || Tracking.windowCovers(tracking, createdAt);
-  }
-
-  static windowCovers(tracking: Tracking | null, createdAt: Date) {
-    return !!tracking && tracking.covers(createdAt);
-  }
 }

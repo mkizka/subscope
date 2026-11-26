@@ -3,7 +3,7 @@ import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { ITrackingRepository } from "../../../application/interfaces/repositories/tracking-repository.js";
+import type { ITrackingRepository } from "../../../domain/interfaces/tracking-repository.js";
 import { Tracking } from "../../../domain/tracking.js";
 
 export class TrackingRepository implements ITrackingRepository {

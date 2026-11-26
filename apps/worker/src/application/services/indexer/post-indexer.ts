@@ -3,12 +3,12 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import type { Origin } from "../../../domain/origin.js";
 import { Post } from "../../../domain/post.js";
 import type { Record } from "../../../domain/record.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { NotificationService } from "../notification-service.js";
-import type { PastRecordFilterService } from "../past-record-filter-service.js";
 import type { RecordSaveService } from "../record-save-service.js";
 import type { RelatedRecordService } from "../related-record-service.js";
 import type { StatsService } from "../stats-service.js";
@@ -20,7 +20,7 @@ export class PostIndexer implements IRecordIndexer {
     private readonly postRepository: IPostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postQuery: IPostQuery,
-    private readonly pastRecordFilterService: PastRecordFilterService,
+    private readonly storagePolicy: StoragePolicy,
     private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
     private readonly relatedRecordService: RelatedRecordService,
@@ -37,13 +37,12 @@ export class PostIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const post = Post.fromRecord(record);
-    const accepted = await this.pastRecordFilterService.accepts({
+    const stores = await this.storagePolicy.storesFeedRecord({
       ctx,
       origin,
-      did: post.accountDid,
-      createdAt: post.createdAt,
+      record: post,
     });
-    if (!accepted) {
+    if (!stores) {
       return;
     }
 

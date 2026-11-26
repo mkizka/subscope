@@ -37,8 +37,4 @@ export class Follow {
       sortAt: getSortAt(this),
     };
   }
-
-  changesTrackedAccounts({ followerIsMember }: { followerIsMember: boolean }) {
-    return followerIsMember;
-  }
 }

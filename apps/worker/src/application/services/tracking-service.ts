@@ -4,10 +4,10 @@ import type {
   ITransactionManager,
 } from "@repo/common/interface";
 
+import type { ITrackingRepository } from "../../domain/interfaces/tracking-repository.js";
 import { Tracking } from "../../domain/tracking.js";
 import type { ILabelFetcher } from "../interfaces/external/label-fetcher.js";
 import type { ITapClient } from "../interfaces/external/tap-client.js";
-import type { ITrackingRepository } from "../interfaces/repositories/tracking-repository.js";
 import type { IndexLabelService } from "./index-label-service.js";
 
 export class TrackingService {
