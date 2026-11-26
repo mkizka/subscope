@@ -1,10 +1,8 @@
 import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 
-import type {
-  INotificationRepository,
-  Notification,
-} from "../../../application/interfaces/repositories/notification-repository.js";
+import type { INotificationRepository } from "../../../application/interfaces/repositories/notification-repository.js";
+import type { Notification } from "../../../domain/notification.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class NotificationRepository implements INotificationRepository {

@@ -2,18 +2,19 @@ import { AtUri } from "@atproto/syntax";
 import { type ITransactionManager } from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
+import { Origin } from "../../../domain/origin.js";
 import type { JobLogger } from "../../../shared/job.js";
 import {
   type IRecordFetcher,
   RecordFetchError,
 } from "../../interfaces/external/record-fetcher.js";
-import type { IndexRecordService } from "../../services/index-record-service.js";
+import type { RecordIndexer } from "../../services/indexer/record-indexer.js";
 
 export class FetchRecordUseCase {
   constructor(
     private readonly recordFetcher: IRecordFetcher,
     private readonly transactionManager: ITransactionManager,
-    private readonly indexRecordService: IndexRecordService,
+    private readonly recordIndexer: RecordIndexer,
   ) {}
 
   async execute({
@@ -49,11 +50,10 @@ export class FetchRecordUseCase {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
     await this.transactionManager.transaction((ctx) =>
-      this.indexRecordService.index({
+      this.recordIndexer.index({
         ctx,
         record,
-        origin: { type: "pds", hop: depth + 1 },
-        priority: live ? "high" : "low",
+        origin: Origin.fromFetchJob({ live, depth }),
       }),
     );
   }

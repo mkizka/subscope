@@ -1,6 +1,6 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { FeedItem } from "../../dto/feed-item.js";
+import type { FeedItem } from "../../../domain/feed-item.js";
 
 export interface IFeedItemRepository {
   save: (params: {

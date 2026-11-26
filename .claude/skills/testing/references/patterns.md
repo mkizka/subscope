@@ -129,7 +129,7 @@ const ctx = {
   db: testInjector.resolve("db"),
 };
 
-await saveRecordService.save({ ctx, record });
+await postIndexer.index({ ctx, record, origin: Origin.live() });
 ```
 
 ## テストすべきケース

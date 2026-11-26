@@ -31,7 +31,7 @@ import type { IPostQuery } from "../application/interfaces/queries/post-query.js
 import type { IPostStatsQuery } from "../application/interfaces/queries/post-stats-query.js";
 import type { IProfileQuery } from "../application/interfaces/queries/profile-query.js";
 import type { IPushNotificationQuery } from "../application/interfaces/queries/push-notification-query.js";
-import type { IRegistrationQuery } from "../application/interfaces/queries/registration-query.js";
+import type { IRecordQuery } from "../application/interfaces/queries/record-query.js";
 import type { IAccountRepository } from "../application/interfaces/repositories/account-repository.js";
 import type { IAccountStatsRepository } from "../application/interfaces/repositories/account-stats-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
@@ -49,18 +49,24 @@ import type { IPushSubscriptionRepository } from "../application/interfaces/repo
 import type { IRecordRepository } from "../application/interfaces/repositories/record-repository.js";
 import type { IRepoRevRepository } from "../application/interfaces/repositories/repo-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
-import type { ITrackingRepository } from "../application/interfaces/repositories/tracking-repository.js";
-import { FetchPolicyService } from "../application/services/fetch-policy-service.js";
 import { IndexAccountService } from "../application/services/index-account-service.js";
-import { IndexJobService } from "../application/services/index-job-service.js";
 import { IndexLabelService } from "../application/services/index-label-service.js";
-import { IndexRecordService } from "../application/services/index-record-service.js";
-import { NotificationPolicyService } from "../application/services/notification-policy-service.js";
+import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
+import { GateIndexer } from "../application/services/indexer/gate-indexer.js";
+import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
+import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
+import { LinkIndexer } from "../application/services/indexer/link-indexer.js";
+import { ListIndexer } from "../application/services/indexer/list-indexer.js";
+import { ListItemIndexer } from "../application/services/indexer/list-item-indexer.js";
+import { PostIndexer } from "../application/services/indexer/post-indexer.js";
+import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
+import { RecordIndexer } from "../application/services/indexer/record-indexer.js";
+import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
+import { NotificationService } from "../application/services/notification-service.js";
+import { RecordSaveService } from "../application/services/record-save-service.js";
+import { RelatedRecordService } from "../application/services/related-record-service.js";
 import { ResolveDidService } from "../application/services/resolve-did-service.js";
-import { SaveRecordService } from "../application/services/save-record-service.js";
-import { StatsPolicyService } from "../application/services/stats-policy-service.js";
-import { StoragePolicyService } from "../application/services/storage-policy-service.js";
-import { TrackingPolicyService } from "../application/services/tracking-policy-service.js";
+import { StatsService } from "../application/services/stats-service.js";
 import { TrackingService } from "../application/services/tracking-service.js";
 import { AggregateAccountStatsUseCase } from "../application/use-cases/async/aggregate-account-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
@@ -74,6 +80,10 @@ import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit
 import { UpdateRepoRevUseCase } from "../application/use-cases/commit/update-repo-rev-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
+import type { IRegistrationQuery } from "../domain/interfaces/registration-query.js";
+import type { ITrackingRepository } from "../domain/interfaces/tracking-repository.js";
+import { NotificationPolicy } from "../domain/services/notification-policy.js";
+import { StoragePolicy } from "../domain/services/storage-policy.js";
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
@@ -83,6 +93,7 @@ import { PostQuery } from "../infrastructure/queries/post-query/post-query.js";
 import { PostStatsQuery } from "../infrastructure/queries/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/queries/profile-query/profile-query.js";
 import { PushNotificationQuery } from "../infrastructure/queries/push-notification-query/push-notification-query.js";
+import { RecordQuery } from "../infrastructure/queries/record-query/record-query.js";
 import { RegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.js";
 import { RepoStatusFetcher } from "../infrastructure/repo-status-fetcher/repo-status-fetcher.js";
 import { AccountRepository } from "../infrastructure/repositories/account-repository/account-repository.js";
@@ -142,6 +153,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("postQuery", asClassArgs<IPostQuery>()(PostQuery))
     .service("profileQuery", asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("recordRepository", asClassArgs<IRecordRepository>()(RecordRepository))
+    .service("recordQuery", asClassArgs<IRecordQuery>()(RecordQuery))
     .service("repoRevRepository", asClassArgs<IRepoRevRepository>()(RepoRevRepository))
     .service("trackingRepository", asClassArgs<ITrackingRepository>()(TrackingRepository))
     .service("followRepository", asClassArgs<IFollowRepository>()(FollowRepository))
@@ -158,31 +170,41 @@ export const createWorkerRegistry = (env: Env) =>
     .service("pushNotificationQuery", asClassArgs<IPushNotificationQuery>()(PushNotificationQuery))
     .service("pushSubscriptionRepository", asClassArgs<IPushSubscriptionRepository>()(PushSubscriptionRepository))
     .service("webPushSender", ["env"], asClassArgs<IWebPushSender>()(WebPushSender))
-    // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
+    // domain(service)
+    .service("storagePolicy", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicy))
+    .service("notificationPolicy", ["registrationQuery"], asClassArgs(NotificationPolicy))
+    // application(service)
+    .service("notificationService", ["notificationRepository", "notificationPolicy", "jobScheduler"], asClassArgs(NotificationService))
+    .service("statsService", ["jobScheduler"], asClassArgs(StatsService))
+    .service("relatedRecordService", ["recordQuery", "profileQuery", "accountRepository", "jobScheduler", "storagePolicy"], asClassArgs(RelatedRecordService))
     .service("indexLabelService", ["labelRepository", "accountQuery"], asClassArgs(IndexLabelService))
     .service("trackingService", ["tapClient", "trackingRepository", "labelFetcher", "indexLabelService", "jobScheduler", "transactionManager"], asClassArgs(TrackingService))
     .service("indexAccountService", ["accountRepository"], asClassArgs(IndexAccountService))
-    .service("fetchPolicyService", ["accountRepository", "profileQuery", "postQuery", "registrationQuery", "trackingRepository"], asClassArgs(FetchPolicyService))
-    .service("indexJobService", ["jobScheduler"], asClassArgs(IndexJobService))
-    .service("saveRecordService", ["indexAccountService", "recordRepository", "postRepository", "repostRepository", "feedItemRepository", "likeRepository", "followRepository", "profileRepository", "generatorRepository", "listRepository", "listItemRepository"], asClassArgs(SaveRecordService))
-    .service("notificationPolicyService", ["postQuery", "registrationQuery"], asClassArgs(NotificationPolicyService))
-    .service("statsPolicyService", asClassArgs(StatsPolicyService))
-    .service("trackingPolicyService", ["registrationQuery"], asClassArgs(TrackingPolicyService))
     .service("resolveDidService", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidService))
-    .service("storagePolicyService", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicyService))
-    .service("indexRecordService", ["recordRepository", "notificationRepository", "saveRecordService", "storagePolicyService", "fetchPolicyService", "notificationPolicyService", "statsPolicyService", "trackingPolicyService", "indexJobService"], asClassArgs(IndexRecordService))
+    .service("recordSaveService", ["recordRepository", "indexAccountService"], asClassArgs(RecordSaveService))
+    .service("postIndexer", ["postRepository", "feedItemRepository", "postQuery", "storagePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(PostIndexer))
+    .service("repostIndexer", ["repostRepository", "feedItemRepository", "storagePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(RepostIndexer))
+    .service("likeIndexer", ["likeRepository", "storagePolicy", "recordSaveService", "notificationService", "relatedRecordService", "statsService"], asClassArgs(LikeIndexer))
+    .service("followIndexer", ["followRepository", "storagePolicy", "indexAccountService", "recordSaveService", "notificationService", "relatedRecordService", "statsService", "jobScheduler"], asClassArgs(FollowIndexer))
+    .service("listItemIndexer", ["listItemRepository", "indexAccountService", "recordSaveService", "relatedRecordService"], asClassArgs(ListItemIndexer))
+    .service("profileIndexer", ["profileRepository", "recordSaveService", "relatedRecordService"], asClassArgs(ProfileIndexer))
+    .service("generatorIndexer", ["generatorRepository", "recordSaveService", "relatedRecordService"], asClassArgs(GeneratorIndexer))
+    .service("listIndexer", ["listRepository", "recordSaveService", "relatedRecordService"], asClassArgs(ListIndexer))
+    .service("gateIndexer", ["recordSaveService", "relatedRecordService"], asClassArgs(GateIndexer))
+    .service("linkIndexer", ["recordSaveService", "relatedRecordService"], asClassArgs(LinkIndexer))
+    .service("recordIndexer", ["recordRepository", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(RecordIndexer))
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
-    .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidService", "fetchPolicyService", "indexJobService"], asClassArgs(UpsertIdentityUseCase))
-    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService"], asClassArgs(IndexCommitUseCase))
+    .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "relatedRecordService", "resolveDidService"], asClassArgs(UpsertIdentityUseCase))
+    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "recordIndexer"], asClassArgs(IndexCommitUseCase))
     .service("updateRepoRevUseCase", ["transactionManager", "repoRevRepository"], asClassArgs(UpdateRepoRevUseCase))
-    .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
+    .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "recordIndexer"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClassArgs(AggregateAccountStatsUseCase))
     .service("indexLabelUseCase", ["indexLabelService", "transactionManager"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["trackingService", "registrationQuery", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
-    .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "trackingService", "registrationQuery", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
+    .service("syncTapRepoUseCase", ["trackingService", "storagePolicy", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
+    .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "trackingService", "storagePolicy", "accountRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClassArgs(SendPushNotificationUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClassArgs(SyncWorker))

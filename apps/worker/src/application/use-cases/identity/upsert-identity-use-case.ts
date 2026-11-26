@@ -1,8 +1,8 @@
 import type { ITransactionManager } from "@repo/common/interface";
 
-import type { FetchPolicyService } from "../../services/fetch-policy-service.js";
+import { Origin } from "../../../domain/origin.js";
 import type { IndexAccountService } from "../../services/index-account-service.js";
-import type { IndexJobService } from "../../services/index-job-service.js";
+import type { RelatedRecordService } from "../../services/related-record-service.js";
 import type { ResolveDidService } from "../../services/resolve-did-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
@@ -10,9 +10,8 @@ export class UpsertIdentityUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly indexAccountService: IndexAccountService,
+    private readonly relatedRecordService: RelatedRecordService,
     private readonly resolveDidService: ResolveDidService,
-    private readonly fetchPolicyService: FetchPolicyService,
-    private readonly indexJobService: IndexJobService,
   ) {}
 
   async execute(command: UpsertIdentityCommand) {
@@ -33,11 +32,11 @@ export class UpsertIdentityUseCase {
         handle,
         status: command.status,
       });
-      const targets = await this.fetchPolicyService.targetsForAccount({
+      await this.relatedRecordService.requestAccount({
         ctx,
+        origin: Origin.live(),
         did: command.did,
       });
-      this.indexJobService.schedule({ ctx, priority: "high", fetch: targets });
     });
     if (handle === "handle.invalid") {
       await this.resolveDidService.resolve(command.did);

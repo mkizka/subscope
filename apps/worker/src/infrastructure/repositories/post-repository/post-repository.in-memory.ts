@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Post } from "../../../application/dto/post.js";
 import type { IPostRepository } from "../../../application/interfaces/repositories/post-repository.js";
+import type { Post } from "../../../domain/post.js";
 
 export class InMemoryPostRepository implements IPostRepository {
   private posts: Map<string, Post> = new Map();

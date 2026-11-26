@@ -1,13 +1,6 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-export type Notification = {
-  recordUri: string;
-  recipientDid: string;
-  authorDid: string;
-  reason: "like" | "repost" | "follow" | "mention" | "reply" | "quote";
-  reasonSubject: string | null;
-  sortAt: Date;
-};
+import type { Notification } from "../../../domain/notification.js";
 
 export interface INotificationRepository {
   save: (params: {

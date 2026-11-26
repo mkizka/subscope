@@ -2,9 +2,9 @@ import * as webpush from "web-push";
 
 import type {
   IWebPushSender,
-  PushPayload,
   PushSubscription,
 } from "../../application/interfaces/external/web-push-sender.js";
+import type { PushPayload } from "../../domain/push-notification.js";
 import type { Env } from "../../shared/env.js";
 
 const TTL_SECONDS = 24 * 60 * 60;

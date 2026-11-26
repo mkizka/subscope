@@ -10,6 +10,7 @@ import {
 
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/queries/profile-query/profile-query.in-memory.js";
+import { InMemoryRecordQuery } from "../infrastructure/queries/record-query/record-query.in-memory.js";
 import { InMemoryRegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.in-memory.js";
 import { InMemoryRepoStatusFetcher } from "../infrastructure/repo-status-fetcher/repo-status-fetcher.in-memory.js";
 import { InMemoryAccountRepository } from "../infrastructure/repositories/account-repository/account-repository.in-memory.js";
@@ -64,6 +65,7 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("postQuery", ["postRepository"], asClassArgs(InMemoryPostQuery))
   .replaceService("profileQuery", ["profileRepository"], asClassArgs(InMemoryProfileQuery))
   .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
+  .replaceService("recordQuery", ["recordRepository"], asClassArgs(InMemoryRecordQuery))
   .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
   .replaceService("trackingRepository", asClassArgs(InMemoryTrackingRepository))
   .replaceService("registrationQuery", asClassArgs(InMemoryRegistrationQuery))

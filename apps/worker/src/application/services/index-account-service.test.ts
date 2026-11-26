@@ -118,7 +118,7 @@ describe("IndexAccountService", () => {
       });
     });
 
-    test("handle指定なし、既存accountなしの場合は、accountを作成する", async () => {
+    test("handle指定なし、既存accountなしの場合は、handleなしでaccountを作成する", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const newDid = asDid("did:plc:new-no-handle");
@@ -137,7 +137,7 @@ describe("IndexAccountService", () => {
       });
     });
 
-    test("handle指定なし、既存accountあり、既存accountのhandleなしの場合は、何もしない", async () => {
+    test("handle指定なし、既存accountあり、既存accountのhandleなしの場合は、handleなしのままにする", async () => {
       const ctx = { db, afterCommit };
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");

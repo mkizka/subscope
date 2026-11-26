@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 
-import type { Generator } from "../../../application/dto/generator.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
+import type { Generator } from "../../../domain/generator.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class GeneratorRepository implements IGeneratorRepository {

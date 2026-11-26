@@ -22,19 +22,9 @@ export class IndexAccountService {
   }): Promise<void> {
     const existingAccount = await this.accountRepository.find({ ctx, did });
     const account = existingAccount ?? Account.create({ did });
-    const changed =
-      !existingAccount ||
-      (!!handle && handle !== account.handle) ||
-      (!!status && status !== account.status);
+    const changed = account.update({ handle, status });
 
-    if (handle) {
-      account.updateHandle(handle);
-    }
-    if (status) {
-      account.updateStatus(status);
-    }
-
-    if (changed) {
+    if (!existingAccount || changed) {
       await this.accountRepository.save({ ctx, account });
     }
   }

@@ -2,7 +2,7 @@ import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
+import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
 
 export class RegistrationQuery implements IRegistrationQuery {
   async isRegistered(

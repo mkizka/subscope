@@ -1,7 +1,7 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { Generator } from "../../../application/dto/generator.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
+import type { Generator } from "../../../domain/generator.js";
 
 export class InMemoryGeneratorRepository implements IGeneratorRepository {
   private generators: Map<string, Generator> = new Map();

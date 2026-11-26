@@ -4,7 +4,8 @@ import {
 } from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
-import type { IndexRecordService } from "../../services/index-record-service.js";
+import { Origin } from "../../../domain/origin.js";
+import type { RecordIndexer } from "../../services/indexer/record-indexer.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 export class IndexCommitUseCase {
@@ -13,7 +14,7 @@ export class IndexCommitUseCase {
   constructor(
     loggerManager: ILoggerManager,
     private readonly transactionManager: ITransactionManager,
-    private readonly indexRecordService: IndexRecordService,
+    private readonly recordIndexer: RecordIndexer,
   ) {
     this.logger = loggerManager.createLogger("IndexCommitUseCase");
   }
@@ -33,15 +34,13 @@ export class IndexCommitUseCase {
   private async doIndexCommit({ commit, live }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
       if (commit.operation === "delete") {
-        // Related data is also deleted by cascade
-        await this.indexRecordService.delete({ ctx, uri: commit.uri });
+        await this.recordIndexer.delete({ ctx, uri: commit.uri });
         return;
       }
-      await this.indexRecordService.index({
+      await this.recordIndexer.index({
         ctx,
         record: commit.record,
-        origin: { type: live ? "tapLive" : "tapPast" },
-        priority: live ? "high" : "low",
+        origin: live ? Origin.live() : Origin.backfill(),
       });
     });
   }

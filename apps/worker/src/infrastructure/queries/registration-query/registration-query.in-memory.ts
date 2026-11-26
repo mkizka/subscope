@@ -1,6 +1,6 @@
 import type { TransactionContext } from "@repo/common/interface";
 
-import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
+import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
 
 export class InMemoryRegistrationQuery implements IRegistrationQuery {
   private registrations: Set<string> = new Set();
