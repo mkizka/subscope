@@ -10,9 +10,11 @@ import type { IRegistrationRepository } from "../../interfaces/registration-repo
 
 export class CreateRegistrationService {
   constructor(
-    private readonly registrationRepository: IRegistrationRepository,
-    private readonly followQuery: IFollowQuery,
-    private readonly jobScheduler: IJobScheduler,
+    private readonly deps: {
+      registrationRepository: IRegistrationRepository;
+      followQuery: IFollowQuery;
+      jobScheduler: IJobScheduler;
+    },
   ) {}
 
   async create({
@@ -29,15 +31,16 @@ export class CreateRegistrationService {
       inviteCode,
       createdAt: new Date(),
     });
-    await this.registrationRepository.save({ ctx, registration });
+    await this.deps.registrationRepository.save({ ctx, registration });
 
     ctx.afterCommit(async () => {
-      const followeeDids = await this.followQuery.findFolloweeDids(accountDid);
-      await this.jobScheduler.scheduleSyncTapRepo(accountDid, {
+      const followeeDids =
+        await this.deps.followQuery.findFolloweeDids(accountDid);
+      await this.deps.jobScheduler.scheduleSyncTapRepo(accountDid, {
         refetch: true,
       });
       for (const did of followeeDids) {
-        await this.jobScheduler.scheduleSyncTapRepo(did);
+        await this.deps.jobScheduler.scheduleSyncTapRepo(did);
       }
     });
   }

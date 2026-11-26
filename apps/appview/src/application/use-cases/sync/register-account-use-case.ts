@@ -19,11 +19,13 @@ export class InvalidInviteCodeError extends Error {
 
 export class RegisterAccountUseCase {
   constructor(
-    private readonly transactionManager: ITransactionManager,
-    private readonly accountRepository: IAccountRepository,
-    private readonly inviteCodeRepository: IInviteCodeRepository,
-    private readonly validateRegistrationService: ValidateRegistrationService,
-    private readonly createRegistrationService: CreateRegistrationService,
+    private readonly deps: {
+      transactionManager: ITransactionManager;
+      accountRepository: IAccountRepository;
+      inviteCodeRepository: IInviteCodeRepository;
+      validateRegistrationService: ValidateRegistrationService;
+      createRegistrationService: CreateRegistrationService;
+    },
   ) {}
 
   private async useInviteCode(
@@ -34,7 +36,7 @@ export class RegisterAccountUseCase {
       throw new InvalidInviteCodeError("Invite code is required");
     }
 
-    const inviteCode = await this.inviteCodeRepository.find({ code, ctx });
+    const inviteCode = await this.deps.inviteCodeRepository.find({ code, ctx });
 
     if (!inviteCode) {
       throw new InvalidInviteCodeError("Invalid invite code");
@@ -45,7 +47,7 @@ export class RegisterAccountUseCase {
       );
     }
     inviteCode.markAsUsed();
-    await this.inviteCodeRepository.save({ inviteCode, ctx });
+    await this.deps.inviteCodeRepository.save({ inviteCode, ctx });
   }
 
   async execute({
@@ -56,17 +58,17 @@ export class RegisterAccountUseCase {
     code?: string;
   }): Promise<void> {
     const existingAccount =
-      await this.validateRegistrationService.validate(accountDid);
+      await this.deps.validateRegistrationService.validate(accountDid);
 
-    await this.transactionManager.transaction(async (ctx) => {
+    await this.deps.transactionManager.transaction(async (ctx) => {
       if (!existingAccount?.isAdmin) {
         await this.useInviteCode(code, ctx);
       }
       if (!existingAccount) {
         const account = Account.create({ did: accountDid });
-        await this.accountRepository.save({ ctx, account });
+        await this.deps.accountRepository.save({ ctx, account });
       }
-      await this.createRegistrationService.create({
+      await this.deps.createRegistrationService.create({
         ctx,
         accountDid,
         inviteCode: code,

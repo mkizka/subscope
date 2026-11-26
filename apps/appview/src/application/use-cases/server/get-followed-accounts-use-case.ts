@@ -8,9 +8,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetFollowedAccountsUseCase {
   constructor(
-    private readonly registrationQuery: IRegistrationQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      registrationQuery: IRegistrationQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(params: {
@@ -26,18 +28,18 @@ export class GetFollowedAccountsUseCase {
       getCursor: (item) => `${item.memberFollowersCount}::${item.did}`,
     });
     const [items, total] = await Promise.all([
-      this.registrationQuery.findFollowedAccounts({
+      this.deps.registrationQuery.findFollowedAccounts({
         limit: paginator.queryLimit,
         cursor: params.cursor,
         q: params.q,
       }),
-      this.registrationQuery.countFollowedAccounts(),
+      this.deps.registrationQuery.countFollowedAccounts(),
     ]);
     const page = paginator.extractPage(items);
 
-    const ctx = this.viewContextFactory.create();
+    const ctx = this.deps.viewContextFactory.create();
     const profiles = await Promise.all(
-      page.items.map((item) => this.profileViews.view(item.did, ctx)),
+      page.items.map((item) => this.deps.profileViews.view(item.did, ctx)),
     );
 
     return {
