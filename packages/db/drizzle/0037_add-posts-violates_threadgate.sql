@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ADD COLUMN "violates_threadgate" boolean DEFAULT false NOT NULL;

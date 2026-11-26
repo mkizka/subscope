@@ -52,6 +52,14 @@ export class PostIndexer implements IRecordIndexer {
     if (violatesEmbeddingRules) {
       post.markEmbeddingRulesViolated();
     }
+    const violatesThreadgate = await this.gatePolicy.violatesThreadgate({
+      ctx,
+      origin,
+      post,
+    });
+    if (violatesThreadgate) {
+      post.markThreadgateViolated();
+    }
 
     await this.recordSaveService.save({ ctx, record });
     await this.relatedRecordService.requestFor({ ctx, origin, record: post });

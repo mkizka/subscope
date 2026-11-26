@@ -14,7 +14,10 @@ import {
 import { schema } from "@repo/db";
 import {
   accountFactory,
+  followFactory,
+  listItemFactory,
   randomCid,
+  recordFactory,
   registrationFactory,
   testSetup,
 } from "@repo/test-utils";
@@ -165,6 +168,162 @@ describe("commit", () => {
         expect(records).toHaveLength(saved ? 1 : 0);
       },
     );
+  });
+
+  describe("返信制限の違反", () => {
+    type Rule = "mention" | "following" | "follower" | "list";
+
+    const setup = async ({
+      allow,
+      ownerFollows = false,
+      replierFollows = false,
+      mentioned = false,
+      listed = false,
+    }: {
+      allow: Rule[];
+      ownerFollows?: boolean;
+      replierFollows?: boolean;
+      mentioned?: boolean;
+      listed?: boolean;
+    }) => {
+      const owner = await accountFactory(ctx.db)
+        .use((t) => t.serverMember())
+        .create();
+      const replier = await accountFactory(ctx.db).create();
+      const follow = (from: string, to: typeof owner) =>
+        followFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.graph.follow")
+                .vars({ accountDid: () => from })
+                .create(),
+            followee: () => to,
+          })
+          .create();
+      if (ownerFollows) await follow(owner.did, replier);
+      if (replierFollows) await follow(replier.did, owner);
+      const listItem = await listItemFactory(ctx.db)
+        .vars({ subject: () => (listed ? replier : owner) })
+        .create();
+      const mention = {
+        index: { byteStart: 0, byteEnd: 1 },
+        features: [
+          { $type: "app.bsky.richtext.facet#mention", did: replier.did },
+        ],
+      };
+      const root = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ account: () => owner })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "@",
+            facets: mentioned ? [mention] : [],
+            createdAt: new Date().toISOString(),
+          }),
+        })
+        .create();
+      await recordFactory(ctx.db, "app.bsky.feed.threadgate")
+        .vars({ account: () => owner })
+        .props({
+          uri: () =>
+            AtUri.make(
+              owner.did,
+              "app.bsky.feed.threadgate",
+              new AtUri(root.uri).rkey,
+            ).toString(),
+          json: () => ({
+            $type: "app.bsky.feed.threadgate",
+            post: root.uri,
+            allow: allow.map((rule) =>
+              rule === "list"
+                ? {
+                    $type: "app.bsky.feed.threadgate#listRule",
+                    list: listItem.listUri,
+                  }
+                : { $type: `app.bsky.feed.threadgate#${rule}Rule` },
+            ),
+            createdAt: new Date().toISOString(),
+          }),
+        })
+        .create();
+      const ref = { uri: root.uri, cid: root.cid };
+      const replyEvent = (live: boolean): RecordEvent => ({
+        ...postEvent(replier.did, "create", "3aaaaaaaaaaaa", "reply"),
+        record: {
+          $type: "app.bsky.feed.post",
+          text: "reply",
+          reply: { root: ref, parent: ref },
+          createdAt: new Date().toISOString(),
+        },
+        live,
+      });
+      return { replier, replyEvent };
+    };
+
+    const findReply = async (did: string) => {
+      const [post] = await ctx.db
+        .select()
+        .from(schema.posts)
+        .where(eq(schema.posts.accountDid, did));
+      return post;
+    };
+
+    test.each([
+      { name: "誰も返信できない", allow: [], violates: true },
+      { name: "フォローしていない人", allow: ["following"], violates: true },
+      {
+        name: "フォローしている人",
+        allow: ["following"],
+        ownerFollows: true,
+        violates: false,
+      },
+      {
+        name: "フォロワー",
+        allow: ["follower"],
+        replierFollows: true,
+        violates: false,
+      },
+      {
+        name: "メンションした人",
+        allow: ["mention"],
+        mentioned: true,
+        violates: false,
+      },
+      { name: "リストの人", allow: ["list"], listed: true, violates: false },
+    ] satisfies (Parameters<typeof setup>[0] & {
+      name: string;
+      violates: boolean;
+    })[])(
+      "index-25: スレッドの起点の投稿の返信制限で許されていない返信は、返信制限の違反として保存する($name)",
+      async ({ violates, ...params }) => {
+        // arrange
+        const { replier, replyEvent } = await setup(params);
+
+        // act
+        await processCommit(replyEvent(true));
+
+        // assert
+        expect(await findReply(replier.did)).toMatchObject({
+          violatesThreadgate: violates,
+        });
+      },
+    );
+
+    test("index-26: 返信制限の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+      // arrange
+      const { replier, replyEvent } = await setup({ allow: [] });
+      await registrationFactory(ctx.db)
+        .vars({ account: () => replier })
+        .create();
+
+      // act
+      await processCommit(replyEvent(false));
+
+      // assert
+      expect(await findReply(replier.did)).toMatchObject({
+        violatesThreadgate: false,
+      });
+    });
   });
 
   test("index-15: 投稿のgallery埋め込みの画像を、images埋め込みと区別して保存する", async () => {
