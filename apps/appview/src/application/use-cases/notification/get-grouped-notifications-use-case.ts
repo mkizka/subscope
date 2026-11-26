@@ -43,10 +43,12 @@ const groupKey = (item: NotificationDto) => {
 
 export class GetGroupedNotificationsUseCase {
   constructor(
-    private readonly notificationQuery: INotificationQuery,
-    private readonly registrationRepository: IRegistrationRepository,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly notificationViews: NotificationViews,
+    private readonly deps: {
+      notificationQuery: INotificationQuery;
+      registrationRepository: IRegistrationRepository;
+      viewContextFactory: ViewContextFactory;
+      notificationViews: NotificationViews;
+    },
   ) {}
 
   async execute(params: {
@@ -59,7 +61,7 @@ export class GetGroupedNotificationsUseCase {
       throw new UnsupportedFeedError(params.feed);
     }
     const queryLimit = params.limit * ITEMS_PER_GROUP;
-    const items = await this.notificationQuery.findNotifications({
+    const items = await this.deps.notificationQuery.findNotifications({
       recipientDid: params.viewerDid,
       limit: queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
@@ -83,14 +85,16 @@ export class GetGroupedNotificationsUseCase {
     const last = items[consumed - 1];
     const hasMore = consumed < items.length || items.length === queryLimit;
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const [views, registration] = await Promise.all([
       Promise.all(
         [...grouped.values()].map((group) =>
-          this.notificationViews.group(group, ctx),
+          this.deps.notificationViews.group(group, ctx),
         ),
       ),
-      this.registrationRepository.find(params.viewerDid),
+      this.deps.registrationRepository.find(params.viewerDid),
     ]);
     const groups = views.filter((view) => view !== undefined);
 
