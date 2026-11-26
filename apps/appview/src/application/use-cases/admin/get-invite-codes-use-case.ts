@@ -9,9 +9,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetInviteCodesUseCase {
   constructor(
-    private readonly inviteCodeQuery: IInviteCodeQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      inviteCodeQuery: IInviteCodeQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(params: {
@@ -23,13 +25,13 @@ export class GetInviteCodesUseCase {
       getCursor: (item) => item.createdAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.inviteCodeQuery.findAll({
+      await this.deps.inviteCodeQuery.findAll({
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
     );
 
-    const ctx = this.viewContextFactory.create({ includeTakedowns: true });
+    const ctx = this.deps.viewContextFactory.create({ includeTakedowns: true });
     const codes = await Promise.all(
       page.items.map(async (item) => ({
         code: item.code,
@@ -37,7 +39,7 @@ export class GetInviteCodesUseCase {
         createdAt: toDatetimeString(item.createdAt),
         usedAt: item.usedAt ? toDatetimeString(item.usedAt) : undefined,
         usedBy: item.usedByDid
-          ? await this.profileViews.view(item.usedByDid, ctx)
+          ? await this.deps.profileViews.view(item.usedByDid, ctx)
           : undefined,
       })),
     );
