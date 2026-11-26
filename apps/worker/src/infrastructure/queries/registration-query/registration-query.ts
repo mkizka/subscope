@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
 
 export class RegistrationQuery implements IRegistrationQuery {
-  async isRegistered(
+  async isMember(
     ctx: TransactionContext,
     accountDid: string,
   ): Promise<boolean> {

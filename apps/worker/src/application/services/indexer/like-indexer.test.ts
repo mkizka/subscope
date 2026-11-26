@@ -63,28 +63,28 @@ describe("LikeIndexer", () => {
     test.each([
       {
         name: "notify-1: 通知はメンバー宛てにだけ作る",
-        isRegistered: false,
+        isMember: false,
         isSelf: false,
         expected: [],
       },
       {
         name: "notify-2: 自分自身の操作では通知を作らない",
-        isRegistered: true,
+        isMember: true,
         isSelf: true,
         expected: [],
       },
       {
         name: "notify-3: いいねされた投稿の作者に like の通知を作る",
-        isRegistered: true,
+        isMember: true,
         isSelf: false,
         expected: [{ reason: "like" }],
       },
-    ])("$name", async ({ isRegistered, isSelf, expected }) => {
+    ])("$name", async ({ isMember, isSelf, expected }) => {
       // arrange
       const liker = accountFactory();
       const author = isSelf ? liker : accountFactory();
       registrationQuery.add(liker.did);
-      if (isRegistered) {
+      if (isMember) {
         registrationQuery.add(author.did);
       }
       const record = recordFactory({

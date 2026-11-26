@@ -1,0 +1,227 @@
+{
+  "src/application/services/indexer/follow-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/generator-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/like-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/list-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/list-item-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/post-indexer.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/post-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/profile-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/record-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/indexer/repost-indexer.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/notification-service.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/related-record-service.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/resolve-did-service.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/services/tracking-service.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/async/aggregate-account-stats-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/async/aggregate-post-stats-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/async/check-backfill-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/async/fetch-record-use-case.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  },
+  "src/application/use-cases/async/schedule-backfill-checks-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/async/send-push-notification-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/async/sync-tap-repo-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/commit/index-commit-use-case.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/commit/index-commit-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/identity/upsert-identity-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/follow.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/generator.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/label.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/like.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/list-item.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/list.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/origin.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/post.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/profile.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/repost.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/services/storage-policy.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/infrastructure/queries/post-query/post-query.in-memory.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/infrastructure/queries/post-query/post-query.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/infrastructure/repositories/post-repository/post-repository.ts": {
+    "params/max-params": {
+      "count": 4
+    }
+  },
+  "src/presentation/commit.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/label-subscriber.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/push-notification-create.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/server.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/tap.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/tap.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/worker.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  }
+}

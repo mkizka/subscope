@@ -33,7 +33,7 @@ export const subscopeQueryFactory = ({
       const { initialized } = await publicClient.call(getSetupStatus);
       return initialized;
     },
-    async isRegistered(did) {
+    async isMember(did) {
       const response = await (await restore(did)).call(getRegistrationStatus);
       return member.isTypeOf(response);
     },
@@ -77,7 +77,7 @@ export const subscopeQueryFactory = ({
             handle: profile.handle,
             displayName: profile.displayName,
             avatarUrl: profile.avatar,
-            registeredFollowersCount,
+            memberFollowersCount: registeredFollowersCount,
           }),
         ),
       };

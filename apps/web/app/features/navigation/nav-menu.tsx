@@ -108,7 +108,7 @@ export function AdminNavMenu({ onNavigate }: { onNavigate?: () => void }) {
       <h2 className="px-3 py-2 text-caption text-muted">サーバー管理</h2>
       <ul className="flex flex-col gap-1">
         <Item
-          to="/admin/registered-accounts"
+          to="/admin/server-members"
           icon={<UsersIcon className="size-6" />}
           {...p}
         >

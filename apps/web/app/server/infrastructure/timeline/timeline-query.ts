@@ -45,7 +45,7 @@ export const timelineQueryFactory = ({
     return agent;
   };
   return {
-    async isRegistered(did) {
+    async isMember(did) {
       const agent = await restore(did);
       return member.isTypeOf(await agent.call(getRegistrationStatus));
     },
