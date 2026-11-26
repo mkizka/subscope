@@ -1,32 +1,24 @@
 import type { AfterCommitContext } from "@repo/common/interface";
 
 import type { Origin } from "../../../domain/origin.js";
-import { feedItemFromPost } from "../../dto/feed-item.js";
-import { postNotifications } from "../../dto/notification.js";
-import {
-  getEmbedRecordUri,
-  parsePost,
-  postStatsTargets,
-} from "../../dto/post.js";
-import type { Record } from "../../dto/record.js";
+import { Post } from "../../../domain/post.js";
+import type { Record } from "../../../domain/record.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { NotificationService } from "../notification-service.js";
-import type { PastRecordFilterService } from "../past-record-filter-service.js";
 import type { RecordSaveService } from "../record-save-service.js";
 import type { RelatedRecordService } from "../related-record-service.js";
 import type { StatsService } from "../stats-service.js";
-
-const REPLY_NOTIFICATION_DEPTH = 4;
 
 export class PostIndexer implements IRecordIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postQuery: IPostQuery,
-    private readonly pastRecordFilterService: PastRecordFilterService,
+    private readonly storagePolicy: StoragePolicy,
     private readonly recordSaveService: RecordSaveService,
     private readonly notificationService: NotificationService,
     private readonly relatedRecordService: RelatedRecordService,
@@ -42,56 +34,47 @@ export class PostIndexer implements IRecordIndexer {
     record: Record;
     origin: Origin;
   }) {
-    const post = parsePost(record);
-    const accepted = await this.pastRecordFilterService.accepts({
+    const post = Post.fromRecord(record);
+    const saves = await this.storagePolicy.savesFeedRecord({
       ctx,
       origin,
-      did: post.accountDid,
-      createdAt: post.createdAt,
+      record: post,
     });
-    if (!accepted) {
+    if (!saves) {
       return;
     }
 
-    await this.recordSaveService.save({ ctx, record, origin });
+    await this.recordSaveService.save({ ctx, record });
+    await this.relatedRecordService.requestFor({ ctx, origin, record: post });
     await this.postRepository.save({ ctx, post });
-    await this.feedItemRepository.save({
-      ctx,
-      feedItem: feedItemFromPost(post),
-    });
+    await this.feedItemRepository.save({ ctx, feedItem: post.feedItem });
 
     await this.notificationService.notify({
       ctx,
       origin,
       notifications: async () =>
-        postNotifications(
-          post,
+        post.notifications(
           post.replyParent
             ? await this.postQuery.findReplyAncestorUris(
                 ctx,
                 post.replyParent.uri,
-                REPLY_NOTIFICATION_DEPTH,
+                Post.replyNotificationDepth,
               )
             : [],
         ),
     });
-    await this.relatedRecordService.request({
-      ctx,
-      origin,
-      uri: getEmbedRecordUri(post),
-    });
     this.statsService.recount({
       ctx,
-      posts: [post.uri, ...postStatsTargets(post)],
+      posts: [post.uri, ...post.statsTargets],
       accounts: [post.accountDid],
     });
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const post = parsePost(record);
+    const post = Post.fromRecord(record);
     this.statsService.recount({
       ctx,
-      posts: postStatsTargets(post),
+      posts: post.statsTargets,
       accounts: [post.accountDid],
     });
   }

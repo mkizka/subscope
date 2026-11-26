@@ -3,10 +3,8 @@ import { schema } from "@repo/db";
 import { and, eq, sql } from "drizzle-orm";
 
 import type { PushSubscription } from "../../../application/interfaces/external/web-push-sender.js";
-import type {
-  IPushNotificationQuery,
-  PushNotification,
-} from "../../../application/interfaces/queries/push-notification-query.js";
+import type { IPushNotificationQuery } from "../../../application/interfaces/queries/push-notification-query.js";
+import { PushNotification } from "../../../domain/push-notification.js";
 
 export class PushNotificationQuery implements IPushNotificationQuery {
   async find({
@@ -47,13 +45,13 @@ export class PushNotificationQuery implements IPushNotificationQuery {
       )
       .limit(1);
     if (!row) return null;
-    return {
+    return new PushNotification({
       recordUri: row.recordUri,
       reason: row.reason,
       reasonSubject: row.reasonSubject,
       authorName: row.authorDisplayName || row.authorHandle || row.authorDid,
       postText: row.postText,
-    };
+    });
   }
 
   async findSubscriptions({

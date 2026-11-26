@@ -1,6 +1,6 @@
 import type { ITransactionManager } from "@repo/common/interface";
 
-import type { LabelData } from "../../interfaces/repositories/label-repository.js";
+import type { LabelData } from "../../../domain/label.js";
 import type { IndexLabelService } from "../../services/index-label-service.js";
 
 export class IndexLabelUseCase {

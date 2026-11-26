@@ -7,6 +7,10 @@ export type AccountStatus =
 
 export type BackfillStatus = "inProgress" | "completed" | "error";
 
+const INVALID_HANDLE = "handle.invalid";
+
+const IN_PROGRESS_TAP_STATES = ["pending", "desynchronized", "resyncing"];
+
 export type AccountParams = {
   did: string;
   handle: string | null;
@@ -54,15 +58,50 @@ export class Account {
     return this._backfillStatus;
   }
 
-  updateBackfillStatus(backfillStatus: BackfillStatus): void {
-    this._backfillStatus = backfillStatus;
+  get needsBackfillRecheck(): boolean {
+    return this._backfillStatus !== "completed";
   }
 
-  updateStatus(status: AccountStatus): void {
-    this._status = status;
+  get needsHandleResolution(): boolean {
+    return !this._handle || this._handle === INVALID_HANDLE;
   }
 
-  updateHandle(handle: string | null): void {
-    this._handle = handle ? asHandle(handle) : null;
+  applyTapState(tapState: string): void {
+    if (tapState === "error") {
+      this._backfillStatus = "error";
+    } else if (IN_PROGRESS_TAP_STATES.includes(tapState)) {
+      this._backfillStatus = "inProgress";
+    } else {
+      this._backfillStatus = "completed";
+    }
+  }
+
+  completeBackfill(): void {
+    this._backfillStatus = "completed";
+  }
+
+  applyResolvedHandle({
+    handle,
+    resolvedDid,
+  }: {
+    handle: string;
+    resolvedDid: string | undefined;
+  }): void {
+    this._handle = asHandle(resolvedDid === this.did ? handle : INVALID_HANDLE);
+  }
+
+  update({
+    handle,
+    status,
+  }: {
+    handle?: Handle;
+    status?: AccountStatus;
+  }): boolean {
+    const changed =
+      (!!handle && handle !== this._handle) ||
+      (!!status && status !== this._status);
+    this._handle = handle ?? this._handle;
+    this._status = status ?? this._status;
+    return changed;
   }
 }

@@ -21,10 +21,7 @@ export class ResolveDidService {
     const existingAccount = await this.transactionManager.transaction((ctx) =>
       this.accountRepository.find({ ctx, did }),
     );
-    if (
-      existingAccount?.handle &&
-      existingAccount.handle !== "handle.invalid"
-    ) {
+    if (existingAccount && !existingAccount.needsHandleResolution) {
       return;
     }
 
@@ -38,7 +35,7 @@ export class ResolveDidService {
     const resolvedDid = await this.handleResolver.resolve(handle);
 
     const account = existingAccount ?? Account.create({ did });
-    account.updateHandle(resolvedDid === did ? handle : "handle.invalid");
+    account.applyResolvedHandle({ handle, resolvedDid });
 
     await this.transactionManager.transaction((ctx) =>
       this.accountRepository.save({ ctx, account }),

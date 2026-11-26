@@ -6,7 +6,7 @@ import {
 } from "@repo/common/utils";
 
 import type { Origin } from "../../../domain/origin.js";
-import type { Record } from "../../dto/record.js";
+import { hasNullCharacter, type Record } from "../../../domain/record.js";
 import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { FollowIndexer } from "./follow-indexer.js";
@@ -19,9 +19,6 @@ import type { ListItemIndexer } from "./list-item-indexer.js";
 import type { PostIndexer } from "./post-indexer.js";
 import type { ProfileIndexer } from "./profile-indexer.js";
 import type { RepostIndexer } from "./repost-indexer.js";
-
-const hasNullCharacter = (record: Record) =>
-  JSON.stringify(record.json).includes("\\u0000");
 
 export class RecordIndexer {
   private readonly indexers: { [key in SupportedCollection]: IRecordIndexer };

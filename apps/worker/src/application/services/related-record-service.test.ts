@@ -5,12 +5,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../domain/account.factory.js";
 import { Origin } from "../../domain/origin.js";
+import { recordFactory } from "../../domain/record.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
 } from "../../shared/test-utils.js";
-import { recordFactory } from "../dto/record.factory.js";
 
 describe("RelatedRecordService", () => {
   let relatedRecordService: TestServices["relatedRecordService"];
