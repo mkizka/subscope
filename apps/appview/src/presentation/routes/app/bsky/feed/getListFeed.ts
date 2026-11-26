@@ -7,23 +7,25 @@ import type { RepoRevMiddleware } from "../../../../../presentation/middleware/r
 
 export class GetListFeed {
   constructor(
-    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
-    private readonly getListFeedUseCase: GetListFeedUseCase,
-    private readonly repoRevMiddleware: RepoRevMiddleware,
+    private readonly deps: {
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      getListFeedUseCase: GetListFeedUseCase;
+      repoRevMiddleware: RepoRevMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getListFeed, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const body = await this.getListFeedUseCase.execute({
+        const body = await this.deps.getListFeedUseCase.execute({
           listUri: params.list,
           limit: params.limit,
           cursor: params.cursor,
           viewerDid: viewerDid ?? undefined,
         });
         return {
-          headers: await this.repoRevMiddleware.headers(viewerDid),
+          headers: await this.deps.repoRevMiddleware.headers(viewerDid),
           body,
         };
       },

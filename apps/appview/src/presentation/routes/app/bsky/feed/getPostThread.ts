@@ -10,21 +10,23 @@ import type { RepoRevMiddleware } from "../../../../../presentation/middleware/r
 
 export class GetPostThread {
   constructor(
-    private readonly getPostThreadUseCase: GetPostThreadUseCase,
-    private readonly atUriService: AtUriService,
-    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
-    private readonly repoRevMiddleware: RepoRevMiddleware,
+    private readonly deps: {
+      getPostThreadUseCase: GetPostThreadUseCase;
+      atUriService: AtUriService;
+      authVerifierMiddleware: AuthVerifierMiddleware;
+      repoRevMiddleware: RepoRevMiddleware;
+    },
   ) {}
 
   handle(router: LexRouter) {
     router.add(getPostThread, {
-      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      auth: (ctx) => this.deps.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const resolvedUri = await this.atUriService.resolveHostname(
+        const resolvedUri = await this.deps.atUriService.resolveHostname(
           new AtUri(params.uri),
         );
         try {
-          const result = await this.getPostThreadUseCase.execute({
+          const result = await this.deps.getPostThreadUseCase.execute({
             uri: resolvedUri,
             depth: params.depth,
             parentHeight: params.parentHeight,
@@ -32,7 +34,7 @@ export class GetPostThread {
             viewerDid: viewerDid || undefined,
           });
           return {
-            headers: await this.repoRevMiddleware.headers(viewerDid),
+            headers: await this.deps.repoRevMiddleware.headers(viewerDid),
             body: result,
           };
         } catch (error) {
@@ -40,7 +42,7 @@ export class GetPostThread {
             throw new LexServerError(
               400,
               { error: error.name, message: error.message },
-              await this.repoRevMiddleware.headers(viewerDid),
+              await this.deps.repoRevMiddleware.headers(viewerDid),
             );
           }
           throw error;

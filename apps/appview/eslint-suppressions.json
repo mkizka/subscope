@@ -1,24 +1,4 @@
 {
-  "src/presentation/routes/app/bsky/feed/getListFeed.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/getPostThread.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/getTimeline.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/routes/app/bsky/feed/searchPostsV2.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/routes/app/bsky/graph/getFollowers.ts": {
     "params/max-params": {
       "count": 1
