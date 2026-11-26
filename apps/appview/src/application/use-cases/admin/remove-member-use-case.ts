@@ -16,9 +16,11 @@ export class CannotRemoveAdminError extends Error {
 
 export class RemoveMemberUseCase {
   constructor(
-    private readonly transactionManager: ITransactionManager,
-    private readonly accountRepository: IAccountRepository,
-    private readonly unregisterAccountService: UnregisterAccountService,
+    private readonly deps: {
+      transactionManager: ITransactionManager;
+      accountRepository: IAccountRepository;
+      unregisterAccountService: UnregisterAccountService;
+    },
   ) {}
   static inject = [
     "transactionManager",
@@ -27,7 +29,7 @@ export class RemoveMemberUseCase {
   ] as const;
 
   async execute(params: { did: Did }): Promise<void> {
-    const account = await this.accountRepository.find(params.did);
+    const account = await this.deps.accountRepository.find(params.did);
     if (!account) {
       throw new NotMemberError("Not a member of this server");
     }
@@ -35,8 +37,8 @@ export class RemoveMemberUseCase {
       throw new CannotRemoveAdminError("Cannot remove an admin");
     }
 
-    await this.transactionManager.transaction(async (ctx) => {
-      await this.unregisterAccountService.unregister({
+    await this.deps.transactionManager.transaction(async (ctx) => {
+      await this.deps.unregisterAccountService.unregister({
         ctx,
         accountDid: params.did,
       });

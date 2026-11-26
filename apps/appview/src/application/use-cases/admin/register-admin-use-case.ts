@@ -18,24 +18,26 @@ type RegisterAdminParams = {
 
 export class RegisterAdminUseCase {
   constructor(
-    private readonly transactionManager: ITransactionManager,
-    private readonly accountQuery: IAccountQuery,
-    private readonly createAdminService: CreateAdminService,
-    private readonly createRegistrationService: CreateRegistrationService,
+    private readonly deps: {
+      transactionManager: ITransactionManager;
+      accountQuery: IAccountQuery;
+      createAdminService: CreateAdminService;
+      createRegistrationService: CreateRegistrationService;
+    },
   ) {}
 
   async execute(params: RegisterAdminParams): Promise<void> {
-    const hasAnyAdmin = await this.accountQuery.hasAnyAdmin();
+    const hasAnyAdmin = await this.deps.accountQuery.hasAnyAdmin();
     if (hasAnyAdmin) {
       throw new AdminAlreadyExistsError("Admin already exists");
     }
 
-    await this.transactionManager.transaction(async (ctx) => {
-      await this.createAdminService.create({
+    await this.deps.transactionManager.transaction(async (ctx) => {
+      await this.deps.createAdminService.create({
         ctx,
         did: params.requesterDid,
       });
-      await this.createRegistrationService.create({
+      await this.deps.createRegistrationService.create({
         ctx,
         accountDid: params.requesterDid,
       });
