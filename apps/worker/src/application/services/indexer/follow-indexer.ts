@@ -36,7 +36,8 @@ export class FollowIndexer implements IRecordIndexer {
     const follow = Follow.fromRecord(record);
     const tracksFollowee = await this.storagePolicy.tracksFollowee(ctx, follow);
 
-    await this.recordSaveService.save({ ctx, record, origin });
+    await this.recordSaveService.save({ ctx, record });
+    await this.relatedRecordService.requestFor({ ctx, origin, record: follow });
     await this.indexAccountService.upsert({ ctx, did: follow.subjectDid });
     await this.followRepository.save({ ctx, follow });
 
@@ -46,11 +47,6 @@ export class FollowIndexer implements IRecordIndexer {
       notifications: () => [follow.notification],
     });
     if (tracksFollowee) {
-      await this.relatedRecordService.requestAccount({
-        ctx,
-        origin,
-        did: follow.subjectDid,
-      });
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );

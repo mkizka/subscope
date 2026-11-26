@@ -40,7 +40,8 @@ export class LikeIndexer implements IRecordIndexer {
       return;
     }
 
-    await this.recordSaveService.save({ ctx, record, origin });
+    await this.recordSaveService.save({ ctx, record });
+    await this.relatedRecordService.requestFor({ ctx, origin, record: like });
     await this.likeRepository.save({ ctx, like });
 
     await this.notificationService.notify({
@@ -48,18 +49,6 @@ export class LikeIndexer implements IRecordIndexer {
       origin,
       notifications: () => [like.notification],
     });
-    const fetchesLikedPost = await this.storagePolicy.fetchesLikedPost({
-      ctx,
-      origin,
-      like,
-    });
-    if (fetchesLikedPost) {
-      await this.relatedRecordService.request({
-        ctx,
-        origin,
-        uri: like.subject,
-      });
-    }
     this.statsService.recount({ ctx, posts: [like.subject] });
   }
 

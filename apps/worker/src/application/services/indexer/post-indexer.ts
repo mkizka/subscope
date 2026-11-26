@@ -44,7 +44,8 @@ export class PostIndexer implements IRecordIndexer {
       return;
     }
 
-    await this.recordSaveService.save({ ctx, record, origin });
+    await this.recordSaveService.save({ ctx, record });
+    await this.relatedRecordService.requestFor({ ctx, origin, record: post });
     await this.postRepository.save({ ctx, post });
     await this.feedItemRepository.save({ ctx, feedItem: post.feedItem });
 
@@ -61,11 +62,6 @@ export class PostIndexer implements IRecordIndexer {
               )
             : [],
         ),
-    });
-    await this.relatedRecordService.request({
-      ctx,
-      origin,
-      uri: post.fetchableEmbedUri,
     });
     this.statsService.recount({
       ctx,
