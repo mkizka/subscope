@@ -7,8 +7,7 @@ export interface IListQuery {
   findLists: (did: string, account: AtIdentifierString) => Promise<ListDto[]>;
   findList: (
     did: string,
-    account: AtIdentifierString,
-    rkey: string,
+    params: { account: AtIdentifierString; rkey: string },
   ) => Promise<{ list: ListDto; members: ListMemberDto[] }>;
   findListsWithMembership: (
     did: string,

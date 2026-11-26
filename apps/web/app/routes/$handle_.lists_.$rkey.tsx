@@ -27,11 +27,10 @@ export const action = async ({
   if (submission.status !== "success") {
     throw data("リストの内容が不正です", { status: 400 });
   }
-  await di.updateListUseCase.execute(
-    context.get(didContext),
-    params.rkey,
-    submission.value,
-  );
+  await di.updateListUseCase.execute(context.get(didContext), {
+    rkey: params.rkey,
+    input: submission.value,
+  });
   return null;
 };
 

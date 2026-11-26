@@ -24,7 +24,7 @@ export const listCommandFactory = ({
         createdAt: currentDatetimeString(),
       });
     },
-    async update(did, rkey, input) {
+    async update(did, { rkey, input }) {
       const agent = await restore(did);
       const { value } = await agent.get(list, { rkey });
       await agent.put(
@@ -38,7 +38,7 @@ export const listCommandFactory = ({
         { rkey },
       );
     },
-    async addMember(did, listUri, subject) {
+    async addMember(did, { listUri, subject }) {
       const agent = await restore(did);
       await agent.create(listitem, {
         list: listUri,
