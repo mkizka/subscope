@@ -1,0 +1,332 @@
+{
+  "src/application/service/feed/post-thread-service.ts": {
+    "params/max-params": {
+      "count": 3
+    }
+  },
+  "src/application/service/sync/create-registration-service.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/service/sync/unregister-account-service.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/actor/search-actors-typeahead-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/actor/search-actors-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/add-member-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/create-invite-code-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/get-invite-codes-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/grant-admin-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/list-server-members-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/register-admin-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/admin/remove-member-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-actor-likes-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-author-feed-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-likes-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-list-feed-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-local-timeline-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-post-thread-v2-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-quotes-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-reposted-by-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/get-timeline-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/feed/search-posts-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-followers-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-follows-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-known-followers-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-list-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-lists-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-lists-with-membership-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/graph/get-server-member-followers-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/notification/get-grouped-notifications-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/notification/list-notifications-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/server/get-followed-accounts-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/server/get-operator-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/server/get-server-members-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/use-cases/sync/register-account-use-case.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/application/views/embed-views.ts": {
+    "params/max-params": {
+      "count": 5
+    }
+  },
+  "src/application/views/notification-views.ts": {
+    "params/max-params": {
+      "count": 2
+    }
+  },
+  "src/application/views/post-views.ts": {
+    "params/max-params": {
+      "count": 3
+    }
+  },
+  "src/application/views/view-context.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/domain/models/at-uri.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/actor/getProfile.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/actor/getProfile.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/actor/getProfiles.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/actor/getProfiles.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getActorLikes.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getAuthorFeed.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getAuthorFeed.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getListFeed.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getPostThread.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getPosts.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getTimeline.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/getTimeline.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/feed/searchPostsV2.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/graph/getFollowers.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/graph/getFollows.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/graph/getKnownFollowers.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/graph/getKnownFollowers.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/graph/getList.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/graph/getListsWithMembership.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/unspecced/getPostThreadV2.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/app/bsky/unspecced/getPostThreadV2.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/labelers.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/lex.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/me/subsco/graph/getServerMemberFollowers.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/routes/me/subsco/server/getLocalTimeline.test.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  },
+  "src/presentation/server.ts": {
+    "params/max-params": {
+      "count": 1
+    }
+  }
+}
