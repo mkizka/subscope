@@ -19,21 +19,6 @@
       "count": 1
     }
   },
-  "src/application/use-cases/graph/get-lists-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/graph/get-lists-with-membership-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/graph/get-server-member-followers-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/use-cases/notification/get-grouped-notifications-use-case.ts": {
     "params/max-params": {
       "count": 1

@@ -13,10 +13,12 @@ const SUPPORTED_PURPOSES = ["curatelist", "modlist"];
 
 export class GetListsWithMembershipUseCase {
   constructor(
-    private readonly listQuery: IListQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly listViews: ListViews,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      listQuery: IListQuery;
+      viewContextFactory: ViewContextFactory;
+      listViews: ListViews;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(params: {
@@ -30,7 +32,7 @@ export class GetListsWithMembershipUseCase {
       limit: params.limit,
       getCursor: (list) => list.createdAt.toISOString(),
     });
-    const lists = await this.listQuery.findByAccount({
+    const lists = await this.deps.listQuery.findByAccount({
       accountDid: params.viewerDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
@@ -40,16 +42,16 @@ export class GetListsWithMembershipUseCase {
     });
     const page = paginator.extractPage(lists);
 
-    const items = await this.listQuery.findItemsBySubject({
+    const items = await this.deps.listQuery.findItemsBySubject({
       listUris: page.items.map((list) => new AtUri(list.uri)),
       subjectDid: params.subjectDid,
     });
-    const ctx = this.viewContextFactory.create();
-    const subject = await this.profileViews.view(params.subjectDid, ctx);
+    const ctx = this.deps.viewContextFactory.create();
+    const subject = await this.deps.profileViews.view(params.subjectDid, ctx);
 
     const listsWithMembership = await Promise.all(
       page.items.map(async (list) => {
-        const view = await this.listViews.view(list.uri, ctx);
+        const view = await this.deps.listViews.view(list.uri, ctx);
         if (!view) return undefined;
         const item = items.find((item) => item.listUri === list.uri);
         return {
