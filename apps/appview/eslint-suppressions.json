@@ -19,26 +19,6 @@
       "count": 1
     }
   },
-  "src/application/use-cases/graph/get-followers-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/graph/get-follows-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/graph/get-known-followers-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/graph/get-list-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/use-cases/graph/get-lists-use-case.ts": {
     "params/max-params": {
       "count": 1

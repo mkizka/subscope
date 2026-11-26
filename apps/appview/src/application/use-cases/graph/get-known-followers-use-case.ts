@@ -10,9 +10,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetKnownFollowersUseCase {
   constructor(
-    private readonly followQuery: IFollowQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      followQuery: IFollowQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(params: {
@@ -26,7 +28,7 @@ export class GetKnownFollowersUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.followQuery.findKnownFollowers({
+      await this.deps.followQuery.findKnownFollowers({
         viewerDid: params.viewerDid,
         subjectDid: params.subjectDid,
         limit: paginator.queryLimit,
@@ -34,11 +36,15 @@ export class GetKnownFollowersUseCase {
       }),
     );
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const [subject, followers] = await Promise.all([
-      this.profileViews.view(params.subjectDid, ctx),
+      this.deps.profileViews.view(params.subjectDid, ctx),
       Promise.all(
-        page.items.map((item) => this.profileViews.view(item.accountDid, ctx)),
+        page.items.map((item) =>
+          this.deps.profileViews.view(item.accountDid, ctx),
+        ),
       ),
     ]);
 

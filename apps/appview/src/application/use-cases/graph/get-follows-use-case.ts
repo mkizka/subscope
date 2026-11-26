@@ -10,9 +10,11 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetFollowsUseCase {
   constructor(
-    private readonly followQuery: IFollowQuery,
-    private readonly viewContextFactory: ViewContextFactory,
-    private readonly profileViews: ProfileViews,
+    private readonly deps: {
+      followQuery: IFollowQuery;
+      viewContextFactory: ViewContextFactory;
+      profileViews: ProfileViews;
+    },
   ) {}
 
   async execute(params: {
@@ -26,18 +28,22 @@ export class GetFollowsUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.followQuery.findAccountFollows({
+      await this.deps.followQuery.findAccountFollows({
         accountDid: params.accountDid,
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
     );
 
-    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const ctx = this.deps.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
     const [subject, follows] = await Promise.all([
-      this.profileViews.view(params.accountDid, ctx),
+      this.deps.profileViews.view(params.accountDid, ctx),
       Promise.all(
-        page.items.map((item) => this.profileViews.view(item.subjectDid, ctx)),
+        page.items.map((item) =>
+          this.deps.profileViews.view(item.subjectDid, ctx),
+        ),
       ),
     ]);
 
