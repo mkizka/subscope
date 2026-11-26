@@ -43,24 +43,34 @@ export class PostRepository implements IPostRepository {
     const { embed } = post;
     if (!embed) return;
     if (embed.type === "record" || embed.type === "recordWithMedia") {
-      await this.upsertEmbedRecord(ctx, postUri, embed);
+      await this.upsertEmbedRecord({ ctx, postUri, embedRecord: embed });
     }
     const media = embed.type === "recordWithMedia" ? embed.media : embed;
     if (media.type === "external") {
-      await this.upsertEmbedExternal(ctx, postUri, media);
+      await this.upsertEmbedExternal({ ctx, postUri, embedExternal: media });
     } else if (media.type === "video") {
-      await this.upsertEmbedVideo(ctx, postUri, media);
+      await this.upsertEmbedVideo({ ctx, postUri, embedVideo: media });
     } else if (media.type === "images" || media.type === "gallery") {
-      await this.upsertEmbedImages(ctx, postUri, media.images, media.type);
+      await this.upsertEmbedImages({
+        ctx,
+        postUri,
+        embedImages: media.images,
+        embedType: media.type,
+      });
     }
   }
 
-  private async upsertEmbedImages(
-    ctx: TransactionContext,
-    postUri: string,
-    embedImages: EmbedImage[],
-    embedType: "images" | "gallery",
-  ) {
+  private async upsertEmbedImages({
+    ctx,
+    postUri,
+    embedImages,
+    embedType,
+  }: {
+    ctx: TransactionContext;
+    postUri: string;
+    embedImages: EmbedImage[];
+    embedType: "images" | "gallery";
+  }) {
     // 添付画像には一意なIDがないので、既存の画像を削除してから新しい画像を挿入
     await ctx.db
       .delete(schema.postEmbedImages)
@@ -81,11 +91,15 @@ export class PostRepository implements IPostRepository {
     }
   }
 
-  private async upsertEmbedVideo(
-    ctx: TransactionContext,
-    postUri: string,
-    embedVideo: Extract<EmbedMedia, { type: "video" }>,
-  ) {
+  private async upsertEmbedVideo({
+    ctx,
+    postUri,
+    embedVideo,
+  }: {
+    ctx: TransactionContext;
+    postUri: string;
+    embedVideo: Extract<EmbedMedia, { type: "video" }>;
+  }) {
     const data = {
       cid: embedVideo.cid,
       alt: embedVideo.alt,
@@ -102,11 +116,15 @@ export class PostRepository implements IPostRepository {
       });
   }
 
-  private async upsertEmbedExternal(
-    ctx: TransactionContext,
-    postUri: string,
-    embedExternal: Extract<EmbedMedia, { type: "external" }>,
-  ) {
+  private async upsertEmbedExternal({
+    ctx,
+    postUri,
+    embedExternal,
+  }: {
+    ctx: TransactionContext;
+    postUri: string;
+    embedExternal: Extract<EmbedMedia, { type: "external" }>;
+  }) {
     await ctx.db
       .insert(schema.postEmbedExternals)
       .values({
@@ -127,11 +145,15 @@ export class PostRepository implements IPostRepository {
       });
   }
 
-  private async upsertEmbedRecord(
-    ctx: TransactionContext,
-    postUri: string,
-    embedRecord: Extract<PostEmbed, { uri: AtUri }>,
-  ) {
+  private async upsertEmbedRecord({
+    ctx,
+    postUri,
+    embedRecord,
+  }: {
+    ctx: TransactionContext;
+    postUri: string;
+    embedRecord: Extract<PostEmbed, { uri: AtUri }>;
+  }) {
     await ctx.db
       .insert(schema.postEmbedRecords)
       .values({

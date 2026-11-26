@@ -109,21 +109,6 @@
       "count": 1
     }
   },
-  "src/infrastructure/queries/post-query/post-query.in-memory.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/infrastructure/queries/post-query/post-query.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/infrastructure/repositories/post-repository/post-repository.ts": {
-    "params/max-params": {
-      "count": 4
-    }
-  },
   "src/presentation/label-subscriber.ts": {
     "params/max-params": {
       "count": 1

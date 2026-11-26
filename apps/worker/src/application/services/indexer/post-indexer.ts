@@ -72,11 +72,11 @@ export class PostIndexer implements IRecordIndexer {
       notifications: async () =>
         post.notifications(
           post.replyParent
-            ? await this.postQuery.findReplyAncestorUris(
+            ? await this.postQuery.findReplyAncestorUris({
                 ctx,
-                post.replyParent.uri,
-                Post.replyNotificationDepth,
-              )
+                parentUri: post.replyParent.uri,
+                limit: Post.replyNotificationDepth,
+              })
             : [],
         ),
     });
