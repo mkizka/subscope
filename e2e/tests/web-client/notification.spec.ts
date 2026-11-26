@@ -35,7 +35,8 @@ test.describe("通知", () => {
   }) => {
     const createdAt = new Date().toISOString();
     const text = `notification-e1: ${createdAt}`;
-    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+    const post = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       createdAt,
     });
@@ -47,11 +48,13 @@ test.describe("通知", () => {
     });
     await follow("alice.test", "bob.test");
     const subject = { uri: post.uri, cid: post.cid };
-    await createRecord("bob.test", "app.bsky.feed.like", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.like",
       subject,
       createdAt,
     });
-    await createRecord("bob.test", "app.bsky.feed.repost", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.repost",
       subject,
       createdAt,
     });
@@ -80,7 +83,8 @@ test.describe("通知", () => {
   }) => {
     const createdAt = new Date().toISOString();
     const aliceDid = await resolveHandle("alice.test");
-    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+    const post = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "notification-e3: 元の投稿",
       createdAt,
     });
@@ -96,18 +100,21 @@ test.describe("通知", () => {
       "notification-e3: 引用",
       mentionText,
     ];
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: texts[0],
       reply: { root: ref, parent: ref },
       createdAt,
     });
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: texts[1],
       embed: { $type: "app.bsky.embed.record", record: ref },
       createdAt,
     });
     const byteEnd = Buffer.byteLength(mentionText);
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: mentionText,
       facets: [
         {
@@ -147,7 +154,8 @@ test.describe("通知", () => {
       displayName: "Bob",
     });
     await follow("alice.test", "bob.test");
-    const { uri } = await createRecord("bob.test", "app.bsky.graph.follow", {
+    const { uri } = await createRecord("bob.test", {
+      $type: "app.bsky.graph.follow",
       subject: await resolveHandle("alice.test"),
       createdAt: new Date().toISOString(),
     });
@@ -180,7 +188,8 @@ test.describe("通知", () => {
   test("notification-e4: 通知を新しい順に並べ、下までスクロールすると古い通知を読み込む", async ({
     page,
   }) => {
-    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+    const post = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "notification-e4: 元の投稿",
       createdAt: new Date().toISOString(),
     });
@@ -194,7 +203,8 @@ test.describe("通知", () => {
       (_, i) => `notification-e4: リプライ${i}`,
     );
     for (const text of texts) {
-      await createRecord("bob.test", "app.bsky.feed.post", {
+      await createRecord("bob.test", {
+        $type: "app.bsky.feed.post",
         text,
         reply: { root: ref, parent: ref },
         createdAt: new Date().toISOString(),

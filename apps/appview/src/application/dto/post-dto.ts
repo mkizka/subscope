@@ -30,6 +30,7 @@ export type PostDto = {
   embedExternal: PostEmbedExternalDto | null;
   embedRecordUri: string | null;
   violatesEmbeddingRules: boolean;
+  violatesThreadgate: boolean;
   replyRootUri: string | null;
   replyParentUri: string | null;
   indexedAt: Date;

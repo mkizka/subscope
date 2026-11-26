@@ -48,6 +48,55 @@ describe("app.bsky.feed.getPostThread", () => {
     });
   });
 
+  test("threadgate-8: 返信制限に違反した返信は、スレッドのリプライに含めない", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const root = await postFactory(ctx.db).create();
+    const reply = await postFactory(ctx.db)
+      .use((t) => t.asReplyTo(root))
+      .create();
+    await postFactory(ctx.db)
+      .use((t) => t.asReplyTo(root))
+      .props({ violatesThreadgate: () => true })
+      .create();
+
+    // act
+    const res = await client.call(getPostThread, {
+      uri: asAtUriString(root.uri),
+    });
+
+    // assert
+    expect(res.thread).toMatchObject({
+      replies: [{ post: { uri: reply.uri } }],
+    });
+    expect(res.thread).not.toHaveProperty("replies.1");
+  });
+
+  test("threadgate-9: 返信制限に違反した返信をスレッドの中心にしたときは、親投稿とリプライを含めない", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const root = await postFactory(ctx.db).create();
+    const violating = await postFactory(ctx.db)
+      .use((t) => t.asReplyTo(root))
+      .props({ violatesThreadgate: () => true })
+      .create();
+    await postFactory(ctx.db)
+      .use((t) => t.asReplyTo(violating, root))
+      .create();
+
+    // act
+    const res = await client.call(getPostThread, {
+      uri: asAtUriString(violating.uri),
+    });
+
+    // assert
+    expect(res.thread).toMatchObject({
+      post: { uri: violating.uri },
+      replies: [],
+    });
+    expect(res.thread).not.toHaveProperty("parent");
+  });
+
   test("getPostThread-2: 存在しない投稿には400とNotFoundを返す", async () => {
     // arrange
     const { client } = await setupApiTest();

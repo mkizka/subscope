@@ -45,10 +45,11 @@ export class PostThreadService {
     }
 
     // 2. スレッド全体の構造を収集
+    const depth = targetPost.violatesThreadgate ? 0 : params.depth;
     const threadData = await this.collectThreadData({
       targetPost,
-      parentHeight: params.parentHeight,
-      replyDepth: params.depth,
+      parentHeight: targetPost.violatesThreadgate ? 0 : params.parentHeight,
+      replyDepth: depth,
       replyLimits: params.replyLimits ?? DEFAULT_REPLY_LIMITS,
     });
 
@@ -70,7 +71,7 @@ export class PostThreadService {
         targetPost,
         targetPostView,
         parentPosts: threadData.parentPosts,
-        replyDepth: params.depth,
+        replyDepth: depth,
         postViewMap,
         replyTree: threadData.replyTree,
       }),

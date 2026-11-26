@@ -15,7 +15,8 @@ test.describe("投稿画像", () => {
         aspectRatio: { width: 1, height: 1 },
       })),
     );
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text,
       embed: { $type: "app.bsky.embed.gallery", items },
       createdAt: new Date().toISOString(),

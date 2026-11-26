@@ -23,8 +23,7 @@ const xrpc = async <T>(
 
 export const createRecord = async (
   handle: string,
-  collection: string,
-  record: Record<string, unknown>,
+  record: { $type: string } & Record<string, unknown>,
 ) => {
   const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
     "com.atproto.server.createSession",
@@ -32,7 +31,7 @@ export const createRecord = async (
   );
   return xrpc<{ uri: string; cid: string }>(
     "com.atproto.repo.createRecord",
-    { repo: did, collection, record: { $type: collection, ...record } },
+    { repo: did, collection: record.$type, record },
     accessJwt,
   );
 };
@@ -110,7 +109,8 @@ export const follow = async (handle: string, subjectHandle: string) => {
     records: { value: { subject: string } }[];
   };
   if (records.some((record) => record.value.subject === subject)) return;
-  await createRecord(handle, "app.bsky.graph.follow", {
+  await createRecord(handle, {
+    $type: "app.bsky.graph.follow",
     subject,
     createdAt: new Date().toISOString(),
   });

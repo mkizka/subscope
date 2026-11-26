@@ -46,6 +46,7 @@ describe("PostQuery", () => {
           embedExternal: null,
           embedRecordUri: null,
           violatesEmbeddingRules: false,
+          violatesThreadgate: false,
           replyRootUri: null,
           replyParentUri: null,
           indexedAt: post.indexedAt,

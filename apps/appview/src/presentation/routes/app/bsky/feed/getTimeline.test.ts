@@ -207,6 +207,34 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
   });
 
+  test("threadgate-10: 返信制限に違反した返信のfeedViewPostには、replyを含めない", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await createAccount();
+    const root = await createPost(viewer, new Date("2024-01-01"));
+    const reply = await postFactory(ctx.db)
+      .use((t) => t.asReplyTo(root))
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.post")
+            .vars({ account: () => viewer })
+            .create(),
+      })
+      .props({ violatesThreadgate: () => true })
+      .create();
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => reply })
+      .create();
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getTimeline, { limit: 1 });
+
+    // assert
+    expect(res.feed).toMatchObject([{ post: { uri: reply.uri } }]);
+    expect(res.feed[0]?.reply).toBeUndefined();
+  });
+
   test("feedViewPost-2: 起点や親が見つからないときは、その投稿をnotFoundPostにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();

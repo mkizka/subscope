@@ -1,5 +1,3 @@
-import assert from "node:assert";
-
 import { asDid } from "@atproto/did";
 import type { LexValue } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
@@ -44,9 +42,7 @@ const services = await createWorkerRegistry(testEnv)
 describe("commit", () => {
   const { ctx } = testSetup;
   const processCommit = async (event: RecordEvent) => {
-    const command = indexCommitCommandFactory(event);
-    assert(command);
-    await services.indexCommitUseCase.execute(command);
+    await services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
   };
 
   const postEvent = (did: string, text: string): RecordEvent => ({

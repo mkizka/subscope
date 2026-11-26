@@ -3,7 +3,8 @@ import { expect, type Page, test } from "@playwright/test";
 import { createRecord, uploadImage } from "../../helpers/pds";
 
 const openViewer = async (page: Page, text: string, alt: string) => {
-  await createRecord("alice.test", "app.bsky.feed.post", {
+  await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     embed: {
       $type: "app.bsky.embed.images",

@@ -34,7 +34,8 @@ const turnOn = async ({ page }: Device) => {
 
 const likeAlicePost = async (text: string) => {
   const createdAt = new Date().toISOString();
-  const post = await createRecord("alice.test", "app.bsky.feed.post", {
+  const post = await createRecord("alice.test", {
+    $type: "app.bsky.feed.post",
     text,
     createdAt,
   });
@@ -42,7 +43,8 @@ const likeAlicePost = async (text: string) => {
     displayName: "Bob",
   });
   await follow("alice.test", "bob.test");
-  await createRecord("bob.test", "app.bsky.feed.like", {
+  await createRecord("bob.test", {
+    $type: "app.bsky.feed.like",
     subject: { uri: post.uri, cid: post.cid },
     createdAt,
   });

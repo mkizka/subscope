@@ -1,5 +1,3 @@
-import assert from "node:assert";
-
 import { asDid, type Did } from "@atproto/did";
 import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
@@ -38,9 +36,7 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
 export const setupJobTest = async () => {
   const services = await jobTestRegistry.resolve();
   const indexCommit = async (event: RecordEvent) => {
-    const command = indexCommitCommandFactory(event);
-    assert(command);
-    await services.indexCommitUseCase.execute(command);
+    await services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
   };
   const runSyncTapRepoJobs = async () => {
     const jobs = [...services.jobScheduler.getSyncTapRepoJobs()];

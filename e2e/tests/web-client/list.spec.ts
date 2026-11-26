@@ -10,7 +10,8 @@ import {
 
 const createEmptyList = async (name: string) => {
   await follow("alice.test", "bob.test");
-  return createRecord("alice.test", "app.bsky.graph.list", {
+  return createRecord("alice.test", {
+    $type: "app.bsky.graph.list",
     purpose: "app.bsky.graph.defs#curatelist",
     name,
     description: `${name}の説明`,
@@ -21,7 +22,8 @@ const createEmptyList = async (name: string) => {
 const createList = async (name: string) => {
   const bob = await resolveHandle("bob.test");
   const list = await createEmptyList(name);
-  await createRecord("alice.test", "app.bsky.graph.listitem", {
+  await createRecord("alice.test", {
+    $type: "app.bsky.graph.listitem",
     subject: bob,
     list: list.uri,
     createdAt: new Date().toISOString(),
@@ -57,7 +59,8 @@ test.describe("リスト", () => {
     const older = `list-e2の古い投稿 ${Date.now()}`;
     const newer = `list-e2の新しい投稿 ${Date.now()}`;
     for (const text of [older, newer]) {
-      await createRecord("bob.test", "app.bsky.feed.post", {
+      await createRecord("bob.test", {
+        $type: "app.bsky.feed.post",
         text,
         createdAt: new Date().toISOString(),
       });
@@ -285,20 +288,24 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-e9のリスト ${Date.now()}`);
-    const alicePost = await createRecord("alice.test", "app.bsky.feed.post", {
+    const alicePost = await createRecord("alice.test", {
+      $type: "app.bsky.feed.post",
       text: "list-e9: aliceの投稿",
       createdAt: new Date().toISOString(),
     });
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: "list-e9: aliceへの返信",
       reply: { root: alicePost, parent: alicePost },
       createdAt: new Date().toISOString(),
     });
-    const root = await createRecord("bob.test", "app.bsky.feed.post", {
+    const root = await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: "list-e9: bobの投稿",
       createdAt: new Date().toISOString(),
     });
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", {
+      $type: "app.bsky.feed.post",
       text: "list-e9: bob自身への返信",
       reply: { root, parent: root },
       createdAt: new Date().toISOString(),
