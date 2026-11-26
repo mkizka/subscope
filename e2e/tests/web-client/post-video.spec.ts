@@ -11,11 +11,10 @@ async function postVideo(text: string) {
     text,
     embed: {
       $type: "app.bsky.embed.video",
-      video: await uploadBlob(
-        "alice.test",
-        new Uint8Array([0, 0, 0, 24]),
-        "video/mp4",
-      ),
+      video: await uploadBlob("alice.test", {
+        body: new Uint8Array([0, 0, 0, 24]),
+        contentType: "video/mp4",
+      }),
       alt: text,
       aspectRatio: { width: 16, height: 9 },
     },

@@ -6,7 +6,10 @@ const authorize = async (page: Page) => {
   await page.getByRole("button", { name: "Authorize" }).click();
 };
 
-export const login = async (page: Page, handle = "alice.test", url = "/") => {
+export const login = async (
+  page: Page,
+  { handle = "alice.test", url = "/" }: { handle?: string; url?: string } = {},
+) => {
   await page.goto("/login");
   if (new URL(page.url()).pathname !== "/login") return;
   await page.getByLabel("ハンドル").fill(handle);
@@ -15,7 +18,10 @@ export const login = async (page: Page, handle = "alice.test", url = "/") => {
   await page.waitForURL(url);
 };
 
-export const register = async (page: Page, handle: string, code: string) => {
+export const register = async (
+  page: Page,
+  { handle, code }: { handle: string; code: string },
+) => {
   await page.goto("/login");
   await page.getByRole("tab", { name: "新規登録" }).click();
   await page.getByLabel("ハンドル").fill(handle);

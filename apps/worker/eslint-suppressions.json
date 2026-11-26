@@ -24,11 +24,6 @@
       "count": 1
     }
   },
-  "src/application/services/indexer/post-indexer.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/application/services/indexer/post-indexer.ts": {
     "params/max-params": {
       "count": 1
@@ -100,11 +95,6 @@
     }
   },
   "src/application/use-cases/async/sync-tap-repo-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/application/use-cases/commit/index-commit-use-case.test.ts": {
     "params/max-params": {
       "count": 1
     }
@@ -189,27 +179,12 @@
       "count": 4
     }
   },
-  "src/presentation/commit.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/label-subscriber.ts": {
     "params/max-params": {
       "count": 1
     }
   },
-  "src/presentation/push-notification-create.test.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "src/presentation/server.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "src/presentation/tap.test.ts": {
     "params/max-params": {
       "count": 1
     }

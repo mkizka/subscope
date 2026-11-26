@@ -8,9 +8,11 @@ import type { IListQuery } from "@/app/server/application/interfaces/list-query"
 export interface IGetListPageUseCase {
   execute: (
     did: string,
-    account: AtIdentifierString,
-    rkey: string,
-    tab: "posts" | "members",
+    params: {
+      account: AtIdentifierString;
+      rkey: string;
+      tab: "posts" | "members";
+    },
   ) => Promise<{
     list: ListDto;
     members: ListMemberDto[];
@@ -26,8 +28,8 @@ export const getListPageUseCaseFactory = ({
   listQuery: IListQuery;
   backfillQuery: IBackfillQuery;
 }): IGetListPageUseCase => ({
-  async execute(did, account, rkey, tab) {
-    const { list, members } = await listQuery.findList(did, account, rkey);
+  async execute(did, { account, rkey, tab }) {
+    const { list, members } = await listQuery.findList(did, { account, rkey });
     const [posts, statuses] = await Promise.all([
       tab === "posts" ? listQuery.findPosts(did, list.uri) : [],
       backfillQuery.findTrackedStatuses(members.map((member) => member.did)),

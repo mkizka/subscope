@@ -252,7 +252,11 @@ test.describe("タイムライン", () => {
     page,
   }) => {
     await follow("alice.test", "bob.test");
-    await putRecord("alice.test", "app.bsky.actor.profile", "self", {});
+    await putRecord("alice.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {},
+    });
     const parent = await createRecord("alice.test", {
       $type: "app.bsky.feed.post",
       text: "timeline-e2: 親投稿",

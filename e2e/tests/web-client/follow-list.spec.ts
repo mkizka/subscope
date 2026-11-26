@@ -4,12 +4,20 @@ import { follow, putRecord } from "../../helpers/pds";
 
 test.describe("フォロー・フォロワー", () => {
   test.beforeEach(async ({ page }) => {
-    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
-      displayName: "Alice",
-      description: "follow-listの自己紹介",
+    await putRecord("alice.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Alice",
+        description: "follow-listの自己紹介",
+      },
     });
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
+    await putRecord("bob.test", {
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: {
+        displayName: "Bob",
+      },
     });
     await follow("alice.test", "bob.test");
     await page.goto("/");

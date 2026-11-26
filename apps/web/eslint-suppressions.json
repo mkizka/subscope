@@ -24,16 +24,6 @@
       "count": 2
     }
   },
-  "app/server/application/list/get-list-page-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "app/server/application/list/update-list-use-case.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "app/server/application/search/search-use-case.ts": {
     "params/max-params": {
       "count": 1
@@ -42,16 +32,6 @@
   "app/server/application/thread/get-thread-use-case.ts": {
     "params/max-params": {
       "count": 2
-    }
-  },
-  "app/server/infrastructure/list/list-command.ts": {
-    "params/max-params": {
-      "count": 2
-    }
-  },
-  "app/server/infrastructure/list/list-query.ts": {
-    "params/max-params": {
-      "count": 1
     }
   },
   "app/server/infrastructure/reaction/reaction-command.ts": {
