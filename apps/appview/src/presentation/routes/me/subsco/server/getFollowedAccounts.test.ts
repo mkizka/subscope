@@ -82,8 +82,8 @@ describe("me.subsco.server.getFollowedAccounts", () => {
       ...page1.followedAccounts,
       ...page2.followedAccounts,
     ]).toMatchObject([
-      { profile: { did: followedByTwo.did }, registeredFollowersCount: 2 },
-      { profile: { did: followedByOne.did }, registeredFollowersCount: 1 },
+      { profile: { did: followedByTwo.did }, memberFollowersCount: 2 },
+      { profile: { did: followedByOne.did }, memberFollowersCount: 1 },
     ]);
   });
 

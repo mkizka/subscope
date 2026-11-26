@@ -71,15 +71,13 @@ export const subscopeQueryFactory = ({
         await restore(did)
       ).call(getFollowedAccounts, { limit: 100, q });
       return {
-        accounts: followedAccounts.map(
-          ({ profile, registeredFollowersCount }) => ({
-            did: profile.did,
-            handle: profile.handle,
-            displayName: profile.displayName,
-            avatarUrl: profile.avatar,
-            memberFollowersCount: registeredFollowersCount,
-          }),
-        ),
+        accounts: followedAccounts.map(({ profile, memberFollowersCount }) => ({
+          did: profile.did,
+          handle: profile.handle,
+          displayName: profile.displayName,
+          avatarUrl: profile.avatar,
+          memberFollowersCount,
+        })),
       };
     },
   };

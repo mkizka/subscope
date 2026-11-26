@@ -1,6 +1,6 @@
 import { createServer, type Server } from "node:http";
 
-import { fakeDid } from "@repo/common/test";
+import { fakeCid, fakeDid } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import {
   afterAll,
@@ -20,6 +20,7 @@ const uri = `at://${did}/app.bsky.feed.post/3kxyzabc`;
 describe("FetchRecordUseCase", () => {
   let fetchRecordUseCase: TestServices["fetchRecordUseCase"];
   let didResolver: TestServices["didResolver"];
+  let jobScheduler: TestServices["jobScheduler"];
   let pdsResponse: { status: number; body: object };
   let server: Server;
   let pdsUrl: URL;
@@ -44,6 +45,7 @@ describe("FetchRecordUseCase", () => {
     const services = await testRegistry.resolve();
     fetchRecordUseCase = services.fetchRecordUseCase;
     didResolver = services.didResolver;
+    jobScheduler = services.jobScheduler;
     didResolver.setResolveResult(did, {
       handle: asHandle("alice.test"),
       signingKey: "test-key",
@@ -101,5 +103,36 @@ describe("FetchRecordUseCase", () => {
 
     // act & assert
     await expect(execute()).rejects.toThrow();
+  });
+
+  test("fetchRecord-8: PDSから取得したプロフィールが指す固定投稿は取得しない", async () => {
+    // arrange
+    const profileUri = `at://${did}/app.bsky.actor.profile/self`;
+    pdsResponse = {
+      status: 200,
+      body: {
+        uri: profileUri,
+        cid: fakeCid(),
+        value: {
+          $type: "app.bsky.actor.profile",
+          pinnedPost: { uri, cid: fakeCid() },
+        },
+      },
+    };
+
+    // act
+    await fetchRecordUseCase.execute({
+      uri: profileUri,
+      depth: 0,
+      live: false,
+      jobLogger,
+    });
+
+    // assert
+    expect(
+      jobScheduler
+        .getFetchRecordJobs()
+        .filter((job) => job.uri.toString() === uri),
+    ).toEqual([]);
   });
 });

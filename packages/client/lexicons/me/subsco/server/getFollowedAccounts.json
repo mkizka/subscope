@@ -48,13 +48,13 @@
     },
     "followedAccount": {
       "type": "object",
-      "required": ["profile", "registeredFollowersCount"],
+      "required": ["profile", "memberFollowersCount"],
       "properties": {
         "profile": {
           "type": "ref",
           "ref": "app.bsky.actor.defs#profileView"
         },
-        "registeredFollowersCount": {
+        "memberFollowersCount": {
           "type": "integer"
         }
       }

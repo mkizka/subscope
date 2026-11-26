@@ -3,6 +3,7 @@ import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
+import { postFactory } from "../../../domain/post.factory.js";
 import { Tracking } from "../../../domain/tracking.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
@@ -274,6 +275,46 @@ describe("IndexCommitUseCase", () => {
         expect((await recordRepo.find({ ctx, uri })) !== null).toBe(
           liker || author,
         );
+      },
+    );
+
+    test.each([
+      { name: "保存していない", saved: false },
+      { name: "保存している", saved: true },
+    ])(
+      "fetchRecord-7: Tapから受け取ったプロフィールが指す固定投稿を、保存していなければ取得する($name)",
+      async ({ saved }) => {
+        // arrange
+        const account = accountFactory();
+        const pinnedUri = `at://${account.did}/app.bsky.feed.post/pinned`;
+        if (saved) {
+          recordRepo.add(postFactory({ uri: pinnedUri }).record);
+        }
+        const uri = new AtUri(
+          `at://${account.did}/app.bsky.actor.profile/self`,
+        );
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: "app.bsky.actor.profile",
+            pinnedPost: { uri: pinnedUri, cid: fakeCid() },
+          },
+          indexedAt: new Date(),
+        };
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: false,
+        });
+
+        // assert
+        expect(
+          jobScheduler
+            .getFetchRecordJobs()
+            .filter((job) => job.uri.toString() === pinnedUri),
+        ).toMatchObject(saved ? [] : [{ live: false, depth: 0 }]);
       },
     );
 
