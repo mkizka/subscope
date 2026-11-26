@@ -20,7 +20,7 @@ const wideImage = {
   ),
 };
 
-const writeAlt = async (page: Page, n: number, alt: string) => {
+const writeAlt = async (page: Page, { n, alt }: { n: number; alt: string }) => {
   await page.getByRole("button", { name: `画像${n}のALTを編集` }).click();
   const dialog = page.getByRole("dialog", { name: "ALTを追加" });
   await dialog.getByRole("textbox", { name: "ALT" }).fill(alt);
@@ -71,7 +71,7 @@ test.describe("投稿欄", () => {
   }) => {
     const alt = `postForm-e2: ${Date.now()}`;
     await page.getByLabel("画像を追加").setInputFiles(image("a.png"));
-    await writeAlt(page, 1, alt);
+    await writeAlt(page, { n: 1, alt });
     await page.getByRole("button", { name: "投稿", exact: true }).click();
 
     await expect(page.getByRole("img", { name: alt })).toBeAttached();

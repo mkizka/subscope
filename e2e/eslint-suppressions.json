@@ -1,40 +1,5 @@
 {
-  "tests/web-client/image-viewer.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "tests/web-client/post-form.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "tests/web-client/post-toolbar.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
   "tests/web-client/push-setting.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "tests/web-client/reactors.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "tests/web-client/search.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "tests/web-client/thread.spec.ts": {
-    "params/max-params": {
-      "count": 1
-    }
-  },
-  "tests/web-client/timeline.spec.ts": {
     "params/max-params": {
       "count": 1
     }

@@ -122,8 +122,7 @@ test.describe("タイムライン", () => {
   });
 
   const openRefreshing = async (
-    page: Page,
-    request: APIRequestContext,
+    { page, request }: { page: Page; request: APIRequestContext },
     label: string,
   ) => {
     await createPosts(request, [`${label}: ${Date.now()}`]);
@@ -150,8 +149,7 @@ test.describe("タイムライン", () => {
     request,
   }) => {
     const { spinner, release } = await openRefreshing(
-      page,
-      request,
+      { page, request },
       "timeline-e10",
     );
     const isOnTop = await spinner.evaluate((el) => {
@@ -173,8 +171,7 @@ test.describe("タイムライン", () => {
     request,
   }) => {
     const { spinner, release } = await openRefreshing(
-      page,
-      request,
+      { page, request },
       "timeline-e11",
     );
     await page.addStyleTag({ content: "main { min-height: 3000px }" });

@@ -10,7 +10,10 @@ const post = (text: string, parent?: { uri: string; cid: string }) =>
     createdAt: new Date().toISOString(),
   });
 
-const searchPosts = async (page: Page, q: string, text: string) => {
+const searchPosts = async (
+  page: Page,
+  { q, text }: { q: string; text: string },
+) => {
   const article = page.getByRole("article").filter({ hasText: text });
   await expect(async () => {
     await page.goto(`/search?${new URLSearchParams({ q })}`);
@@ -82,7 +85,7 @@ test.describe("検索", () => {
     const older = await post(`古い ${q} 投稿`);
     await post(`新しい ${q} 投稿`);
     await post(`返信 ${q}`, older);
-    await searchPosts(page, q, `新しい ${q} 投稿`);
+    await searchPosts(page, { q, text: `新しい ${q} 投稿` });
     await page.goto("/search");
 
     await page.getByRole("searchbox", { name: "検索語" }).fill(q);

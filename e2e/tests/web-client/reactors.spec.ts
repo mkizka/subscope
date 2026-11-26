@@ -5,10 +5,12 @@ import { createRecord } from "../../helpers/pds";
 
 const openList = async (
   page: Page,
-  id: string,
-  collection: string,
-  label: string,
-  path: string,
+  {
+    id,
+    collection,
+    label,
+    path,
+  }: { id: string; collection: string; label: string; path: string },
 ) => {
   const subject = await createRecord("bob.test", {
     $type: "app.bsky.feed.post",
@@ -39,23 +41,21 @@ const openList = async (
 test("reactors-e1: 「N件のリポスト」を押すと、リポストしたアカウントの一覧を開く", async ({
   page,
 }) => {
-  await openList(
-    page,
-    "reactors-e1",
-    "app.bsky.feed.repost",
-    "リポスト",
-    "reposted-by",
-  );
+  await openList(page, {
+    id: "reactors-e1",
+    collection: "app.bsky.feed.repost",
+    label: "リポスト",
+    path: "reposted-by",
+  });
 });
 
 test("reactors-e2: 「N件のいいね」を押すと、いいねしたアカウントの一覧を開く", async ({
   page,
 }) => {
-  await openList(
-    page,
-    "reactors-e2",
-    "app.bsky.feed.like",
-    "いいね",
-    "liked-by",
-  );
+  await openList(page, {
+    id: "reactors-e2",
+    collection: "app.bsky.feed.like",
+    label: "いいね",
+    path: "liked-by",
+  });
 });
