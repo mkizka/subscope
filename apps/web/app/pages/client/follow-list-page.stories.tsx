@@ -33,11 +33,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-const emptyData = (
-  handle: string,
-  kind: "follows" | "followers",
+const emptyData = ({
+  handle,
+  kind,
   filter = "all",
-) => {
+}: {
+  handle: string;
+  kind: "follows" | "followers";
+  filter?: string;
+}) => {
   queryClient.setQueryData(
     ["follow-list", handle, kind, filter],
     infinite<typeof followListLoader>({
@@ -83,7 +87,7 @@ export const FollowersTabs: Story = {
 export const FollowsEmpty: Story = {
   name: "followList-s4: フォローが0件のときは「フォローしているアカウントはありません」を出す",
   args: { handle: "dave.bsky.social" },
-  beforeEach: () => emptyData("dave.bsky.social", "follows"),
+  beforeEach: () => emptyData({ handle: "dave.bsky.social", kind: "follows" }),
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText("フォローしているアカウントはありません"),
@@ -94,7 +98,8 @@ export const FollowsEmpty: Story = {
 export const FollowersEmpty: Story = {
   name: "followList-s5: フォロワーが0件のときは「フォロワーはいません」を出す",
   args: { handle: "dave.bsky.social", kind: "followers" },
-  beforeEach: () => emptyData("dave.bsky.social", "followers"),
+  beforeEach: () =>
+    emptyData({ handle: "dave.bsky.social", kind: "followers" }),
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText("フォロワーはいません"),
@@ -124,7 +129,12 @@ export const KnownFollowersEmpty: Story = {
   parameters: {
     path: "/dave.bsky.social/followers?filter=known",
   },
-  beforeEach: () => emptyData("dave.bsky.social", "followers", "known"),
+  beforeEach: () =>
+    emptyData({
+      handle: "dave.bsky.social",
+      kind: "followers",
+      filter: "known",
+    }),
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText("知り合いのフォロワーはいません"),

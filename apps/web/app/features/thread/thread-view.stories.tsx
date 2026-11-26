@@ -2,7 +2,15 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ThreadView } from "./thread-view";
 
-const post = (id: number, text: string, handle = "alice.bsky.social") => ({
+const post = ({
+  id,
+  text,
+  handle = "alice.bsky.social",
+}: {
+  id: number;
+  text: string;
+  handle?: string;
+}) => ({
   uri: `at://did:plc:example/app.bsky.feed.post/${id}`,
   cid: `bafyexample${id}`,
   authorHandle: handle,
@@ -15,17 +23,20 @@ const meta = {
   component: ThreadView,
   args: {
     thread: {
-      ancestors: [post(1, "親投稿です")],
+      ancestors: [post({ id: 1, text: "親投稿です" })],
       post: {
-        ...post(2, "選んだ投稿です", "bob.bsky.social"),
+        ...post({ id: 2, text: "選んだ投稿です", handle: "bob.bsky.social" }),
         replyCount: 2,
         repostCount: 3,
         quoteCount: 2,
         likeCount: 8,
       },
       replies: [
-        [post(3, "返信です"), post(4, "返信への返信です", "bob.bsky.social")],
-        [post(5, "別の返信です")],
+        [
+          post({ id: 3, text: "返信です" }),
+          post({ id: 4, text: "返信への返信です", handle: "bob.bsky.social" }),
+        ],
+        [post({ id: 5, text: "別の返信です" })],
       ],
     },
   },
@@ -40,7 +51,7 @@ export const NoAncestorsAndReplies: Story = {
   args: {
     thread: {
       ancestors: [],
-      post: post(2, "返信のない投稿です"),
+      post: post({ id: 2, text: "返信のない投稿です" }),
       replies: [],
     },
   },
