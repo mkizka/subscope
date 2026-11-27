@@ -84,6 +84,8 @@ import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
+import { RefreshAccountRosterUseCase } from "../application/use-cases/roster/refresh-account-roster-use-case.js";
+import { AccountRoster } from "../domain/account-roster.js";
 import type { IGateQuery } from "../domain/interfaces/gate-query.js";
 import type { IRegistrationQuery } from "../domain/interfaces/registration-query.js";
 import type { ITrackingRepository } from "../domain/interfaces/tracking-repository.js";
@@ -180,6 +182,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("webPushSender", ["env"], asClassArgs<IWebPushSender>()(WebPushSender))
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     // domain(service)
+    .service("accountRoster", asClassArgs(AccountRoster))
     .service("storagePolicy", ["registrationQuery"], asClassArgs(StoragePolicy))
     .service("notificationPolicy", ["registrationQuery"], asClassArgs(NotificationPolicy))
     .service("gatePolicy", ["gateQuery"], asClassArgs(GatePolicy))
@@ -211,7 +214,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClass(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClass(AggregateAccountStatsUseCase))
     .service("indexLabelUseCase", ["indexLabelService", "transactionManager"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["trackingService", "storagePolicy", "transactionManager"], asClass(SyncTapRepoUseCase))
+    .service("syncTapRepoUseCase", ["trackingService", "storagePolicy", "transactionManager", "accountRoster"], asClass(SyncTapRepoUseCase))
+    .service("refreshAccountRosterUseCase", ["registrationQuery", "accountRoster", "transactionManager"], asClass(RefreshAccountRosterUseCase))
     .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "trackingService", "storagePolicy", "accountRepository", "jobScheduler", "transactionManager"], asClass(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClass(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClass(SendPushNotificationUseCase))

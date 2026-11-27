@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 
 export interface IRegistrationQuery {
@@ -7,4 +8,6 @@ export interface IRegistrationQuery {
     ctx: TransactionContext,
     subjectDid: string,
   ) => Promise<boolean>;
+  findMemberDids: (ctx: TransactionContext) => Promise<Did[]>;
+  findTrackedDids: (ctx: TransactionContext) => Promise<Did[]>;
 }
