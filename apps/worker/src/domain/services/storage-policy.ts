@@ -99,13 +99,6 @@ export class StoragePolicy {
     return [record.accountDid];
   }
 
-  async isTracked(ctx: TransactionContext, did: Did) {
-    return (
-      (await this.registrationQuery.isMember(ctx, did)) ||
-      (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did))
-    );
-  }
-
   tracksFollowee(ctx: TransactionContext, follow: Follow) {
     return this.registrationQuery.isMember(ctx, follow.accountDid);
   }

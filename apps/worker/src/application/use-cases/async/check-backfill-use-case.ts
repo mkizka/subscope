@@ -8,14 +8,14 @@ import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IRepoStatusFetcher } from "../../interfaces/external/repo-status-fetcher.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
-import type { TrackingService } from "../../services/tracking-service.js";
+import type { TapRepoService } from "../../services/tap-repo-service.js";
 
 export class CheckBackfillUseCase {
   constructor(
     private readonly deps: {
       tapClient: ITapClient;
       repoStatusFetcher: IRepoStatusFetcher;
-      trackingService: TrackingService;
+      tapRepoService: TapRepoService;
       storagePolicy: StoragePolicy;
       accountRepository: IAccountRepository;
       jobScheduler: IJobScheduler;
@@ -26,8 +26,8 @@ export class CheckBackfillUseCase {
   async execute({ did, attempt }: JobData["checkBackfill"]) {
     const account = await this.deps.transactionManager.transaction(
       async (ctx) => {
-        const isTracked = await this.deps.storagePolicy.isTracked(ctx, did);
-        return isTracked
+        const kind = await this.deps.storagePolicy.classify(ctx, did);
+        return kind.usesTap
           ? this.deps.accountRepository.find({ ctx, did })
           : null;
       },
@@ -40,7 +40,7 @@ export class CheckBackfillUseCase {
       tapState === "error" &&
       (await this.deps.repoStatusFetcher.isDeleted(did));
     if (isDeleted) {
-      await this.deps.trackingService.stop(did);
+      await this.deps.tapRepoService.remove(did);
       account.completeBackfill();
       await this.deps.transactionManager.transaction((ctx) =>
         this.deps.accountRepository.save({ ctx, account }),

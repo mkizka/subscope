@@ -53,14 +53,11 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleSyncTapRepo(
-    did: Did,
-    options?: { refetch: boolean },
-  ): Promise<void> {
+  async scheduleSyncTapRepo(did: Did): Promise<void> {
     await this.jobQueue.add({
       queueName: "syncTapRepo",
       jobName: did,
-      data: { did, ...options },
+      data: { did },
     });
   }
 

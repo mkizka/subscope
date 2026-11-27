@@ -32,13 +32,13 @@ export const getListPageUseCaseFactory = ({
     const { list, members } = await listQuery.findList(did, { account, rkey });
     const [posts, statuses] = await Promise.all([
       tab === "posts" ? listQuery.findPosts(did, list.uri) : [],
-      backfillQuery.findTrackedStatuses(members.map((member) => member.did)),
+      backfillQuery.findMemberStatuses(members.map((member) => member.did)),
     ]);
     return {
       list,
       members: members.map((member) => ({
         ...member,
-        backfillStatus: statuses[member.did]?.status,
+        backfillStatus: statuses[member.did],
       })),
       posts,
       isSelf: list.creatorDid === did,

@@ -345,7 +345,7 @@ describe("PostIndexer", () => {
       ]);
     });
 
-    test("index-24: 引用禁止の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+    test("index-24: 引用禁止の違反は、リアルタイムに受け取った投稿でだけ判定する", async () => {
       const ctx = { db, afterCommit };
       // arrange
       disableEmbedding();

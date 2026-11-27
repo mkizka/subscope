@@ -25,13 +25,13 @@ export const searchUseCaseFactory = ({
       return { accounts: [], posts: await timelineQuery.searchPosts(did, q) };
     }
     const accounts = await accountQuery.searchActors(did, q);
-    const statuses = await backfillQuery.findTrackedStatuses(
+    const statuses = await backfillQuery.findMemberStatuses(
       accounts.map((account) => account.did),
     );
     return {
       accounts: accounts.map((account) => ({
         ...account,
-        backfillStatus: statuses[account.did]?.status,
+        backfillStatus: statuses[account.did],
       })),
       posts: [],
     };

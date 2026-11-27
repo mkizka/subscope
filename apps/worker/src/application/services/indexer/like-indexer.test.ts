@@ -117,7 +117,7 @@ describe("LikeIndexer", () => {
         origin: Origin.fromFetchJob({ live: true, depth: 0 }),
       },
     ])(
-      "notify-9: 通知はTapからリアルタイムに受け取ったレコードでだけ作り、バックフィルや取得しに行ったレコードでは作らない ($name)",
+      "notify-9: 通知はリアルタイムに受け取ったレコードでだけ作り、バックフィルや取得しに行ったレコードでは作らない ($name)",
       async ({ origin }) => {
         // arrange
         const liker = accountFactory();

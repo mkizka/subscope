@@ -6,5 +6,5 @@ import type { AccountStatus } from "../../../domain/account.js";
 export type UpsertIdentityCommand = {
   did: Did;
   handle?: Handle;
-  status: AccountStatus;
+  status?: AccountStatus;
 };

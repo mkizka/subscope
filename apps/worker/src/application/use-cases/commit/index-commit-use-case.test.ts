@@ -324,7 +324,7 @@ describe("IndexCommitUseCase", () => {
       { name: "保存していない", saved: false },
       { name: "保存している", saved: true },
     ])(
-      "fetchRecord-7: Tapから受け取ったプロフィールが指す固定投稿を、保存していなければ取得する($name)",
+      "fetchRecord-7: TapかJetstreamから受け取ったプロフィールが指す固定投稿を、保存していなければ取得する($name)",
       async ({ saved }) => {
         // arrange
         const account = accountFactory();
@@ -479,7 +479,7 @@ describe("IndexCommitUseCase", () => {
         saved: false,
       },
     ])(
-      "index-28: 追跡アカウントでないアカウントのレコードは、メンバー宛てのものだけ保存する($name)",
+      "index-28: メンバーでも追跡アカウントでもないアカウントのレコードは、メンバー宛てのものだけ保存する($name)",
       async ({ collection, json, saved }) => {
         // arrange
         const author = accountFactory();

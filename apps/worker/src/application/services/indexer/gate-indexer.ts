@@ -3,7 +3,6 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import { Gate } from "../../../domain/gate.js";
 import type { Origin } from "../../../domain/origin.js";
 import type { Record } from "../../../domain/record.js";
-import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IRecordQuery } from "../../interfaces/queries/record-query.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { RecordSaveService } from "../record-save-service.js";
@@ -13,7 +12,6 @@ export class GateIndexer implements IRecordIndexer {
   constructor(
     private readonly deps: {
       recordQuery: IRecordQuery;
-      storagePolicy: StoragePolicy;
       recordSaveService: RecordSaveService;
       relatedRecordService: RelatedRecordService;
     },
@@ -29,14 +27,6 @@ export class GateIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const gate = Gate.fromRecord(record);
-    const saves = await this.deps.storagePolicy.saves({
-      ctx,
-      origin,
-      record: { accountDid: record.uri.did, addresseeDids: [] },
-    });
-    if (!saves) {
-      return;
-    }
     if (!gate.attachesToOwnPost) {
       return;
     }

@@ -27,7 +27,6 @@ const seed = (patch: Partial<ProfileData> = {}, tab = "posts") =>
         followersCount: 345,
       },
       isSelf: false,
-      isMember: true,
       backfillStatus: "completed",
       posts: TimelineFeedStories.args.posts,
       ...patch,
@@ -74,15 +73,9 @@ export const NoPosts: Story = {
   },
 };
 
-export const Untracked: Story = {
+export const NonMember: Story = {
   beforeEach: () => {
-    seed({ isMember: false, backfillStatus: undefined });
-  },
-};
-
-export const Followee: Story = {
-  beforeEach: () => {
-    seed({ isMember: false });
+    seed({ backfillStatus: undefined });
   },
 };
 
@@ -309,9 +302,9 @@ export const KnownFollowersView: Story = {
 };
 
 export const UntrackedBadge: Story = {
-  name: "profile-s10: 追跡アカウントでないときは、ハンドルの横に「同期対象外」を出す",
+  name: "profile-s10: メンバーでないときは、ハンドルの横に「同期対象外」を出す",
   beforeEach: () => {
-    seed({ isMember: false, backfillStatus: undefined });
+    seed({ backfillStatus: undefined });
   },
   play: async ({ canvasElement }) => {
     await expect(
@@ -323,8 +316,8 @@ export const UntrackedBadge: Story = {
 export const IncompleteNotice: Story = {
   name: "profile-s11: メンバーでないときは、全てのタブの下に、表示が不十分な場合があることを出す",
   beforeEach: () => {
-    seed({ isMember: false });
-    seed({ isMember: false }, "likes");
+    seed({ backfillStatus: undefined });
+    seed({ backfillStatus: undefined }, "likes");
   },
   play: async ({ canvasElement }) => {
     const page = main(canvasElement);
@@ -365,7 +358,6 @@ export const ImageViewerProfile: Story = {
           followersCount: 0,
         },
         isSelf: false,
-        isMember: true,
         backfillStatus: "completed",
         posts: [],
       }),

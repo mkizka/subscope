@@ -25,7 +25,7 @@ import type {
   ITransactionManager,
 } from "@repo/common/interface";
 
-import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
+import type { ICursorStore } from "../application/interfaces/external/cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IRepoStatusFetcher } from "../application/interfaces/external/repo-status-fetcher.js";
 import type { ITapClient } from "../application/interfaces/external/tap-client.js";
@@ -72,7 +72,7 @@ import { RecordSaveService } from "../application/services/record-save-service.j
 import { RelatedRecordService } from "../application/services/related-record-service.js";
 import { ResolveDidService } from "../application/services/resolve-did-service.js";
 import { StatsService } from "../application/services/stats-service.js";
-import { TrackingService } from "../application/services/tracking-service.js";
+import { TapRepoService } from "../application/services/tap-repo-service.js";
 import { AggregateAccountStatsUseCase } from "../application/use-cases/async/aggregate-account-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import { CheckBackfillUseCase } from "../application/use-cases/async/check-backfill-use-case.js";
@@ -88,13 +88,12 @@ import { RefreshAccountRosterUseCase } from "../application/use-cases/roster/ref
 import { AccountRoster } from "../domain/account-roster.js";
 import type { IGateQuery } from "../domain/interfaces/gate-query.js";
 import type { IRegistrationQuery } from "../domain/interfaces/registration-query.js";
-import type { ITrackingRepository } from "../domain/interfaces/tracking-repository.js";
 import { GatePolicy } from "../domain/services/gate-policy.js";
 import { NotificationPolicy } from "../domain/services/notification-policy.js";
 import { StoragePolicy } from "../domain/services/storage-policy.js";
+import { CursorStore } from "../infrastructure/cursor-store/cursor-store.js";
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
-import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { AccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.js";
 import { GateQuery } from "../infrastructure/queries/gate-query/gate-query.js";
@@ -122,9 +121,9 @@ import { PushSubscriptionRepository } from "../infrastructure/repositories/push-
 import { RecordRepository } from "../infrastructure/repositories/record-repository/record-repository.js";
 import { RepoRevRepository } from "../infrastructure/repositories/repo-rev-repository/repo-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
-import { TrackingRepository } from "../infrastructure/repositories/tracking-repository/tracking-repository.js";
 import { TapClient } from "../infrastructure/tap-client/tap-client.js";
 import { WebPushSender } from "../infrastructure/web-push-sender/web-push-sender.js";
+import { JetstreamSubscriber } from "../presentation/jetstream.js";
 import { LabelSubscriber } from "../presentation/label-subscriber.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { WorkerServer } from "../presentation/server.js";
@@ -149,7 +148,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("didResolver", ["env", "loggerManager", "didCache", "metricReporter"], asClass<IDidResolver>()(DidResolver))
     .service("jobQueue", ["env"], asClassArgs<IJobQueue>()(JobQueue))
     .service("handleResolver", ["env"], asClassArgs<IHandleResolver>()(HandleResolver))
-    .service("labelCursorStore", ["env"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
+    .service("cursorStore", ["env"], asClassArgs<ICursorStore>()(CursorStore))
     .service("labelFetcher", ["env"], asClassArgs<ILabelFetcher>()(LabelFetcher))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
     .service("accountStatsQuery", asClassArgs<IAccountStatsQuery>()(AccountStatsQuery))
@@ -165,7 +164,6 @@ export const createWorkerRegistry = (env: Env) =>
     .service("recordQuery", asClassArgs<IRecordQuery>()(RecordQuery))
     .service("gateQuery", ["recordRepository"], asClassArgs<IGateQuery>()(GateQuery))
     .service("repoRevRepository", asClassArgs<IRepoRevRepository>()(RepoRevRepository))
-    .service("trackingRepository", asClassArgs<ITrackingRepository>()(TrackingRepository))
     .service("followRepository", asClassArgs<IFollowRepository>()(FollowRepository))
     .service("generatorRepository", asClassArgs<IGeneratorRepository>()(GeneratorRepository))
     .service("listRepository", asClassArgs<IListRepository>()(ListRepository))
@@ -191,7 +189,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("statsService", ["jobScheduler"], asClassArgs(StatsService))
     .service("relatedRecordService", ["recordQuery", "profileQuery", "accountRepository", "jobScheduler", "storagePolicy"], asClass(RelatedRecordService))
     .service("indexLabelService", ["labelRepository", "accountQuery"], asClassArgs(IndexLabelService))
-    .service("trackingService", ["tapClient", "trackingRepository", "labelFetcher", "indexLabelService", "jobScheduler", "transactionManager"], asClass(TrackingService))
+    .service("tapRepoService", ["tapClient", "jobScheduler"], asClassArgs(TapRepoService))
     .service("indexAccountService", ["accountRepository"], asClassArgs(IndexAccountService))
     .service("resolveDidService", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClass(ResolveDidService))
     .service("recordSaveService", ["recordRepository", "indexAccountService"], asClassArgs(RecordSaveService))
@@ -203,7 +201,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("profileIndexer", ["profileRepository", "storagePolicy", "recordSaveService", "relatedRecordService"], asClass(ProfileIndexer))
     .service("generatorIndexer", ["generatorRepository", "storagePolicy", "recordSaveService", "relatedRecordService"], asClass(GeneratorIndexer))
     .service("listIndexer", ["listRepository", "storagePolicy", "recordSaveService", "relatedRecordService"], asClass(ListIndexer))
-    .service("gateIndexer", ["recordQuery", "storagePolicy", "recordSaveService", "relatedRecordService"], asClass(GateIndexer))
+    .service("gateIndexer", ["recordQuery", "recordSaveService", "relatedRecordService"], asClass(GateIndexer))
     .service("linkIndexer", ["storagePolicy", "recordSaveService", "relatedRecordService"], asClass(LinkIndexer))
     .service("recordIndexer", ["recordRepository", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClass(RecordIndexer))
     // application(use-case)
@@ -214,14 +212,15 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClass(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClass(AggregateAccountStatsUseCase))
     .service("indexLabelUseCase", ["indexLabelService", "transactionManager"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["trackingService", "storagePolicy", "transactionManager", "accountRoster"], asClass(SyncTapRepoUseCase))
+    .service("syncTapRepoUseCase", ["tapRepoService", "storagePolicy", "accountRoster", "labelFetcher", "indexLabelService", "transactionManager"], asClass(SyncTapRepoUseCase))
     .service("refreshAccountRosterUseCase", ["registrationQuery", "accountRoster", "transactionManager"], asClass(RefreshAccountRosterUseCase))
-    .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "trackingService", "storagePolicy", "accountRepository", "jobScheduler", "transactionManager"], asClass(CheckBackfillUseCase))
+    .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "tapRepoService", "storagePolicy", "accountRepository", "jobScheduler", "transactionManager"], asClass(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClass(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClass(SendPushNotificationUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClass(SyncWorker))
     // presentation
     .service("healthRouter", ["env"], healthRouterFactory)
     .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClass(TapSubscriber))
-    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "env"], asClass(LabelSubscriber))
-    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClass(WorkerServer));
+    .service("jetstreamSubscriber", ["loggerManager", "metricReporter", "accountRoster", "refreshAccountRosterUseCase", "indexCommitUseCase", "upsertIdentityUseCase", "cursorStore", "env"], asClass(JetstreamSubscriber))
+    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "cursorStore", "env"], asClass(LabelSubscriber))
+    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "jetstreamSubscriber", "labelSubscriber", "jobQueue", "scheduleBackfillChecksUseCase", "healthRouter", "env"], asClass(WorkerServer));

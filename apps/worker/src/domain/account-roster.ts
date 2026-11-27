@@ -19,6 +19,11 @@ const ADDRESSABLE_COLLECTIONS = new Set([
   "app.bsky.graph.follow",
 ]);
 
+const GATE_COLLECTIONS = new Set([
+  "app.bsky.feed.threadgate",
+  "app.bsky.feed.postgate",
+]);
+
 export class AccountRoster {
   private members = new Set<Did>();
   private tracked = new Set<Did>();
@@ -54,6 +59,9 @@ export class AccountRoster {
       return isTracked;
     }
     if (event.operation === "delete") {
+      return true;
+    }
+    if (GATE_COLLECTIONS.has(event.collection)) {
       return true;
     }
     if (isTracked && event.collection !== "app.bsky.feed.like") {

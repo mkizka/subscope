@@ -1,8 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
 import { type DatabaseClient } from "@repo/common/interface";
 import { type BackfillStatus, schema } from "@repo/db";
-import { and, eq, inArray } from "drizzle-orm";
-import { union } from "drizzle-orm/pg-core";
+import { eq, inArray } from "drizzle-orm";
 
 import type { ITrackingQuery } from "../../../application/interfaces/queries/tracking-query.js";
 
@@ -11,37 +10,21 @@ export class TrackingQuery implements ITrackingQuery {
 
   async findStatuses(
     dids: Did[],
-  ): Promise<
-    { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[]
-  > {
+  ): Promise<{ did: Did; backfillStatus: BackfillStatus }[]> {
     if (dids.length === 0) {
       return [];
     }
-    const { accounts, follows, registrations } = schema;
-    const trackedDids = union(
-      this.db.select({ did: registrations.accountDid }).from(registrations),
-      this.db
-        .select({ did: follows.subjectDid })
-        .from(follows)
-        .innerJoin(
-          registrations,
-          eq(follows.accountDid, registrations.accountDid),
-        ),
-    );
+    const { accounts, registrations } = schema;
     const rows = await this.db
       .select({
         did: accounts.did,
-        memberDid: registrations.accountDid,
         backfillStatus: accounts.backfillStatus,
       })
       .from(accounts)
-      .leftJoin(registrations, eq(registrations.accountDid, accounts.did))
-      .where(
-        and(inArray(accounts.did, dids), inArray(accounts.did, trackedDids)),
-      );
+      .innerJoin(registrations, eq(registrations.accountDid, accounts.did))
+      .where(inArray(accounts.did, dids));
     return rows.map((row) => ({
       did: asDid(row.did),
-      isMember: row.memberDid !== null,
       backfillStatus: row.backfillStatus ?? "inProgress",
     }));
   }

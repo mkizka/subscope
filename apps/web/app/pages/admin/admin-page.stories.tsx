@@ -115,7 +115,7 @@ export const ProfileLinks: Story = {
 };
 
 export const BackfillBadges: Story = {
-  name: "syncStatus-s1: 追跡アカウントには、過去の投稿の同期状態を「同期中」「同期済み」「同期エラー」のバッジで表示する",
+  name: "syncStatus-s1: メンバーには、過去の投稿の同期状態を「同期中」「同期済み」「同期エラー」のバッジで表示する",
   beforeEach: () => {
     queryClient.setQueryData(["serverMembers"], {
       pages: [

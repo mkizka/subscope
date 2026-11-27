@@ -500,6 +500,9 @@ importers:
       '@atproto/xrpc-server':
         specifier: 0.13.14
         version: 0.13.14(supports-color@7.2.0)
+      '@bsky/jetstream':
+        specifier: 1.0.0
+        version: 1.0.0(@atproto/lex@0.6.0)
       '@gyaku/di':
         specifier: 5.0.0
         version: 5.0.0
@@ -1338,6 +1341,12 @@ packages:
 
   '@borewit/text-codec@0.2.2':
     resolution: {integrity: sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ==}
+
+  '@bsky/jetstream@1.0.0':
+    resolution: {integrity: sha512-YtQYhG6NEo7GevmVhRAUp8koyjoj+zf7u+Mo5/Of8xmHFVGLhHyQ57jck8JTPjizFW59G3fqM1fifMCuHFzL0w==}
+    engines: {node: '>=22.15.0'}
+    peerDependencies:
+      '@atproto/lex': ^0.3.0
 
   '@bufbuild/protobuf@1.10.1':
     resolution: {integrity: sha512-wJ8ReQbHxsAfXhrf9ixl0aYbZorRuOWpBNzm8pL8ftmSxQx/wnJD5Eg861NwJU/czy2VXFIebCeZnZrI9rktIQ==}
@@ -8285,6 +8294,15 @@ snapshots:
   '@blazediff/core@1.10.0': {}
 
   '@borewit/text-codec@0.2.2': {}
+
+  '@bsky/jetstream@1.0.0(@atproto/lex@0.6.0)':
+    dependencies:
+      '@atproto/lex': 0.6.0
+      '@atproto/lex-cbor': 0.1.11
+      '@atproto/ws-client': 0.2.2
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@bufbuild/protobuf@1.10.1': {}
 

@@ -22,23 +22,23 @@ describe("UpsertIdentityUseCase", () => {
     ctx = { db };
   });
 
-  test("ハンドルがない場合は何もしない", async () => {
+  test("ハンドルがない場合はハンドルを変えずに状態を保存する", async () => {
     // arrange
-    const command: UpsertIdentityCommand = {
-      did: "did:plc:nohandle",
-      handle: undefined,
-      status: "active",
-    };
+    const account = accountFactory({ handle: "alice.test" });
+    accountRepo.add(account);
 
     // act
-    await upsertIdentityUseCase.execute(command);
+    await upsertIdentityUseCase.execute({
+      did: account.did,
+      status: "takendown",
+    });
 
     // assert
-    const foundAccount = await accountRepo.find({
-      ctx,
-      did: command.did,
+    const foundAccount = await accountRepo.find({ ctx, did: account.did });
+    expect(foundAccount).toMatchObject({
+      handle: "alice.test",
+      status: "takendown",
     });
-    expect(foundAccount).toBeNull();
   });
 
   test("ハンドルがある場合はaccountを保存する", async () => {

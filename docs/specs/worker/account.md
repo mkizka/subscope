@@ -2,7 +2,7 @@
 
 ## アカウント状態の保存
 
-Tapのidentityイベントが持つアカウントの状態(active、deactivated、deleted、suspended、takendown)を保存する。
+TapとJetstreamから受け取った、メンバーと追跡アカウントの状態(active、deactivated、deleted、suspended、takendown)を保存する。
 
 | ID        | 仕様                                                |
 | --------- | --------------------------------------------------- |

@@ -2,8 +2,18 @@ import { asDid, type Did } from "@atproto/did";
 import type { Handle } from "@repo/common/utils";
 import { asHandle } from "@repo/common/utils";
 
-export type AccountStatus =
-  "active" | "deactivated" | "deleted" | "suspended" | "takendown";
+const ACCOUNT_STATUSES = [
+  "active",
+  "deactivated",
+  "deleted",
+  "suspended",
+  "takendown",
+] as const;
+
+export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
+
+export const isAccountStatus = (status: string): status is AccountStatus =>
+  ACCOUNT_STATUSES.some((known) => known === status);
 
 export type BackfillStatus = "inProgress" | "completed" | "error";
 

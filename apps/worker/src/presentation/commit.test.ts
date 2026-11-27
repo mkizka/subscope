@@ -201,7 +201,7 @@ describe("commit", () => {
       },
     );
 
-    test("index-27: 返信制限の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+    test("index-27: 返信制限の違反は、リアルタイムに受け取った投稿でだけ判定する", async () => {
       // arrange
       const { replier, replyEvent } = await setup({ allow: [] });
       await registrationFactory(ctx.db)

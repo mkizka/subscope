@@ -18,7 +18,6 @@ type CheckBackfillData = {
 
 type SyncTapRepoData = {
   did: Did;
-  refetch?: boolean;
 };
 
 type SendPushNotificationData = {

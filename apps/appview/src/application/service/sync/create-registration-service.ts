@@ -36,10 +36,7 @@ export class CreateRegistrationService {
     ctx.afterCommit(async () => {
       const followeeDids =
         await this.deps.followQuery.findFolloweeDids(accountDid);
-      await this.deps.jobScheduler.scheduleSyncTapRepo(accountDid, {
-        refetch: true,
-      });
-      for (const did of followeeDids) {
+      for (const did of [accountDid, ...followeeDids]) {
         await this.deps.jobScheduler.scheduleSyncTapRepo(did);
       }
     });

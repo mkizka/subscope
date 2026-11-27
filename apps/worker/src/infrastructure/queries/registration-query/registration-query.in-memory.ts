@@ -44,6 +44,8 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
   }
 
   async findTrackedDids(_ctx: TransactionContext): Promise<Did[]> {
-    return [];
+    return [...this.followed]
+      .filter((did) => !this.registrations.has(did))
+      .map((did) => asDid(did));
   }
 }

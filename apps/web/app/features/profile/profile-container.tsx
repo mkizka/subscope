@@ -93,7 +93,7 @@ export function ProfileContainer({ handle }: Props) {
           }))}
         />
       )}
-      {data && !data.isMember && <IncompleteNotice />}
+      {data && !data.backfillStatus && <IncompleteNotice />}
       {tab === "lists" ? (
         <ListsContainer handle={handle} />
       ) : pages && data && !isPlaceholderData ? (

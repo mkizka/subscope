@@ -14,7 +14,7 @@ import { WebSocketServer } from "ws";
 
 import { IndexLabelService } from "../application/services/index-label-service.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
-import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.in-memory.js";
+import { InMemoryCursorStore } from "../infrastructure/cursor-store/cursor-store.in-memory.js";
 import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { LabelRepository } from "../infrastructure/repositories/label-repository/label-repository.js";
 import { LabelSubscriber } from "./label-subscriber.js";
@@ -30,7 +30,7 @@ describe("モデレーションサービスからのラベル受信", () => {
   const { ctx } = testSetup;
   let server: WebSocketServer;
   let moderationUrl: string;
-  const labelCursorStore = new InMemoryLabelCursorStore();
+  const cursorStore = new InMemoryCursorStore();
 
   const connect = async () => {
     const connection = new Promise<[WebSocket, URL]>((resolve) =>
@@ -44,7 +44,7 @@ describe("モデレーションサービスからのラベル受信", () => {
         new IndexLabelService(new LabelRepository(), new AccountQuery()),
         new TransactionManager(ctx.db),
       ),
-      labelCursorStore,
+      cursorStore,
       env: { MODERATION_URL: moderationUrl },
     });
     void subscriber.start();
@@ -52,7 +52,7 @@ describe("モデレーションサービスからのラベル受信", () => {
   };
 
   beforeEach(async () => {
-    labelCursorStore.clear();
+    cursorStore.clear();
     server = new WebSocketServer({ port: 0 });
     await once(server, "listening");
     const address = server.address();
@@ -98,7 +98,7 @@ describe("モデレーションサービスからのラベル受信", () => {
       ).toBytes(),
     );
     await vi.waitFor(async () =>
-      expect(await labelCursorStore.getCursor(moderationUrl)).toBe(42),
+      expect(await cursorStore.getCursor(moderationUrl)).toBe(42),
     );
 
     const [, secondUrl] = await connect();

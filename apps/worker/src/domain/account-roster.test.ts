@@ -55,6 +55,11 @@ describe("AccountRoster", () => {
       expected: false,
     },
     {
+      name: "その他のアカウントが返信制限を書いた",
+      event: commit(other, { collection: "app.bsky.feed.threadgate" }),
+      expected: true,
+    },
+    {
       name: "その他のアカウントが削除した",
       event: commit(other, { operation: "delete" }),
       expected: true,

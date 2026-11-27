@@ -23,6 +23,7 @@
     "@atproto/syntax": "0.7.8",
     "@atproto/tap": "0.4.21",
     "@atproto/xrpc-server": "0.13.14",
+    "@bsky/jetstream": "1.0.0",
     "@gyaku/di": "5.0.0",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",

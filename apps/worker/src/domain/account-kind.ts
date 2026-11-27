@@ -28,6 +28,10 @@ export class AccountKind {
   }
 
   get usesTap() {
+    return this.value === "member";
+  }
+
+  get syncsLabels() {
     return this.value !== "other";
   }
 

@@ -7,7 +7,7 @@ export class GetTrackingStatusesUseCase {
   constructor(private readonly trackingQuery: ITrackingQuery) {}
 
   async execute(params: { dids: Did[] }): Promise<{
-    statuses: { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[];
+    statuses: { did: Did; backfillStatus: BackfillStatus }[];
   }> {
     const statuses = await this.trackingQuery.findStatuses(params.dids);
     return { statuses };

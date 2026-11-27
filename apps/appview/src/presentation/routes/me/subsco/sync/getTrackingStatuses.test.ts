@@ -36,30 +36,23 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
       })
       .create();
 
-  test("getTrackingStatuses-1: 追跡アカウントだけを返す", async () => {
+  test("getTrackingStatuses-1: メンバーだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
     const followee = await createAccount("completed");
     const other = await createAccount("completed");
-    const otherFollowee = await createAccount("completed");
     await follow(serverMember, followee);
-    await follow(other, otherFollowee);
 
     // act
     const res = await client.call(getTrackingStatuses, {
-      dids: [serverMember, followee, other, otherFollowee].map((a) =>
-        asDid(a.did),
-      ),
+      dids: [serverMember, followee, other].map((a) => asDid(a.did)),
     });
 
     // assert
-    expect(res.statuses.sort((a, b) => a.did.localeCompare(b.did))).toEqual(
-      [
-        { did: serverMember.did, isMember: true, backfillStatus: "inProgress" },
-        { did: followee.did, isMember: false, backfillStatus: "completed" },
-      ].sort((a, b) => a.did.localeCompare(b.did)),
-    );
+    expect(res.statuses).toEqual([
+      { did: serverMember.did, backfillStatus: "inProgress" },
+    ]);
   });
 
   test("getTrackingStatuses-2: 状態をまだ確認していないアカウントは同期中として返す", async () => {
@@ -74,7 +67,7 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
 
     // assert
     expect(res.statuses).toEqual([
-      { did: serverMember.did, isMember: true, backfillStatus: "inProgress" },
+      { did: serverMember.did, backfillStatus: "inProgress" },
     ]);
   });
 
@@ -90,23 +83,5 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
 
     // assert
     expect(res.statuses).toHaveLength(1);
-  });
-
-  test("getTrackingStatuses-4: アカウントごとにメンバーかどうかを返す", async () => {
-    // arrange
-    const { client } = await setupApiTest();
-    const serverMember = await createServerMember();
-    const followee = await createAccount();
-    await follow(serverMember, followee);
-
-    // act
-    const res = await client.call(getTrackingStatuses, {
-      dids: [serverMember, followee].map((a) => asDid(a.did)),
-    });
-
-    // assert
-    expect(
-      Object.fromEntries(res.statuses.map((s) => [s.did, s.isMember])),
-    ).toEqual({ [serverMember.did]: true, [followee.did]: false });
   });
 });
