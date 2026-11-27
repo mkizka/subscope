@@ -27,7 +27,8 @@
         "REDIS_URL",
         "PLC_URL",
         "ATPROTO_PLC_URL",
-        "ATPROTO_HANDLE_RESOLVER_URL"
+        "ATPROTO_HANDLE_RESOLVER_URL",
+        "JETSTREAM_URL"
       ]
     }
   }
