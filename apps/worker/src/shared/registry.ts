@@ -183,7 +183,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     // domain(service)
     .service("accountRoster", asClassArgs(AccountRoster))
-    .service("storagePolicy", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicy))
+    .service("storagePolicy", ["registrationQuery"], asClassArgs(StoragePolicy))
     .service("notificationPolicy", ["registrationQuery"], asClassArgs(NotificationPolicy))
     .service("gatePolicy", ["gateQuery"], asClassArgs(GatePolicy))
     // application(service)
