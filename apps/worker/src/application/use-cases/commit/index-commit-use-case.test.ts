@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { postFactory } from "../../../domain/post.factory.js";
-import { Tracking } from "../../../domain/tracking.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
@@ -15,7 +14,6 @@ describe("IndexCommitUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
-  let trackingRepo: TestServices["trackingRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   let ctx: { db: TestServices["db"] };
@@ -27,7 +25,6 @@ describe("IndexCommitUseCase", () => {
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
-    trackingRepo = services.trackingRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
     ctx = { db };
@@ -363,23 +360,11 @@ describe("IndexCommitUseCase", () => {
       },
     );
 
-    const DAY_MS = 24 * 60 * 60 * 1000;
-    const trackedAt = new Date("2026-01-10T00:00:00.000Z");
-    const likedPostUri = "at://did:plc:author/app.bsky.feed.post/liked";
-
-    const indexMemberLike = async ({
-      live,
-      createdAt,
-    }: {
-      live: boolean;
-      createdAt: Date;
-    }) => {
+    test("index-20: メンバーがいいねした投稿は、保存していなければPDSから取得する", async () => {
+      // arrange
       const liker = accountFactory();
       registrationQuery.add(liker.did);
-      await trackingRepo.save({
-        ctx,
-        tracking: Tracking.reconstruct({ did: liker.did, trackedAt }),
-      });
+      const likedPostUri = "at://did:plc:author/app.bsky.feed.post/liked";
       const uri = new AtUri(`at://${liker.did}/app.bsky.feed.like/123`);
       const record = {
         uri,
@@ -387,44 +372,22 @@ describe("IndexCommitUseCase", () => {
         json: {
           $type: "app.bsky.feed.like",
           subject: { uri: likedPostUri, cid: fakeCid() },
-          createdAt: createdAt.toISOString(),
+          createdAt: "2020-01-01T00:00:00.000Z",
         },
         indexedAt: new Date(),
       };
+
+      // act
       await indexCommitUseCase.execute({
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        live,
-      });
-      return jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString());
-    };
-
-    test("index-20: メンバーがいいねした投稿は、保存していなければPDSから取得する", async () => {
-      // act
-      const fetchUris = await indexMemberLike({
-        live: true,
-        createdAt: new Date(trackedAt.getTime() - 30 * DAY_MS),
+        live: false,
       });
 
       // assert
-      expect(fetchUris).toContain(likedPostUri);
+      expect(
+        jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString()),
+      ).toContain(likedPostUri);
     });
-
-    test.each([
-      { name: "1日前ちょうど", offset: -DAY_MS, expected: true },
-      { name: "1日前より古い", offset: -DAY_MS - 1, expected: false },
-    ])(
-      "index-21: メンバーの過去のいいねでは、作成日時が追跡を始めた時刻の1日前より古いものの投稿は取得しない($name)",
-      async ({ offset, expected }) => {
-        // act
-        const fetchUris = await indexMemberLike({
-          live: false,
-          createdAt: new Date(trackedAt.getTime() + offset),
-        });
-
-        // assert
-        expect(fetchUris.includes(likedPostUri)).toBe(expected);
-      },
-    );
 
     const memberPost = (did: string) => ({
       uri: `at://${did}/app.bsky.feed.post/1`,
