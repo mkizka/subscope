@@ -5,7 +5,6 @@ import type { TransactionContext } from "@repo/common/interface";
 import { AccountKind, type Addressed } from "../account-kind.js";
 import { Follow } from "../follow.js";
 import type { IRegistrationQuery } from "../interfaces/registration-query.js";
-import type { ITrackingRepository } from "../interfaces/tracking-repository.js";
 import { Like } from "../like.js";
 import { ListItem } from "../list-item.js";
 import type { Origin } from "../origin.js";
@@ -13,19 +12,11 @@ import { Post } from "../post.js";
 import { Profile } from "../profile.js";
 import { Repost } from "../repost.js";
 
-type DatedRecord = { accountDid: Did; createdAt: Date };
-
 type Saved =
   Post | Repost | Like | Follow | ListItem | Profile | { accountDid: Did };
 
-const isEvent = (record: Addressed) =>
-  record instanceof Post || record instanceof Repost || record instanceof Like;
-
 export class StoragePolicy {
-  constructor(
-    private readonly registrationQuery: IRegistrationQuery,
-    private readonly trackingRepository: ITrackingRepository,
-  ) {}
+  constructor(private readonly registrationQuery: IRegistrationQuery) {}
 
   async saves({
     ctx,
@@ -40,14 +31,9 @@ export class StoragePolicy {
       return true;
     }
     const kind = await this.classify(ctx, record.accountDid);
-    const addressed =
-      kind.savesWithoutAddressee(record) ||
-      (await this.registrationQuery.includesMember(ctx, record.addresseeDids));
     return (
-      addressed &&
-      (kind.isMember ||
-        !isEvent(record) ||
-        (await this.isWithinWindow({ ctx, origin, record })))
+      kind.savesWithoutAddressee(record) ||
+      (await this.registrationQuery.includesMember(ctx, record.addresseeDids))
     );
   }
 
@@ -85,12 +71,11 @@ export class StoragePolicy {
       return record.pinnedPost && !origin.isFetched ? [record.pinnedPost] : [];
     }
     if (record instanceof Like) {
-      const fetchesLikedPost = await this.fetchesLikedPost({
+      const likerIsMember = await this.registrationQuery.isMember(
         ctx,
-        origin,
-        like: record,
-      });
-      return fetchesLikedPost ? [record.subject] : [];
+        record.accountDid,
+      );
+      return record.likesPost && likerIsMember ? [record.subject] : [];
     }
     return [];
   }
@@ -114,22 +99,6 @@ export class StoragePolicy {
     return [record.accountDid];
   }
 
-  private async fetchesLikedPost({
-    ctx,
-    origin,
-    like,
-  }: {
-    ctx: TransactionContext;
-    origin: Origin;
-    like: Like;
-  }) {
-    return (
-      like.likesPost &&
-      (await this.registrationQuery.isMember(ctx, like.accountDid)) &&
-      (await this.isWithinWindow({ ctx, origin, record: like }))
-    );
-  }
-
   async isTracked(ctx: TransactionContext, did: Did) {
     return (
       (await this.registrationQuery.isMember(ctx, did)) ||
@@ -139,24 +108,5 @@ export class StoragePolicy {
 
   tracksFollowee(ctx: TransactionContext, follow: Follow) {
     return this.registrationQuery.isMember(ctx, follow.accountDid);
-  }
-
-  private async isWithinWindow({
-    ctx,
-    origin,
-    record,
-  }: {
-    ctx: TransactionContext;
-    origin: Origin;
-    record: DatedRecord;
-  }) {
-    if (!origin.isPast) {
-      return true;
-    }
-    const tracking = await this.trackingRepository.find({
-      ctx,
-      did: record.accountDid,
-    });
-    return !!tracking && tracking.covers(record.createdAt);
   }
 }

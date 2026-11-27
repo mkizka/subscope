@@ -19,10 +19,6 @@ export class AccountKind {
     return new AccountKind("other");
   }
 
-  get isMember() {
-    return this.value === "member";
-  }
-
   savesWithoutAddressee(record: Addressed) {
     if (this.value === "member") {
       return true;

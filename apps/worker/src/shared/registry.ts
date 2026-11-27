@@ -180,7 +180,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("webPushSender", ["env"], asClassArgs<IWebPushSender>()(WebPushSender))
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     // domain(service)
-    .service("storagePolicy", ["registrationQuery", "trackingRepository"], asClassArgs(StoragePolicy))
+    .service("storagePolicy", ["registrationQuery"], asClassArgs(StoragePolicy))
     .service("notificationPolicy", ["registrationQuery"], asClassArgs(NotificationPolicy))
     .service("gatePolicy", ["gateQuery"], asClassArgs(GatePolicy))
     // application(service)
