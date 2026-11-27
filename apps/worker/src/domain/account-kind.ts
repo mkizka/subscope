@@ -23,6 +23,14 @@ export class AccountKind {
     return this.value === "member";
   }
 
+  get isTracked() {
+    return this.value === "tracked";
+  }
+
+  get usesTap() {
+    return this.value !== "other";
+  }
+
   savesWithoutAddressee(record: Addressed) {
     if (this.value === "member") {
       return true;

@@ -1,3 +1,5 @@
+import type { Did } from "@atproto/did";
+import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/interface";
 
 import type { IRegistrationQuery } from "../../../domain/interfaces/registration-query.js";
@@ -29,5 +31,13 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
     _subjectDid: string,
   ): Promise<boolean> {
     return false;
+  }
+
+  async findMemberDids(_ctx: TransactionContext): Promise<Did[]> {
+    return [...this.registrations].map((did) => asDid(did));
+  }
+
+  async findTrackedDids(_ctx: TransactionContext): Promise<Did[]> {
+    return [];
   }
 }

@@ -123,4 +123,54 @@ describe("RegistrationQuery", () => {
       expect(result).toBe(true);
     });
   });
+
+  describe("findMemberDids", () => {
+    test("メンバーのDIDだけを返す", async () => {
+      // arrange
+      const member = await accountFactory(ctx.db).create();
+      await accountFactory(ctx.db).create();
+      await registrationFactory(ctx.db)
+        .vars({ account: () => member })
+        .create();
+
+      // act
+      const result = await registrationQuery.findMemberDids(ctx);
+
+      // assert
+      expect(result).toEqual([member.did]);
+    });
+  });
+
+  describe("findTrackedDids", () => {
+    test("メンバーがフォローしている、メンバー以外のDIDを重複なく返す", async () => {
+      // arrange
+      const [member1, member2, nonMember, followee, nonMemberFollowee] =
+        await accountFactory(ctx.db).createList(5);
+      for (const member of [member1, member2]) {
+        await registrationFactory(ctx.db)
+          .vars({ account: () => member })
+          .create();
+      }
+      const follows = [
+        [member1, followee],
+        [member2, followee],
+        [member1, member2],
+        [nonMember, nonMemberFollowee],
+      ] as const;
+      for (const [follower, subject] of follows) {
+        const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
+          .vars({ account: () => follower })
+          .create();
+        await followFactory(ctx.db)
+          .vars({ record: () => record, followee: () => subject })
+          .create();
+      }
+
+      // act
+      const result = await registrationQuery.findTrackedDids(ctx);
+
+      // assert
+      expect(result).toEqual([followee.did]);
+    });
+  });
 });
