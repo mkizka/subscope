@@ -11,6 +11,7 @@ const PORTS = {
   plc: 2582,
   pds: 2583,
   tap: 2480,
+  jetstream: 6008,
   blobProxy: 3002,
 };
 
@@ -96,6 +97,17 @@ const tap = await new GenericContainer("ghcr.io/bluesky-social/indigo/tap:0.1")
   })
   .start();
 
+const jetstream = await new GenericContainer(
+  "ghcr.io/bluesky-social/jetstream:sha-d5a3b62",
+)
+  .withNetworkMode("host")
+  .withEnvironment({
+    JETSTREAM_WS_URL: `ws://localhost:${PORTS.pds}/xrpc/com.atproto.sync.subscribeRepos`,
+    JETSTREAM_LISTEN_ADDR: `:${PORTS.jetstream}`,
+    JETSTREAM_LIVENESS_TTL: "8760h",
+  })
+  .start();
+
 const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:0")
   .withNetworkMode("host")
   .withEnvironment({
@@ -125,7 +137,13 @@ const app = spawn(process.argv.slice(2).join(" "), {
 
 app.on("exit", async () => {
   await network.close();
-  await Promise.all([tap.stop(), atblob.stop(), redis.stop(), postgres.stop()]);
+  await Promise.all([
+    tap.stop(),
+    jetstream.stop(),
+    atblob.stop(),
+    redis.stop(),
+    postgres.stop(),
+  ]);
   await rm(tmp, { recursive: true, force: true });
   process.exit();
 });
