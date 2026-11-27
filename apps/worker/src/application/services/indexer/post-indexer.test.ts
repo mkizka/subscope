@@ -43,6 +43,7 @@ describe("PostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
+      registrationQuery.add(author.did);
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey123`,
         json: {
@@ -77,6 +78,7 @@ describe("PostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
+      registrationQuery.add(author.did);
       const embedCid = await randomCid();
       const embedUri = "at://did:plc:embeduser/app.bsky.feed.post/embedpost";
       const record = recordFactory({
@@ -132,6 +134,7 @@ describe("PostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
+      registrationQuery.add(author.did);
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey000`,
         json: {
@@ -321,6 +324,7 @@ describe("PostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       disableEmbedding();
+      registrationQuery.add(quotedDid);
       const records = [
         await quoteRecord(accountFactory().did),
         await quoteRecord(quotedDid),
@@ -377,6 +381,7 @@ describe("PostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const author = accountFactory();
+      registrationQuery.add(author.did);
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey111`,
         json: {
@@ -405,6 +410,7 @@ describe("PostIndexer", () => {
       const parentCid = await randomCid();
 
       const replier = accountFactory();
+      registrationQuery.add(replier.did);
       const record = recordFactory({
         uri: `at://${replier.did}/app.bsky.feed.post/replypost`,
         json: {
@@ -443,6 +449,7 @@ describe("PostIndexer", () => {
       const quotedCid = await randomCid();
 
       const quotingAccount = accountFactory();
+      registrationQuery.add(quotingAccount.did);
       const record = recordFactory({
         uri: `at://${quotingAccount.did}/app.bsky.feed.post/quotepost`,
         json: {
@@ -471,6 +478,7 @@ describe("PostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const replier = accountFactory();
+      registrationQuery.add(replier.did);
       const nonExistentParentUri =
         "at://did:plc:nonexistent/app.bsky.feed.post/parent";
       const nonExistentParentCid = await randomCid();

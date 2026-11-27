@@ -35,7 +35,7 @@ export class RepostIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const repost = Repost.fromRecord(record);
-    const saves = await this.deps.storagePolicy.savesFeedRecord({
+    const saves = await this.deps.storagePolicy.saves({
       ctx,
       origin,
       record: repost,

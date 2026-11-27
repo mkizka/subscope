@@ -41,6 +41,10 @@ export class Follow {
     });
   }
 
+  get addresseeDids() {
+    return [this.subjectDid];
+  }
+
   get notification(): Notification {
     return {
       recordUri: this.uri,

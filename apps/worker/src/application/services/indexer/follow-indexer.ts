@@ -36,6 +36,14 @@ export class FollowIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const follow = Follow.fromRecord(record);
+    const saves = await this.deps.storagePolicy.saves({
+      ctx,
+      origin,
+      record: follow,
+    });
+    if (!saves) {
+      return;
+    }
     const tracksFollowee = await this.deps.storagePolicy.tracksFollowee(
       ctx,
       follow,

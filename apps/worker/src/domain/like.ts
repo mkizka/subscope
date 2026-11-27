@@ -54,6 +54,10 @@ export class Like {
     return this.subject.host;
   }
 
+  get addresseeDids() {
+    return [this.subject.did];
+  }
+
   get likesPost() {
     return this.subject.collection === "app.bsky.feed.post";
   }

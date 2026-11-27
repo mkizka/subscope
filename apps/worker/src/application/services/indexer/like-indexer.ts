@@ -33,10 +33,10 @@ export class LikeIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const like = Like.fromRecord(record);
-    const saves = await this.deps.storagePolicy.savesLike({
+    const saves = await this.deps.storagePolicy.saves({
       ctx,
       origin,
-      like,
+      record: like,
     });
     if (!saves) {
       return;
