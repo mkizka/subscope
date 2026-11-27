@@ -1,16 +1,22 @@
 import { execSync, spawn } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { createServer } from "node:http";
+import { connect, createServer as createTcpServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { TestNetworkNoAppView } from "@atproto/dev-env";
+import { getKey } from "@atproto/identity";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
-import { GenericContainer } from "testcontainers";
+import { GenericContainer, Wait } from "testcontainers";
 
 const PORTS = {
   plc: 2582,
   pds: 2583,
   tap: 2480,
+  jetstream: 6008,
+  jetstreamRelay: 2584,
+  jetstreamPlc: 2585,
   blobProxy: 3002,
 };
 
@@ -96,6 +102,64 @@ const tap = await new GenericContainer("ghcr.io/bluesky-social/indigo/tap:0.1")
   })
   .start();
 
+const jetstreamRelay = createTcpServer((socket) => {
+  socket.once("data", (head) => {
+    if (head.toString().startsWith("GET /xrpc/com.atproto.sync.listHosts")) {
+      const body = JSON.stringify({ hosts: [] });
+      socket.end(
+        `HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: ${body.length}\r\nconnection: close\r\n\r\n${body}`,
+      );
+      return;
+    }
+    const pds = connect(PORTS.pds, "localhost", () => {
+      pds.write(head);
+      socket.pipe(pds).pipe(socket);
+    });
+    pds.on("error", () => socket.destroy());
+    socket.on("error", () => pds.destroy());
+  });
+}).listen(PORTS.jetstreamRelay);
+
+const jetstreamPlc = createServer(async (req, res) => {
+  const plcRes = await fetch(`${PLC_URL}${req.url}`);
+  if (!plcRes.ok || !req.url?.startsWith("/did:plc:")) {
+    res.writeHead(plcRes.status).end(await plcRes.text());
+    return;
+  }
+  const doc = await plcRes.json();
+  const key = getKey(doc);
+  res.writeHead(200, { "content-type": "application/json" }).end(
+    JSON.stringify({
+      ...doc,
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/multikey/v1",
+      ],
+      verificationMethod: [
+        {
+          id: `${doc.id}#atproto`,
+          type: "Multikey",
+          controller: doc.id,
+          publicKeyMultibase: key?.replace("did:key:", ""),
+        },
+      ],
+    }),
+  );
+}).listen(PORTS.jetstreamPlc);
+
+const jetstream = await new GenericContainer(
+  "ghcr.io/bluesky-social/jetstream:v0.4.6",
+)
+  .withNetworkMode("host")
+  .withEnvironment({
+    JETSTREAM_ADDR: `:${PORTS.jetstream}`,
+    JETSTREAM_RELAY_URL: `http://localhost:${PORTS.jetstreamRelay}`,
+    JETSTREAM_PLC_URL: `http://localhost:${PORTS.jetstreamPlc}`,
+    JETSTREAM_DATA_DIR: "/tmp/jetstream",
+  })
+  .withWaitStrategy(Wait.forLogMessage(/steady-state consumer running/))
+  .start();
+
 const atblob = await new GenericContainer("ghcr.io/mkizka/atblob:0")
   .withNetworkMode("host")
   .withEnvironment({
@@ -125,7 +189,15 @@ const app = spawn(process.argv.slice(2).join(" "), {
 
 app.on("exit", async () => {
   await network.close();
-  await Promise.all([tap.stop(), atblob.stop(), redis.stop(), postgres.stop()]);
+  jetstreamRelay.close();
+  jetstreamPlc.close();
+  await Promise.all([
+    tap.stop(),
+    jetstream.stop(),
+    atblob.stop(),
+    redis.stop(),
+    postgres.stop(),
+  ]);
   await rm(tmp, { recursive: true, force: true });
   process.exit();
 });
