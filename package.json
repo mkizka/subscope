@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@atproto/dev-env": "0.7.16",
+    "@atproto/identity": "0.5.24",
     "@testcontainers/postgresql": "12.2.2",
     "@vitest/coverage-v8": "5.1.1",
     "husky": "9.1.7",
