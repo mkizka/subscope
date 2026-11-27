@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import { createRecord, follow } from "../../helpers/pds";
 
-test("jetstream-1: 追跡アカウントのレコードを保存する", async ({ page }) => {
+test("jetstream-1: 追跡アカウントの投稿を保存する", async ({ page }) => {
   await follow("alice.test", "erin.test");
 
   await expect(async () => {

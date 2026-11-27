@@ -41,6 +41,8 @@ export class Follow {
     });
   }
 
+  readonly reachesFollowers = true;
+
   get addresseeDids() {
     return [this.subjectDid];
   }

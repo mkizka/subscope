@@ -19,6 +19,14 @@ const ADDRESSABLE_COLLECTIONS = new Set([
   "app.bsky.graph.follow",
 ]);
 
+const FOLLOWER_COLLECTIONS = new Set([
+  "app.bsky.feed.post",
+  "app.bsky.feed.repost",
+  "app.bsky.graph.follow",
+  "app.bsky.actor.profile",
+  "app.bsky.actor.link",
+]);
+
 const GATE_COLLECTIONS = new Set([
   "app.bsky.feed.threadgate",
   "app.bsky.feed.postgate",
@@ -64,7 +72,7 @@ export class AccountRoster {
     if (GATE_COLLECTIONS.has(event.collection)) {
       return true;
     }
-    if (isTracked && event.collection !== "app.bsky.feed.like") {
+    if (isTracked && FOLLOWER_COLLECTIONS.has(event.collection)) {
       return true;
     }
     return (

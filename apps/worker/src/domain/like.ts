@@ -54,6 +54,8 @@ export class Like {
     return this.subject.host;
   }
 
+  readonly reachesFollowers = false;
+
   get addresseeDids() {
     return [this.subject.did];
   }

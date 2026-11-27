@@ -479,7 +479,7 @@ describe("IndexCommitUseCase", () => {
         saved: false,
       },
     ])(
-      "index-28: メンバーでも追跡アカウントでもないアカウントのレコードは、メンバー宛てのものだけ保存する($name)",
+      "index-28: メンバー以外のレコードは、宛先にメンバーがいるものだけ保存する($name)",
       async ({ collection, json, saved }) => {
         // arrange
         const author = accountFactory();
@@ -508,6 +508,82 @@ describe("IndexCommitUseCase", () => {
         expect((await recordRepo.find({ ctx, uri })) !== null).toBe(saved);
       },
     );
+
+    test.each([
+      {
+        name: "投稿",
+        collection: "app.bsky.feed.post",
+        json: { text: "post" },
+        saved: true,
+      },
+      {
+        name: "リポスト",
+        collection: "app.bsky.feed.repost",
+        json: {
+          subject: {
+            uri: "at://did:plc:other/app.bsky.feed.post/1",
+            cid: fakeCid(),
+          },
+        },
+        saved: true,
+      },
+      {
+        name: "フォロー",
+        collection: "app.bsky.graph.follow",
+        json: { subject: "did:plc:other" },
+        saved: true,
+      },
+      {
+        name: "プロフィール",
+        collection: "app.bsky.actor.profile",
+        json: { displayName: "followee" },
+        saved: true,
+      },
+      {
+        name: "いいね",
+        collection: "app.bsky.feed.like",
+        json: {
+          subject: {
+            uri: "at://did:plc:other/app.bsky.feed.post/1",
+            cid: fakeCid(),
+          },
+        },
+        saved: false,
+      },
+      {
+        name: "リスト",
+        collection: "app.bsky.graph.list",
+        json: { name: "list", purpose: "app.bsky.graph.defs#curatelist" },
+        saved: false,
+      },
+    ])(
+      "index-29: 投稿・リポスト・フォロー・プロフィール・プロフィールのリンクは、書いた人のフォロワーも宛先に含める($name)",
+      async ({ collection, json, saved }) => {
+        // arrange
+        const author = accountFactory();
+        registrationQuery.addFollowed(author.did);
+        const uri = AtUri.make(author.did, collection, "123");
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: collection,
+            ...json,
+            createdAt: new Date().toISOString(),
+          },
+          indexedAt: new Date(),
+        };
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: true,
+        });
+
+        // assert
+        expect((await recordRepo.find({ ctx, uri })) !== null).toBe(saved);
+      },
+    );
   });
 
   describe("フォロー・リスト項目の相手", () => {
@@ -515,7 +591,6 @@ describe("IndexCommitUseCase", () => {
       { collection: "app.bsky.graph.follow", member: true },
       { collection: "app.bsky.graph.follow", member: false },
       { collection: "app.bsky.graph.listitem", member: true },
-      { collection: "app.bsky.graph.listitem", member: false },
     ])(
       "index-17: フォローとリスト項目の相手のプロフィールとハンドルは、メンバーの分だけ取る($collection, メンバー=$member)",
       async ({ collection, member }) => {

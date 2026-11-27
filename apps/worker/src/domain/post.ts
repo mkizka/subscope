@@ -225,6 +225,8 @@ export class Post {
     return uri?.collection === "app.bsky.feed.post" ? uri : null;
   }
 
+  readonly reachesFollowers = true;
+
   get addresseeDids() {
     return [
       this.replyParent?.uri.did,

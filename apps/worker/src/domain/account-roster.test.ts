@@ -27,13 +27,18 @@ describe("AccountRoster", () => {
   test.each([
     { name: "メンバーが書いた", event: commit(member), expected: false },
     {
-      name: "追跡アカウントがいいね以外を書いた",
+      name: "追跡アカウントが投稿を書いた",
       event: commit(tracked),
       expected: true,
     },
     {
       name: "追跡アカウントがメンバー以外にいいねした",
       event: commit(tracked, { collection: "app.bsky.feed.like" }),
+      expected: false,
+    },
+    {
+      name: "追跡アカウントがリストを書いた",
+      event: commit(tracked, { collection: "app.bsky.graph.list" }),
       expected: false,
     },
     {

@@ -175,7 +175,7 @@ describe("Jetstreamからのイベント受信", () => {
     expect(await findPosts(member.did)).toEqual([]);
   });
 
-  test("jetstream-3: メンバーでも追跡アカウントでもないアカウントのレコードは、メンバー宛てのものだけ保存する", async () => {
+  test("jetstream-3: メンバー以外のレコードは、宛先にメンバーがいるものだけ保存する", async () => {
     // arrange
     const member = await createMember();
     const other = await accountFactory(ctx.db).create();
@@ -301,7 +301,7 @@ describe("Jetstreamからのイベント受信", () => {
     );
   });
 
-  test("jetstream-9: メンバーがフォローしたアカウントの、以後のレコードを保存する", async () => {
+  test("jetstream-9: メンバーがフォローしたアカウントの、以後の投稿を保存する", async () => {
     // arrange
     const member = await createMember();
     const followee = await accountFactory(ctx.db).create();

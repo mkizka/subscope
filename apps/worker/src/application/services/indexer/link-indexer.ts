@@ -30,7 +30,11 @@ export class LinkIndexer implements IRecordIndexer {
     const saves = await this.deps.storagePolicy.saves({
       ctx,
       origin,
-      record: { accountDid: record.uri.did, addresseeDids: [] },
+      record: {
+        accountDid: record.uri.did,
+        addresseeDids: [],
+        reachesFollowers: true,
+      },
     });
     if (!saves) {
       return;

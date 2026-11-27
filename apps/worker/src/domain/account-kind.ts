@@ -1,9 +1,3 @@
-import type { Did } from "@atproto/did";
-
-import { Like } from "./like.js";
-
-export type Addressed = { accountDid: Did; addresseeDids: Did[] };
-
 export class AccountKind {
   private constructor(private readonly value: "member" | "tracked" | "other") {}
 
@@ -33,12 +27,5 @@ export class AccountKind {
 
   get syncsLabels() {
     return this.value !== "other";
-  }
-
-  savesWithoutAddressee(record: Addressed) {
-    if (this.value === "member") {
-      return true;
-    }
-    return this.value === "tracked" && !(record instanceof Like);
   }
 }

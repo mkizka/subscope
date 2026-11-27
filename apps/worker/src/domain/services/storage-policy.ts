@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
-import { AccountKind, type Addressed } from "../account-kind.js";
+import { AccountKind } from "../account-kind.js";
 import { Follow } from "../follow.js";
 import type { IRegistrationQuery } from "../interfaces/registration-query.js";
 import { Like } from "../like.js";
@@ -11,6 +11,12 @@ import type { Origin } from "../origin.js";
 import { Post } from "../post.js";
 import { Profile } from "../profile.js";
 import { Repost } from "../repost.js";
+
+type Addressed = {
+  accountDid: Did;
+  addresseeDids: Did[];
+  reachesFollowers: boolean;
+};
 
 type Saved =
   Post | Repost | Like | Follow | ListItem | Profile | { accountDid: Did };
@@ -32,7 +38,8 @@ export class StoragePolicy {
     }
     const kind = await this.classify(ctx, record.accountDid);
     return (
-      kind.savesWithoutAddressee(record) ||
+      kind.isMember ||
+      (record.reachesFollowers && kind.isTracked) ||
       (await this.registrationQuery.includesMember(ctx, record.addresseeDids))
     );
   }

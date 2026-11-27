@@ -32,7 +32,11 @@ export class GeneratorIndexer implements IRecordIndexer {
     const saves = await this.deps.storagePolicy.saves({
       ctx,
       origin,
-      record: { accountDid: record.uri.did, addresseeDids: [] },
+      record: {
+        accountDid: record.uri.did,
+        addresseeDids: [],
+        reachesFollowers: false,
+      },
     });
     if (!saves) {
       return;
