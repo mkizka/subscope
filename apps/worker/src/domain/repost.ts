@@ -51,6 +51,10 @@ export class Repost {
     return new AtUri(this.subjectUri);
   }
 
+  get addresseeDids() {
+    return [this.subject.did];
+  }
+
   get feedItem(): FeedItem {
     return {
       uri: this.uri,

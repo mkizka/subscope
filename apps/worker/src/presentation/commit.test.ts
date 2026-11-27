@@ -129,6 +129,17 @@ describe("commit", () => {
         const serverMember = await accountFactory(ctx.db)
           .use((t) => t.serverMember())
           .create();
+        if (tracked) {
+          await followFactory(ctx.db)
+            .vars({
+              record: () =>
+                recordFactory(ctx.db, "app.bsky.graph.follow")
+                  .vars({ accountDid: () => serverMember.did })
+                  .create(),
+              followee: () => author,
+            })
+            .create();
+        }
         const subject = {
           uri: AtUri.make(
             serverMember.did,

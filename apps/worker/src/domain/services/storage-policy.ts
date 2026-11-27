@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/interface";
 
+import { AccountKind, type Addressed } from "../account-kind.js";
 import { Follow } from "../follow.js";
 import type { IRegistrationQuery } from "../interfaces/registration-query.js";
 import type { ITrackingRepository } from "../interfaces/tracking-repository.js";
@@ -23,46 +24,38 @@ export class StoragePolicy {
     private readonly trackingRepository: ITrackingRepository,
   ) {}
 
-  async savesFeedRecord({
+  async saves({
     ctx,
     origin,
     record,
   }: {
     ctx: TransactionContext;
     origin: Origin;
-    record: DatedRecord;
+    record: Addressed & DatedRecord;
   }) {
+    if (origin.isFetched) {
+      return true;
+    }
+    const kind = await this.classify(ctx, record.accountDid);
+    const addressed =
+      kind.savesWithoutAddressee(record) ||
+      (await this.registrationQuery.includesMember(ctx, record.addresseeDids));
     return (
-      !origin.isPast ||
-      (await this.registrationQuery.isMember(ctx, record.accountDid)) ||
-      (await this.isWithinWindow({ ctx, origin, record }))
+      addressed &&
+      (kind.isMember || (await this.isWithinWindow({ ctx, origin, record })))
     );
   }
 
-  async savesLike({
-    ctx,
-    origin,
-    like,
-  }: {
-    ctx: TransactionContext;
-    origin: Origin;
-    like: Like;
-  }) {
-    const likerIsMember = await this.registrationQuery.isMember(
-      ctx,
-      like.accountDid,
-    );
-    if (likerIsMember) {
-      return true;
+  async classify(ctx: TransactionContext, did: Did) {
+    const isMember = await this.registrationQuery.isMember(ctx, did);
+    if (isMember) {
+      return AccountKind.member();
     }
-    const subjectAuthorIsMember = await this.registrationQuery.isMember(
+    const isFollowed = await this.registrationQuery.isFollowedByAnyServerMember(
       ctx,
-      like.subjectAuthorDid,
+      did,
     );
-    return (
-      subjectAuthorIsMember &&
-      (await this.isWithinWindow({ ctx, origin, record: like }))
-    );
+    return isFollowed ? AccountKind.tracked() : AccountKind.other();
   }
 
   async recordsToFetch({

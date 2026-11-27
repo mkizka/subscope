@@ -113,6 +113,7 @@ describe("IndexCommitUseCase", () => {
     test("index-10: 保存済みのアカウントは、ハンドルと状態が変わらなければ更新しない", async () => {
       // arrange
       const account = accountFactory();
+      registrationQuery.add(account.did);
       accountRepo.add(account);
       const saveSpy = vi.spyOn(accountRepo, "save");
 
@@ -189,6 +190,7 @@ describe("IndexCommitUseCase", () => {
     test("index-9: threadgateとpostgateは、同じアカウントの同じrkeyの投稿に付くものだけ保存する", async () => {
       // arrange
       const account = accountFactory();
+      registrationQuery.add(account.did);
       accountRepo.add(account);
       const gate = ({
         collection,
@@ -421,6 +423,107 @@ describe("IndexCommitUseCase", () => {
 
         // assert
         expect(fetchUris.includes(likedPostUri)).toBe(expected);
+      },
+    );
+
+    const memberPost = (did: string) => ({
+      uri: `at://${did}/app.bsky.feed.post/1`,
+      cid: fakeCid(),
+    });
+
+    test.each([
+      {
+        name: "返信先の作者がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string, other: string) => ({
+          text: "reply",
+          reply: { parent: memberPost(member), root: memberPost(other) },
+        }),
+        saved: true,
+      },
+      {
+        name: "起点の作者がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string, other: string) => ({
+          text: "reply",
+          reply: { parent: memberPost(other), root: memberPost(member) },
+        }),
+        saved: true,
+      },
+      {
+        name: "引用元の作者がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string) => ({
+          text: "quote",
+          embed: { $type: "app.bsky.embed.record", record: memberPost(member) },
+        }),
+        saved: true,
+      },
+      {
+        name: "メンションの相手がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string) => ({
+          text: "@member",
+          facets: [
+            {
+              index: { byteStart: 0, byteEnd: 7 },
+              features: [
+                { $type: "app.bsky.richtext.facet#mention", did: member },
+              ],
+            },
+          ],
+        }),
+        saved: true,
+      },
+      {
+        name: "メンバー宛てでない投稿",
+        collection: "app.bsky.feed.post",
+        json: (_: string, other: string) => ({
+          text: "reply",
+          reply: { parent: memberPost(other), root: memberPost(other) },
+        }),
+        saved: false,
+      },
+      {
+        name: "リポストの対象の作者がメンバー",
+        collection: "app.bsky.feed.repost",
+        json: (member: string) => ({ subject: memberPost(member) }),
+        saved: true,
+      },
+      {
+        name: "メンバー宛てでないリポスト",
+        collection: "app.bsky.feed.repost",
+        json: (_: string, other: string) => ({ subject: memberPost(other) }),
+        saved: false,
+      },
+    ])(
+      "index-28: 追跡アカウントでないアカウントの投稿・リポストは、メンバー宛てのものだけ保存する($name)",
+      async ({ collection, json, saved }) => {
+        // arrange
+        const author = accountFactory();
+        const member = accountFactory();
+        const other = accountFactory();
+        registrationQuery.add(member.did);
+        const uri = AtUri.make(author.did, collection, "123");
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: collection,
+            ...json(member.did, other.did),
+            createdAt: new Date().toISOString(),
+          },
+          indexedAt: new Date(),
+        };
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: true,
+        });
+
+        // assert
+        expect((await recordRepo.find({ ctx, uri })) !== null).toBe(saved);
       },
     );
   });
