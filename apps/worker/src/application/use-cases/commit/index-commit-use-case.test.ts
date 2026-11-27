@@ -331,6 +331,7 @@ describe("IndexCommitUseCase", () => {
       async ({ saved }) => {
         // arrange
         const account = accountFactory();
+        registrationQuery.add(account.did);
         const pinnedUri = `at://${account.did}/app.bsky.feed.post/pinned`;
         if (saved) {
           recordRepo.add(postFactory({ uri: pinnedUri }).record);
@@ -496,8 +497,26 @@ describe("IndexCommitUseCase", () => {
         json: (_: string, other: string) => ({ subject: memberPost(other) }),
         saved: false,
       },
+      {
+        name: "フォローの相手がメンバー",
+        collection: "app.bsky.graph.follow",
+        json: (member: string) => ({ subject: member }),
+        saved: true,
+      },
+      {
+        name: "メンバー宛てでないフォロー",
+        collection: "app.bsky.graph.follow",
+        json: (_: string, other: string) => ({ subject: other }),
+        saved: false,
+      },
+      {
+        name: "宛先を持たないプロフィール",
+        collection: "app.bsky.actor.profile",
+        json: () => ({ displayName: "other" }),
+        saved: false,
+      },
     ])(
-      "index-28: 追跡アカウントでないアカウントの投稿・リポストは、メンバー宛てのものだけ保存する($name)",
+      "index-28: 追跡アカウントでないアカウントのレコードは、メンバー宛てのものだけ保存する($name)",
       async ({ collection, json, saved }) => {
         // arrange
         const author = accountFactory();
@@ -543,6 +562,8 @@ describe("IndexCommitUseCase", () => {
         const subject = accountFactory();
         if (member) {
           registrationQuery.add(author.did);
+        } else {
+          registrationQuery.addFollowed(author.did);
         }
         const uri = AtUri.make(author.did, collection, "123");
         const record = {

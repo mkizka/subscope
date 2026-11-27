@@ -18,6 +18,9 @@ type DatedRecord = { accountDid: Did; createdAt: Date };
 type Saved =
   Post | Repost | Like | Follow | ListItem | Profile | { accountDid: Did };
 
+const isEvent = (record: Addressed) =>
+  record instanceof Post || record instanceof Repost || record instanceof Like;
+
 export class StoragePolicy {
   constructor(
     private readonly registrationQuery: IRegistrationQuery,
@@ -31,7 +34,7 @@ export class StoragePolicy {
   }: {
     ctx: TransactionContext;
     origin: Origin;
-    record: Addressed & DatedRecord;
+    record: Addressed;
   }) {
     if (origin.isFetched) {
       return true;
@@ -42,7 +45,9 @@ export class StoragePolicy {
       (await this.registrationQuery.includesMember(ctx, record.addresseeDids));
     return (
       addressed &&
-      (kind.isMember || (await this.isWithinWindow({ ctx, origin, record })))
+      (kind.isMember ||
+        !isEvent(record) ||
+        (await this.isWithinWindow({ ctx, origin, record })))
     );
   }
 

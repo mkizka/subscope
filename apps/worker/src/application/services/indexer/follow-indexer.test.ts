@@ -34,6 +34,7 @@ describe("FollowIndexer", () => {
       // arrange
       const follower = accountFactory();
       const followee = accountFactory();
+      registrationQuery.add(follower.did);
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey123`,
         json: {
@@ -91,6 +92,7 @@ describe("FollowIndexer", () => {
       // arrange
       const follower = accountFactory();
       const followee = accountFactory();
+      registrationQuery.add(follower.did);
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey789`,
         json: {

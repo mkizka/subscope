@@ -4,13 +4,19 @@ import type { IRegistrationQuery } from "../../../domain/interfaces/registration
 
 export class InMemoryRegistrationQuery implements IRegistrationQuery {
   private registrations: Set<string> = new Set();
+  private followed: Set<string> = new Set();
 
   add(accountDid: string): void {
     this.registrations.add(accountDid);
   }
 
+  addFollowed(subjectDid: string): void {
+    this.followed.add(subjectDid);
+  }
+
   clear(): void {
     this.registrations.clear();
+    this.followed.clear();
   }
 
   async isMember(
@@ -26,8 +32,8 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
 
   async isFollowedByAnyServerMember(
     _ctx: TransactionContext,
-    _subjectDid: string,
+    subjectDid: string,
   ): Promise<boolean> {
-    return false;
+    return this.followed.has(subjectDid);
   }
 }
