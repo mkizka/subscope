@@ -142,6 +142,13 @@ export class JetstreamSubscriber {
       },
     });
     for await (const event of events) {
+      this.deps.metricReporter.increment(
+        "worker_jetstream_events_received_total",
+      );
+      this.deps.metricReporter.set(
+        "worker_jetstream_last_event_time_seconds",
+        new Date(event.time).getTime() / 1000,
+      );
       if (gap.detected && cursor !== undefined) {
         gap.detected = false;
         this.reportGap(cursor, event.time);
@@ -161,10 +168,6 @@ export class JetstreamSubscriber {
 
   private async handle(event: JetstreamEvent) {
     if (event.kind === "commit") {
-      this.deps.metricReporter.increment("worker_events_commit_total", {
-        source: "jetstream",
-        collection: event.commit.collection,
-      });
       const indexed = await this.deps.indexCommitUseCase.execute(
         indexCommitCommandFactory(event),
       );

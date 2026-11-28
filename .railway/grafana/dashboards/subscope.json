@@ -293,7 +293,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 6,
         "x": 0,
         "y": 9
       },
@@ -318,14 +318,110 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "editorMode": "code",
-          "expr": "sum by (collection) (rate(worker_events_commit_total{source=\"jetstream\"}[5m]))",
-          "legendFormat": "{{collection}}",
-          "range": true,
+          "expr": "sum(rate(worker_jetstream_events_received_total[5m]))",
+          "legendFormat": "受信",
           "refId": "A"
         }
       ],
-      "title": "commit - Jetstream",
+      "title": "received - Jetstream",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 9
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "time() - max(worker_jetstream_last_event_time_seconds)",
+          "legendFormat": "遅れ",
+          "refId": "A"
+        }
+      ],
+      "title": "lag - Jetstream",
       "type": "timeseries"
     },
     {
@@ -1474,7 +1570,7 @@
         "x": 0,
         "y": 44
       },
-      "id": 20,
+      "id": 23,
       "panels": [],
       "title": "保存",
       "type": "row"
@@ -1547,7 +1643,7 @@
         "x": 0,
         "y": 45
       },
-      "id": 21,
+      "id": 24,
       "options": {
         "legend": {
           "calcs": [],
@@ -1644,7 +1740,7 @@
         "x": 12,
         "y": 45
       },
-      "id": 22,
+      "id": 25,
       "options": {
         "legend": {
           "calcs": [],

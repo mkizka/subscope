@@ -8,12 +8,16 @@ export type CounterKey =
   | "worker_events_label_total"
   | "worker_records_indexed_total"
   | "worker_jetstream_gap_total"
+  | "worker_jetstream_events_received_total"
   | "fetch_record_request_total"
   | "fetch_record_error_total";
+
+export type GaugeKey = "worker_jetstream_last_event_time_seconds";
 
 export type LabelsValue = Record<string, string | number>;
 
 export interface IMetricReporter {
   increment: (key: CounterKey, labels?: LabelsValue) => void;
+  set: (key: GaugeKey, value: number) => void;
   getMetrics: () => Promise<string>;
 }

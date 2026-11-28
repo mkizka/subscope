@@ -2,6 +2,7 @@ import client from "prom-client";
 
 import type {
   CounterKey,
+  GaugeKey,
   IMetricReporter,
   LabelsValue,
 } from "../../interface/metric.js";
@@ -10,8 +11,13 @@ type CounterMap = {
   [key in CounterKey]: client.Counter;
 };
 
+type GaugeMap = {
+  [key in GaugeKey]: client.Gauge;
+};
+
 export class MetricReporter implements IMetricReporter {
   private readonly counters: CounterMap;
+  private readonly gauges: GaugeMap;
 
   constructor() {
     client.register.clear();
@@ -55,6 +61,10 @@ export class MetricReporter implements IMetricReporter {
         name: "worker_jetstream_gap_total",
         help: "Total number of times Jetstream events were lost beyond the lookback window",
       }),
+      worker_jetstream_events_received_total: new client.Counter({
+        name: "worker_jetstream_events_received_total",
+        help: "Total number of events received from Jetstream before filtering",
+      }),
       fetch_record_request_total: new client.Counter({
         name: "fetch_record_request_total",
         help: "Total number of record fetch requests",
@@ -64,6 +74,16 @@ export class MetricReporter implements IMetricReporter {
         help: "Total number of record fetch errors",
       }),
     };
+    this.gauges = {
+      worker_jetstream_last_event_time_seconds: new client.Gauge({
+        name: "worker_jetstream_last_event_time_seconds",
+        help: "Unix time of the last event received from Jetstream",
+      }),
+    };
+  }
+
+  set(key: GaugeKey, value: number): void {
+    this.gauges[key].set(value);
   }
 
   increment(key: CounterKey, labels?: LabelsValue): void {
