@@ -100,8 +100,8 @@
     "me.subsco.server.getOperator",
     "me.subsco.server.getServerMembers",
     "me.subsco.server.getSetupStatus",
+    "me.subsco.sync.getBackfillStatuses",
     "me.subsco.sync.getRegistrationStatus",
-    "me.subsco.sync.getTrackingStatuses",
     "me.subsco.sync.registerAccount",
     "me.subsco.sync.unregisterAccount"
   ],
@@ -416,7 +416,7 @@
     },
     "me.subsco.authFull": {
       "uri": "file://./lexicons/me/subsco/authFull.json",
-      "cid": "bafyreid3cxwzawbedri4olpewwj3iv7jg53stjplmaxuucuuqcvwtzbgwy"
+      "cid": "bafyreie2jewrifycdg5si3p5oatiqjsdp7kunxsw3omsqt6wnqe7tnilzu"
     },
     "me.subsco.graph.getServerMemberFollowers": {
       "uri": "file://./lexicons/me/subsco/graph/getServerMemberFollowers.json",
@@ -442,13 +442,13 @@
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
       "cid": "bafyreiaml7lvp3tih3gcbfaxmpuc4eelqgpxy23ld7gzrejeqtu5ytqb2q"
     },
+    "me.subsco.sync.getBackfillStatuses": {
+      "uri": "file://./lexicons/me/subsco/sync/getBackfillStatuses.json",
+      "cid": "bafyreieahwem33vdmjc6d5ry67ubnmjp4li6qdy7rncbknucphrmztl364"
+    },
     "me.subsco.sync.getRegistrationStatus": {
       "uri": "file://./lexicons/me/subsco/sync/getRegistrationStatus.json",
       "cid": "bafyreiemyyduwx5elgczghsh42ypyticefdjevhh7xgtdzhj52tmb25agu"
-    },
-    "me.subsco.sync.getTrackingStatuses": {
-      "uri": "file://./lexicons/me/subsco/sync/getTrackingStatuses.json",
-      "cid": "bafyreigcrqsxorifjptfkkz36ojkfxgfgzv7r2mgafygorxiap5lymsas4"
     },
     "me.subsco.sync.registerAccount": {
       "uri": "file://./lexicons/me/subsco/sync/registerAccount.json",

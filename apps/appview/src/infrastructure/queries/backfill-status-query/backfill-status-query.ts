@@ -3,9 +3,9 @@ import { type DatabaseClient } from "@repo/common/interface";
 import { type BackfillStatus, schema } from "@repo/db";
 import { eq, inArray } from "drizzle-orm";
 
-import type { ITrackingQuery } from "../../../application/interfaces/queries/tracking-query.js";
+import type { IBackfillStatusQuery } from "../../../application/interfaces/queries/backfill-status-query.js";
 
-export class TrackingQuery implements ITrackingQuery {
+export class BackfillStatusQuery implements IBackfillStatusQuery {
   constructor(private readonly db: DatabaseClient) {}
 
   async findStatuses(

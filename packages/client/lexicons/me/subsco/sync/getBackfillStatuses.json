@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "me.subsco.sync.getTrackingStatuses",
+  "id": "me.subsco.sync.getBackfillStatuses",
   "defs": {
     "main": {
       "type": "query",
@@ -29,14 +29,14 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#trackingStatus"
+                "ref": "#memberStatus"
               }
             }
           }
         }
       }
     },
-    "trackingStatus": {
+    "memberStatus": {
       "type": "object",
       "required": ["did", "backfillStatus"],
       "properties": {

@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import getTrackingStatuses from "@repo/client/me/subsco/sync/getTrackingStatuses";
+import getBackfillStatuses from "@repo/client/me/subsco/sync/getBackfillStatuses";
 import {
   accountFactory,
   followFactory,
@@ -10,7 +10,7 @@ import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
-describe("me.subsco.sync.getTrackingStatuses", () => {
+describe("me.subsco.sync.getBackfillStatuses", () => {
   const { ctx } = testSetup;
 
   const createAccount = (backfillStatus?: "completed" | "error") =>
@@ -36,7 +36,7 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
       })
       .create();
 
-  test("getTrackingStatuses-1: メンバーだけを返す", async () => {
+  test("getBackfillStatuses-1: メンバーだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
@@ -45,7 +45,7 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
     await follow(serverMember, followee);
 
     // act
-    const res = await client.call(getTrackingStatuses, {
+    const res = await client.call(getBackfillStatuses, {
       dids: [serverMember, followee, other].map((a) => asDid(a.did)),
     });
 
@@ -55,13 +55,13 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
     ]);
   });
 
-  test("getTrackingStatuses-2: 状態をまだ確認していないアカウントは同期中として返す", async () => {
+  test("getBackfillStatuses-2: 状態をまだ確認していないアカウントは同期中として返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
 
     // act
-    const res = await client.call(getTrackingStatuses, {
+    const res = await client.call(getBackfillStatuses, {
       dids: [asDid(serverMember.did)],
     });
 
@@ -71,13 +71,13 @@ describe("me.subsco.sync.getTrackingStatuses", () => {
     ]);
   });
 
-  test("getTrackingStatuses-3: 認証がなくても状態を返す", async () => {
+  test("getBackfillStatuses-3: 認証がなくても状態を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const serverMember = await createServerMember();
 
     // act
-    const res = await client.call(getTrackingStatuses, {
+    const res = await client.call(getBackfillStatuses, {
       dids: [asDid(serverMember.did)],
     });
 

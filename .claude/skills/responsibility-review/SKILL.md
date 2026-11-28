@@ -41,7 +41,7 @@ description: PRを作成した後に必ず実行する。PRで触ったユース
 
 クエリサービスは、返すものの主語で分ける。既存のクエリサービスに置き場所の近いメソッドを足すだけにせず、主語が違えば新しく作る。
 
-例: #996 で、追跡状況の取得を `RegistrationQuery` から `TrackingQuery` に移した。
+例: #996 で、取り込み状況の取得を `RegistrationQuery` から `BackfillStatusQuery` に移した。
 
 ### ドメインモデルかDTOか
 

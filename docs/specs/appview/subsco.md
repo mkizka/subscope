@@ -92,15 +92,15 @@ qは大文字と小文字を区別しない。
 | unregisterAccount-2 | 登録を消し、使った招待コードは使用済みのまま残す                  |
 | unregisterAccount-3 | メンバーでなければ400とNotMemberを返す                            |
 
-## me.subsco.sync.getTrackingStatuses
+## me.subsco.sync.getBackfillStatuses
 
 指定したアカウントのうち、メンバーについて、バックフィルの状態を返す。認証は不要。一度に指定できるのは100件まで。
 
 | ID                    | 仕様                                                 |
 | --------------------- | ---------------------------------------------------- |
-| getTrackingStatuses-1 | メンバーだけを返す                                   |
-| getTrackingStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
-| getTrackingStatuses-3 | 認証がなくても状態を返す                             |
+| getBackfillStatuses-1 | メンバーだけを返す                                   |
+| getBackfillStatuses-2 | 状態をまだ確認していないアカウントは同期中として返す |
+| getBackfillStatuses-3 | 認証がなくても状態を返す                             |
 
 メンバー以外のアカウントは保存する範囲が狭い。状態が返らなかったアカウントはメンバーでないので、画面で表示が不十分だと示すのにも使う。
 
