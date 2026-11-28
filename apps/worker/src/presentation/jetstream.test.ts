@@ -257,7 +257,7 @@ describe("Jetstreamからのイベント受信", () => {
     );
   });
 
-  test("jetstream-7: 最後に処理したイベントの時刻を保存し、再接続時はその続きから受け取る", async () => {
+  test("jetstream-7: 止まっていた間のイベントは、再開したときに受け取る", async () => {
     // arrange
     const { tracked } = await createTracked();
     const [socket, firstUrl] = await connect();
@@ -279,7 +279,7 @@ describe("Jetstreamからのイベント受信", () => {
     );
   });
 
-  test("jetstream-8: DBに保存できなかったイベントは、接続し直して受け取り直す", async () => {
+  test("jetstream-8: 保存できなかったイベントは、受け取り直して保存する", async () => {
     // arrange
     const { tracked } = await createTracked();
     const [socket] = await connect();
@@ -345,7 +345,7 @@ describe("Jetstreamからのイベント受信", () => {
     expect(await findPosts(tracked.did)).toEqual([]);
   });
 
-  test("jetstream-11: 保存した時刻がJetstreamのさかのぼれる期間より古いときは、欠けた期間をログとメトリクスに出す", async () => {
+  test("jetstream-11: Jetstreamがさかのぼれる期間より長く止まっていたときは、欠けた期間をログとメトリクスに出す", async () => {
     // arrange
     const { tracked } = await createTracked();
     await services.cursorStore.setCursor(
@@ -379,7 +379,7 @@ describe("Jetstreamからのイベント受信", () => {
     );
   });
 
-  test("jetstream-12: Jetstreamから受け取ったレコードでは、アカウントのrevを記録しない", async () => {
+  test("Jetstreamから受け取ったレコードでは、アカウントのrevを記録しない", async () => {
     // arrange
     const { tracked } = await createTracked();
     const [socket] = await connect();
