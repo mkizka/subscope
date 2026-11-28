@@ -156,7 +156,9 @@ describe("me.subsco.sync.registerAccount", () => {
     await client.call(registerAccount, { inviteCode: inviteCode.code });
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: account.did }]);
+    expect(jobScheduler.getSyncAccountKindJobs()).toEqual([
+      { did: account.did },
+    ]);
   });
 
   test("registerAccount-8: まだ保存していないアカウントも登録する", async () => {
@@ -196,7 +198,7 @@ describe("me.subsco.sync.registerAccount", () => {
     await client.call(registerAccount, { inviteCode: inviteCode.code });
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
+    expect(jobScheduler.getSyncAccountKindJobs()).toEqual([
       { did: account.did },
       { did: followee.did },
     ]);

@@ -37,7 +37,7 @@ export class CreateRegistrationService {
       const followeeDids =
         await this.deps.followQuery.findFolloweeDids(accountDid);
       for (const did of [accountDid, ...followeeDids]) {
-        await this.deps.jobScheduler.scheduleSyncTapRepo(did);
+        await this.deps.jobScheduler.scheduleSyncAccountKind(did);
       }
     });
   }

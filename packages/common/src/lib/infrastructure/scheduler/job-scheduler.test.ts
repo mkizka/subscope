@@ -83,19 +83,19 @@ describe("JobScheduler", () => {
     });
   });
 
-  describe("scheduleSyncTapRepo", () => {
-    test("syncTapRepoジョブを遅延なしでスケジュールする", async () => {
+  describe("scheduleSyncAccountKind", () => {
+    test("syncAccountKindジョブを遅延なしでスケジュールする", async () => {
       // arrange
       const did = "did:plc:test";
 
       // act
-      await jobScheduler.scheduleSyncTapRepo(did);
+      await jobScheduler.scheduleSyncAccountKind(did);
 
       // assert
       const jobs = jobQueue.getJobs();
       expect(jobs).toHaveLength(1);
       expect(jobs[0]).toMatchObject({
-        queueName: "syncTapRepo",
+        queueName: "syncAccountKind",
         jobName: did,
         data: { did },
       });

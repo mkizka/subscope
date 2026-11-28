@@ -7,7 +7,7 @@ import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
 import type { IndexLabelService } from "../../services/index-label-service.js";
 import type { TapRepoService } from "../../services/tap-repo-service.js";
 
-export class SyncTapRepoUseCase {
+export class SyncAccountKindUseCase {
   constructor(
     private readonly deps: {
       tapRepoService: TapRepoService;

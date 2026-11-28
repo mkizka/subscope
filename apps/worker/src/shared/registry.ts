@@ -80,7 +80,7 @@ import { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-
 import { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import { ScheduleBackfillChecksUseCase } from "../application/use-cases/async/schedule-backfill-checks-use-case.js";
 import { SendPushNotificationUseCase } from "../application/use-cases/async/send-push-notification-use-case.js";
-import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
+import { SyncAccountKindUseCase } from "../application/use-cases/async/sync-account-kind-use-case.js";
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
@@ -212,12 +212,12 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClass(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClass(AggregateAccountStatsUseCase))
     .service("indexLabelUseCase", ["indexLabelService", "transactionManager"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["tapRepoService", "storagePolicy", "accountRoster", "labelFetcher", "indexLabelService", "transactionManager"], asClass(SyncTapRepoUseCase))
+    .service("syncAccountKindUseCase", ["tapRepoService", "storagePolicy", "accountRoster", "labelFetcher", "indexLabelService", "transactionManager"], asClass(SyncAccountKindUseCase))
     .service("refreshAccountRosterUseCase", ["registrationQuery", "accountRoster", "transactionManager"], asClass(RefreshAccountRosterUseCase))
     .service("checkBackfillUseCase", ["tapClient", "repoStatusFetcher", "tapRepoService", "storagePolicy", "accountRepository", "jobScheduler", "transactionManager"], asClass(CheckBackfillUseCase))
     .service("scheduleBackfillChecksUseCase", ["accountQuery", "jobScheduler", "transactionManager"], asClass(ScheduleBackfillChecksUseCase))
     .service("sendPushNotificationUseCase", ["pushNotificationQuery", "pushSubscriptionRepository", "webPushSender", "transactionManager"], asClass(SendPushNotificationUseCase))
-    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClass(SyncWorker))
+    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateAccountStatsUseCase", "syncAccountKindUseCase", "checkBackfillUseCase", "sendPushNotificationUseCase", "env"], asClass(SyncWorker))
     // presentation
     .service("healthRouter", ["env"], healthRouterFactory)
     .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "env"], asClass(TapSubscriber))

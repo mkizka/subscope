@@ -53,9 +53,9 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleSyncTapRepo(did: Did): Promise<void> {
+  async scheduleSyncAccountKind(did: Did): Promise<void> {
     await this.jobQueue.add({
-      queueName: "syncTapRepo",
+      queueName: "syncAccountKind",
       jobName: did,
       data: { did },
     });

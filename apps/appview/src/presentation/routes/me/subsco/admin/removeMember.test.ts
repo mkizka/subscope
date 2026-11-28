@@ -59,7 +59,7 @@ describe("me.subsco.admin.removeMember", () => {
     await client.call(removeMember, { did: asDid(serverMember.did) });
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
+    expect(jobScheduler.getSyncAccountKindJobs()).toEqual([
       { did: asDid(serverMember.did) },
       { did: followee.did },
     ]);

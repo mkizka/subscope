@@ -82,7 +82,7 @@ describe("ラベルの保存", () => {
 
   test("label-4: メンバーと追跡アカウントに前から付いているラベルを取り寄せて保存する", async () => {
     // arrange
-    const { syncTapRepo, labelFetcher } = await setupJobTest();
+    const { syncAccountKind, labelFetcher } = await setupJobTest();
     const serverMember = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
       .create();
@@ -104,7 +104,7 @@ describe("ラベルの保存", () => {
 
     // act
     for (const { did } of [serverMember, followee, other]) {
-      await syncTapRepo(asDid(did));
+      await syncAccountKind(asDid(did));
     }
 
     // assert

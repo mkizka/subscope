@@ -317,7 +317,7 @@ describe("Jetstreamからのイベント受信", () => {
       .create();
 
     // act
-    await services.syncTapRepoUseCase.execute({ did: asDid(followee.did) });
+    await services.syncAccountKindUseCase.execute({ did: asDid(followee.did) });
     send(socket, postEvent(followee.did));
 
     // assert
@@ -335,7 +335,7 @@ describe("Jetstreamからのイベント受信", () => {
       .where(eq(schema.follows.uri, follow.uri));
 
     // act
-    await services.syncTapRepoUseCase.execute({ did: asDid(tracked.did) });
+    await services.syncAccountKindUseCase.execute({ did: asDid(tracked.did) });
     send(socket, postEvent(tracked.did), followEvent(tracked.did, member.did));
 
     // assert

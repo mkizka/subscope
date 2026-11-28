@@ -38,7 +38,7 @@ describe("me.subsco.sync.unregisterAccount", () => {
     await client.call(unregisterAccount);
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
+    expect(jobScheduler.getSyncAccountKindJobs()).toEqual([
       { did: serverMember.did },
       { did: followee.did },
     ]);

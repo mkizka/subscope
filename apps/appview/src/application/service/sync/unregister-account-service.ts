@@ -39,7 +39,7 @@ export class UnregisterAccountService {
       await this.deps.followQuery.findFolloweeDids(accountDid);
     ctx.afterCommit(async () => {
       for (const did of [accountDid, ...followeeDids]) {
-        await this.deps.jobScheduler.scheduleSyncTapRepo(did);
+        await this.deps.jobScheduler.scheduleSyncAccountKind(did);
       }
     });
   }

@@ -37,13 +37,13 @@ describe("Tapへの追加", () => {
 
   test("tap-11: 登録されたアカウントをTapに追加する", async () => {
     // arrange
-    const { syncTapRepo, tapClient } = await setupJobTest();
+    const { syncAccountKind, tapClient } = await setupJobTest();
     const serverMember = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
       .create();
 
     // act
-    await syncTapRepo(asDid(serverMember.did));
+    await syncAccountKind(asDid(serverMember.did));
 
     // assert
     expect(tapClient.getAddedDids()).toEqual([serverMember.did]);
@@ -51,7 +51,8 @@ describe("Tapへの追加", () => {
 
   test("tap-12: メンバーがフォローしたアカウントはTapに追加しない", async () => {
     // arrange
-    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
+    const { indexCommit, runSyncAccountKindJobs, tapClient } =
+      await setupJobTest();
     const serverMember = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
       .create();
@@ -59,7 +60,7 @@ describe("Tapへの追加", () => {
 
     // act
     await indexCommit(await followEvent(serverMember.did, followee.did));
-    await runSyncTapRepoJobs();
+    await runSyncAccountKindJobs();
 
     // assert
     expect(tapClient.getAddedDids()).not.toContain(followee.did);
@@ -67,17 +68,17 @@ describe("Tapへの追加", () => {
 
   test("tap-13: 登録を解除されたアカウントをTapから外す", async () => {
     // arrange
-    const { syncTapRepo, tapClient } = await setupJobTest();
+    const { syncAccountKind, tapClient } = await setupJobTest();
     const serverMember = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
       .create();
-    await syncTapRepo(asDid(serverMember.did));
+    await syncAccountKind(asDid(serverMember.did));
     await ctx.db
       .delete(schema.registrations)
       .where(eq(schema.registrations.accountDid, serverMember.did));
 
     // act
-    await syncTapRepo(asDid(serverMember.did));
+    await syncAccountKind(asDid(serverMember.did));
 
     // assert
     expect(tapClient.getAddedDids()).toEqual([]);
@@ -97,13 +98,13 @@ describe("バックフィルの状態の確認", () => {
 
   test("backfill-1: Tapに追加したアカウントのバックフィルの状態を確認する", async () => {
     // arrange
-    const { syncTapRepo, runCheckBackfillJobs } = await setupJobTest();
+    const { syncAccountKind, runCheckBackfillJobs } = await setupJobTest();
     const serverMember = await accountFactory(ctx.db)
       .use((t) => t.serverMember())
       .create();
 
     // act
-    await syncTapRepo(asDid(serverMember.did));
+    await syncAccountKind(asDid(serverMember.did));
     await runCheckBackfillJobs();
 
     // assert
