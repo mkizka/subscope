@@ -4,7 +4,10 @@ import { Fragment } from "react";
 import { Link } from "react-router";
 
 import { PostCard, type PostCardProps } from "@/app/features/post/post-card";
-import { PostToolbarContainer } from "@/app/features/post/post-toolbar-container";
+import {
+  PostToolbarContainer,
+  useDeletedPostUris,
+} from "@/app/features/post/post-toolbar-container";
 
 export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   uri: string;
@@ -73,6 +76,8 @@ function OmittedPosts({ count, to }: { count: number; to: string }) {
 }
 
 export function TimelineFeed({ posts, refreshing = false }: Props) {
+  const deletedUris = useDeletedPostUris();
+  const visiblePosts = posts.filter((post) => !deletedUris.has(post.uri));
   return (
     <section>
       {refreshing && (
@@ -102,12 +107,12 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
           </div>
         </div>
       )}
-      {posts.length === 0 && (
+      {visiblePosts.length === 0 && (
         <p className="py-8 text-center text-label text-muted">
           タイムラインに投稿がありません
         </p>
       )}
-      {groupThreads(posts).map(({ key, posts: group }) => {
+      {groupThreads(visiblePosts).map(({ key, posts: group }) => {
         const omitted = Math.max(group.length - 3, 0);
         return (
           <Fragment key={key}>

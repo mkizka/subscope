@@ -228,10 +228,13 @@ test.describe("スレッド", () => {
     ).toBeVisible();
   });
 
-  test("thread-e10: 選んだ投稿を削除すると、ホームに戻る", async ({ page }) => {
+  test("thread-e10: 選んだ投稿を削除すると、削除の完了を待たずにホームに戻る", async ({
+    page,
+  }) => {
     const target = await post("thread-e10: 投稿");
 
     await openThread(page, { uri: target.uri, text: "thread-e10: 投稿" });
+    await page.route("**/api/posts", () => {});
     await page
       .getByRole("region", { name: "スレッド" })
       .getByRole("button", { name: "投稿のメニュー" })

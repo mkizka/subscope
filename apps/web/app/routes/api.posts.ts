@@ -1,5 +1,5 @@
 import { parseWithZod } from "@conform-to/zod/v4";
-import { data, redirect } from "react-router";
+import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { deletePostSchema } from "@/app/features/post/post-toolbar-container";
@@ -21,8 +21,5 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     context.get(didContext),
     submission.value.uri,
   );
-  if (submission.value.redirectTo) {
-    return redirect(submission.value.redirectTo);
-  }
   return data({ ok: true });
 };
