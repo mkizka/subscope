@@ -36,10 +36,13 @@ describe("JobScheduler", () => {
 
   test("tap-14: 登録・登録解除によるTapへの追加・削除は、フォローによる追跡アカウントの見直しより先に行う", async () => {
     // act
-    for (const fromFollow of [true, false]) {
-      await jobScheduler.scheduleSyncAccountKind(`did:plc:${fromFollow}`, {
-        fromFollow,
-      });
+    for (const fromRegistration of [false, true]) {
+      await jobScheduler.scheduleSyncAccountKind(
+        `did:plc:${fromRegistration}`,
+        {
+          fromRegistration,
+        },
+      );
     }
 
     // assert
@@ -104,7 +107,9 @@ describe("JobScheduler", () => {
       const did = "did:plc:test";
 
       // act
-      await jobScheduler.scheduleSyncAccountKind(did, { fromFollow: false });
+      await jobScheduler.scheduleSyncAccountKind(did, {
+        fromRegistration: true,
+      });
 
       // assert
       const jobs = jobQueue.getJobs();

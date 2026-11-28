@@ -40,7 +40,7 @@ export class UnregisterAccountService {
     ctx.afterCommit(async () => {
       for (const did of [accountDid, ...followeeDids]) {
         await this.deps.jobScheduler.scheduleSyncAccountKind(did, {
-          fromFollow: false,
+          fromRegistration: true,
         });
       }
     });

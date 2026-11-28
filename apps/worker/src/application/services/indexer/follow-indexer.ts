@@ -66,7 +66,7 @@ export class FollowIndexer implements IRecordIndexer {
     if (tracksFollowee) {
       ctx.afterCommit(() =>
         this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid, {
-          fromFollow: true,
+          fromRegistration: false,
         }),
       );
     }
@@ -91,7 +91,7 @@ export class FollowIndexer implements IRecordIndexer {
     if (tracksFollowee) {
       ctx.afterCommit(() =>
         this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid, {
-          fromFollow: true,
+          fromRegistration: false,
         }),
       );
     }
