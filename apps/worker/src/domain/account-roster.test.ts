@@ -16,7 +16,7 @@ const commit = (
   authorDid,
   operation: "create",
   collection: "app.bsky.feed.post",
-  mentionedDids: [],
+  containedDids: [],
   ...overrides,
 });
 
@@ -43,20 +43,20 @@ describe("AccountRoster", () => {
     },
     {
       name: "その他のアカウントがメンバーに返信した",
-      event: commit(other, { mentionedDids: [member] }),
+      event: commit(other, { containedDids: [member] }),
       expected: true,
     },
     {
       name: "その他のアカウントのプロフィールにメンバーのDIDが含まれる",
       event: commit(other, {
         collection: "app.bsky.actor.profile",
-        mentionedDids: [member],
+        containedDids: [member],
       }),
       expected: false,
     },
     {
       name: "その他のアカウントがメンバー以外に返信した",
-      event: commit(other, { mentionedDids: [tracked] }),
+      event: commit(other, { containedDids: [tracked] }),
       expected: false,
     },
     {
@@ -100,7 +100,7 @@ describe("AccountRoster", () => {
 
     // assert
     expect(roster.passes(commit(tracked))).toBe(false);
-    expect(roster.passes(commit(other, { mentionedDids: [tracked] }))).toBe(
+    expect(roster.passes(commit(other, { containedDids: [tracked] }))).toBe(
       true,
     );
   });
@@ -116,7 +116,7 @@ describe("AccountRoster", () => {
 
     // assert
     expect(roster.passes(commit(member, { operation: "delete" }))).toBe(true);
-    expect(roster.passes(commit(other, { mentionedDids: [member] }))).toBe(
+    expect(roster.passes(commit(other, { containedDids: [member] }))).toBe(
       false,
     );
     expect(roster.passes(commit(tracked))).toBe(false);

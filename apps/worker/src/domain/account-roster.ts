@@ -8,7 +8,7 @@ export type StreamEvent =
       authorDid: Did;
       operation: "create" | "update" | "delete";
       collection: string;
-      mentionedDids: Did[];
+      containedDids: Did[];
     }
   | { kind: "identity" | "account"; authorDid: Did };
 
@@ -75,9 +75,10 @@ export class AccountRoster {
     if (isTracked && FOLLOWER_COLLECTIONS.has(event.collection)) {
       return true;
     }
+    // 宛先の正確な判定はStoragePolicyに任せ、ここではメンバーのDIDを含まないレコードを捨てる
     return (
       ADDRESSABLE_COLLECTIONS.has(event.collection) &&
-      event.mentionedDids.some((did) => this.members.has(did))
+      event.containedDids.some((did) => this.members.has(did))
     );
   }
 }

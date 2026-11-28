@@ -39,7 +39,7 @@ const streamEventFactory = (event: JetstreamEvent): StreamEvent => {
     authorDid: event.did,
     operation: event.commit.operation,
     collection: event.commit.collection,
-    mentionedDids: (JSON.stringify(record).match(DID_PATTERN) ?? []).map(
+    containedDids: (JSON.stringify(record).match(DID_PATTERN) ?? []).map(
       (did) => asDid(did),
     ),
   };
