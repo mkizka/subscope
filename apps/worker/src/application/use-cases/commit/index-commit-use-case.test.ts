@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { postFactory } from "../../../domain/post.factory.js";
-import { Tracking } from "../../../domain/tracking.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
@@ -15,7 +14,6 @@ describe("IndexCommitUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
-  let trackingRepo: TestServices["trackingRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   let ctx: { db: TestServices["db"] };
@@ -27,7 +25,6 @@ describe("IndexCommitUseCase", () => {
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
-    trackingRepo = services.trackingRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
     ctx = { db };
@@ -113,6 +110,7 @@ describe("IndexCommitUseCase", () => {
     test("index-10: 保存済みのアカウントは、ハンドルと状態が変わらなければ更新しない", async () => {
       // arrange
       const account = accountFactory();
+      registrationQuery.add(account.did);
       accountRepo.add(account);
       const saveSpy = vi.spyOn(accountRepo, "save");
 
@@ -189,6 +187,7 @@ describe("IndexCommitUseCase", () => {
     test("index-9: threadgateとpostgateは、同じアカウントの同じrkeyの投稿に付くものだけ保存する", async () => {
       // arrange
       const account = accountFactory();
+      registrationQuery.add(account.did);
       accountRepo.add(account);
       const gate = ({
         collection,
@@ -325,10 +324,11 @@ describe("IndexCommitUseCase", () => {
       { name: "保存していない", saved: false },
       { name: "保存している", saved: true },
     ])(
-      "fetchRecord-7: Tapから受け取ったプロフィールが指す固定投稿を、保存していなければ取得する($name)",
+      "fetchRecord-7: TapかJetstreamから受け取ったプロフィールが指す固定投稿を、保存していなければ取得する($name)",
       async ({ saved }) => {
         // arrange
         const account = accountFactory();
+        registrationQuery.add(account.did);
         const pinnedUri = `at://${account.did}/app.bsky.feed.post/pinned`;
         if (saved) {
           recordRepo.add(postFactory({ uri: pinnedUri }).record);
@@ -361,23 +361,11 @@ describe("IndexCommitUseCase", () => {
       },
     );
 
-    const DAY_MS = 24 * 60 * 60 * 1000;
-    const trackedAt = new Date("2026-01-10T00:00:00.000Z");
-    const likedPostUri = "at://did:plc:author/app.bsky.feed.post/liked";
-
-    const indexMemberLike = async ({
-      live,
-      createdAt,
-    }: {
-      live: boolean;
-      createdAt: Date;
-    }) => {
+    test("index-20: メンバーがいいねした投稿は、保存していなければPDSから取得する", async () => {
+      // arrange
       const liker = accountFactory();
       registrationQuery.add(liker.did);
-      await trackingRepo.save({
-        ctx,
-        tracking: Tracking.reconstruct({ did: liker.did, trackedAt }),
-      });
+      const likedPostUri = "at://did:plc:author/app.bsky.feed.post/liked";
       const uri = new AtUri(`at://${liker.did}/app.bsky.feed.like/123`);
       const record = {
         uri,
@@ -385,42 +373,215 @@ describe("IndexCommitUseCase", () => {
         json: {
           $type: "app.bsky.feed.like",
           subject: { uri: likedPostUri, cid: fakeCid() },
-          createdAt: createdAt.toISOString(),
+          createdAt: "2020-01-01T00:00:00.000Z",
         },
         indexedAt: new Date(),
       };
+
+      // act
       await indexCommitUseCase.execute({
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        live,
-      });
-      return jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString());
-    };
-
-    test("index-20: メンバーがいいねした投稿は、保存していなければPDSから取得する", async () => {
-      // act
-      const fetchUris = await indexMemberLike({
-        live: true,
-        createdAt: new Date(trackedAt.getTime() - 30 * DAY_MS),
+        live: false,
       });
 
       // assert
-      expect(fetchUris).toContain(likedPostUri);
+      expect(
+        jobScheduler.getFetchRecordJobs().map((job) => job.uri.toString()),
+      ).toContain(likedPostUri);
+    });
+
+    const memberPost = (did: string) => ({
+      uri: `at://${did}/app.bsky.feed.post/1`,
+      cid: fakeCid(),
     });
 
     test.each([
-      { name: "1日前ちょうど", offset: -DAY_MS, expected: true },
-      { name: "1日前より古い", offset: -DAY_MS - 1, expected: false },
+      {
+        name: "返信先の作者がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string, other: string) => ({
+          text: "reply",
+          reply: { parent: memberPost(member), root: memberPost(other) },
+        }),
+        saved: true,
+      },
+      {
+        name: "起点の作者がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string, other: string) => ({
+          text: "reply",
+          reply: { parent: memberPost(other), root: memberPost(member) },
+        }),
+        saved: true,
+      },
+      {
+        name: "引用元の作者がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string) => ({
+          text: "quote",
+          embed: { $type: "app.bsky.embed.record", record: memberPost(member) },
+        }),
+        saved: true,
+      },
+      {
+        name: "メンションの相手がメンバー",
+        collection: "app.bsky.feed.post",
+        json: (member: string) => ({
+          text: "@member",
+          facets: [
+            {
+              index: { byteStart: 0, byteEnd: 7 },
+              features: [
+                { $type: "app.bsky.richtext.facet#mention", did: member },
+              ],
+            },
+          ],
+        }),
+        saved: true,
+      },
+      {
+        name: "メンバー宛てでない投稿",
+        collection: "app.bsky.feed.post",
+        json: (_: string, other: string) => ({
+          text: "reply",
+          reply: { parent: memberPost(other), root: memberPost(other) },
+        }),
+        saved: false,
+      },
+      {
+        name: "リポストの対象の作者がメンバー",
+        collection: "app.bsky.feed.repost",
+        json: (member: string) => ({ subject: memberPost(member) }),
+        saved: true,
+      },
+      {
+        name: "メンバー宛てでないリポスト",
+        collection: "app.bsky.feed.repost",
+        json: (_: string, other: string) => ({ subject: memberPost(other) }),
+        saved: false,
+      },
+      {
+        name: "フォローの相手がメンバー",
+        collection: "app.bsky.graph.follow",
+        json: (member: string) => ({ subject: member }),
+        saved: true,
+      },
+      {
+        name: "メンバー宛てでないフォロー",
+        collection: "app.bsky.graph.follow",
+        json: (_: string, other: string) => ({ subject: other }),
+        saved: false,
+      },
+      {
+        name: "宛先を持たないプロフィール",
+        collection: "app.bsky.actor.profile",
+        json: () => ({ displayName: "other" }),
+        saved: false,
+      },
     ])(
-      "index-21: メンバーの過去のいいねでは、作成日時が追跡を始めた時刻の1日前より古いものの投稿は取得しない($name)",
-      async ({ offset, expected }) => {
+      "index-28: メンバー以外のレコードは、宛先にメンバーがいるものだけ保存する($name)",
+      async ({ collection, json, saved }) => {
+        // arrange
+        const author = accountFactory();
+        const member = accountFactory();
+        const other = accountFactory();
+        registrationQuery.add(member.did);
+        const uri = AtUri.make(author.did, collection, "123");
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: collection,
+            ...json(member.did, other.did),
+            createdAt: new Date().toISOString(),
+          },
+          indexedAt: new Date(),
+        };
+
         // act
-        const fetchUris = await indexMemberLike({
-          live: false,
-          createdAt: new Date(trackedAt.getTime() + offset),
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: true,
         });
 
         // assert
-        expect(fetchUris.includes(likedPostUri)).toBe(expected);
+        expect((await recordRepo.find({ ctx, uri })) !== null).toBe(saved);
+      },
+    );
+
+    test.each([
+      {
+        name: "投稿",
+        collection: "app.bsky.feed.post",
+        json: { text: "post" },
+        saved: true,
+      },
+      {
+        name: "リポスト",
+        collection: "app.bsky.feed.repost",
+        json: {
+          subject: {
+            uri: "at://did:plc:other/app.bsky.feed.post/1",
+            cid: fakeCid(),
+          },
+        },
+        saved: true,
+      },
+      {
+        name: "フォロー",
+        collection: "app.bsky.graph.follow",
+        json: { subject: "did:plc:other" },
+        saved: true,
+      },
+      {
+        name: "プロフィール",
+        collection: "app.bsky.actor.profile",
+        json: { displayName: "followee" },
+        saved: true,
+      },
+      {
+        name: "いいね",
+        collection: "app.bsky.feed.like",
+        json: {
+          subject: {
+            uri: "at://did:plc:other/app.bsky.feed.post/1",
+            cid: fakeCid(),
+          },
+        },
+        saved: false,
+      },
+      {
+        name: "リスト",
+        collection: "app.bsky.graph.list",
+        json: { name: "list", purpose: "app.bsky.graph.defs#curatelist" },
+        saved: false,
+      },
+    ])(
+      "index-29: 投稿・リポスト・フォロー・プロフィール・プロフィールのリンクは、書いた人のフォロワーも宛先に含める($name)",
+      async ({ collection, json, saved }) => {
+        // arrange
+        const author = accountFactory();
+        registrationQuery.addFollowed(author.did);
+        const uri = AtUri.make(author.did, collection, "123");
+        const record = {
+          uri,
+          cid: "cid123",
+          json: {
+            $type: collection,
+            ...json,
+            createdAt: new Date().toISOString(),
+          },
+          indexedAt: new Date(),
+        };
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: true,
+        });
+
+        // assert
+        expect((await recordRepo.find({ ctx, uri })) !== null).toBe(saved);
       },
     );
   });
@@ -430,7 +591,6 @@ describe("IndexCommitUseCase", () => {
       { collection: "app.bsky.graph.follow", member: true },
       { collection: "app.bsky.graph.follow", member: false },
       { collection: "app.bsky.graph.listitem", member: true },
-      { collection: "app.bsky.graph.listitem", member: false },
     ])(
       "index-17: フォローとリスト項目の相手のプロフィールとハンドルは、メンバーの分だけ取る($collection, メンバー=$member)",
       async ({ collection, member }) => {
@@ -440,6 +600,8 @@ describe("IndexCommitUseCase", () => {
         const subject = accountFactory();
         if (member) {
           registrationQuery.add(author.did);
+        } else {
+          registrationQuery.addFollowed(author.did);
         }
         const uri = AtUri.make(author.did, collection, "123");
         const record = {

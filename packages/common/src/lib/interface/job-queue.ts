@@ -16,9 +16,8 @@ type CheckBackfillData = {
   attempt: number;
 };
 
-type SyncTapRepoData = {
+type SyncAccountKindData = {
   did: Did;
-  refetch?: boolean;
 };
 
 type SendPushNotificationData = {
@@ -31,7 +30,7 @@ export type JobData = {
   fetchRecord: FetchRecordData;
   aggregatePostStats: null;
   aggregateAccountStats: AggregateAccountStatsData;
-  syncTapRepo: SyncTapRepoData;
+  syncAccountKind: SyncAccountKindData;
   checkBackfill: CheckBackfillData;
   sendPushNotification: SendPushNotificationData;
 };

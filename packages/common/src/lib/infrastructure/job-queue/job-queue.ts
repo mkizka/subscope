@@ -53,7 +53,7 @@ export class JobQueue implements IJobQueue {
         "aggregateAccountStats",
         queueOptions(withRetry),
       ),
-      syncTapRepo: new Queue("syncTapRepo", queueOptions(withRetry)),
+      syncAccountKind: new Queue("syncAccountKind", queueOptions(withRetry)),
       checkBackfill: new Queue("checkBackfill", queueOptions(withRetry)),
       sendPushNotification: new Queue("sendPushNotification", queueOptions()),
     };

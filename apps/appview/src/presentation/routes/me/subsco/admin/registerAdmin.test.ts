@@ -76,8 +76,8 @@ describe("me.subsco.admin.registerAdmin", () => {
     await client.call(registerAdmin);
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
-      { did: account.did, refetch: true },
+    expect(jobScheduler.getSyncAccountKindJobs()).toEqual([
+      { did: account.did },
       { did: followee.did },
     ]);
   });

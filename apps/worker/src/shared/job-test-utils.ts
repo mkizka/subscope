@@ -38,11 +38,11 @@ export const setupJobTest = async () => {
   const indexCommit = async (event: RecordEvent) => {
     await services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
   };
-  const runSyncTapRepoJobs = async () => {
-    const jobs = [...services.jobScheduler.getSyncTapRepoJobs()];
+  const runSyncAccountKindJobs = async () => {
+    const jobs = [...services.jobScheduler.getSyncAccountKindJobs()];
     services.jobScheduler.clear();
     for (const job of jobs) {
-      await services.syncTapRepoUseCase.execute(job);
+      await services.syncAccountKindUseCase.execute(job);
     }
   };
   const runCheckBackfillJobs = async () => {
@@ -70,12 +70,13 @@ export const setupJobTest = async () => {
     sendPushNotification,
     runSendPushNotificationJobs,
     webPushSender: services.webPushSender,
-    runSyncTapRepoJobs,
+    runSyncAccountKindJobs,
     runCheckBackfillJobs,
     scheduleBackfillChecks: () =>
       services.scheduleBackfillChecksUseCase.execute(),
     jobScheduler: services.jobScheduler,
-    syncTapRepo: (did: Did) => services.syncTapRepoUseCase.execute({ did }),
+    syncAccountKind: (did: Did) =>
+      services.syncAccountKindUseCase.execute({ did }),
     checkBackfill: (did: Did, attempt = 0) =>
       services.checkBackfillUseCase.execute({ did, attempt }),
     indexLabel: (label: LabelData) => services.indexLabelUseCase.execute(label),

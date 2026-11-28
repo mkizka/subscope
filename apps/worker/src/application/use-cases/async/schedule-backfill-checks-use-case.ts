@@ -16,7 +16,7 @@ export class ScheduleBackfillChecksUseCase {
 
   async execute() {
     const dids = await this.deps.transactionManager.transaction((ctx) =>
-      this.deps.accountQuery.findTrackedDidsWithoutBackfillStatus(ctx),
+      this.deps.accountQuery.findMemberDidsWithoutBackfillStatus(ctx),
     );
     for (const did of dids) {
       await this.deps.jobScheduler.scheduleCheckBackfill(did, 0);

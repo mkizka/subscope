@@ -225,6 +225,17 @@ export class Post {
     return uri?.collection === "app.bsky.feed.post" ? uri : null;
   }
 
+  readonly reachesFollowers = true;
+
+  get addresseeDids() {
+    return [
+      this.replyParent?.uri.did,
+      this.replyRoot?.uri.did,
+      this.quotedUri?.did,
+      ...this.mentionDids,
+    ].filter((did) => did !== undefined);
+  }
+
   get statsTargets() {
     const { replyParent, quotedUri } = this;
     return [

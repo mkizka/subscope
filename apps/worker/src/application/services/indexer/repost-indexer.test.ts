@@ -38,6 +38,7 @@ describe("RepostIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const reposter = accountFactory();
+      registrationQuery.add(reposter.did);
       const author = accountFactory();
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
 

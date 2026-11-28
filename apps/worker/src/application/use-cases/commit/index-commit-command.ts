@@ -4,11 +4,11 @@ import type { Record } from "../../../domain/record.js";
 
 export type IndexCommitCommand = {
   commit:
-    | { operation: "delete"; uri: AtUri; rev: string }
+    | { operation: "delete"; uri: AtUri; rev?: string }
     | {
         operation: "create" | "update";
         uri: AtUri;
-        rev: string;
+        rev?: string;
         record: Record | null;
       };
   live: boolean;

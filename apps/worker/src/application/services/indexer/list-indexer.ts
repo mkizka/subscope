@@ -3,6 +3,7 @@ import type { AfterCommitContext } from "@repo/common/interface";
 import { List } from "../../../domain/list.js";
 import type { Origin } from "../../../domain/origin.js";
 import type { Record } from "../../../domain/record.js";
+import type { StoragePolicy } from "../../../domain/services/storage-policy.js";
 import type { IListRepository } from "../../interfaces/repositories/list-repository.js";
 import type { IRecordIndexer } from "../../interfaces/services/record-indexer.js";
 import type { RecordSaveService } from "../record-save-service.js";
@@ -12,6 +13,7 @@ export class ListIndexer implements IRecordIndexer {
   constructor(
     private readonly deps: {
       listRepository: IListRepository;
+      storagePolicy: StoragePolicy;
       recordSaveService: RecordSaveService;
       relatedRecordService: RelatedRecordService;
     },
@@ -27,6 +29,18 @@ export class ListIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const list = List.fromRecord(record);
+    const saves = await this.deps.storagePolicy.saves({
+      ctx,
+      origin,
+      record: {
+        accountDid: record.uri.did,
+        addresseeDids: [],
+        reachesFollowers: false,
+      },
+    });
+    if (!saves) {
+      return;
+    }
     await this.deps.recordSaveService.save({ ctx, record });
     await this.deps.relatedRecordService.requestFor({
       ctx,

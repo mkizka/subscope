@@ -35,14 +35,14 @@ export const getFollowListUseCaseFactory = ({
       const dids = await followQuery.findMemberFollowers(account);
       list = { ...list, accounts: await accountQuery.findProfiles(did, dids) };
     }
-    const statuses = await backfillQuery.findTrackedStatuses(
+    const statuses = await backfillQuery.findMemberStatuses(
       list.accounts.map((item) => item.did),
     );
     return {
       ...list,
       accounts: list.accounts.map((item) => ({
         ...item,
-        backfillStatus: statuses[item.did]?.status,
+        backfillStatus: statuses[item.did],
       })),
     };
   },

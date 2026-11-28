@@ -9,7 +9,7 @@ import type { CheckBackfillUseCase } from "../application/use-cases/async/check-
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import type { SendPushNotificationUseCase } from "../application/use-cases/async/send-push-notification-use-case.js";
-import type { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
+import type { SyncAccountKindUseCase } from "../application/use-cases/async/sync-account-kind-use-case.js";
 import type { Env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
@@ -43,7 +43,7 @@ export class SyncWorker {
     fetchRecordUseCase: FetchRecordUseCase;
     aggregatePostStatsUseCase: AggregatePostStatsUseCase;
     aggregateAccountStatsUseCase: AggregateAccountStatsUseCase;
-    syncTapRepoUseCase: SyncTapRepoUseCase;
+    syncAccountKindUseCase: SyncAccountKindUseCase;
     checkBackfillUseCase: CheckBackfillUseCase;
     sendPushNotificationUseCase: SendPushNotificationUseCase;
     env: Pick<Env, "REDIS_URL">;
@@ -118,9 +118,9 @@ export class SyncWorker {
         options: { concurrency: 16 },
       }),
       createWorker({
-        name: "syncTapRepo",
+        name: "syncAccountKind",
         process: async (job) => {
-          await deps.syncTapRepoUseCase.execute(job.data);
+          await deps.syncAccountKindUseCase.execute(job.data);
         },
       }),
       createWorker({

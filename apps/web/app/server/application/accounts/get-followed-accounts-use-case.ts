@@ -15,14 +15,14 @@ export const getFollowedAccountsUseCaseFactory = ({
 }): IGetFollowedAccountsUseCase => ({
   async execute(did, q) {
     const result = await subscopeQuery.findFollowedAccounts(did, q);
-    const statuses = await backfillQuery.findTrackedStatuses(
+    const statuses = await backfillQuery.findMemberStatuses(
       result.accounts.map((account) => account.did),
     );
     return {
       ...result,
       accounts: result.accounts.map((account) => ({
         ...account,
-        backfillStatus: statuses[account.did]?.status,
+        backfillStatus: statuses[account.did],
       })),
     };
   },

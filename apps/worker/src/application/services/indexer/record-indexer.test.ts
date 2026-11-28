@@ -54,11 +54,17 @@ describe("RecordIndexer", () => {
     });
 
     test("フォローレコードの場合、レコードとフォローを保存する", async () => {
-      const { recordIndexer, recordRepository, followRepository, db } =
-        services;
+      const {
+        recordIndexer,
+        recordRepository,
+        followRepository,
+        registrationQuery,
+        db,
+      } = services;
       const ctx = { db, afterCommit };
       // arrange
       const follower = accountFactory();
+      registrationQuery.add(follower.did);
       const followee = accountFactory();
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/456`,

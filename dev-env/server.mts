@@ -184,6 +184,7 @@ const app = spawn(process.argv.slice(2).join(" "), {
     PLC_URL,
     ATPROTO_PLC_URL: PLC_URL,
     ATPROTO_HANDLE_RESOLVER_URL: PDS_URL,
+    JETSTREAM_URL: `http://localhost:${PORTS.jetstream}`,
   },
 });
 

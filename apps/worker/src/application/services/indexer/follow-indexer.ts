@@ -36,6 +36,14 @@ export class FollowIndexer implements IRecordIndexer {
     origin: Origin;
   }) {
     const follow = Follow.fromRecord(record);
+    const saves = await this.deps.storagePolicy.saves({
+      ctx,
+      origin,
+      record: follow,
+    });
+    if (!saves) {
+      return;
+    }
     const tracksFollowee = await this.deps.storagePolicy.tracksFollowee(
       ctx,
       follow,
@@ -57,7 +65,7 @@ export class FollowIndexer implements IRecordIndexer {
     });
     if (tracksFollowee) {
       ctx.afterCommit(() =>
-        this.deps.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
+        this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid),
       );
     }
     this.deps.statsService.recount({
@@ -80,7 +88,7 @@ export class FollowIndexer implements IRecordIndexer {
     );
     if (tracksFollowee) {
       ctx.afterCommit(() =>
-        this.deps.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
+        this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid),
       );
     }
     this.deps.statsService.recount({

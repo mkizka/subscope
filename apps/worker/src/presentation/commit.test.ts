@@ -62,105 +62,6 @@ describe("commit", () => {
     live: true,
   });
 
-  describe("過去のレコードの期間", () => {
-    const DAY = 24 * 60 * 60 * 1000;
-    const trackedAt = new Date("2026-01-10T00:00:00.000Z");
-    const old = new Date(trackedAt.getTime() - 2 * DAY);
-    const recent = new Date(trackedAt.getTime() - DAY / 2);
-
-    test.each([
-      { name: "古い投稿", collection: "post", createdAt: old, saved: false },
-      {
-        name: "古いリポスト",
-        collection: "repost",
-        createdAt: old,
-        saved: false,
-      },
-      { name: "古いいいね", collection: "like", createdAt: old, saved: false },
-      {
-        name: "1日前以降の投稿",
-        collection: "post",
-        createdAt: recent,
-        saved: true,
-      },
-      {
-        name: "ライブの古い投稿",
-        collection: "post",
-        createdAt: old,
-        live: true,
-        saved: true,
-      },
-      {
-        name: "メンバーの古い投稿",
-        collection: "post",
-        createdAt: old,
-        member: true,
-        saved: true,
-      },
-      {
-        name: "追跡の記録がない人の1日前以降の投稿",
-        collection: "post",
-        createdAt: recent,
-        tracked: false,
-        saved: false,
-      },
-    ])(
-      "index-19: メンバー以外の過去の投稿・リポスト・いいねは、追跡開始の1日前以降の分だけ保存する($name)",
-      async ({
-        collection,
-        createdAt,
-        live = false,
-        member = false,
-        tracked = true,
-        saved,
-      }) => {
-        // arrange
-        const author = await accountFactory(ctx.db).create();
-        if (tracked) {
-          await ctx.db
-            .insert(schema.trackings)
-            .values({ accountDid: author.did, trackedAt });
-        }
-        if (member) {
-          await registrationFactory(ctx.db)
-            .vars({ account: () => author })
-            .create();
-        }
-        const serverMember = await accountFactory(ctx.db)
-          .use((t) => t.serverMember())
-          .create();
-        const subject = {
-          uri: AtUri.make(
-            serverMember.did,
-            "app.bsky.feed.post",
-            "1",
-          ).toString(),
-          cid: await randomCid(),
-        };
-        const event: RecordEvent = {
-          ...postEvent(author.did, "past"),
-          collection: `app.bsky.feed.${collection}`,
-          record: {
-            $type: `app.bsky.feed.${collection}`,
-            ...(collection === "post" ? { text: "past" } : { subject }),
-            createdAt: createdAt.toISOString(),
-          },
-          live,
-        };
-
-        // act
-        await processCommit(event);
-
-        // assert
-        const records = await ctx.db
-          .select()
-          .from(schema.records)
-          .where(eq(schema.records.accountDid, author.did));
-        expect(records).toHaveLength(saved ? 1 : 0);
-      },
-    );
-  });
-
   describe("返信制限の違反", () => {
     type Rule = "mention" | "following" | "follower" | "list";
 
@@ -300,7 +201,7 @@ describe("commit", () => {
       },
     );
 
-    test("index-27: 返信制限の違反は、Tapからリアルタイムに受け取った投稿でだけ判定する", async () => {
+    test("index-27: 返信制限の違反は、リアルタイムに受け取った投稿でだけ判定する", async () => {
       // arrange
       const { replier, replyEvent } = await setup({ allow: [] });
       await registrationFactory(ctx.db)

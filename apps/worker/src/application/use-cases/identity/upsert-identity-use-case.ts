@@ -23,15 +23,11 @@ export class UpsertIdentityUseCase {
       );
       return;
     }
-    const handle = command.handle;
-    if (!handle) {
-      return;
-    }
     await this.deps.transactionManager.transaction(async (ctx) => {
       await this.deps.indexAccountService.upsert({
         ctx,
         did: command.did,
-        handle,
+        handle: command.handle,
         status: command.status,
       });
       await this.deps.relatedRecordService.requestAccount({
@@ -40,7 +36,7 @@ export class UpsertIdentityUseCase {
         did: command.did,
       });
     });
-    if (handle === "handle.invalid") {
+    if (command.handle === "handle.invalid") {
       await this.deps.resolveDidService.resolve(command.did);
     }
   }

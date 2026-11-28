@@ -8,8 +8,10 @@ import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
 describe("ListIndexer", () => {
   test("リストレコードを正しく保存する", async () => {
     // arrange
-    const { listIndexer, listRepository, db } = await testRegistry.resolve();
+    const { listIndexer, listRepository, registrationQuery, db } =
+      await testRegistry.resolve();
     const account = accountFactory();
+    registrationQuery.add(account.did);
     const record = recordFactory({
       uri: `at://${account.did}/app.bsky.graph.list/listrkey123`,
       json: {

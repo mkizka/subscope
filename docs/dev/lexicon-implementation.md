@@ -4,7 +4,7 @@
 
 ## データの流れ
 
-workerはTapから受け取ったコミットを、レコードタイプごとのIndexerに振り分けます。IndexerはRepositoryを通してデータベースに保存します。
+workerはTapとJetstreamから受け取ったコミットを、レコードタイプごとのIndexerに振り分けます。IndexerはRepositoryを通してデータベースに保存します。
 
 ## 手順
 

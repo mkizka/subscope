@@ -1,6 +1,6 @@
 import { Client } from "@atproto/lex";
 import { isValidDid } from "@atproto/syntax";
-import getTrackingStatuses from "@repo/client/me/subsco/sync/getTrackingStatuses";
+import getBackfillStatuses from "@repo/client/me/subsco/sync/getBackfillStatuses";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
@@ -16,18 +16,17 @@ export const backfillQueryFactory = ({
 }): IBackfillQuery => {
   const publicClient = new Client(env.APPVIEW_URL);
   return {
-    async findTrackedStatuses(dids) {
+    async findMemberStatuses(dids) {
       if (dids.length === 0) {
         return {};
       }
-      const { statuses } = await publicClient.call(getTrackingStatuses, {
+      const { statuses } = await publicClient.call(getBackfillStatuses, {
         dids: dids.filter(isValidDid),
       });
-      const result: Awaited<ReturnType<IBackfillQuery["findTrackedStatuses"]>> =
-        {};
-      for (const { did, backfillStatus, isMember } of statuses) {
+      const result: Record<string, BackfillStatus> = {};
+      for (const { did, backfillStatus } of statuses) {
         if (isBackfillStatus(backfillStatus)) {
-          result[did] = { status: backfillStatus, isMember };
+          result[did] = backfillStatus;
         }
       }
       return result;

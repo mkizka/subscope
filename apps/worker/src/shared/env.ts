@@ -19,6 +19,7 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("http://localhost:2480"),
   }),
+  JETSTREAM_URL: z.url().default("https://jetstream.us-east.bsky.network"),
   RELAY_URL: z.url().default("https://relay1.us-east.bsky.network"),
   MODERATION_URL: z.url().default("https://mod.bsky.app"),
   VAPID_PUBLIC_KEY: match({

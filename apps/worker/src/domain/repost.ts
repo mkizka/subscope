@@ -51,6 +51,12 @@ export class Repost {
     return new AtUri(this.subjectUri);
   }
 
+  readonly reachesFollowers = true;
+
+  get addresseeDids() {
+    return [this.subject.did];
+  }
+
   get feedItem(): FeedItem {
     return {
       uri: this.uri,

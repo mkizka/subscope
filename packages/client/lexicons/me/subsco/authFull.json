@@ -27,8 +27,8 @@
             "me.subsco.server.getOperator",
             "me.subsco.server.getServerMembers",
             "me.subsco.server.getSetupStatus",
+            "me.subsco.sync.getBackfillStatuses",
             "me.subsco.sync.getRegistrationStatus",
-            "me.subsco.sync.getTrackingStatuses",
             "me.subsco.sync.registerAccount"
           ]
         }

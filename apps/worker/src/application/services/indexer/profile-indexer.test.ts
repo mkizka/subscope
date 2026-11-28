@@ -13,11 +13,13 @@ import {
 describe("ProfileIndexer", () => {
   let profileIndexer: TestServices["profileIndexer"];
   let profileRepo: TestServices["profileRepository"];
+  let registrationQuery: TestServices["registrationQuery"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     profileIndexer = services.profileIndexer;
     profileRepo = services.profileRepository;
+    registrationQuery = services.registrationQuery;
     db = services.db;
   });
 
@@ -26,6 +28,7 @@ describe("ProfileIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const account = accountFactory();
+      registrationQuery.add(account.did);
       const avatarCid = fakeCid();
       const bannerCid = fakeCid();
       const record = recordFactory({

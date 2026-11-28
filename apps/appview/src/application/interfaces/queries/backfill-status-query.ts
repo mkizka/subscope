@@ -2,10 +2,8 @@ import type { Did } from "@atproto/did";
 
 import type { BackfillStatus } from "../../../domain/models/account.js";
 
-export interface ITrackingQuery {
+export interface IBackfillStatusQuery {
   findStatuses: (
     dids: Did[],
-  ) => Promise<
-    { did: Did; isMember: boolean; backfillStatus: BackfillStatus }[]
-  >;
+  ) => Promise<{ did: Did; backfillStatus: BackfillStatus }[]>;
 }

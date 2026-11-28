@@ -7,6 +7,7 @@ import promBundle from "express-prom-bundle";
 
 import type { ScheduleBackfillChecksUseCase } from "../application/use-cases/async/schedule-backfill-checks-use-case.js";
 import type { Env } from "../shared/env.js";
+import type { JetstreamSubscriber } from "./jetstream.js";
 import type { LabelSubscriber } from "./label-subscriber.js";
 import type { TapSubscriber } from "./tap.js";
 import type { SyncWorker } from "./worker.js";
@@ -21,6 +22,7 @@ export class WorkerServer {
       loggerManager: ILoggerManager;
       syncWorker: SyncWorker;
       tapSubscriber: TapSubscriber;
+      jetstreamSubscriber: JetstreamSubscriber;
       labelSubscriber: LabelSubscriber;
       jobQueue: IJobQueue;
       scheduleBackfillChecksUseCase: ScheduleBackfillChecksUseCase;
@@ -42,6 +44,9 @@ export class WorkerServer {
       this.logger.info(`Worker server listening on port ${this.deps.env.PORT}`);
       this.deps.tapSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Tap subscriber threw");
+      });
+      this.deps.jetstreamSubscriber.start().catch((err: unknown) => {
+        this.logger.error({ err }, "Jetstream subscriber threw");
       });
       this.deps.labelSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Label subscriber threw");

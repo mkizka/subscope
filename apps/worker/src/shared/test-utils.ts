@@ -26,7 +26,6 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRepoRevRepository } from "../infrastructure/repositories/repo-rev-repository/repo-rev-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
-import { InMemoryTrackingRepository } from "../infrastructure/repositories/tracking-repository/tracking-repository.in-memory.js";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import { InMemoryWebPushSender } from "../infrastructure/web-push-sender/web-push-sender.in-memory.js";
 import type { Env } from "./env.js";
@@ -40,6 +39,7 @@ export const testEnv = {
   DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres",
   REDIS_URL: "redis://localhost:6379",
   TAP_URL: "http://localhost:2480",
+  JETSTREAM_URL: "https://jetstream.us-east.bsky.network",
   RELAY_URL: "https://relay1.us-east.bsky.network",
   MODERATION_URL: "https://mod.bsky.app",
   DATABASE_POOL_MAX: 32,
@@ -68,7 +68,6 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("recordQuery", ["recordRepository"], asClassArgs(InMemoryRecordQuery))
   .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
   .replaceService("repoRevRepository", asClassArgs(InMemoryRepoRevRepository))
-  .replaceService("trackingRepository", asClassArgs(InMemoryTrackingRepository))
   .replaceService("registrationQuery", asClassArgs(InMemoryRegistrationQuery))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
   .replaceService("tapClient", asClassArgs(InMemoryTapClient))

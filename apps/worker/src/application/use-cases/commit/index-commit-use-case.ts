@@ -33,7 +33,9 @@ export class IndexCommitUseCase {
     const { uri, rev } = command.commit;
     await this.deps.transactionManager.transaction(async (ctx) => {
       await this.indexCommit(ctx, command);
-      await this.deps.repoRevRepository.save({ ctx, did: uri.did, rev });
+      if (rev) {
+        await this.deps.repoRevRepository.save({ ctx, did: uri.did, rev });
+      }
     });
   }
 
