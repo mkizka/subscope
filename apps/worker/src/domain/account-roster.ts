@@ -75,7 +75,7 @@ export class AccountRoster {
     if (isTracked && FOLLOWER_COLLECTIONS.has(event.collection)) {
       return true;
     }
-    // 宛先の正確な判定はStoragePolicyに任せ、ここではメンバーのDIDを含まないレコードを捨てる
+    // レコードの文字列にメンバーのDIDが含まれるかだけを見る。宛先かどうかはStoragePolicyが判定する
     return (
       ADDRESSABLE_COLLECTIONS.has(event.collection) &&
       event.containedDids.some((did) => this.members.has(did))
