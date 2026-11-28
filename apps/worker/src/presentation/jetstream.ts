@@ -161,11 +161,17 @@ export class JetstreamSubscriber {
 
   private async handle(event: JetstreamEvent) {
     if (event.kind === "commit") {
+      this.deps.metricReporter.increment("worker_events_commit_total", {
+        source: "jetstream",
+        collection: event.commit.collection,
+      });
       await this.deps.indexCommitUseCase.execute(
         indexCommitCommandFactory(event),
       );
     } else {
-      this.deps.metricReporter.increment("worker_events_identity_total");
+      this.deps.metricReporter.increment("worker_events_identity_total", {
+        source: "jetstream",
+      });
       await this.deps.upsertIdentityUseCase.execute(
         upsertIdentityCommandFactory(event),
       );
