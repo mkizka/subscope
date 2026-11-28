@@ -2,6 +2,7 @@ import { AtUri } from "@atproto/syntax";
 import {
   type APIRequestContext,
   expect,
+  type Locator,
   type Page,
   test,
 } from "@playwright/test";
@@ -227,35 +228,63 @@ test("postToolbar-e5: いいね・リポストのボタンは、結果を画面�
   }
 });
 
-test("postToolbar-e6: 削除は確認ダイアログを経て、再読み込みなしでタイムラインから投稿を消す", async ({
-  page,
-  request,
-}) => {
-  const text = "postToolbar-e6: 投稿";
+const openOwnPost = async (page: Page, text: string) => {
   const { uri } = await createRecord("alice.test", {
     $type: "app.bsky.feed.post",
     text,
     createdAt: new Date().toISOString(),
   });
-
   await page.goto("/");
   const post = page.getByRole("article").filter({ hasText: text });
   await expect(async () => {
     await page.reload();
     await expect(post).toBeVisible({ timeout: 1000 });
   }).toPass();
+  return { uri, post };
+};
+
+const deletePost = async (page: Page, post: Locator) => {
   await post.getByRole("button", { name: "投稿のメニュー" }).click();
   await post.getByRole("button", { name: "削除" }).click();
   await page
     .getByRole("dialog", { name: "投稿を削除" })
     .getByRole("button", { name: "削除" })
     .click();
+};
+
+test("postToolbar-e6: 削除は確認ダイアログを経て、削除の完了を待たずにタイムラインから投稿を消す", async ({
+  page,
+  request,
+}) => {
+  const { uri, post } = await openOwnPost(page, "postToolbar-e6: 投稿");
+  let release: (v: unknown) => void = () => {};
+  const gate = new Promise((resolve) => (release = resolve));
+  await page.route("**/api/posts", async (route) => {
+    await gate;
+    await route.continue();
+  });
+  const response = page.waitForResponse("**/api/posts");
+
+  await deletePost(page, post);
 
   await expect(post).toHaveCount(0);
+  release(undefined);
+  await response;
   const res = await request.get(
     `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=alice.test&collection=app.bsky.feed.post`,
   );
   expect(await res.text()).not.toContain(uri);
+});
+
+test("postToolbar-e11: 削除に失敗すると、消した投稿をタイムラインに戻す", async ({
+  page,
+}) => {
+  const { post } = await openOwnPost(page, "postToolbar-e11: 投稿");
+  await page.route("**/api/posts", (route) => route.fulfill({ status: 500 }));
+
+  await deletePost(page, post);
+
+  await expect(post).toBeVisible();
 });
 
 test("postToolbar-e7: 返信すると、再読み込みなしで返信先の返信の件数を増やす", async ({

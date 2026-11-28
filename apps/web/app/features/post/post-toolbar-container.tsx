@@ -1,12 +1,17 @@
 import { AtUri } from "@atproto/syntax";
+import {
+  useMutation,
+  useMutationState,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useState } from "react";
-import { useFetcher } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 import { z } from "zodV4";
 
 import { useMe } from "@/app/features/navigation/side-nav-container";
 import type { TimelinePost } from "@/app/features/timeline/timeline-feed";
+import { fetchJson } from "@/app/lib/fetch-json";
 import type { action as pinPostAction } from "@/app/routes/api.pinned-post";
-import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";
 
 import { useCompose } from "./post-form-container";
@@ -21,8 +26,21 @@ export const reactionSchema = z.object({
 
 export const deletePostSchema = z.object({
   uri: z.string(),
-  redirectTo: z.literal("/").optional(),
 });
+
+const deletePostKey = ["deletePost"];
+
+export function useDeletedPostUris() {
+  return new Set(
+    useMutationState({
+      filters: {
+        mutationKey: deletePostKey,
+        predicate: (mutation) => mutation.state.status !== "error",
+      },
+      select: (mutation) => String(mutation.state.variables),
+    }),
+  );
+}
 
 export const pinPostSchema = z.object({
   uri: z.string(),
@@ -74,7 +92,17 @@ export function PostToolbarContainer(props: Props) {
   });
   const openCompose = useCompose();
   const me = useMe();
-  const deleter = useFetcher<typeof deletePostAction>();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const deleter = useMutation({
+    mutationKey: deletePostKey,
+    mutationFn: (uri: string) =>
+      fetchJson("/api/posts", {
+        method: "POST",
+        body: new URLSearchParams({ uri }),
+      }),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
   const pinner = useFetcher<typeof pinPostAction>();
   const pinned = pinner.formData
     ? pinner.formData.get("pinned") === "true"
@@ -92,14 +120,13 @@ export function PostToolbarContainer(props: Props) {
       repostBusy={repost.busy}
       onLike={like.toggle}
       onRepost={repost.toggle}
-      deleteBusy={deleter.state !== "idle"}
+      deleteBusy={deleter.isPending}
       onDelete={
         me && new AtUri(props.uri).host === me.did
-          ? () =>
-              void deleter.submit(
-                { uri: props.uri, redirectTo: props.deleteRedirectTo ?? "" },
-                { method: "post", action: "/api/posts" },
-              )
+          ? () => {
+              deleter.mutate(props.uri);
+              if (props.deleteRedirectTo) void navigate(props.deleteRedirectTo);
+            }
           : undefined
       }
       pinned={pinned}
