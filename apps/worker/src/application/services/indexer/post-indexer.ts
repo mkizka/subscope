@@ -45,7 +45,7 @@ export class PostIndexer implements IRecordIndexer {
       record: post,
     });
     if (!saves) {
-      return;
+      return false;
     }
 
     const violatesEmbeddingRules =
@@ -90,6 +90,7 @@ export class PostIndexer implements IRecordIndexer {
       posts: [post.uri, ...post.statsTargets],
       accounts: [post.accountDid],
     });
+    return true;
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {

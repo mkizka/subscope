@@ -39,7 +39,7 @@ export class LikeIndexer implements IRecordIndexer {
       record: like,
     });
     if (!saves) {
-      return;
+      return false;
     }
 
     await this.deps.recordSaveService.save({ ctx, record });
@@ -56,6 +56,7 @@ export class LikeIndexer implements IRecordIndexer {
       notifications: () => [like.notification],
     });
     this.deps.statsService.recount({ ctx, posts: [like.subject] });
+    return true;
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {

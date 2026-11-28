@@ -37,7 +37,7 @@ export class LinkIndexer implements IRecordIndexer {
       },
     });
     if (!saves) {
-      return;
+      return false;
     }
     await this.deps.recordSaveService.save({ ctx, record });
     await this.deps.relatedRecordService.requestFor({
@@ -45,5 +45,6 @@ export class LinkIndexer implements IRecordIndexer {
       origin,
       record: { accountDid: record.uri.did },
     });
+    return true;
   }
 }

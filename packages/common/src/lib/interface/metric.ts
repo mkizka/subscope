@@ -6,6 +6,7 @@ export type CounterKey =
   | "worker_events_identity_total"
   | "worker_events_commit_total"
   | "worker_events_label_total"
+  | "worker_records_indexed_total"
   | "worker_jetstream_gap_total"
   | "fetch_record_request_total"
   | "fetch_record_error_total";

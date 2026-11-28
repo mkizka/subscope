@@ -8,7 +8,7 @@ export interface IRecordIndexer {
     ctx: AfterCommitContext;
     record: Record;
     origin: Origin;
-  }) => Promise<void>;
+  }) => Promise<boolean>;
   afterDelete?: (params: {
     ctx: AfterCommitContext;
     record: Record;
