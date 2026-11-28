@@ -53,8 +53,20 @@ export class TapSubscriber {
     this.logger = deps.loggerManager.createLogger("TapSubscriber");
   }
 
+  private async handleRecordEvent(event: RecordEvent) {
+    this.deps.metricReporter.increment("worker_events_commit_total", {
+      source: "tap",
+      collection: event.collection,
+    });
+    await this.deps.indexCommitUseCase.execute(
+      indexCommitCommandFactory(event),
+    );
+  }
+
   private async handleIdentityEvent(event: IdentityEvent) {
-    this.deps.metricReporter.increment("worker_events_identity_total");
+    this.deps.metricReporter.increment("worker_events_identity_total", {
+      source: "tap",
+    });
     await this.deps.upsertIdentityUseCase.execute({
       did: event.did,
       handle: event.handle,
@@ -64,9 +76,7 @@ export class TapSubscriber {
 
   async start() {
     const indexer = new SimpleIndexer()
-      .record((event) =>
-        this.deps.indexCommitUseCase.execute(indexCommitCommandFactory(event)),
-      )
+      .record((event) => this.handleRecordEvent(event))
       .identity((event) => this.handleIdentityEvent(event))
       .error((err) => this.logger.error({ err }, "Tap error occurred"));
     const channel = new Tap(this.deps.env.TAP_URL).channel(indexer, {

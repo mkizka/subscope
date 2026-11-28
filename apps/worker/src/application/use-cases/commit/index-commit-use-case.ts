@@ -1,7 +1,6 @@
 import type {
   AfterCommitContext,
   ILoggerManager,
-  IMetricReporter,
   ITransactionManager,
 } from "@repo/common/interface";
 import {
@@ -20,7 +19,6 @@ export class IndexCommitUseCase {
   constructor(
     private readonly deps: {
       loggerManager: ILoggerManager;
-      metricReporter: IMetricReporter;
       transactionManager: ITransactionManager;
       recordIndexer: RecordIndexer;
       repoRevRepository: IRepoRevRepository;
@@ -45,9 +43,6 @@ export class IndexCommitUseCase {
   ) {
     const { collection } = commit.uri;
     if (!isSupportedCollection(collection)) return;
-    this.deps.metricReporter.increment("worker_events_commit_total", {
-      collection,
-    });
     if (commit.operation === "delete") {
       await this.deps.recordIndexer.delete({ ctx, uri: commit.uri });
       return;

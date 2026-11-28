@@ -34,12 +34,13 @@ export class MetricReporter implements IMetricReporter {
       }),
       worker_events_identity_total: new client.Counter({
         name: "worker_events_identity_total",
-        help: "Total number of identity events processed by the worker",
+        labelNames: ["source"],
+        help: "Total number of identity events received by the worker",
       }),
       worker_events_commit_total: new client.Counter({
         name: "worker_events_commit_total",
-        labelNames: ["collection"],
-        help: "Total number of commit events processed by the worker",
+        labelNames: ["source", "collection"],
+        help: "Total number of commit events received by the worker",
       }),
       worker_events_label_total: new client.Counter({
         name: "worker_events_label_total",

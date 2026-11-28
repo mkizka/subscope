@@ -207,7 +207,7 @@ export const createWorkerRegistry = (env: Env) =>
     // application(use-case)
     .service("resolveDidUseCase", ["resolveDidService"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "relatedRecordService", "resolveDidService"], asClass(UpsertIdentityUseCase))
-    .service("indexCommitUseCase", ["loggerManager", "metricReporter", "transactionManager", "recordIndexer", "repoRevRepository"], asClass(IndexCommitUseCase))
+    .service("indexCommitUseCase", ["loggerManager", "transactionManager", "recordIndexer", "repoRevRepository"], asClass(IndexCommitUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "recordIndexer"], asClass(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClass(AggregatePostStatsUseCase))
     .service("aggregateAccountStatsUseCase", ["accountStatsQuery", "accountStatsRepository", "accountQuery", "transactionManager"], asClass(AggregateAccountStatsUseCase))
