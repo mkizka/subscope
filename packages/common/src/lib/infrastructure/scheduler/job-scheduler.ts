@@ -53,11 +53,17 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleSyncAccountKind(did: Did): Promise<void> {
+  async scheduleSyncAccountKind(
+    did: Did,
+    { fromFollow }: { fromFollow: boolean },
+  ): Promise<void> {
     await this.jobQueue.add({
       queueName: "syncAccountKind",
       jobName: did,
       data: { did },
+      options: {
+        priority: fromFollow ? 1 : undefined,
+      },
     });
   }
 

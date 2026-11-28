@@ -122,6 +122,7 @@ export class SyncWorker {
         process: async (job) => {
           await deps.syncAccountKindUseCase.execute(job.data);
         },
+        options: { concurrency: 8 },
       }),
       createWorker({
         name: "checkBackfill",

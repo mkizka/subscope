@@ -65,7 +65,9 @@ export class FollowIndexer implements IRecordIndexer {
     });
     if (tracksFollowee) {
       ctx.afterCommit(() =>
-        this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid),
+        this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid, {
+          fromFollow: true,
+        }),
       );
     }
     this.deps.statsService.recount({
@@ -88,7 +90,9 @@ export class FollowIndexer implements IRecordIndexer {
     );
     if (tracksFollowee) {
       ctx.afterCommit(() =>
-        this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid),
+        this.deps.jobScheduler.scheduleSyncAccountKind(follow.subjectDid, {
+          fromFollow: true,
+        }),
       );
     }
     this.deps.statsService.recount({
