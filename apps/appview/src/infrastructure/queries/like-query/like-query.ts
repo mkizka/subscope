@@ -61,6 +61,7 @@ export class LikeQuery implements ILikeQuery {
         sortAt: schema.likes.sortAt,
       })
       .from(schema.likes)
+      .innerJoin(schema.posts, eq(schema.posts.uri, schema.likes.subjectUri))
       .where(and(...filters))
       .orderBy(desc(schema.likes.sortAt))
       .limit(limit);

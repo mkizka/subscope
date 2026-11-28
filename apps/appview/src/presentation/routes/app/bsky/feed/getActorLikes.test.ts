@@ -49,4 +49,34 @@ describe("app.bsky.feed.getActorLikes", () => {
       { post: { uri: post.uri, author: { did: author.did } } },
     ]);
   });
+
+  test("getActorLikes-2: 保存していない投稿へのいいねは数えずにlimit件まで返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const account = await accountFactory(ctx.db).create();
+    const createLike = (createdAt: string) =>
+      likeFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.feed.like")
+              .vars({ account: () => account })
+              .create(),
+        })
+        .props({ createdAt: () => new Date(createdAt) });
+    const savedLike = await createLike("2024-01-01T01:00:00.000Z").create();
+    await createLike("2024-01-01T02:00:00.000Z")
+      .props({
+        subjectUri: () => "at://did:plc:unsaved/app.bsky.feed.post/unsaved",
+      })
+      .create();
+
+    // act
+    const res = await client.call(getActorLikes, {
+      actor: asAtIdentifierString(account.did),
+      limit: 1,
+    });
+
+    // assert
+    expect(res.feed).toMatchObject([{ post: { uri: savedLike.subjectUri } }]);
+  });
 });
