@@ -19,7 +19,7 @@ import { z } from "zod";
 import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import { createWorkerRegistry } from "../shared/registry.js";
 import { testEnv } from "../shared/test-utils.js";
-import { TapSubscriber } from "./tap.js";
+import { MAX_IN_FLIGHT, TapSubscriber } from "./tap.js";
 
 // prettier-ignore
 const services = await createWorkerRegistry(testEnv)
@@ -198,7 +198,7 @@ describe("Tapからのイベント受信", () => {
     expect(await findPosts(account.did)).toEqual([]);
   });
 
-  test("channel-5: イベントは1件ずつ処理し、処理を終えるまで次のイベントを読まない", async () => {
+  test("channel-5: 処理中のイベントが上限に達したら、どれかを処理し終えるまで次のイベントを読まない", async () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)
@@ -207,20 +207,47 @@ describe("Tapからのイベント受信", () => {
     const blocker = Promise.withResolvers<never>();
     const transaction = vi
       .spyOn(services.transactionManager, "transaction")
-      .mockImplementationOnce(() => blocker.promise);
+      .mockImplementation(() => blocker.promise);
+
+    // act
+    send(
+      ...Array.from({ length: MAX_IN_FLIGHT + 1 }, (_, i) =>
+        recordEvent({ id: i + 1, did: account.did }),
+      ),
+    );
+    await vi.waitFor(() =>
+      expect(transaction).toHaveBeenCalledTimes(MAX_IN_FLIGHT),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    // assert
+    expect(transaction).toHaveBeenCalledTimes(MAX_IN_FLIGHT);
+    blocker.reject(new Error("db down"));
+    await vi.waitFor(() =>
+      expect(transaction).toHaveBeenCalledTimes(MAX_IN_FLIGHT + 1),
+    );
+  });
+
+  test("channel-6: 処理中のイベントを待たずに、次のイベントを処理する", async () => {
+    // arrange
+    await connect();
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const blocker = Promise.withResolvers<never>();
+    vi.spyOn(services.transactionManager, "transaction").mockImplementationOnce(
+      () => blocker.promise,
+    );
 
     // act
     send(
       recordEvent({ id: 1, did: account.did }),
-      recordEvent({ id: 2, did: account.did }),
+      recordEvent({ id: 2, did: account.did, rkey: "3l3qo2vuowo2c" }),
     );
-    await vi.waitFor(() => expect(transaction).toHaveBeenCalledOnce());
-    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // assert
-    expect(transaction).toHaveBeenCalledOnce();
-    blocker.reject(new Error("db down"));
     await vi.waitFor(() => expect(acks).toEqual([2]));
+    blocker.reject(new Error("db down"));
   });
 
   const findRev = async (did: string) => {

@@ -1,7 +1,12 @@
 import { lexToJson } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import type { IdentityEvent, RecordEvent } from "@atproto/tap";
-import { SimpleIndexer, Tap } from "@atproto/tap";
+import type {
+  HandlerOpts,
+  IdentityEvent,
+  RecordEvent,
+  TapEvent,
+} from "@atproto/tap";
+import { Tap } from "@atproto/tap";
 import type { ILoggerManager, IMetricReporter } from "@repo/common/interface";
 
 import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";
@@ -38,8 +43,11 @@ export const indexCommitCommandFactory = (
   };
 };
 
+export const MAX_IN_FLIGHT = 16;
+
 export class TapSubscriber {
   private readonly logger;
+  private readonly inFlight = new Set<Promise<void>>();
 
   constructor(
     private readonly deps: {
@@ -74,14 +82,35 @@ export class TapSubscriber {
     });
   }
 
+  private async handleEvent(event: TapEvent, opts: HandlerOpts) {
+    if (event.type === "record") {
+      await this.handleRecordEvent(event);
+    } else {
+      await this.handleIdentityEvent(event);
+    }
+    await opts.ack();
+  }
+
+  private async onEvent(event: TapEvent, opts: HandlerOpts) {
+    const task = this.handleEvent(event, opts)
+      .catch((err: unknown) =>
+        this.logger.error({ err, id: event.id }, "Failed to process Tap event"),
+      )
+      .finally(() => this.inFlight.delete(task));
+    this.inFlight.add(task);
+    if (this.inFlight.size >= MAX_IN_FLIGHT) {
+      await Promise.race(this.inFlight);
+    }
+  }
+
   async start() {
-    const indexer = new SimpleIndexer()
-      .record((event) => this.handleRecordEvent(event))
-      .identity((event) => this.handleIdentityEvent(event))
-      .error((err) => this.logger.error({ err }, "Tap error occurred"));
-    const channel = new Tap(this.deps.env.TAP_URL).channel(indexer, {
-      heartbeatIntervalMs: 60_000,
-    });
+    const channel = new Tap(this.deps.env.TAP_URL).channel(
+      {
+        onEvent: (event, opts) => this.onEvent(event, opts),
+        onError: (err) => this.logger.error({ err }, "Tap error occurred"),
+      },
+      { heartbeatIntervalMs: 60_000 },
+    );
     this.logger.info(`Tap connection starting at ${this.deps.env.TAP_URL}`);
     await channel.start();
   }
