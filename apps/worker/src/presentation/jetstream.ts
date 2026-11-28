@@ -144,6 +144,10 @@ export class JetstreamSubscriber {
     for await (const event of events) {
       this.deps.metricReporter.increment(
         "worker_jetstream_events_received_total",
+        {
+          kind: event.kind,
+          collection: event.kind === "commit" ? event.commit.collection : "",
+        },
       );
       this.deps.metricReporter.set(
         "worker_jetstream_last_event_time_seconds",
