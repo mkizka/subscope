@@ -169,14 +169,15 @@
     {
       "id": 6,
       "type": "timeseries",
-      "title": "コミット",
+      "title": "処理したコミット",
+      "description": "TapとJetstreamの合計。削除・threadgate・postgateは全員分を含むので、保存件数ではない",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 10
       },
@@ -208,8 +209,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 10
       },
       "fieldConfig": {
@@ -249,8 +250,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 12,
         "y": 10
       },
       "fieldConfig": {
@@ -277,6 +278,39 @@
           "expr": "sum(rate(fetch_record_error_total[5m]))",
           "legendFormat": "エラー",
           "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Jetstreamの欠け",
+      "description": "さかのぼれる期間より長く止まり、イベントが欠けた回数。期間はworkerのログに出る",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(worker_jetstream_gap_total[1h]))",
+          "legendFormat": "欠け",
+          "refId": "A"
         }
       ]
     },
