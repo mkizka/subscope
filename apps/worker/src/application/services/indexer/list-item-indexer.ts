@@ -41,7 +41,7 @@ export class ListItemIndexer implements IRecordIndexer {
       },
     });
     if (!saves) {
-      return;
+      return false;
     }
 
     await this.deps.recordSaveService.save({ ctx, record });
@@ -55,5 +55,6 @@ export class ListItemIndexer implements IRecordIndexer {
       did: listItem.subjectDid,
     });
     await this.deps.listItemRepository.save({ ctx, listItem });
+    return true;
   }
 }

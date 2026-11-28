@@ -355,4 +355,42 @@ describe("Tapからのイベント受信", () => {
     expect(acks).toEqual([]);
     expect(await findPosts(account.did)).toEqual([]);
   });
+
+  test("channel-7: 保存・削除したレコードの件数を、コレクションと操作ごとにメトリクスに出す", async () => {
+    // arrange
+    await connect();
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .create();
+    const like = {
+      collection: "app.bsky.feed.like",
+      record: {
+        $type: "app.bsky.feed.like",
+        subject: { uri: "at://did:plc:other/app.bsky.feed.post/1", cid },
+        createdAt: "2026-01-01T00:00:00.000Z",
+      },
+    };
+
+    // act
+    send(
+      recordEvent({ id: 1, did: account.did, ...like }),
+      recordEvent({
+        id: 2,
+        did: account.did,
+        ...like,
+        rkey: "unsaved",
+        action: "delete",
+      }),
+    );
+
+    // assert
+    await vi.waitFor(() => expect(acks.toSorted()).toEqual([1, 2]));
+    const metrics = await services.metricReporter.getMetrics();
+    expect(metrics).toContain(
+      'worker_records_indexed_total{source="tap",collection="app.bsky.feed.like",operation="create"} 1',
+    );
+    expect(metrics).not.toContain(
+      'worker_records_indexed_total{source="tap",collection="app.bsky.feed.like",operation="delete"}',
+    );
+  });
 });

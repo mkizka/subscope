@@ -29,11 +29,12 @@ export class IndexCommitUseCase {
 
   async execute(command: IndexCommitCommand) {
     const { uri, rev } = command.commit;
-    await this.deps.transactionManager.transaction(async (ctx) => {
-      await this.indexCommit(ctx, command);
+    return await this.deps.transactionManager.transaction(async (ctx) => {
+      const indexed = await this.indexCommit(ctx, command);
       if (rev) {
         await this.deps.repoRevRepository.save({ ctx, did: uri.did, rev });
       }
+      return indexed;
     });
   }
 
@@ -42,20 +43,19 @@ export class IndexCommitUseCase {
     { commit, live }: IndexCommitCommand,
   ) {
     const { collection } = commit.uri;
-    if (!isSupportedCollection(collection)) return;
+    if (!isSupportedCollection(collection)) return false;
     if (commit.operation === "delete") {
-      await this.deps.recordIndexer.delete({ ctx, uri: commit.uri });
-      return;
+      return await this.deps.recordIndexer.delete({ ctx, uri: commit.uri });
     }
     if (!commit.record) {
       this.logger.warn(
         { uri: commit.uri.toString() },
         "RecordEvent missing record or cid",
       );
-      return;
+      return false;
     }
     try {
-      await this.deps.recordIndexer.index({
+      return await this.deps.recordIndexer.index({
         ctx,
         record: commit.record,
         origin: live ? Origin.live() : Origin.backfill(),
@@ -63,6 +63,7 @@ export class IndexCommitUseCase {
     } catch (error) {
       if (!(error instanceof RecordValidationError)) throw error;
       this.logger.warn({ uri: commit.uri.toString() }, error.message);
+      return false;
     }
   }
 }

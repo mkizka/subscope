@@ -28,11 +28,11 @@ export class GateIndexer implements IRecordIndexer {
   }) {
     const gate = Gate.fromRecord(record);
     if (!gate.attachesToOwnPost) {
-      return;
+      return false;
     }
     const postSaved = await this.deps.recordQuery.exists(ctx, gate.postUri);
     if (!postSaved) {
-      return;
+      return false;
     }
     await this.deps.recordSaveService.save({ ctx, record });
     await this.deps.relatedRecordService.requestFor({
@@ -40,5 +40,6 @@ export class GateIndexer implements IRecordIndexer {
       origin,
       record: { accountDid: record.uri.did },
     });
+    return true;
   }
 }

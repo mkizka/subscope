@@ -67,19 +67,20 @@ export class RecordIndexer {
       throw new Error(`Unsupported collection: ${collection}`);
     }
     if (hasNullCharacter(record)) {
-      return;
+      return false;
     }
-    await this.indexers[collection].index({ ctx, record, origin });
+    return await this.indexers[collection].index({ ctx, record, origin });
   }
 
   async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {
     const record = await this.deps.recordRepository.find({ ctx, uri });
     if (!record) {
-      return;
+      return false;
     }
     await this.deps.recordRepository.delete({ ctx, uri });
     if (isSupportedCollection(uri.collection)) {
       await this.indexers[uri.collection].afterDelete?.({ ctx, record });
     }
+    return true;
   }
 }

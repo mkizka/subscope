@@ -39,7 +39,7 @@ export class ProfileIndexer implements IRecordIndexer {
       },
     });
     if (!saves) {
-      return;
+      return false;
     }
     await this.deps.recordSaveService.save({ ctx, record });
     await this.deps.relatedRecordService.requestFor({
@@ -48,5 +48,6 @@ export class ProfileIndexer implements IRecordIndexer {
       record: profile,
     });
     await this.deps.profileRepository.save({ ctx, profile });
+    return true;
   }
 }

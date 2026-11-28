@@ -379,6 +379,41 @@ describe("Jetstreamからのイベント受信", () => {
     );
   });
 
+  test("jetstream-12: 保存・削除したレコードの件数を、コレクションと操作ごとにメトリクスに出す", async () => {
+    // arrange
+    const { tracked } = await createTracked();
+    const stranger = await accountFactory(ctx.db).create();
+    const [socket] = await connect();
+    const repost = {
+      collection: "app.bsky.feed.repost",
+      record: {
+        $type: "app.bsky.feed.repost",
+        subject: { uri: "at://did:plc:other/app.bsky.feed.post/1", cid },
+        createdAt: "2026-01-01T00:00:00.000Z",
+      },
+    };
+    const metric = (operation: string) =>
+      `worker_records_indexed_total{source="jetstream",collection="app.bsky.feed.repost",operation="${operation}"} 1`;
+
+    // act
+    send(
+      socket,
+      postEvent(tracked.did, repost),
+      postEvent(stranger.did, { ...repost, operation: "delete" }),
+      postEvent(tracked.did, { ...repost, operation: "delete" }),
+    );
+
+    // assert
+    await vi.waitFor(async () =>
+      expect(await services.metricReporter.getMetrics()).toContain(
+        metric("delete"),
+      ),
+    );
+    expect(await services.metricReporter.getMetrics()).toContain(
+      metric("create"),
+    );
+  });
+
   test("Jetstreamから受け取ったレコードでは、アカウントのrevを記録しない", async () => {
     // arrange
     const { tracked } = await createTracked();

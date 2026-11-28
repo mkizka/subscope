@@ -39,7 +39,7 @@ export class GeneratorIndexer implements IRecordIndexer {
       },
     });
     if (!saves) {
-      return;
+      return false;
     }
     await this.deps.recordSaveService.save({ ctx, record });
     await this.deps.relatedRecordService.requestFor({
@@ -48,5 +48,6 @@ export class GeneratorIndexer implements IRecordIndexer {
       record: generator,
     });
     await this.deps.generatorRepository.save({ ctx, generator });
+    return true;
   }
 }

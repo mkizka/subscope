@@ -66,9 +66,16 @@ export class TapSubscriber {
       source: "tap",
       collection: event.collection,
     });
-    await this.deps.indexCommitUseCase.execute(
+    const indexed = await this.deps.indexCommitUseCase.execute(
       indexCommitCommandFactory(event),
     );
+    if (indexed) {
+      this.deps.metricReporter.increment("worker_records_indexed_total", {
+        source: "tap",
+        collection: event.collection,
+        operation: event.action,
+      });
+    }
   }
 
   private async handleIdentityEvent(event: IdentityEvent) {

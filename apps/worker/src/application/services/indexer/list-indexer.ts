@@ -39,7 +39,7 @@ export class ListIndexer implements IRecordIndexer {
       },
     });
     if (!saves) {
-      return;
+      return false;
     }
     await this.deps.recordSaveService.save({ ctx, record });
     await this.deps.relatedRecordService.requestFor({
@@ -48,5 +48,6 @@ export class ListIndexer implements IRecordIndexer {
       record: list,
     });
     await this.deps.listRepository.save({ ctx, list });
+    return true;
   }
 }

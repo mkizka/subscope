@@ -42,7 +42,7 @@ export class FollowIndexer implements IRecordIndexer {
       record: follow,
     });
     if (!saves) {
-      return;
+      return false;
     }
     const tracksFollowee = await this.deps.storagePolicy.tracksFollowee(
       ctx,
@@ -74,6 +74,7 @@ export class FollowIndexer implements IRecordIndexer {
       ctx,
       accounts: [follow.accountDid, follow.subjectDid],
     });
+    return true;
   }
 
   async afterDelete({

@@ -41,7 +41,7 @@ export class RepostIndexer implements IRecordIndexer {
       record: repost,
     });
     if (!saves) {
-      return;
+      return false;
     }
 
     await this.deps.recordSaveService.save({ ctx, record });
@@ -59,6 +59,7 @@ export class RepostIndexer implements IRecordIndexer {
       notifications: () => [repost.notification],
     });
     this.deps.statsService.recount({ ctx, posts: [repost.subject] });
+    return true;
   }
 
   afterDelete({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {

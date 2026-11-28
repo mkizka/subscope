@@ -52,6 +52,11 @@ export class MetricReporter implements IMetricReporter {
         name: "worker_events_label_total",
         help: "Total number of label messages processed by the worker",
       }),
+      worker_records_indexed_total: new client.Counter({
+        name: "worker_records_indexed_total",
+        labelNames: ["source", "collection", "operation"],
+        help: "Total number of records saved or deleted by the worker",
+      }),
       worker_jetstream_gap_total: new client.Counter({
         name: "worker_jetstream_gap_total",
         help: "Total number of times Jetstream events were lost beyond the lookback window",
