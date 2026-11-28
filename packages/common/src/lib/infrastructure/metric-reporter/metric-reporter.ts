@@ -63,6 +63,7 @@ export class MetricReporter implements IMetricReporter {
       }),
       worker_jetstream_events_received_total: new client.Counter({
         name: "worker_jetstream_events_received_total",
+        labelNames: ["kind", "collection"],
         help: "Total number of events received from Jetstream before filtering",
       }),
       fetch_record_request_total: new client.Counter({
